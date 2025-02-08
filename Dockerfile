@@ -6,19 +6,16 @@ WORKDIR /app
 COPY . .
 
 # Собираем проект
-RUN gradle wasmJsBrowserProductionWebpack
+RUN gradle wasmJsBrowserDevelopmentExecutableDistribution
 
-# Используем легковесный веб-сервер для статики
+# Этап запуска (Nginx для статики)
 FROM nginx:alpine
 
-# Копируем собранные файлы из папки build/distributions в nginx
-COPY --from=build /app/build/distributions /usr/share/nginx/html
+# Копируем собранные файлы из productionExecutable
+COPY --from=build /app/composeApp/build/dist/wasmJs/productionExecutable /usr/share/nginx/html
 
-# Настраиваем nginx (опционально)
+# Фикс для маршрутизации в SPA (если используется роутинг)
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
-# Порт, который слушает nginx
 EXPOSE 80
-
-# Запускаем nginx
 CMD ["nginx", "-g", "daemon off;"]
