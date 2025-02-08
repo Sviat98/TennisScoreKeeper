@@ -12,7 +12,7 @@ RUN gradle wasmJsBrowserDevelopmentExecutableDistribution
 FROM nginx:alpine
 
 # Копируем собранные файлы из productionExecutable
-COPY --from=build /app/composeApp/build/dist/wasmJs/productionExecutable /usr/share/nginx/html
+COPY --from=build /composeApp/build/dist/wasmJs/productionExecutable /usr/share/nginx/html
 
 # Фикс для маршрутизации в SPA (если используется роутинг)
 COPY nginx.conf /etc/nginx/conf.d/default.conf
