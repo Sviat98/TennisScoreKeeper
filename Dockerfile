@@ -8,14 +8,28 @@ COPY . .
 # Собираем проект
 RUN gradle wasmJsBrowserDevelopmentExecutableDistribution
 
-# Этап запуска (Nginx для статики)
-FROM nginx:alpine
+####### ОТЛАДКА!!!!!
 
-# Копируем собранные файлы из productionExecutable
-COPY --from=build /composeApp/build/dist/wasmJs/productionExecutable /usr/share/nginx/html
+# Устанавливаем tree для визуализации структуры файлов
+RUN apt-get update && apt-get install -y tree
 
-# Фикс для маршрутизации в SPA (если используется роутинг)
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+WORKDIR /app/composeApp
+RUN gradle wasmJsBrowserDevelopmentExecutableDistribution
 
-EXPOSE 80
-CMD ["nginx", "-g", "daemon off;"]
+# Выводим дерево файлов после сборки
+RUN echo "File structure after build:" && tree /app -L 5
+
+####### КОНЕЦ ОТЛАДКИ!!!!!
+
+#
+# # Этап запуска (Nginx для статики)
+# FROM nginx:alpine
+#
+# # Копируем собранные файлы из productionExecutable
+# COPY --from=build /composeApp/build/dist/wasmJs/productionExecutable /usr/share/nginx/html
+#
+# # Фикс для маршрутизации в SPA (если используется роутинг)
+# COPY nginx.conf /etc/nginx/conf.d/default.conf
+#
+# EXPOSE 80
+# CMD ["nginx", "-g", "daemon off;"]
