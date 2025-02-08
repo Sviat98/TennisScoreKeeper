@@ -6,7 +6,7 @@ WORKDIR /app
 COPY . .
 
 # Собираем проект
-RUN gradle jsBrowserProductionWebpack
+RUN gradle wasmJsBrowserProductionWebpack
 
 # Используем легковесный веб-сервер для статики
 FROM nginx:alpine
