@@ -36,7 +36,7 @@ FROM nginx:alpine
 # релиз
 # COPY --from=build /app/composeApp/build/dist/wasmJs/productionExecutable /usr/share/nginx/html
 # дебаг
-COPY --from=build /app/composeApp/build/dist/wasmJs/developmentExecutable /usr/share/nginx/html
+COPY --from=build /app/composeApp/build/kotlin-webpack/wasmJs/developmentExecutable /usr/share/nginx/html
 
 # Фикс для маршрутизации в SPA (если используется роутинг)
 COPY nginx.conf /etc/nginx/conf.d/default.conf
