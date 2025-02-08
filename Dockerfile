@@ -14,7 +14,10 @@ RUN apt-get update && apt-get install -y tree
 
 WORKDIR /app/composeApp
 # Собираем проект
-RUN gradle wasmJsBrowserDistribution
+# для релиза
+# RUN gradle wasmJsBrowserDistribution
+# для дебага
+RUN gradle wasmJsBrowserDevelopmentWebpack
 
 ####### ОТЛАДКА!!!!!
 
@@ -30,7 +33,10 @@ RUN ls -lR /app/composeApp/build
 FROM nginx:alpine
 
 # Копируем собранные файлы из productionExecutable
-COPY --from=build /app/composeApp/build/dist/wasmJs/productionExecutable /usr/share/nginx/html
+# релиз
+# COPY --from=build /app/composeApp/build/dist/wasmJs/productionExecutable /usr/share/nginx/html
+# дебаг
+COPY --from=build /app/composeApp/build/dist/wasmJs/developmentExecutable /usr/share/nginx/html
 
 # Фикс для маршрутизации в SPA (если используется роутинг)
 COPY nginx.conf /etc/nginx/conf.d/default.conf
