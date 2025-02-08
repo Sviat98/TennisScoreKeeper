@@ -1,6 +1,0 @@
-build:
-  os: ubuntu-20.04
-  commands:
-    - sudo apt-get update
-    - sudo apt-get install -y amazoncorretto:22
-    - ./gradlew jsBrowserProductionWebpack
