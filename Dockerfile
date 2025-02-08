@@ -14,7 +14,7 @@ RUN apt-get update && apt-get install -y tree
 
 WORKDIR /app/composeApp
 # Собираем проект
-RUN gradle wasmJsBrowserProductionExecutableDistribution
+RUN gradle wasmJsBrowserDistribution
 
 ####### ОТЛАДКА!!!!!
 
