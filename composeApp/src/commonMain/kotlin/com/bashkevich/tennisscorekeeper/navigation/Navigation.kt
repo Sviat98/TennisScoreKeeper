@@ -13,6 +13,9 @@ data class MatchRoute(val id: Int)
 data object CounterListRoute
 
 @Serializable
+data object AddCounterDialogRoute
+
+@Serializable
 data class CounterDetailsRoute(val id: String)
 
 expect fun NavGraphBuilder.platformSpecificRoutes()

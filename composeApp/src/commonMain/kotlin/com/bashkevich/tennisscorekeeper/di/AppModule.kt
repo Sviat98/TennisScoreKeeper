@@ -1,6 +1,7 @@
 package com.bashkevich.tennisscorekeeper.di
 
 import com.bashkevich.tennisscorekeeper.core.httpClient
+import com.bashkevich.tennisscorekeeper.screens.addcounterdialog.AddCounterDialogViewModel
 import com.bashkevich.tennisscorekeeper.screens.counterdetails.CounterDetailsViewModel
 import com.bashkevich.tennisscorekeeper.screens.counterlist.CounterListViewModel
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
@@ -14,6 +15,7 @@ import org.koin.dsl.module
 
 val counterModule = module {
     viewModelOf(::CounterListViewModel)
+    viewModelOf(::AddCounterDialogViewModel)
     viewModelOf(::CounterDetailsViewModel)
 }
 

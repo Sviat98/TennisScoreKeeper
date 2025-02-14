@@ -3,9 +3,7 @@ package com.bashkevich.tennisscorekeeper.components
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
-import androidx.compose.material.Button
-import androidx.compose.material.ButtonDefaults
-import androidx.compose.material.Text
+import androidx.compose.foundation.background
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -25,15 +23,32 @@ actual fun Modifier.hoverScaleEffect(
 ): Modifier  = composed{
     var isHovered by remember { mutableStateOf(false) }
 
-    val backgroundColor = if (isHovered) Color.Green else Color.Blue
-
     val scale by animateFloatAsState(
-        targetValue = if (isHovered) 1.1f else 1f,
-        animationSpec = tween(durationMillis = 300, easing = FastOutSlowInEasing)
+        targetValue = if (isHovered) targetScale else 1f,
+        animationSpec = tween(durationMillis = duration, easing = FastOutSlowInEasing)
     )
 
 
     this.scale(scale).onPointerEvent(
+        PointerEventType.Enter){
+        isHovered = true
+    }.onPointerEvent(
+        PointerEventType.Exit){
+        isHovered = false
+    }
+}
+
+@OptIn(ExperimentalComposeUiApi::class)
+actual fun Modifier.hoverColorEffect(
+    unhoveredColor: Color,
+    hoveredColor: Color,
+): Modifier  = composed{
+    var isHovered by remember { mutableStateOf(false) }
+
+    val backgroundColor = if (isHovered) hoveredColor else unhoveredColor
+
+
+    this.background(backgroundColor).onPointerEvent(
         PointerEventType.Enter){
         isHovered = true
     }.onPointerEvent(
