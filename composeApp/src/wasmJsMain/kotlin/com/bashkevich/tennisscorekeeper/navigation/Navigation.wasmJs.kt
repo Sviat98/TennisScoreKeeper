@@ -2,8 +2,6 @@ package com.bashkevich.tennisscorekeeper.navigation
 
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
-import androidx.navigation.navDeepLink
-import androidx.navigation.toRoute
 import com.bashkevich.tennisscorekeeper.screens.ScoreboardScreen
 import com.bashkevich.tennisscorekeeper.screens.counteroverlay.CounterOverlayScreen
 import com.bashkevich.tennisscorekeeper.screens.counteroverlay.CounterOverlayViewModel
