@@ -1,9 +1,12 @@
 package com.bashkevich.tennisscorekeeper.screens.counteroverlay
 
 import androidx.lifecycle.SavedStateHandle
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
+import com.bashkevich.tennisscorekeeper.core.LoadResult
 import com.bashkevich.tennisscorekeeper.model.counter.COUNTERS
 import com.bashkevich.tennisscorekeeper.model.counter.COUNTER_DEFAULT
+import com.bashkevich.tennisscorekeeper.model.counter.repository.CounterRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -12,9 +15,13 @@ import kotlinx.coroutines.flow.Flow
 
 import com.bashkevich.tennisscorekeeper.mvi.BaseViewModel
 import com.bashkevich.tennisscorekeeper.navigation.CounterOverlayRoute
+import com.bashkevich.tennisscorekeeper.screens.counterdetails.CounterDetailsUiEvent
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.launch
 
 class CounterOverlayViewModel(
-    savedStateHandle: SavedStateHandle
+    savedStateHandle: SavedStateHandle,
+    private val counterRepository: CounterRepository
 ) :
     BaseViewModel<CounterOverlayState, CounterOverlayUiEvent, CounterOverlayAction>() {
 
@@ -28,9 +35,21 @@ class CounterOverlayViewModel(
     init {
         val counterId = savedStateHandle.toRoute<CounterOverlayRoute>().counterId
 
-        val counter = COUNTERS.find { counter -> counter.id == counterId } ?: COUNTER_DEFAULT
+        counterRepository.connectToCounterUpdates(counterId = counterId)
 
-        onEvent(CounterOverlayUiEvent.ShowCounter(counter))
+        viewModelScope.launch {
+            counterRepository.observeCounterUpdates().distinctUntilChanged().collect {result->
+                println(result)
+                when(result){
+                    is LoadResult.Success->{
+                        onEvent(CounterOverlayUiEvent.ShowCounter(result.result))
+                    }
+                    is LoadResult.Error->{
+                        println(result.result)
+                    }
+                }
+            }
+        }
     }
 
     fun onEvent(uiEvent: CounterOverlayUiEvent) {

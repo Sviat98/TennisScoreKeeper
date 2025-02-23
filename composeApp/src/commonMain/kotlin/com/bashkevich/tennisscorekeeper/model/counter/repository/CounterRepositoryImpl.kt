@@ -5,6 +5,8 @@ import com.bashkevich.tennisscorekeeper.core.mapSuccess
 import com.bashkevich.tennisscorekeeper.model.counter.Counter
 import com.bashkevich.tennisscorekeeper.model.counter.remote.CounterRemoteDataSource
 import com.bashkevich.tennisscorekeeper.model.counter.toDomain
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.map
 
 class CounterRepositoryImpl(
     private val counterRemoteDataSource: CounterRemoteDataSource
@@ -15,6 +17,18 @@ class CounterRepositoryImpl(
             counters
         }
     }
+
+    override suspend fun closeSession() {
+        counterRemoteDataSource.closeSession()
+    }
+
+    override fun connectToCounterUpdates(counterId: String) {
+        counterRemoteDataSource.connectToCounterUpdates(counterId)
+    }
+
+    override fun observeCounterUpdates() =
+        counterRemoteDataSource.observeCounterUpdates()
+            .map { result -> result.mapSuccess { counterDto -> counterDto.toDomain() } }
 
 
 }

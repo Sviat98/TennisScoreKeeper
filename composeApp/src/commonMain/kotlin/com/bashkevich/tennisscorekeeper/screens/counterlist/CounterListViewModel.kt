@@ -29,6 +29,8 @@ class CounterListViewModel(
         viewModelScope.launch {
             val loadResult = counterRepository.getCounters()
 
+            println(loadResult)
+
             if (loadResult is LoadResult.Success){
                 onEvent(CounterListUiEvent.ShowCounters(counters = loadResult.result))
             }

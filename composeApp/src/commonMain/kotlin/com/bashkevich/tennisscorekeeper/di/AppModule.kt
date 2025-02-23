@@ -12,6 +12,8 @@ import com.bashkevich.tennisscorekeeper.screens.counterlist.CounterListViewModel
 import io.ktor.client.plugins.DefaultRequest
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.defaultRequest
+import io.ktor.client.plugins.logging.LogLevel
+import io.ktor.client.plugins.logging.Logging
 import io.ktor.client.plugins.websocket.WebSockets
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
@@ -44,15 +46,18 @@ val coreModule = module {
     single {
         httpClient {
             defaultRequest {
-                url(BASE_URL_LOCAL_BACKEND)
+                url(BASE_URL_BACKEND)
                 contentType(ContentType.Application.Json)
+            }
+            install(Logging){
+                level = LogLevel.ALL
             }
             install(ContentNegotiation) {
                 json(jsonSerializer)
             }
             install(WebSockets) {
                 pingIntervalMillis = 20_000
-                contentConverter = KotlinxWebsocketSerializationConverter(jsonSerializer)
+                contentConverter = KotlinxWebsocketSerializationConverter(Json)
             }
         }
     }

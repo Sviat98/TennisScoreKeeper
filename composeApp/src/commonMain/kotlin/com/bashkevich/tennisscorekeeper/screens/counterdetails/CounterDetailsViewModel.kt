@@ -1,9 +1,12 @@
 package com.bashkevich.tennisscorekeeper.screens.counterdetails
 
 import androidx.lifecycle.SavedStateHandle
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
+import com.bashkevich.tennisscorekeeper.core.LoadResult
 import com.bashkevich.tennisscorekeeper.model.counter.COUNTERS
 import com.bashkevich.tennisscorekeeper.model.counter.COUNTER_DEFAULT
+import com.bashkevich.tennisscorekeeper.model.counter.repository.CounterRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -12,9 +15,14 @@ import kotlinx.coroutines.flow.Flow
 
 import com.bashkevich.tennisscorekeeper.mvi.BaseViewModel
 import com.bashkevich.tennisscorekeeper.navigation.CounterDetailsRoute
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.launch
 
 class CounterDetailsViewModel(
-    savedStateHandle: SavedStateHandle
+    savedStateHandle: SavedStateHandle,
+    private val counterRepository: CounterRepository
 ) :
     BaseViewModel<CounterDetailsState, CounterDetailsUiEvent, CounterDetailsAction>() {
 
@@ -26,11 +34,23 @@ class CounterDetailsViewModel(
         get() = super.action
 
     init {
-        val id = savedStateHandle.toRoute<CounterDetailsRoute>().id
+        val counterId = savedStateHandle.toRoute<CounterDetailsRoute>().id
 
-        val counter = COUNTERS.find { counter -> counter.id == id } ?: COUNTER_DEFAULT
+        counterRepository.connectToCounterUpdates(counterId = counterId)
 
-        onEvent(CounterDetailsUiEvent.ShowCounter(counter))
+        viewModelScope.launch {
+            counterRepository.observeCounterUpdates().distinctUntilChanged().collect {result->
+                println(result)
+                when(result){
+                    is LoadResult.Success->{
+                        onEvent(CounterDetailsUiEvent.ShowCounter(result.result))
+                    }
+                    is LoadResult.Error->{
+                       println(result.result)
+                    }
+                }
+            }
+        }
     }
 
     fun onEvent(uiEvent: CounterDetailsUiEvent) {
@@ -47,4 +67,10 @@ class CounterDetailsViewModel(
         _state.update(reducer)
     }
 
+    override fun onCleared() {
+        viewModelScope.launch {
+            counterRepository.closeSession()
+        }
+        super.onCleared()
+    }
 }
