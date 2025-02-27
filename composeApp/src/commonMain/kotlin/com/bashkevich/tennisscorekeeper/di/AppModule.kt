@@ -16,6 +16,7 @@ import io.ktor.client.plugins.logging.LogLevel
 import io.ktor.client.plugins.logging.Logging
 import io.ktor.client.plugins.websocket.WebSockets
 import io.ktor.http.ContentType
+import io.ktor.http.URLProtocol
 import io.ktor.http.contentType
 import io.ktor.serialization.kotlinx.KotlinxWebsocketSerializationConverter
 import io.ktor.serialization.kotlinx.json.json
@@ -46,7 +47,10 @@ val coreModule = module {
     single {
         httpClient {
             defaultRequest {
-                url(BASE_URL_BACKEND)
+                url{
+                    protocol = URLProtocol.HTTPS
+                    host = BASE_URL_BACKEND
+                }
                 contentType(ContentType.Application.Json)
             }
             install(Logging){
@@ -56,7 +60,7 @@ val coreModule = module {
                 json(jsonSerializer)
             }
             install(WebSockets) {
-                pingIntervalMillis = 20_000
+                pingIntervalMillis = 15_000
                 contentConverter = KotlinxWebsocketSerializationConverter(Json)
             }
         }

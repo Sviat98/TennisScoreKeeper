@@ -46,7 +46,7 @@ class CounterDetailsViewModel(
                         onEvent(CounterDetailsUiEvent.ShowCounter(result.result))
                     }
                     is LoadResult.Error->{
-                       println(result.result)
+                       println(result.result.message)
                     }
                 }
             }
@@ -58,6 +58,11 @@ class CounterDetailsViewModel(
             is CounterDetailsUiEvent.ShowCounter->{
                 reduceState { oldState->
                     oldState.copy(counter = uiEvent.counter)
+                }
+            }
+            is CounterDetailsUiEvent.ChangeCounterValue -> {
+                viewModelScope.launch {
+                    counterRepository.updateCounterValue(uiEvent.counterId,uiEvent.delta)
                 }
             }
         }

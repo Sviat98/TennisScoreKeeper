@@ -11,6 +11,7 @@ import com.bashkevich.tennisscorekeeper.mvi.UiState
 @Immutable
 sealed class CounterDetailsUiEvent : UiEvent {
     class ShowCounter(val counter: Counter): CounterDetailsUiEvent()
+    class ChangeCounterValue(val counterId: String,val delta: Int): CounterDetailsUiEvent()
 }
 
 @Immutable
