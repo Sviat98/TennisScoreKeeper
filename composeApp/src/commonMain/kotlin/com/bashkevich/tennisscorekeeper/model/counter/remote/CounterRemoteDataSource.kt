@@ -13,6 +13,7 @@ import io.ktor.client.plugins.websocket.webSocket
 import io.ktor.client.plugins.websocket.webSocketSession
 import io.ktor.client.request.get
 import io.ktor.client.request.patch
+import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.http.HttpMethod
 import io.ktor.http.URLBuilder
@@ -55,6 +56,19 @@ class CounterRemoteDataSource(
         }
     }
 
+    suspend fun addCounter(
+        counterBody: AddCounterBody,
+    ): LoadResult<CounterDto, Throwable> {
+        return runOperationCatching {
+            val counterDto = httpClient.post("/counters") {
+                setBody(counterBody)
+            }.body<CounterDto>()
+
+            println(counterDto)
+            counterDto
+        }
+    }
+
     suspend fun updateCounterValue(
         counterId: String,
         counterDeltaDto: CounterDeltaDto
@@ -73,7 +87,7 @@ class CounterRemoteDataSource(
         _counterFlow.asSharedFlow() // Expose as read-only flow
 
     fun connectToCounterUpdates(counterId: String) {
-        var reconnectionTime = 0L
+        var reconnectionTime = 5000L
         scope.launch {
             while (true) {
                 try {
@@ -114,7 +128,6 @@ class CounterRemoteDataSource(
                     }
                 } catch (e: Exception) {
                     _counterFlow.emit(LoadResult.Error(e))
-                    reconnectionTime = 5000L // Wait before reconnecting
                 }
                 delay(reconnectionTime)
             }

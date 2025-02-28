@@ -34,7 +34,13 @@ import org.koin.dsl.KoinConfiguration
 @Composable
 @Preview
 fun App(navController: NavHostController = rememberNavController()) {
-    KoinMultiplatformApplication(config = KoinConfiguration { modules(coreModule,counterModule, platformModule) }) {
+    KoinMultiplatformApplication(config = KoinConfiguration {
+        modules(
+            coreModule,
+            counterModule,
+            platformModule
+        )
+    }) {
         MaterialTheme {
             NavHost(navController = navController, startDestination = CounterListRoute) {
                 composable<MatchesRoute> {
@@ -72,7 +78,9 @@ fun App(navController: NavHostController = rememberNavController()) {
                 ) {
                     val addCounterDialogViewModel = koinViewModel<AddCounterDialogViewModel>()
 
-                    AddCounterDialogScreen(viewModel = addCounterDialogViewModel)
+                    AddCounterDialogScreen(
+                        viewModel = addCounterDialogViewModel,
+                        onDismissRequest = { navController.navigateUp() })
                 }
                 platformSpecificRoutes()
             }

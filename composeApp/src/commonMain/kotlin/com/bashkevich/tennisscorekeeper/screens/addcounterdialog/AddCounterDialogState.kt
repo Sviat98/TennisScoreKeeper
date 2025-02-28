@@ -8,6 +8,7 @@ import com.bashkevich.tennisscorekeeper.mvi.UiState
 
 @Immutable
 sealed class AddCounterDialogUiEvent : UiEvent {
+    class AddCounter(val counterName: String): AddCounterDialogUiEvent()
 }
 
 @Immutable

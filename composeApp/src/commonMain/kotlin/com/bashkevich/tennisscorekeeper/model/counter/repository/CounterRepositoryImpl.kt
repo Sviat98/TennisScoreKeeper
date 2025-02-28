@@ -3,6 +3,7 @@ package com.bashkevich.tennisscorekeeper.model.counter.repository
 import com.bashkevich.tennisscorekeeper.core.LoadResult
 import com.bashkevich.tennisscorekeeper.core.mapSuccess
 import com.bashkevich.tennisscorekeeper.model.counter.Counter
+import com.bashkevich.tennisscorekeeper.model.counter.remote.AddCounterBody
 import com.bashkevich.tennisscorekeeper.model.counter.remote.CounterDeltaDto
 import com.bashkevich.tennisscorekeeper.model.counter.remote.CounterRemoteDataSource
 import com.bashkevich.tennisscorekeeper.model.counter.toDomain
@@ -16,6 +17,14 @@ class CounterRepositoryImpl(
         return counterRemoteDataSource.getCounters().mapSuccess { counterDtos ->
             val counters = counterDtos.map { it.toDomain() }
             counters
+        }
+    }
+
+    override suspend fun addCounter(counterName: String): LoadResult<Counter, Throwable>{
+        val counterBody = AddCounterBody(counterName)
+
+        return counterRemoteDataSource.addCounter(counterBody).mapSuccess { counterDto ->
+            counterDto.toDomain()
         }
     }
 

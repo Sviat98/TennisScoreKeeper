@@ -14,6 +14,12 @@ data class CounterDto(
 )
 
 @Serializable
+data class AddCounterBody(
+    @SerialName(value = "name")
+    val name: String
+)
+
+@Serializable
 data class CounterDeltaDto(
     @SerialName(value = "delta")
     val delta: Int,
