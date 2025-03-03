@@ -25,7 +25,7 @@ RUN gradle wasmJsBrowserDevelopmentExecutableDistribution
 # RUN echo "File structure after build:" && tree /app -L 5
 
 # Выводим структуру файлов для отладки
-RUN ls -lR /app/composeApp/build
+RUN ls -lR /app/composeApp/build/dist/wasmJs/developmentExecutable
 
 ####### КОНЕЦ ОТЛАДКИ!!!!!
 
@@ -37,6 +37,9 @@ FROM nginx:alpine
 # COPY --from=build /app/composeApp/build/dist/wasmJs/productionExecutable /usr/share/nginx/html
 # дебаг
 COPY --from=build /app/composeApp/build/dist/wasmJs/developmentExecutable /usr/share/nginx/html
+
+# Выводим структуру файлов для отладки
+RUN ls -lR /usr/share/nginx/html
 
 # Фикс для маршрутизации в SPA (если используется роутинг)
 COPY nginx.conf /etc/nginx/conf.d/default.conf
