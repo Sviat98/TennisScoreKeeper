@@ -13,6 +13,11 @@ RUN apt-get update && apt-get install -y tree
 ####### КОНЕЦ ОТЛАДКИ!!!!!
 
 WORKDIR /app/composeApp
+
+## перед сборкой удаляем ненужные исполняемые файлы из bild-директорий
+RUN rm -rf /app/composeApp/build/dist/wasmJs/developmentExecutable/* && \
+    rm -rf /usr/share/nginx/html/*
+
 # Собираем проект
 # для релиза
 # RUN gradle wasmJsBrowserDistribution
