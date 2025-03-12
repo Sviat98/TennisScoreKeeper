@@ -7,12 +7,17 @@ import com.bashkevich.tennisscorekeeper.model.counter.remote.AddCounterBody
 import com.bashkevich.tennisscorekeeper.model.counter.remote.CounterDeltaDto
 import com.bashkevich.tennisscorekeeper.model.counter.remote.CounterRemoteDataSource
 import com.bashkevich.tennisscorekeeper.model.counter.toDomain
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
 
 class CounterRepositoryImpl(
     private val counterRemoteDataSource: CounterRemoteDataSource
 ) : CounterRepository {
+
+    private val _newCounter = MutableSharedFlow<AddCounterBody>(replay = 1)
+
     override suspend fun getCounters(): LoadResult<List<Counter>, Throwable> {
         return counterRemoteDataSource.getCounters().mapSuccess { counterDtos ->
             val counters = counterDtos.map { it.toDomain() }
@@ -20,10 +25,8 @@ class CounterRepositoryImpl(
         }
     }
 
-    override suspend fun addCounter(counterName: String): LoadResult<Counter, Throwable>{
-        val counterBody = AddCounterBody(counterName)
-
-        return counterRemoteDataSource.addCounter(counterBody).mapSuccess { counterDto ->
+    override suspend fun addCounter(addCounterBody: AddCounterBody): LoadResult<Counter, Throwable>{
+        return counterRemoteDataSource.addCounter(addCounterBody).mapSuccess { counterDto ->
             counterDto.toDomain()
         }
     }
@@ -45,6 +48,12 @@ class CounterRepositoryImpl(
     override fun observeCounterUpdates() =
         counterRemoteDataSource.observeCounterUpdates()
             .map { result -> result.mapSuccess { counterDto -> counterDto.toDomain() } }
+
+    override fun emitNewCounter(addCounterBody: AddCounterBody) {
+        _newCounter.tryEmit(addCounterBody)
+    }
+
+    override fun observeNewCounter() = _newCounter.asSharedFlow()
 
 
 }

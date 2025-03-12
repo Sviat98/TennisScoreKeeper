@@ -3,6 +3,9 @@ package com.bashkevich.tennisscorekeeper.navigation
 import androidx.navigation.NavGraphBuilder
 import kotlinx.serialization.Serializable
 
+const val COUNTERS_ROUTE_STRING = "counters"
+const val COUNTER_OVERLAY_ROUTE_STRING = "counterOverlay"
+
 @Serializable
 data object MatchesRoute
 

@@ -1,5 +1,6 @@
 package com.bashkevich.tennisscorekeeper.screens.addcounterdialog
 
+import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.runtime.Immutable
 
 import com.bashkevich.tennisscorekeeper.mvi.UiAction
@@ -13,11 +14,11 @@ sealed class AddCounterDialogUiEvent : UiEvent {
 
 @Immutable
 data class AddCounterDialogState(
-    val counterName: String,
+    val counterName: TextFieldState,
 ) : UiState {
     companion object {
         fun initial() = AddCounterDialogState(
-            counterName = ""
+            counterName = TextFieldState("")
         )
     }
 }

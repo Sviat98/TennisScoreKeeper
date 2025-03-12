@@ -74,8 +74,7 @@ fun App(navController: NavHostController = rememberNavController()) {
 
                     CounterDetailsScreen(viewModel = counterDetailsViewModel)
                 }
-                dialog<AddCounterDialogRoute>(
-                ) {
+                dialog<AddCounterDialogRoute>{
                     val addCounterDialogViewModel = koinViewModel<AddCounterDialogViewModel>()
 
                     AddCounterDialogScreen(

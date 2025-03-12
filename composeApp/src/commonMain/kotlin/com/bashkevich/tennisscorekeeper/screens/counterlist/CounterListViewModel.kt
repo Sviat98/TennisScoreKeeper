@@ -35,6 +35,20 @@ class CounterListViewModel(
                 onEvent(CounterListUiEvent.ShowCounters(counters = loadResult.result))
             }
         }
+
+        viewModelScope.launch {
+            counterRepository.observeNewCounter().collect{ addCounterBody->
+                val loadResult = counterRepository.addCounter(addCounterBody)
+
+                if (loadResult is LoadResult.Success){
+                    val newCounter = loadResult.result
+                    val counters = state.value.counters.toMutableList()
+
+                    counters.add(newCounter)
+                    onEvent(CounterListUiEvent.ShowCounters(counters = counters.toList()))
+                }
+            }
+        }
     }
 
     fun onEvent(uiEvent: CounterListUiEvent) {
