@@ -6,9 +6,14 @@ import com.bashkevich.tennisscorekeeper.core.httpClient
 import com.bashkevich.tennisscorekeeper.model.counter.remote.CounterRemoteDataSource
 import com.bashkevich.tennisscorekeeper.model.counter.repository.CounterRepository
 import com.bashkevich.tennisscorekeeper.model.counter.repository.CounterRepositoryImpl
+import com.bashkevich.tennisscorekeeper.model.match.remote.MatchRemoteDataSource
+import com.bashkevich.tennisscorekeeper.model.match.repository.MatchRepository
+import com.bashkevich.tennisscorekeeper.model.match.repository.MatchRepositoryImpl
 import com.bashkevich.tennisscorekeeper.screens.addcounterdialog.AddCounterDialogViewModel
 import com.bashkevich.tennisscorekeeper.screens.counterdetails.CounterDetailsViewModel
 import com.bashkevich.tennisscorekeeper.screens.counterlist.CounterListViewModel
+import com.bashkevich.tennisscorekeeper.screens.matchdetails.MatchDetailsViewModel
+import com.bashkevich.tennisscorekeeper.screens.matchlist.MatchListViewModel
 import io.ktor.client.plugins.DefaultRequest
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.defaultRequest
@@ -36,6 +41,16 @@ val counterModule = module {
         bind<CounterRepository>()
     }
     singleOf(::CounterRemoteDataSource)
+}
+
+val matchModule = module {
+    viewModelOf(::MatchListViewModel)
+    //viewModelOf(::AddCounterDialogViewModel)
+    viewModelOf(::MatchDetailsViewModel)
+    singleOf(::MatchRepositoryImpl) {
+        bind<MatchRepository>()
+    }
+    singleOf(::MatchRemoteDataSource)
 }
 
 val coreModule = module {

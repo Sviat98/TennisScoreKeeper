@@ -10,7 +10,7 @@ const val COUNTER_OVERLAY_ROUTE_STRING = "counterOverlay"
 data object MatchesRoute
 
 @Serializable
-data class MatchRoute(val id: Int)
+data class MatchDetailsRoute(val id: String)
 
 @Serializable
 data object CounterListRoute

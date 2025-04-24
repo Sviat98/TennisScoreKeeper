@@ -2,7 +2,6 @@ package com.bashkevich.tennisscorekeeper
 
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.*
-import androidx.compose.ui.window.DialogProperties
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -11,21 +10,24 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import com.bashkevich.tennisscorekeeper.di.coreModule
 import com.bashkevich.tennisscorekeeper.di.counterModule
+import com.bashkevich.tennisscorekeeper.di.matchModule
 import com.bashkevich.tennisscorekeeper.di.platformModule
 import com.bashkevich.tennisscorekeeper.navigation.AddCounterDialogRoute
 import com.bashkevich.tennisscorekeeper.navigation.CounterDetailsRoute
 import com.bashkevich.tennisscorekeeper.navigation.CounterListRoute
-import com.bashkevich.tennisscorekeeper.navigation.MatchRoute
+import com.bashkevich.tennisscorekeeper.navigation.MatchDetailsRoute
 import com.bashkevich.tennisscorekeeper.navigation.MatchesRoute
 import com.bashkevich.tennisscorekeeper.navigation.platformSpecificRoutes
-import com.bashkevich.tennisscorekeeper.screens.MatchScreen
-import com.bashkevich.tennisscorekeeper.screens.MatchesScreen
 import com.bashkevich.tennisscorekeeper.screens.addcounterdialog.AddCounterDialogScreen
 import com.bashkevich.tennisscorekeeper.screens.addcounterdialog.AddCounterDialogViewModel
 import com.bashkevich.tennisscorekeeper.screens.counterdetails.CounterDetailsScreen
 import com.bashkevich.tennisscorekeeper.screens.counterdetails.CounterDetailsViewModel
 import com.bashkevich.tennisscorekeeper.screens.counterlist.CounterListScreen
 import com.bashkevich.tennisscorekeeper.screens.counterlist.CounterListViewModel
+import com.bashkevich.tennisscorekeeper.screens.matchdetails.MatchDetailsScreen
+import com.bashkevich.tennisscorekeeper.screens.matchdetails.MatchDetailsViewModel
+import com.bashkevich.tennisscorekeeper.screens.matchlist.MatchListScreen
+import com.bashkevich.tennisscorekeeper.screens.matchlist.MatchListViewModel
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.KoinMultiplatformApplication
 import org.koin.compose.viewmodel.koinViewModel
@@ -38,20 +40,31 @@ fun App(navController: NavHostController = rememberNavController()) {
         modules(
             coreModule,
             counterModule,
+            matchModule,
             platformModule
         )
     }) {
         MaterialTheme {
-            NavHost(navController = navController, startDestination = CounterListRoute) {
+            NavHost(navController = navController, startDestination = MatchesRoute) {
                 composable<MatchesRoute> {
-                    MatchesScreen(
-                        onNavigateToMatchRoute = { navController.navigate(MatchRoute(1)) }
+                    val matchListViewModel = koinViewModel<MatchListViewModel>()
+
+                    MatchListScreen(
+                        viewModel = matchListViewModel,
+                        onMatchClick = { match ->
+                            navController.navigate(
+                                MatchDetailsRoute(
+                                    match.id
+                                )
+                            )
+                        },
+                        onMatchAdd = {}
                     )
                 }
-                composable<MatchRoute> {
-                    val id = it.toRoute<MatchRoute>().id
+                composable<MatchDetailsRoute> {
+                    val matchDetailsViewModel = koinViewModel<MatchDetailsViewModel>()
 
-                    MatchScreen(matchId = id)
+                    MatchDetailsScreen(viewModel = matchDetailsViewModel)
                 }
                 composable<CounterListRoute> {
                     val counterListViewModel = koinViewModel<CounterListViewModel>()

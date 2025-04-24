@@ -122,44 +122,49 @@ fun MatchView(
                 }
             }
         }
-        Column(
-            modifier = Modifier.height(columnHeight).width(28.dp).border(width = 1.dp, color = Color(0xFF142c6c)).padding(vertical = 1.dp).background(color = Color.Yellow),
-            horizontalAlignment = Alignment.CenterHorizontally, // Выравнивание по центру
-            verticalArrangement = Arrangement.SpaceBetween
-        ) {
-            Text(
-                text = match.currentSet.firstPlayerGamesWon.toString(),
-                fontSize = 20.sp,
-                textAlign = TextAlign.Center,
-                color = Color.Black
-            )
-            Divider(modifier = Modifier.fillMaxWidth(), color = Color(0xFF142c6c))
-            Text(
-                text = match.currentSet.secondPlayerGamesWon.toString(),
-                fontSize = 20.sp,
-                textAlign = TextAlign.Center,
-                color = Color.Black
-            )
-        }
-        Box(modifier = Modifier.height(columnHeight).width(28.dp).background(color = Color(0xFF142c6c)).padding(vertical = 1.dp)){
+
+        val currentGameStarted = match.currentGame.firstPlayerPointsWon!="0" && match.currentGame.secondPlayerPointsWon!="0"
+
+        if(currentGameStarted){
             Column(
-                modifier = Modifier.fillMaxHeight().background(color = Color.White),
+                modifier = Modifier.height(columnHeight).width(28.dp).border(width = 1.dp, color = Color(0xFF142c6c)).padding(vertical = 1.dp).background(color = Color.Yellow),
                 horizontalAlignment = Alignment.CenterHorizontally, // Выравнивание по центру
                 verticalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
-                    text = match.currentGame.firstPlayerPointsWon.toString(),
+                    text = match.currentSet.firstPlayerGamesWon.toString(),
                     fontSize = 20.sp,
                     textAlign = TextAlign.Center,
                     color = Color.Black
                 )
                 Divider(modifier = Modifier.fillMaxWidth(), color = Color(0xFF142c6c))
                 Text(
-                    text =  match.currentGame.secondPlayerPointsWon.toString(),
+                    text = match.currentSet.secondPlayerGamesWon.toString(),
                     fontSize = 20.sp,
                     textAlign = TextAlign.Center,
                     color = Color.Black
                 )
+            }
+            Box(modifier = Modifier.height(columnHeight).width(28.dp).background(color = Color(0xFF142c6c)).padding(vertical = 1.dp)){
+                Column(
+                    modifier = Modifier.fillMaxHeight().background(color = Color.White),
+                    horizontalAlignment = Alignment.CenterHorizontally, // Выравнивание по центру
+                    verticalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(
+                        text = match.currentGame.firstPlayerPointsWon,
+                        fontSize = 20.sp,
+                        textAlign = TextAlign.Center,
+                        color = Color.Black
+                    )
+                    Divider(modifier = Modifier.fillMaxWidth(), color = Color(0xFF142c6c))
+                    Text(
+                        text =  match.currentGame.secondPlayerPointsWon,
+                        fontSize = 20.sp,
+                        textAlign = TextAlign.Center,
+                        color = Color.Black
+                    )
+                }
             }
         }
     }
