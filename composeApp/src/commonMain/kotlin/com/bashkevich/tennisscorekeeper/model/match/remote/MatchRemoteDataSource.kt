@@ -5,7 +5,6 @@ import com.bashkevich.tennisscorekeeper.core.LoadResult
 import com.bashkevich.tennisscorekeeper.core.ResponseMessage
 import com.bashkevich.tennisscorekeeper.core.runOperationCatching
 import com.bashkevich.tennisscorekeeper.core.webSocketDispatcher
-import com.bashkevich.tennisscorekeeper.model.counter.remote.CounterDeltaDto
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.plugins.websocket.DefaultClientWebSocketSession
@@ -63,11 +62,11 @@ class MatchRemoteDataSource(
 
     suspend fun updateMatchScore(
         matchId: String,
-        counterDeltaDto: CounterDeltaDto
+        changeScoreBody: ChangeScoreBody
     ): LoadResult<ResponseMessage, Throwable> {
         return runOperationCatching {
-            val message = httpClient.patch("/matches/$matchId") {
-                setBody(counterDeltaDto)
+            val message = httpClient.patch("/matches/$matchId/score") {
+                setBody(changeScoreBody)
             }.body<ResponseMessage>()
 
             println(message)

@@ -2,19 +2,19 @@ package com.bashkevich.tennisscorekeeper.navigation
 
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
-import com.bashkevich.tennisscorekeeper.screens.ScoreboardScreen
 import com.bashkevich.tennisscorekeeper.screens.counteroverlay.CounterOverlayScreen
 import com.bashkevich.tennisscorekeeper.screens.counteroverlay.CounterOverlayViewModel
+import com.bashkevich.tennisscorekeeper.screens.scoreboard.ScoreboardScreen
+import com.bashkevich.tennisscorekeeper.screens.scoreboard.ScoreboardViewModel
 import kotlinx.serialization.Serializable
 import org.koin.compose.viewmodel.koinViewModel
 
 val uri = "http://localhost:8081"
 
-//@Serializable
-//data class ScoreboardRoute(val id: Int)
-
 @Serializable
-data object ScoreboardRoute
+data class ScoreboardRoute(
+    val matchId: String = ""
+)
 
 @Serializable
 data class CounterOverlayRoute(
@@ -23,7 +23,8 @@ data class CounterOverlayRoute(
 
 actual fun NavGraphBuilder.platformSpecificRoutes(){
     composable<ScoreboardRoute>{
-        ScoreboardScreen(id = 1)
+        val scoreboardViewModel = koinViewModel<ScoreboardViewModel>()
+        ScoreboardScreen(viewModel = scoreboardViewModel)
     }
     composable<CounterOverlayRoute>{
         val counterOverlayViewModel = koinViewModel<CounterOverlayViewModel>()

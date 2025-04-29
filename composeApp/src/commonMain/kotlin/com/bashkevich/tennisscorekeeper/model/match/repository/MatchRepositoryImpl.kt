@@ -2,11 +2,11 @@ package com.bashkevich.tennisscorekeeper.model.match.repository
 
 import com.bashkevich.tennisscorekeeper.core.LoadResult
 import com.bashkevich.tennisscorekeeper.core.mapSuccess
-import com.bashkevich.tennisscorekeeper.model.counter.toDomain
 import com.bashkevich.tennisscorekeeper.model.match.Match
 import com.bashkevich.tennisscorekeeper.model.match.SimpleMatch
-import com.bashkevich.tennisscorekeeper.model.match.remote.MatchDto
+import com.bashkevich.tennisscorekeeper.model.match.remote.ChangeScoreBody
 import com.bashkevich.tennisscorekeeper.model.match.remote.MatchRemoteDataSource
+import com.bashkevich.tennisscorekeeper.model.match.remote.ScoreType
 import com.bashkevich.tennisscorekeeper.model.match.toDomain
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -29,7 +29,11 @@ class MatchRepositoryImpl(
     override fun observeMatchUpdates(): Flow<LoadResult<Match, Throwable>> = matchRemoteDataSource.observeMatchUpdates()
         .map { result -> result.mapSuccess { matchDto -> matchDto.toDomain() } }
 
-    override suspend fun updateCounterValue(counterId: String, delta: Int) {
-        TODO("Not yet implemented")
+    override suspend fun updateMatchScore(matchId: String, playerId: String, scoreType: ScoreType) {
+        val changeScoreBody = ChangeScoreBody(playerId = playerId, scoreType = scoreType)
+
+        matchRemoteDataSource.updateMatchScore(matchId = matchId, changeScoreBody = changeScoreBody)
     }
+
+
 }

@@ -1,17 +1,24 @@
 package com.bashkevich.tennisscorekeeper.screens.matchdetails
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
-import com.bashkevich.tennisscorekeeper.screens.matchdetails.MatchDetailsViewModel
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material.Button
+import androidx.compose.material.Text
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.bashkevich.tennisscorekeeper.components.MatchView
-import com.bashkevich.tennisscorekeeper.screens.matchlist.MatchListContent
+import com.bashkevich.tennisscorekeeper.model.match.remote.ScoreType
 
 @Composable
 fun MatchDetailsScreen(
@@ -27,7 +34,8 @@ fun MatchDetailsScreen(
 
     MatchDetailsContent(
         modifier = Modifier.then(modifier).fillMaxSize(),
-        state = state
+        state = state,
+        onEvent = { viewModel.onEvent(it) }
     )
 }
 
@@ -35,14 +43,75 @@ fun MatchDetailsScreen(
 fun MatchDetailsContent(
     modifier: Modifier = Modifier,
     state: MatchDetailsState,
-){
+    onEvent: (MatchDetailsUiEvent) -> Unit
+) {
 
     val match = state.match
     Column(
-        modifier = Modifier.then(modifier)
+        modifier = Modifier.then(modifier).padding(all = 16.dp),
+        verticalArrangement = Arrangement.SpaceAround,
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
         MatchView(
             match = match
         )
+        val matchId = match.id
+        val firstPlayerId = match.firstPlayer.id
+        val secondPlayerId = match.secondPlayer.id
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Button(onClick = {
+                onEvent(
+                    MatchDetailsUiEvent.UpdateScore(
+                        matchId = matchId,
+                        playerId = firstPlayerId,
+                        scoreType = ScoreType.POINT
+                    )
+                )
+            }) {
+                Text("PLayer 1 Point")
+            }
+            Button(onClick = {
+                onEvent(
+                    MatchDetailsUiEvent.UpdateScore(
+                        matchId = matchId,
+                        playerId = secondPlayerId,
+                        scoreType = ScoreType.POINT
+                    )
+                )
+            }) {
+                Text("PLayer 2 Point")
+            }
+        }
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Button(onClick = {
+                onEvent(
+                    MatchDetailsUiEvent.UpdateScore(
+                        matchId = matchId,
+                        playerId = firstPlayerId,
+                        scoreType = ScoreType.GAME
+                    )
+                )
+            }) {
+                Text("PLayer 1 Game")
+            }
+            Button(onClick = {
+                onEvent(
+                    MatchDetailsUiEvent.UpdateScore(
+                        matchId = matchId,
+                        playerId = secondPlayerId,
+                        scoreType = ScoreType.GAME
+                    )
+                )
+            }) {
+                Text("PLayer 2 Game")
+            }
+        }
     }
 }

@@ -5,7 +5,6 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -14,15 +13,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Divider
-import androidx.compose.material.Icon
 import androidx.compose.material.Text
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Done
-import androidx.compose.material.icons.filled.Star
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -38,8 +32,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.bashkevich.tennisscorekeeper.model.match.Match
-import com.bashkevich.tennisscorekeeper.model.match.SAMPLE_MATCH
-import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
 fun MatchView(
@@ -56,7 +48,8 @@ fun MatchView(
             modifier = Modifier.background(color = Color(0xFF142c6c))
         ) {
             Column(
-                modifier = Modifier.height(columnHeight).padding(top = 8.dp, bottom = 8.dp, start = 4.dp),
+                modifier = Modifier.height(columnHeight)
+                    .padding(top = 8.dp, bottom = 8.dp, start = 4.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = if (match.firstPlayer.isServing) Arrangement.Top else Arrangement.Bottom
             ) {
@@ -70,7 +63,7 @@ fun MatchView(
             }
             Spacer(modifier = Modifier.width(4.dp))
             // Колонка для имен игроков (выравнивание по правому краю)
-            val density= LocalDensity.current
+            val density = LocalDensity.current
             Column(
                 modifier = Modifier.wrapContentWidth().onGloballyPositioned { layoutCoordinates ->
                     columnHeight = with(density) {
@@ -123,11 +116,14 @@ fun MatchView(
             }
         }
 
-        val currentGameStarted = match.currentGame.firstPlayerPointsWon!="0" && match.currentGame.secondPlayerPointsWon!="0"
+        val currentGameStarted =
+            match.currentGame.firstPlayerPointsWon != "0" || match.currentGame.secondPlayerPointsWon != "0"
 
-        if(currentGameStarted){
+        if (currentGameStarted || match.currentSet.firstPlayerGamesWon != 0 || match.currentSet.secondPlayerGamesWon != 0){
             Column(
-                modifier = Modifier.height(columnHeight).width(28.dp).border(width = 1.dp, color = Color(0xFF142c6c)).padding(vertical = 1.dp).background(color = Color.Yellow),
+                modifier = Modifier.height(columnHeight).width(28.dp)
+                    .border(width = 1.dp, color = Color(0xFF142c6c)).padding(vertical = 1.dp)
+                    .background(color = Color.Yellow),
                 horizontalAlignment = Alignment.CenterHorizontally, // Выравнивание по центру
                 verticalArrangement = Arrangement.SpaceBetween
             ) {
@@ -145,7 +141,13 @@ fun MatchView(
                     color = Color.Black
                 )
             }
-            Box(modifier = Modifier.height(columnHeight).width(28.dp).background(color = Color(0xFF142c6c)).padding(vertical = 1.dp)){
+        }
+
+        if (currentGameStarted) {
+            Box(
+                modifier = Modifier.height(columnHeight).width(28.dp)
+                    .background(color = Color(0xFF142c6c)).padding(vertical = 1.dp)
+            ) {
                 Column(
                     modifier = Modifier.fillMaxHeight().background(color = Color.White),
                     horizontalAlignment = Alignment.CenterHorizontally, // Выравнивание по центру
@@ -159,7 +161,7 @@ fun MatchView(
                     )
                     Divider(modifier = Modifier.fillMaxWidth(), color = Color(0xFF142c6c))
                     Text(
-                        text =  match.currentGame.secondPlayerPointsWon,
+                        text = match.currentGame.secondPlayerPointsWon,
                         fontSize = 20.sp,
                         textAlign = TextAlign.Center,
                         color = Color.Black
