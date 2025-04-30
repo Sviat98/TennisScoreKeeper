@@ -2,6 +2,7 @@ package com.bashkevich.tennisscorekeeper.screens.scoreboard
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -11,6 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.bashkevich.tennisscorekeeper.components.MatchView
 import com.bashkevich.tennisscorekeeper.model.match.Match
@@ -48,8 +50,11 @@ fun ScoreboardContent(
     modifier: Modifier = Modifier,
     match: Match
 ){
-    MatchView(
-        modifier = Modifier.then(modifier),
-        match = match
-    )
+    Box(modifier = Modifier.then(modifier).size(1024.dp)){
+        MatchView(
+            modifier = Modifier.align(Alignment.CenterStart),
+            match = match
+        )
+    }
+
 }

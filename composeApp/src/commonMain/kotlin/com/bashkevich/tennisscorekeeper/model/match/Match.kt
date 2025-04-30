@@ -1,7 +1,5 @@
 package com.bashkevich.tennisscorekeeper.model.match
 
-import com.bashkevich.tennisscorekeeper.model.counter.Counter
-import com.bashkevich.tennisscorekeeper.model.counter.remote.CounterDto
 import com.bashkevich.tennisscorekeeper.model.match.remote.MatchDto
 import com.bashkevich.tennisscorekeeper.model.match.remote.PlayerInMatchDto
 import com.bashkevich.tennisscorekeeper.model.match.remote.TennisGameDto
@@ -62,6 +60,20 @@ val SAMPLE_MATCH = Match(
     previousSets = listOf(
         TennisSet(firstPlayerGamesWon = 6, secondPlayerGamesWon = 4),
         TennisSet(firstPlayerGamesWon = 3, secondPlayerGamesWon = 6),
+    ),
+    currentSet = TennisSet(firstPlayerGamesWon = 10, secondPlayerGamesWon = 9),
+    currentGame = TennisGame(firstPlayerPointsWon = "30", secondPlayerPointsWon = "15")
+)
+
+val SECOND_SAMPLE_MATCH = Match(
+    id = "2",
+    firstPlayer = TennisPlayer(id = "1", surname = "Djokovic", isServing = false),
+    secondPlayer = TennisPlayer(id = "2", surname = "Auger-Aliassime", isServing = true),
+    previousSets = listOf(
+        TennisSet(firstPlayerGamesWon = 12, secondPlayerGamesWon = 10),
+        TennisSet(firstPlayerGamesWon = 10, secondPlayerGamesWon = 12),
+        TennisSet(firstPlayerGamesWon = 12, secondPlayerGamesWon = 10),
+        TennisSet(firstPlayerGamesWon = 10, secondPlayerGamesWon = 12),
     ),
     currentSet = TennisSet(firstPlayerGamesWon = 10, secondPlayerGamesWon = 9),
     currentGame = TennisGame(firstPlayerPointsWon = "30", secondPlayerPointsWon = "15")
