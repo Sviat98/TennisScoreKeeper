@@ -60,6 +60,16 @@ class MatchDetailsViewModel(
                     matchRepository.updateMatchScore(uiEvent.matchId,uiEvent.playerId,uiEvent.scoreType)
                 }
             }
+            is MatchDetailsUiEvent.UndoPoint->{
+                viewModelScope.launch {
+                    matchRepository.undoPoint(uiEvent.matchId)
+                }
+            }
+            is MatchDetailsUiEvent.RedoPoint->{
+                viewModelScope.launch {
+                    matchRepository.redoPoint(uiEvent.matchId)
+                }
+            }
         }
     }
 

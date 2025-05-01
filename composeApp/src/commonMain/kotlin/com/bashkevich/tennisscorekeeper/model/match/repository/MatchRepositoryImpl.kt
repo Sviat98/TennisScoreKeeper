@@ -35,5 +35,13 @@ class MatchRepositoryImpl(
         matchRemoteDataSource.updateMatchScore(matchId = matchId, changeScoreBody = changeScoreBody)
     }
 
+    override suspend fun undoPoint(matchId: String) {
+        matchRemoteDataSource.undoPoint(matchId = matchId)
+    }
+
+    override suspend fun redoPoint(matchId: String) {
+        matchRemoteDataSource.redoPoint(matchId = matchId)
+    }
+
 
 }

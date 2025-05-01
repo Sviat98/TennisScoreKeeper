@@ -3,7 +3,6 @@ package com.bashkevich.tennisscorekeeper.components.match
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
@@ -39,14 +38,14 @@ fun MatchCard(
             horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            MatchView(match = match)
+            MatchItemView(match = match)
         }
     }
 
 }
 
 @Composable
-fun MatchView(
+fun MatchItemView(
     modifier: Modifier = Modifier,
     match: SimpleMatch
 ) {

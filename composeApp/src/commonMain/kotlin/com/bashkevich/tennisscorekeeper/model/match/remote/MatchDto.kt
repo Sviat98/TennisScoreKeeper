@@ -30,7 +30,9 @@ data class PlayerInMatchDto(
     @SerialName("name")
     val name: String,
     @SerialName("is_serving")
-    val isServing: Boolean
+    val isServing: Boolean,
+    @SerialName("is_winner")
+    val isWinner: Boolean
 )
 
 @Serializable

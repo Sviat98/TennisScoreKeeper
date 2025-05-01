@@ -7,6 +7,7 @@ import com.bashkevich.tennisscorekeeper.model.match.remote.TennisSetDto
 
 data class Match(
     val id: String,
+    val pointShift: Int,
     val firstPlayer: TennisPlayer,
     val secondPlayer: TennisPlayer,
     val previousSets: List<TennisSet>,
@@ -17,7 +18,8 @@ data class Match(
 data class TennisPlayer(
     val id: String,
     val surname: String,
-    val isServing: Boolean
+    val isServing: Boolean,
+    val isWinner: Boolean
 )
 
 data class TennisSet(
@@ -30,8 +32,13 @@ data class TennisGame(
     val secondPlayerPointsWon: String,
 )
 
+val EMPTY_TENNIS_GAME = TennisGame("0","0")
+
+val EMPTY_TENNIS_SET = TennisSet(0,0)
+
 fun MatchDto.toDomain() = Match(
     id = this.id,
+    pointShift= this.pointShift,
     firstPlayer = this.firstPlayer.toDomain(),
     secondPlayer = this.secondPlayer.toDomain(),
     previousSets = this.previousSets.map { it.toDomain() },
@@ -40,7 +47,7 @@ fun MatchDto.toDomain() = Match(
     )
 
 fun PlayerInMatchDto.toDomain() =
-    TennisPlayer(id = this.id, surname = this.surname, isServing = this.isServing)
+    TennisPlayer(id = this.id, surname = this.surname, isServing = this.isServing, isWinner = this.isWinner)
 
 fun TennisSetDto.toDomain() = TennisSet(
     firstPlayerGamesWon = this.firstPlayerGames,
@@ -55,8 +62,9 @@ fun TennisGameDto.toDomain() = TennisGame(
 
 val SAMPLE_MATCH = Match(
     id = "1",
-    firstPlayer = TennisPlayer(id = "1", surname = "Djokovic", isServing = false),
-    secondPlayer = TennisPlayer(id = "2", surname = "Auger-Aliassime", isServing = true),
+    pointShift = 0,
+    firstPlayer = TennisPlayer(id = "1", surname = "Djokovic", isServing = false, isWinner = false),
+    secondPlayer = TennisPlayer(id = "2", surname = "Auger-Aliassime", isServing = true, isWinner = false),
     previousSets = listOf(
         TennisSet(firstPlayerGamesWon = 6, secondPlayerGamesWon = 4),
         TennisSet(firstPlayerGamesWon = 3, secondPlayerGamesWon = 6),
@@ -67,8 +75,9 @@ val SAMPLE_MATCH = Match(
 
 val SECOND_SAMPLE_MATCH = Match(
     id = "2",
-    firstPlayer = TennisPlayer(id = "1", surname = "Djokovic", isServing = false),
-    secondPlayer = TennisPlayer(id = "2", surname = "Auger-Aliassime", isServing = true),
+    pointShift = 0,
+    firstPlayer = TennisPlayer(id = "1", surname = "Djokovic", isServing = false, isWinner = false),
+    secondPlayer = TennisPlayer(id = "2", surname = "Auger-Aliassime", isServing = true, isWinner = false),
     previousSets = listOf(
         TennisSet(firstPlayerGamesWon = 12, secondPlayerGamesWon = 10),
         TennisSet(firstPlayerGamesWon = 10, secondPlayerGamesWon = 12),

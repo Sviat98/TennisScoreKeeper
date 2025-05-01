@@ -7,7 +7,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Button
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
 import androidx.compose.material.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -18,6 +23,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.bashkevich.tennisscorekeeper.components.MatchView
+import com.bashkevich.tennisscorekeeper.model.match.EMPTY_TENNIS_GAME
+import com.bashkevich.tennisscorekeeper.model.match.EMPTY_TENNIS_SET
 import com.bashkevich.tennisscorekeeper.model.match.remote.ScoreType
 
 @Composable
@@ -47,6 +54,18 @@ fun MatchDetailsContent(
 ) {
 
     val match = state.match
+
+    val isGameStarted = match.currentGame != EMPTY_TENNIS_GAME
+
+    val firstPlayer = match.firstPlayer
+    val secondPlayer = match.secondPlayer
+
+    val isWinnerInMatch = firstPlayer.isWinner || secondPlayer.isWinner
+
+    val hasFirstPointPlayed =
+        match.previousSets.isNotEmpty() || match.currentSet != EMPTY_TENNIS_SET || isGameStarted
+
+    val isPointShift = match.pointShift < 0
     Column(
         modifier = Modifier.then(modifier).padding(all = 16.dp),
         verticalArrangement = Arrangement.SpaceAround,
@@ -63,26 +82,32 @@ fun MatchDetailsContent(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Button(onClick = {
-                onEvent(
-                    MatchDetailsUiEvent.UpdateScore(
-                        matchId = matchId,
-                        playerId = firstPlayerId,
-                        scoreType = ScoreType.POINT
+            Button(
+                onClick = {
+                    onEvent(
+                        MatchDetailsUiEvent.UpdateScore(
+                            matchId = matchId,
+                            playerId = firstPlayerId,
+                            scoreType = ScoreType.POINT
+                        )
                     )
-                )
-            }) {
+                },
+                enabled = !isWinnerInMatch
+            ) {
                 Text("PLayer 1 Point")
             }
-            Button(onClick = {
-                onEvent(
-                    MatchDetailsUiEvent.UpdateScore(
-                        matchId = matchId,
-                        playerId = secondPlayerId,
-                        scoreType = ScoreType.POINT
+            Button(
+                onClick = {
+                    onEvent(
+                        MatchDetailsUiEvent.UpdateScore(
+                            matchId = matchId,
+                            playerId = secondPlayerId,
+                            scoreType = ScoreType.POINT
+                        )
                     )
-                )
-            }) {
+                },
+                enabled = !isWinnerInMatch
+            ) {
                 Text("PLayer 2 Point")
             }
         }
@@ -90,27 +115,69 @@ fun MatchDetailsContent(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Button(onClick = {
-                onEvent(
-                    MatchDetailsUiEvent.UpdateScore(
-                        matchId = matchId,
-                        playerId = firstPlayerId,
-                        scoreType = ScoreType.GAME
+            Button(
+                onClick = {
+                    onEvent(
+                        MatchDetailsUiEvent.UpdateScore(
+                            matchId = matchId,
+                            playerId = firstPlayerId,
+                            scoreType = ScoreType.GAME
+                        )
                     )
-                )
-            }) {
+                },
+                enabled = !isGameStarted && !isWinnerInMatch
+            ) {
                 Text("PLayer 1 Game")
             }
-            Button(onClick = {
-                onEvent(
-                    MatchDetailsUiEvent.UpdateScore(
-                        matchId = matchId,
-                        playerId = secondPlayerId,
-                        scoreType = ScoreType.GAME
+            Button(
+                onClick = {
+                    onEvent(
+                        MatchDetailsUiEvent.UpdateScore(
+                            matchId = matchId,
+                            playerId = secondPlayerId,
+                            scoreType = ScoreType.GAME
+                        )
                     )
-                )
-            }) {
+                },
+                enabled = !isGameStarted && !isWinnerInMatch
+            ) {
                 Text("PLayer 2 Game")
+            }
+        }
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            IconButton(
+                onClick = {
+                    onEvent(
+                        MatchDetailsUiEvent.UndoPoint(
+                            matchId = matchId
+                        )
+                    )
+                },
+                enabled = hasFirstPointPlayed
+            ) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                    contentDescription = "Undo point"
+                )
+            }
+            IconButton(
+                onClick = {
+                    onEvent(
+                        MatchDetailsUiEvent.RedoPoint(
+                            matchId = matchId
+                        )
+                    )
+                },
+                enabled = isPointShift
+            ) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.ArrowForward,
+                    contentDescription = "Redo point"
+                )
             }
         }
     }

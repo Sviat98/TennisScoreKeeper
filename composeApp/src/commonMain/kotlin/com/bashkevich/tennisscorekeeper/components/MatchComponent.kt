@@ -16,7 +16,10 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Divider
+import androidx.compose.material.Icon
 import androidx.compose.material.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -40,6 +43,15 @@ fun MatchView(
 ) {
     var columnHeight by remember { mutableStateOf(0.dp) }
 
+    val firstPlayer = match.firstPlayer
+    val secondPlayer = match.secondPlayer
+
+
+    val hasFirstPlayerWonMatch = firstPlayer.isWinner
+    val hasSecondPlayerWonMatch = secondPlayer.isWinner
+
+    val isWinnerInMatch = hasFirstPlayerWonMatch || hasSecondPlayerWonMatch
+
     Row(
         modifier = Modifier.then(modifier),
         horizontalArrangement = Arrangement.Center
@@ -51,13 +63,17 @@ fun MatchView(
                 modifier = Modifier.height(columnHeight)
                     .padding(top = 8.dp, bottom = 8.dp, start = 4.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = if (match.firstPlayer.isServing) Arrangement.Top else Arrangement.Bottom
+                verticalArrangement = if (firstPlayer.isServing) Arrangement.Top else Arrangement.Bottom
             ) {
-                if (match.firstPlayer.isServing || match.secondPlayer.isServing) {
+                if ((firstPlayer.isServing || secondPlayer.isServing) && !isWinnerInMatch) {
                     Box(
                         modifier = Modifier.size(8.dp).clip(
                             CircleShape
                         ).background(color = Color.Yellow)
+                    )
+                } else {
+                    Spacer(
+                        modifier = Modifier.width(8.dp)
                     )
                 }
             }
@@ -73,16 +89,41 @@ fun MatchView(
                 horizontalAlignment = Alignment.Start, // Выравнивание по левому краю
                 verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterVertically)
             ) {
-                Text(
-                    text = match.firstPlayer.surname,
-                    fontSize = 20.sp,
-                    color = Color.White
-                )
-                Text(
-                    text = match.secondPlayer.surname,
-                    fontSize = 20.sp,
-                    color = Color.White
-                )
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    Text(
+                        text = firstPlayer.surname,
+                        fontSize = 20.sp,
+                        color = Color.White
+                    )
+                    if (hasFirstPlayerWonMatch) {
+                        Icon(
+                            imageVector = Icons.Default.Check,
+                            tint = Color.White,
+                            contentDescription = "First player Won"
+                        )
+                    }
+                }
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    Text(
+                        text = secondPlayer.surname,
+                        fontSize = 20.sp,
+                        color = Color.White
+                    )
+                    if (hasSecondPlayerWonMatch) {
+                        Icon(
+                            imageVector = Icons.Default.Check,
+                            tint = Color.White,
+                            contentDescription = "Second player Won"
+                        )
+                    }
+                }
+
             }
             Spacer(modifier = Modifier.width(4.dp)) // Отступ между сетами
             match.previousSets.forEachIndexed { index, prevSet ->
@@ -119,7 +160,7 @@ fun MatchView(
         val currentGameStarted =
             match.currentGame.firstPlayerPointsWon != "0" || match.currentGame.secondPlayerPointsWon != "0"
 
-        if (currentGameStarted || match.currentSet.firstPlayerGamesWon != 0 || match.currentSet.secondPlayerGamesWon != 0){
+        if (currentGameStarted || match.currentSet.firstPlayerGamesWon != 0 || match.currentSet.secondPlayerGamesWon != 0) {
             Column(
                 modifier = Modifier.height(columnHeight).width(28.dp)
                     .border(width = 1.dp, color = Color(0xFF142c6c)).padding(vertical = 1.dp)

@@ -74,6 +74,28 @@ class MatchRemoteDataSource(
         }
     }
 
+    suspend fun undoPoint(
+        matchId: String,
+    ): LoadResult<ResponseMessage, Throwable> {
+        return runOperationCatching {
+            val message = httpClient.patch("/matches/$matchId/undo") {
+            }.body<ResponseMessage>()
+
+            message
+        }
+    }
+
+    suspend fun redoPoint(
+        matchId: String,
+    ): LoadResult<ResponseMessage, Throwable> {
+        return runOperationCatching {
+            val message = httpClient.patch("/matches/$matchId/redo") {
+            }.body<ResponseMessage>()
+
+            message
+        }
+    }
+
     fun observeMatchUpdates(): SharedFlow<LoadResult<MatchDto, Throwable>> =
         _matchFlow.asSharedFlow() // Expose as read-only flow
 
