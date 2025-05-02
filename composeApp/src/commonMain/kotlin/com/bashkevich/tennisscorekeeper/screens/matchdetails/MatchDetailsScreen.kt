@@ -26,6 +26,7 @@ import com.bashkevich.tennisscorekeeper.components.MatchView
 import com.bashkevich.tennisscorekeeper.model.match.EMPTY_TENNIS_GAME
 import com.bashkevich.tennisscorekeeper.model.match.EMPTY_TENNIS_SET
 import com.bashkevich.tennisscorekeeper.model.match.remote.ScoreType
+import com.bashkevich.tennisscorekeeper.model.match.remote.SpecialSetMode
 
 @Composable
 fun MatchDetailsScreen(
@@ -59,6 +60,8 @@ fun MatchDetailsContent(
 
     val firstPlayer = match.firstPlayer
     val secondPlayer = match.secondPlayer
+
+    val isSuperTiebreak = match.currentSet.specialSetMode == SpecialSetMode.SUPER_TIEBREAK
 
     val isWinnerInMatch = firstPlayer.isWinner || secondPlayer.isWinner
 
@@ -94,7 +97,7 @@ fun MatchDetailsContent(
                 },
                 enabled = !isWinnerInMatch
             ) {
-                Text("PLayer 1 Point")
+                Text("Player 1 Point")
             }
             Button(
                 onClick = {
@@ -108,7 +111,7 @@ fun MatchDetailsContent(
                 },
                 enabled = !isWinnerInMatch
             ) {
-                Text("PLayer 2 Point")
+                Text("Player 2 Point")
             }
         }
         Row(
@@ -125,9 +128,10 @@ fun MatchDetailsContent(
                         )
                     )
                 },
-                enabled = !isGameStarted && !isWinnerInMatch
+                // нужно залочить, когда начался гейм, когда определился победитель и во время супер-тайбрейка
+                enabled = !isGameStarted && !isWinnerInMatch && !isSuperTiebreak
             ) {
-                Text("PLayer 1 Game")
+                Text("Player 1 Game")
             }
             Button(
                 onClick = {
@@ -139,9 +143,10 @@ fun MatchDetailsContent(
                         )
                     )
                 },
-                enabled = !isGameStarted && !isWinnerInMatch
+                // нужно залочить, когда начался гейм, когда определился победитель и во время супер-тайбрейка
+                enabled = !isGameStarted && !isWinnerInMatch && !isSuperTiebreak
             ) {
-                Text("PLayer 2 Game")
+                Text("Player 2 Game")
             }
         }
 

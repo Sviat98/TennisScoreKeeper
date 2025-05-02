@@ -2,6 +2,7 @@ package com.bashkevich.tennisscorekeeper.model.match
 
 import com.bashkevich.tennisscorekeeper.model.match.remote.MatchDto
 import com.bashkevich.tennisscorekeeper.model.match.remote.PlayerInMatchDto
+import com.bashkevich.tennisscorekeeper.model.match.remote.SpecialSetMode
 import com.bashkevich.tennisscorekeeper.model.match.remote.TennisGameDto
 import com.bashkevich.tennisscorekeeper.model.match.remote.TennisSetDto
 
@@ -25,7 +26,8 @@ data class TennisPlayer(
 data class TennisSet(
     val firstPlayerGamesWon: Int,
     val secondPlayerGamesWon: Int,
-)
+    val specialSetMode: SpecialSetMode? = null
+    )
 
 data class TennisGame(
     val firstPlayerPointsWon: String,
@@ -51,7 +53,8 @@ fun PlayerInMatchDto.toDomain() =
 
 fun TennisSetDto.toDomain() = TennisSet(
     firstPlayerGamesWon = this.firstPlayerGames,
-    secondPlayerGamesWon = this.secondPlayerGames
+    secondPlayerGamesWon = this.secondPlayerGames,
+    specialSetMode = this.specialSetMode
 )
 
 fun TennisGameDto.toDomain() = TennisGame(

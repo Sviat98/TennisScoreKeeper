@@ -41,7 +41,15 @@ data class TennisSetDto(
     val firstPlayerGames: Int,
     @SerialName("second_player_games")
     val secondPlayerGames: Int,
+    @SerialName("special_set_mode")
+    val specialSetMode: SpecialSetMode? = null,
 )
+
+// SUPER_TIEBREAK - помечаем, что это супер-тайбрейк (на клиенте нужно залочить кнопки GAME)
+// ENDLESS - там, где gamesToWin > 10, на клиенте должна быть возможность завершить досрочно
+enum class SpecialSetMode {
+    SUPER_TIEBREAK, ENDLESS
+}
 
 @Serializable
 data class TennisGameDto(
