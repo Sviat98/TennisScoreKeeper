@@ -2,12 +2,12 @@ package com.bashkevich.tennisscorekeeper.model.match.repository
 
 import com.bashkevich.tennisscorekeeper.core.LoadResult
 import com.bashkevich.tennisscorekeeper.core.mapSuccess
-import com.bashkevich.tennisscorekeeper.model.match.Match
+import com.bashkevich.tennisscorekeeper.model.match.domain.Match
 import com.bashkevich.tennisscorekeeper.model.match.SimpleMatch
 import com.bashkevich.tennisscorekeeper.model.match.remote.ChangeScoreBody
 import com.bashkevich.tennisscorekeeper.model.match.remote.MatchRemoteDataSource
 import com.bashkevich.tennisscorekeeper.model.match.remote.ScoreType
-import com.bashkevich.tennisscorekeeper.model.match.toDomain
+import com.bashkevich.tennisscorekeeper.model.match.domain.toDomain
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 

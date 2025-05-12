@@ -23,8 +23,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.bashkevich.tennisscorekeeper.components.MatchView
-import com.bashkevich.tennisscorekeeper.model.match.EMPTY_TENNIS_GAME
-import com.bashkevich.tennisscorekeeper.model.match.EMPTY_TENNIS_SET
+import com.bashkevich.tennisscorekeeper.model.match.domain.EMPTY_TENNIS_GAME
+import com.bashkevich.tennisscorekeeper.model.match.domain.EMPTY_TENNIS_SET
 import com.bashkevich.tennisscorekeeper.model.match.remote.ScoreType
 import com.bashkevich.tennisscorekeeper.model.match.remote.SpecialSetMode
 
@@ -58,8 +58,8 @@ fun MatchDetailsContent(
 
     val isGameStarted = match.currentGame != EMPTY_TENNIS_GAME
 
-    val firstPlayer = match.firstPlayer
-    val secondPlayer = match.secondPlayer
+    val firstPlayer = match.firstParticipant
+    val secondPlayer = match.secondParticipant
 
     val isSuperTiebreak = match.currentSet.specialSetMode == SpecialSetMode.SUPER_TIEBREAK
 
@@ -78,8 +78,8 @@ fun MatchDetailsContent(
             match = match
         )
         val matchId = match.id
-        val firstPlayerId = match.firstPlayer.id
-        val secondPlayerId = match.secondPlayer.id
+        val firstPlayerId = match.firstParticipant.id
+        val secondPlayerId = match.secondParticipant.id
 
         Row(
             modifier = Modifier.fillMaxWidth(),

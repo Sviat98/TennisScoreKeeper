@@ -1,8 +1,8 @@
 package com.bashkevich.tennisscorekeeper.screens.scoreboard
 
 import androidx.compose.runtime.Immutable
-import com.bashkevich.tennisscorekeeper.model.match.Match
-import com.bashkevich.tennisscorekeeper.model.match.SAMPLE_MATCH
+import com.bashkevich.tennisscorekeeper.model.match.domain.Match
+import com.bashkevich.tennisscorekeeper.model.match.domain.SAMPLE_MATCH
 
 import com.bashkevich.tennisscorekeeper.mvi.UiAction
 import com.bashkevich.tennisscorekeeper.mvi.UiEvent

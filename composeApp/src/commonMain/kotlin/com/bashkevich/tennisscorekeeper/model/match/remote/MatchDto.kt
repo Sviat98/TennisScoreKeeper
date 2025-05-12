@@ -9,10 +9,10 @@ data class MatchDto(
     val id: String,
     @SerialName("point_shift")
     val pointShift: Int,
-    @SerialName("first_player")
-    val firstPlayer: PlayerInMatchDto,
-    @SerialName("second_player")
-    val secondPlayer: PlayerInMatchDto,
+    @SerialName("first_participant")
+    val firstParticipant: ParticipantDto,
+    @SerialName("second_participant")
+    val secondParticipant: ParticipantDto,
     @SerialName("previous_sets")
     val previousSets: List<TennisSetDto>,
     @SerialName("current_set")
@@ -22,25 +22,11 @@ data class MatchDto(
 )
 
 @Serializable
-data class PlayerInMatchDto(
-    @SerialName("id")
-    val id: String,
-    @SerialName("surname")
-    val surname: String,
-    @SerialName("name")
-    val name: String,
-    @SerialName("is_serving")
-    val isServing: Boolean,
-    @SerialName("is_winner")
-    val isWinner: Boolean
-)
-
-@Serializable
 data class TennisSetDto(
-    @SerialName("first_player_games")
-    val firstPlayerGames: Int,
-    @SerialName("second_player_games")
-    val secondPlayerGames: Int,
+    @SerialName("first_participant_games")
+    val firstParticipantGames: Int,
+    @SerialName("second_participant_games")
+    val secondParticipantGames: Int,
     @SerialName("special_set_mode")
     val specialSetMode: SpecialSetMode? = null,
 )
@@ -53,8 +39,8 @@ enum class SpecialSetMode {
 
 @Serializable
 data class TennisGameDto(
-    @SerialName("first_player_points")
-    val firstPlayerPoints: String,
-    @SerialName("second_player_points")
-    val secondPlayerPoints: String,
+    @SerialName("first_participant_points")
+    val firstParticipantPoints: String,
+    @SerialName("second_participant_points")
+    val secondParticipantPoints: String,
 )

@@ -34,7 +34,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.bashkevich.tennisscorekeeper.model.match.Match
+import com.bashkevich.tennisscorekeeper.model.match.domain.Match
 
 @Composable
 fun MatchView(
@@ -43,14 +43,14 @@ fun MatchView(
 ) {
     var columnHeight by remember { mutableStateOf(0.dp) }
 
-    val firstPlayer = match.firstPlayer
-    val secondPlayer = match.secondPlayer
+    val firstParticipant = match.firstParticipant
+    val secondParticipant = match.secondParticipant
 
 
-    val hasFirstPlayerWonMatch = firstPlayer.isWinner
-    val hasSecondPlayerWonMatch = secondPlayer.isWinner
+    val hasFirstParticipantWonMatch = firstParticipant.isWinner
+    val hasSecondParticipantWonMatch = secondParticipant.isWinner
 
-    val isWinnerInMatch = hasFirstPlayerWonMatch || hasSecondPlayerWonMatch
+    val isWinnerInMatch = hasFirstParticipantWonMatch || hasSecondParticipantWonMatch
 
     Row(
         modifier = Modifier.then(modifier),
@@ -63,9 +63,9 @@ fun MatchView(
                 modifier = Modifier.height(columnHeight)
                     .padding(top = 8.dp, bottom = 8.dp, start = 4.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = if (firstPlayer.isServing) Arrangement.Top else Arrangement.Bottom
+                verticalArrangement = if (firstParticipant.isServing) Arrangement.Top else Arrangement.Bottom
             ) {
-                if ((firstPlayer.isServing || secondPlayer.isServing) && !isWinnerInMatch) {
+                if ((firstParticipant.isServing || secondParticipant.isServing) && !isWinnerInMatch) {
                     Box(
                         modifier = Modifier.size(8.dp).clip(
                             CircleShape
@@ -94,11 +94,11 @@ fun MatchView(
                     horizontalArrangement = Arrangement.spacedBy(4.dp)
                 ) {
                     Text(
-                        text = firstPlayer.surname,
+                        text = firstParticipant.displayName,
                         fontSize = 20.sp,
                         color = Color.White
                     )
-                    if (hasFirstPlayerWonMatch) {
+                    if (hasFirstParticipantWonMatch) {
                         Icon(
                             imageVector = Icons.Default.Check,
                             tint = Color.White,
@@ -111,11 +111,11 @@ fun MatchView(
                     horizontalArrangement = Arrangement.spacedBy(4.dp)
                 ) {
                     Text(
-                        text = secondPlayer.surname,
+                        text = secondParticipant.displayName,
                         fontSize = 20.sp,
                         color = Color.White
                     )
-                    if (hasSecondPlayerWonMatch) {
+                    if (hasSecondParticipantWonMatch) {
                         Icon(
                             imageVector = Icons.Default.Check,
                             tint = Color.White,
@@ -129,8 +129,8 @@ fun MatchView(
             match.previousSets.forEachIndexed { index, prevSet ->
                 // Колонка для счета (выравнивание по центру)
 
-                val firstPlayerGamesWon = prevSet.firstPlayerGamesWon
-                val secondPlayerGamesWon = prevSet.secondPlayerGamesWon
+                val firstPlayerGamesWon = prevSet.firstParticipantGamesWon
+                val secondPlayerGamesWon = prevSet.secondParticipantGamesWon
 
                 val isFirstPlayerWon = firstPlayerGamesWon > secondPlayerGamesWon
                 Column(
@@ -139,13 +139,13 @@ fun MatchView(
                     verticalArrangement = Arrangement.SpaceBetween
                 ) {
                     Text(
-                        text = prevSet.firstPlayerGamesWon.toString(),
+                        text = prevSet.firstParticipantGamesWon.toString(),
                         fontSize = 20.sp,
                         textAlign = TextAlign.Center,
                         color = Color.White.copy(alpha = if (isFirstPlayerWon) 1f else 0.5f)
                     )
                     Text(
-                        text = prevSet.secondPlayerGamesWon.toString(),
+                        text = prevSet.secondParticipantGamesWon.toString(),
                         fontSize = 20.sp,
                         textAlign = TextAlign.Center,
                         color = Color.White.copy(alpha = if (!isFirstPlayerWon) 1f else 0.5f)
@@ -158,9 +158,9 @@ fun MatchView(
         }
 
         val currentGameStarted =
-            match.currentGame.firstPlayerPointsWon != "0" || match.currentGame.secondPlayerPointsWon != "0"
+            match.currentGame.firstParticipantPointsWon != "0" || match.currentGame.secondParticipantPointsWon != "0"
 
-        if (currentGameStarted || match.currentSet.firstPlayerGamesWon != 0 || match.currentSet.secondPlayerGamesWon != 0) {
+        if (currentGameStarted || match.currentSet.firstParticipantGamesWon != 0 || match.currentSet.secondParticipantGamesWon != 0) {
             Column(
                 modifier = Modifier.height(columnHeight).width(28.dp)
                     .border(width = 1.dp, color = Color(0xFF142c6c)).padding(vertical = 1.dp)
@@ -169,14 +169,14 @@ fun MatchView(
                 verticalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
-                    text = match.currentSet.firstPlayerGamesWon.toString(),
+                    text = match.currentSet.firstParticipantGamesWon.toString(),
                     fontSize = 20.sp,
                     textAlign = TextAlign.Center,
                     color = Color.Black
                 )
                 Divider(modifier = Modifier.fillMaxWidth(), color = Color(0xFF142c6c))
                 Text(
-                    text = match.currentSet.secondPlayerGamesWon.toString(),
+                    text = match.currentSet.secondParticipantGamesWon.toString(),
                     fontSize = 20.sp,
                     textAlign = TextAlign.Center,
                     color = Color.Black
@@ -195,14 +195,14 @@ fun MatchView(
                     verticalArrangement = Arrangement.SpaceBetween
                 ) {
                     Text(
-                        text = match.currentGame.firstPlayerPointsWon,
+                        text = match.currentGame.firstParticipantPointsWon,
                         fontSize = 20.sp,
                         textAlign = TextAlign.Center,
                         color = Color.Black
                     )
                     Divider(modifier = Modifier.fillMaxWidth(), color = Color(0xFF142c6c))
                     Text(
-                        text = match.currentGame.secondPlayerPointsWon,
+                        text = match.currentGame.secondParticipantPointsWon,
                         fontSize = 20.sp,
                         textAlign = TextAlign.Center,
                         color = Color.Black
