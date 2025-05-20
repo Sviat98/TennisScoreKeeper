@@ -3,7 +3,6 @@ package com.bashkevich.tennisscorekeeper.model.match.domain
 import com.bashkevich.tennisscorekeeper.model.match.remote.DoublesParticipantDto
 import com.bashkevich.tennisscorekeeper.model.match.remote.MatchDto
 import com.bashkevich.tennisscorekeeper.model.match.remote.ParticipantDto
-import com.bashkevich.tennisscorekeeper.model.match.remote.PlayerInMatchDto
 import com.bashkevich.tennisscorekeeper.model.match.remote.SinglesParticipantDto
 import com.bashkevich.tennisscorekeeper.model.match.remote.SpecialSetMode
 import com.bashkevich.tennisscorekeeper.model.match.remote.TennisGameDto
@@ -50,9 +49,10 @@ fun ParticipantDto.toDomain() =
         is SinglesParticipantDto -> {
             SinglesParticipant(
                 id = this.id,
+                seed = this.seed,
                 displayName = this.displayName,
-                isServing = this.isServing,
                 isWinner = this.isWinner,
+                isServing = this.isServing,
                 player = this.player.toDomain()
             )
         }
@@ -60,7 +60,8 @@ fun ParticipantDto.toDomain() =
         is DoublesParticipantDto -> {
             DoublesParticipant(
                 id = this.id,
-                displayName = this.firstPlayer.surname,
+                seed = this.seed,
+                displayName = this.displayName,
                 isServing = this.isServing,
                 isWinner = this.isWinner,
                 firstPlayer = this.firstPlayer.toDomain(),
@@ -86,6 +87,7 @@ val SAMPLE_MATCH = Match(
     pointShift = 0,
     firstParticipant = SinglesParticipant(
         id = "1",
+        seed = 1,
         displayName = "Djokovic",
         isServing = false,
         isWinner = false,
@@ -93,10 +95,55 @@ val SAMPLE_MATCH = Match(
     ),
     secondParticipant = SinglesParticipant(
         id = "2",
+        seed = null,
         displayName = "Auger-Aliassime",
         isServing = true,
         isWinner = false,
         player = SinglesPlayer(id = "2", surname = "Auger-Aliassime", name = "Felix")
+    ),
+    previousSets = listOf(
+        TennisSet(firstParticipantGamesWon = 6, secondParticipantGamesWon = 4),
+        TennisSet(firstParticipantGamesWon = 3, secondParticipantGamesWon = 6),
+    ),
+    currentSet = TennisSet(firstParticipantGamesWon = 10, secondParticipantGamesWon = 9),
+    currentGame = TennisGame(firstParticipantPointsWon = "30", secondParticipantPointsWon = "15")
+)
+
+val DOUBLES_SAMPLE_MATCH = Match(
+    id = "2",
+    pointShift = 0,
+    firstParticipant = DoublesParticipant(
+        id = "5",
+        seed = 1,
+        displayName = "Djokovic/Nadal",
+        isServing = false,
+        isWinner = false,
+        firstPlayer = DoublesPlayer(
+            id = "1",
+            surname = "Djokovic",
+            name = "Novak",
+            isServing = false
+        ),
+        secondPlayer = DoublesPlayer(
+            id = "3",
+            surname = "Nadal",
+            name = "Rafael",
+            isServing = false
+        )
+    ),
+    secondParticipant = DoublesParticipant(
+        id = "6",
+        seed = null,
+        displayName = "Murray/Federer",
+        isServing = true,
+        isWinner = false,
+        firstPlayer = DoublesPlayer(id = "4", surname = "Murray", name = "Andy", isServing = false),
+        secondPlayer = DoublesPlayer(
+            id = "5",
+            surname = "Federer",
+            name = "Roger",
+            isServing = true
+        ),
     ),
     previousSets = listOf(
         TennisSet(firstParticipantGamesWon = 6, secondParticipantGamesWon = 4),
@@ -111,17 +158,24 @@ val SECOND_SAMPLE_MATCH = Match(
     pointShift = 0,
     firstParticipant = SinglesParticipant(
         id = "1",
+        seed = 10,
         displayName = "Djokovic",
         isServing = false,
         isWinner = false,
-        player = SinglesPlayer(id = "1", surname = "Djokovic", name = "Novak")
+        player = DoublesPlayer(id = "1", surname = "Djokovic", name = "Novak", isServing = false)
     ),
     secondParticipant = SinglesParticipant(
         id = "2",
+        seed = null,
         displayName = "Auger-Aliassime",
         isServing = true,
         isWinner = false,
-        player = SinglesPlayer(id = "2", surname = "Auger-Aliassime", name = "Felix")
+        player = DoublesPlayer(
+            id = "2",
+            surname = "Auger-Aliassime",
+            name = "Felix",
+            isServing = true
+        )
     ),
     previousSets = listOf(
         TennisSet(firstParticipantGamesWon = 12, secondParticipantGamesWon = 10),

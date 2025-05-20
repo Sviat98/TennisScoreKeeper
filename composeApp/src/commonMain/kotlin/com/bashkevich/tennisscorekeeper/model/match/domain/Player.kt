@@ -23,7 +23,16 @@ data class DoublesPlayer(
     val isServing: Boolean,
 ): TennisPlayer()
 
-fun PlayerInMatchDto.toDomain(): TennisPlayer = when(this){
-    is PlayerInSinglesMatchDto -> SinglesPlayer(id =this.id, surname = this.surname, name = this.name)
-    is PlayerInDoublesMatchDto -> DoublesPlayer(id =this.id, surname = this.surname, name = this.name, isServing = this.isServing)
+fun PlayerInMatchDto.toDomain(): TennisPlayer = when(this) {
+    is PlayerInSinglesMatchDto -> SinglesPlayer(
+        id = this.id,
+        surname = this.surname,
+        name = this.name,
+    )
+    is PlayerInDoublesMatchDto -> DoublesPlayer(
+        id = this.id,
+        surname = this.surname,
+        name = this.name,
+        isServing = this.isServing
+    )
 }

@@ -22,7 +22,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.bashkevich.tennisscorekeeper.components.MatchView
+import com.bashkevich.tennisscorekeeper.components.match.MatchView
 import com.bashkevich.tennisscorekeeper.model.match.domain.EMPTY_TENNIS_GAME
 import com.bashkevich.tennisscorekeeper.model.match.domain.EMPTY_TENNIS_SET
 import com.bashkevich.tennisscorekeeper.model.match.remote.ScoreType

@@ -14,7 +14,7 @@ import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.bashkevich.tennisscorekeeper.components.MatchView
+import com.bashkevich.tennisscorekeeper.components.match.MatchView
 import com.bashkevich.tennisscorekeeper.model.match.domain.Match
 
 @Composable

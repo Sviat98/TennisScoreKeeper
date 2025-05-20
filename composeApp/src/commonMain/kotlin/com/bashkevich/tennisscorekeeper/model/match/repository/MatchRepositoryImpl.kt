@@ -15,7 +15,11 @@ class MatchRepositoryImpl(
     private val matchRemoteDataSource: MatchRemoteDataSource
 ) : MatchRepository{
     override suspend fun getMatches(): LoadResult<List<SimpleMatch>, Throwable> {
-        return LoadResult.Success(listOf(SimpleMatch("1","Djokovic", "Auger Aliassime", "not started")))
+        return LoadResult.Success(listOf(
+            SimpleMatch("1","Djokovic", "Auger Aliassime", "not started"),
+            SimpleMatch("2","Djokovic/Nadal", "Murray/Federer", "not started"),
+            )
+        )
     }
 
     override suspend fun closeSession() {
