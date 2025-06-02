@@ -90,7 +90,7 @@ val SAMPLE_MATCH = Match(
         seed = 1,
         displayName = "Djokovic",
         isServing = false,
-        isWinner = false,
+        isWinner = true,
         player = SinglesPlayer(id = "1", surname = "Djokovic", name = "Novak")
     ),
     secondParticipant = SinglesParticipant(
