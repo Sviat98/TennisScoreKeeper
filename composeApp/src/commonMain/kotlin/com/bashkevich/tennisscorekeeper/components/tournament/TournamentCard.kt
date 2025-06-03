@@ -19,10 +19,11 @@ import com.bashkevich.tennisscorekeeper.model.tournament.domain.Tournament
 @Composable
 fun TournamentListItem(
     modifier: Modifier = Modifier,
-    tournament: Tournament
-){
+    tournament: Tournament,
+    onTournamentClick: (Tournament) -> Unit
+) {
     Card(
-        onClick = {},
+        onClick = { onTournamentClick(tournament) },
         modifier = Modifier.then(modifier),
         border = BorderStroke(1.dp, color = Color.Black),
         shape = RoundedCornerShape(8.dp)

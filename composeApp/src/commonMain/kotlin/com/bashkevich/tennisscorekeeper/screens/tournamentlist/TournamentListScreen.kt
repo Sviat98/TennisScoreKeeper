@@ -21,12 +21,14 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.bashkevich.tennisscorekeeper.components.hoverScaleEffect
 import com.bashkevich.tennisscorekeeper.components.tournament.TournamentListItem
+import com.bashkevich.tennisscorekeeper.model.tournament.domain.Tournament
 
 @Composable
 fun TournamentListScreen(
     modifier: Modifier = Modifier,
     viewModel: TournamentListViewModel,
-    onTournamentAdd: () -> Unit
+    onTournamentAdd: () -> Unit,
+    onTournamentClick: (Tournament) -> Unit
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 
@@ -38,7 +40,8 @@ fun TournamentListScreen(
     TournamentListContent(
         modifier = Modifier.then(modifier),
         state = state,
-        onTournamentAdd = onTournamentAdd
+        onTournamentAdd = onTournamentAdd,
+        onTournamentClick = onTournamentClick
     )
 }
 
@@ -46,7 +49,8 @@ fun TournamentListScreen(
 fun TournamentListContent(
     modifier: Modifier = Modifier,
     state: TournamentListState,
-    onTournamentAdd: () -> Unit
+    onTournamentAdd: () -> Unit,
+    onTournamentClick: (Tournament) -> Unit
 ){
     Scaffold(
         modifier = Modifier.then(modifier),
@@ -68,6 +72,7 @@ fun TournamentListContent(
                     TournamentListItem(
                         modifier = Modifier.hoverScaleEffect(),
                         tournament = tournament,
+                        onTournamentClick = onTournamentClick
                     )
                 }
 

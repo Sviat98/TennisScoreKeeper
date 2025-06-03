@@ -40,7 +40,7 @@ fun MatchListScreen(
     }
 
     MatchListContent(
-        modifier = Modifier.then(modifier).fillMaxSize(),
+        modifier = Modifier.then(modifier),
         state = state,
         onItemClick = onMatchClick,
         onCounterAdd = onMatchAdd
