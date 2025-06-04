@@ -9,7 +9,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.dialog
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.toRoute
 import com.bashkevich.tennisscorekeeper.di.coreModule
 import com.bashkevich.tennisscorekeeper.di.counterModule
 import com.bashkevich.tennisscorekeeper.di.matchModule
@@ -22,7 +21,6 @@ import com.bashkevich.tennisscorekeeper.navigation.CounterDetailsRoute
 import com.bashkevich.tennisscorekeeper.navigation.CounterListRoute
 import com.bashkevich.tennisscorekeeper.navigation.MatchDetailsRoute
 import com.bashkevich.tennisscorekeeper.navigation.TournamentRoute
-import com.bashkevich.tennisscorekeeper.navigation.TournamentTab
 import com.bashkevich.tennisscorekeeper.navigation.TournamentsRoute
 import com.bashkevich.tennisscorekeeper.navigation.platformSpecificRoutes
 import com.bashkevich.tennisscorekeeper.screens.addcounterdialog.AddCounterDialogScreen
@@ -63,13 +61,13 @@ fun App(navController: NavHostController = rememberNavController()) {
                     val tournamentListViewModel = koinViewModel<TournamentListViewModel>()
 
                     TournamentListScreen(
+                        modifier = Modifier.fillMaxSize(),
                         viewModel = tournamentListViewModel,
                         onTournamentAdd = { navController.navigate(AddTournamentRoute) },
                         onTournamentClick = { tournament ->
                             navController.navigate(
-                                TournamentRoute.create(
-                                    tournament.id,
-                                    TournamentTab.Matches
+                                TournamentRoute(
+                                    tournament.id
                                 )
                             )
                         }
@@ -78,19 +76,9 @@ fun App(navController: NavHostController = rememberNavController()) {
                 composable<TournamentRoute> {
                     val tournamentViewModel = koinViewModel<TournamentViewModel>()
 
-                    val tournamentId = it.toRoute<TournamentRoute>().tournamentId
-
                     TournamentScreen(
                         modifier = Modifier.fillMaxSize(),
                         viewModel = tournamentViewModel,
-                        onTabSelected = { currentTab ->
-                            navController.navigate(
-                                TournamentRoute.create(
-                                    tournamentId,
-                                    currentTab
-                                )
-                            )
-                        },
                         onMatchClick = { match ->
                             navController.navigate(
                                 MatchDetailsRoute(
@@ -111,21 +99,6 @@ fun App(navController: NavHostController = rememberNavController()) {
                         onDismissRequest = { navController.navigateUp() }
                     )
                 }
-//                composable<MatchesRoute> {
-//                    val matchListViewModel = koinViewModel<MatchListViewModel>()
-//
-//                    MatchListScreen(
-//                        viewModel = matchListViewModel,
-//                        onMatchClick = { match ->
-//                            navController.navigate(
-//                                MatchDetailsRoute(
-//                                    match.id
-//                                )
-//                            )
-//                        },
-//                        onMatchAdd = {}
-//                    )
-//                }
                 composable<MatchDetailsRoute> {
                     val matchDetailsViewModel = koinViewModel<MatchDetailsViewModel>()
 

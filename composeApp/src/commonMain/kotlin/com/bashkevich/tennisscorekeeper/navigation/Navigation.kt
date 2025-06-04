@@ -13,13 +13,13 @@ data object TournamentsRoute
 
 @Serializable
 @SerialName("tournaments")
-data class TournamentRoute(val tournamentId: String, val currentTab: String){
-    companion object {
-        fun create(id: String, tab: TournamentTab): TournamentRoute =
-            TournamentRoute(id, tab.toRouteString())
-    }
-
-    fun getTab(): TournamentTab = routeStringToTournamentTab(currentTab)
+data class TournamentRoute(val tournamentId: String){
+//    companion object {
+//        fun create(id: String, tab: TournamentTab): TournamentRoute =
+//            TournamentRoute(id, tab.toRouteString())
+//    }
+//
+//    fun getTab(): TournamentTab = routeStringToTournamentTab(currentTab)
 }
 
 @Serializable

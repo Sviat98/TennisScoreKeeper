@@ -5,6 +5,8 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.Text
 
 import androidx.compose.runtime.Composable
@@ -28,9 +30,8 @@ import org.koin.compose.viewmodel.koinViewModel
 fun TournamentScreen(
     modifier: Modifier = Modifier,
     viewModel: TournamentViewModel,
-    onTabSelected: (TournamentTab) -> Unit,
     onMatchClick: (SimpleMatch) -> Unit,
-    onMatchAdd: ()->Unit
+    onMatchAdd: () -> Unit
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 
@@ -39,11 +40,31 @@ fun TournamentScreen(
         }
     }
 
+
+    TournamentContent(
+        modifier = Modifier.then(modifier),
+        state = state,
+        onEvent = { viewModel.onEvent(it) },
+        onMatchClick = onMatchClick,
+        onMatchAdd = onMatchAdd
+    )
+}
+
+@Composable
+fun TournamentContent(
+    modifier: Modifier = Modifier,
+    state: TournamentState,
+    onEvent: (TournamentUiEvent) -> Unit,
+    onMatchClick: (SimpleMatch) -> Unit,
+    onMatchAdd: () -> Unit
+) {
     val currentTab = state.currentTab
 
     val matchListViewModel = koinViewModel<MatchListViewModel>()
 
     val participantListViewModel = koinViewModel<ParticipantListViewModel>()
+
+    val pagerState = rememberPagerState(pageCount = { 2 })
 
     Column(
         modifier = Modifier.then(modifier),
@@ -55,19 +76,29 @@ fun TournamentScreen(
         ) {
             Text(
                 text = TournamentTab.Matches.toRouteString(),
-                modifier = Modifier.clickable { onTabSelected(TournamentTab.Matches) },
+                modifier = Modifier.clickable {
+                    onEvent(TournamentUiEvent.SelectTab(TournamentTab.Matches))
+                },
                 color = if (currentTab == TournamentTab.Matches) Color.Red else Color.DarkGray
             )
             Text(
                 text = TournamentTab.Participants.toRouteString(),
-                modifier = Modifier.clickable { onTabSelected(TournamentTab.Participants) },
+                modifier = Modifier.clickable {
+                    onEvent(TournamentUiEvent.SelectTab(TournamentTab.Participants))
+                },
                 color = if (currentTab == TournamentTab.Participants) Color.Red else Color.DarkGray
             )
         }
-        when(currentTab){
-            TournamentTab.Matches -> MatchListScreen(viewModel = matchListViewModel, onMatchClick = onMatchClick, onMatchAdd = onMatchAdd)
-            TournamentTab.Participants -> ParticipantListScreen(viewModel = participantListViewModel)
+
+        HorizontalPager(state = pagerState) { _ ->
+            when (currentTab) {
+                TournamentTab.Matches -> MatchListScreen(
+                    viewModel = matchListViewModel,
+                    onMatchClick = onMatchClick,
+                    onMatchAdd = onMatchAdd
+                )
+                TournamentTab.Participants -> ParticipantListScreen(viewModel = participantListViewModel)
+            }
         }
     }
-
 }

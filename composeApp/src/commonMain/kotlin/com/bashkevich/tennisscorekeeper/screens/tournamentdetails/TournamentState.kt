@@ -9,6 +9,7 @@ import com.bashkevich.tennisscorekeeper.navigation.TournamentTab
 
 @Immutable
 sealed class TournamentUiEvent : UiEvent {
+    class SelectTab(val tournamentTab: TournamentTab): TournamentUiEvent()
 }
 
 @Immutable

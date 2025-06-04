@@ -22,7 +22,9 @@ fun ParticipantListScreen(
         }
     }
 
-    Column {
+    Column(
+        modifier = Modifier.then(modifier)
+    ) {
         Text("This is a participant screen")
     }
 }
