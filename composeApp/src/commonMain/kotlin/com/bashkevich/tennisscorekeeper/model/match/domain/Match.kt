@@ -1,18 +1,24 @@
 package com.bashkevich.tennisscorekeeper.model.match.domain
 
-import com.bashkevich.tennisscorekeeper.model.match.remote.DoublesParticipantDto
+import com.bashkevich.tennisscorekeeper.model.participant.remote.DoublesParticipantInMatchDto
 import com.bashkevich.tennisscorekeeper.model.match.remote.MatchDto
-import com.bashkevich.tennisscorekeeper.model.match.remote.ParticipantDto
-import com.bashkevich.tennisscorekeeper.model.match.remote.SinglesParticipantDto
+import com.bashkevich.tennisscorekeeper.model.participant.remote.ParticipantInMatchDto
+import com.bashkevich.tennisscorekeeper.model.participant.remote.SinglesParticipantInMatchDto
 import com.bashkevich.tennisscorekeeper.model.match.remote.SpecialSetMode
 import com.bashkevich.tennisscorekeeper.model.match.remote.TennisGameDto
 import com.bashkevich.tennisscorekeeper.model.match.remote.TennisSetDto
+import com.bashkevich.tennisscorekeeper.model.participant.domain.DoublesParticipantInMatch
+import com.bashkevich.tennisscorekeeper.model.participant.domain.SinglesParticipantInMatch
+import com.bashkevich.tennisscorekeeper.model.participant.domain.TennisParticipantInMatch
+import com.bashkevich.tennisscorekeeper.model.player.domain.DoublesPlayerInMatch
+import com.bashkevich.tennisscorekeeper.model.player.domain.SinglesPlayerInMatch
+import com.bashkevich.tennisscorekeeper.model.player.domain.toDomain
 
 data class Match(
     val id: String,
     val pointShift: Int,
-    val firstParticipant: TennisParticipant,
-    val secondParticipant: TennisParticipant,
+    val firstParticipant: TennisParticipantInMatch,
+    val secondParticipant: TennisParticipantInMatch,
     val previousSets: List<TennisSet>,
     val currentSet: TennisSet,
     val currentGame: TennisGame
@@ -44,10 +50,10 @@ fun MatchDto.toDomain() = Match(
     currentGame = this.currentGame.toDomain()
 )
 
-fun ParticipantDto.toDomain() =
+fun ParticipantInMatchDto.toDomain() =
     when (this) {
-        is SinglesParticipantDto -> {
-            SinglesParticipant(
+        is SinglesParticipantInMatchDto -> {
+            SinglesParticipantInMatch(
                 id = this.id,
                 seed = this.seed,
                 displayName = this.displayName,
@@ -57,8 +63,8 @@ fun ParticipantDto.toDomain() =
             )
         }
 
-        is DoublesParticipantDto -> {
-            DoublesParticipant(
+        is DoublesParticipantInMatchDto -> {
+            DoublesParticipantInMatch(
                 id = this.id,
                 seed = this.seed,
                 displayName = this.displayName,
@@ -85,21 +91,21 @@ fun TennisGameDto.toDomain() = TennisGame(
 val SAMPLE_MATCH = Match(
     id = "1",
     pointShift = 0,
-    firstParticipant = SinglesParticipant(
+    firstParticipant = SinglesParticipantInMatch(
         id = "1",
         seed = 1,
         displayName = "Djokovic",
         isServing = false,
         isWinner = true,
-        player = SinglesPlayer(id = "1", surname = "Djokovic", name = "Novak")
+        player = SinglesPlayerInMatch(id = "1", surname = "Djokovic", name = "Novak")
     ),
-    secondParticipant = SinglesParticipant(
+    secondParticipant = SinglesParticipantInMatch(
         id = "2",
         seed = null,
         displayName = "Auger-Aliassime",
         isServing = true,
         isWinner = false,
-        player = SinglesPlayer(id = "2", surname = "Auger-Aliassime", name = "Felix")
+        player = SinglesPlayerInMatch(id = "2", surname = "Auger-Aliassime", name = "Felix")
     ),
     previousSets = listOf(
         TennisSet(firstParticipantGamesWon = 6, secondParticipantGamesWon = 4),
@@ -112,33 +118,33 @@ val SAMPLE_MATCH = Match(
 val DOUBLES_SAMPLE_MATCH = Match(
     id = "2",
     pointShift = 0,
-    firstParticipant = DoublesParticipant(
+    firstParticipant = DoublesParticipantInMatch(
         id = "5",
         seed = 1,
         displayName = "Djokovic/Nadal",
         isServing = false,
         isWinner = false,
-        firstPlayer = DoublesPlayer(
+        firstPlayer = DoublesPlayerInMatch(
             id = "1",
             surname = "Djokovic",
             name = "Novak",
             isServing = false
         ),
-        secondPlayer = DoublesPlayer(
+        secondPlayer = DoublesPlayerInMatch(
             id = "3",
             surname = "Nadal",
             name = "Rafael",
             isServing = false
         )
     ),
-    secondParticipant = DoublesParticipant(
+    secondParticipant = DoublesParticipantInMatch(
         id = "6",
         seed = null,
         displayName = "Murray/Federer",
         isServing = true,
         isWinner = false,
-        firstPlayer = DoublesPlayer(id = "4", surname = "Murray", name = "Andy", isServing = false),
-        secondPlayer = DoublesPlayer(
+        firstPlayer = DoublesPlayerInMatch(id = "4", surname = "Murray", name = "Andy", isServing = false),
+        secondPlayer = DoublesPlayerInMatch(
             id = "5",
             surname = "Federer",
             name = "Roger",
@@ -156,21 +162,21 @@ val DOUBLES_SAMPLE_MATCH = Match(
 val SECOND_SAMPLE_MATCH = Match(
     id = "2",
     pointShift = 0,
-    firstParticipant = SinglesParticipant(
+    firstParticipant = SinglesParticipantInMatch(
         id = "1",
         seed = 10,
         displayName = "Djokovic",
         isServing = false,
         isWinner = false,
-        player = DoublesPlayer(id = "1", surname = "Djokovic", name = "Novak", isServing = false)
+        player = DoublesPlayerInMatch(id = "1", surname = "Djokovic", name = "Novak", isServing = false)
     ),
-    secondParticipant = SinglesParticipant(
+    secondParticipant = SinglesParticipantInMatch(
         id = "2",
         seed = null,
         displayName = "Auger-Aliassime",
         isServing = true,
         isWinner = false,
-        player = DoublesPlayer(
+        player = DoublesPlayerInMatch(
             id = "2",
             surname = "Auger-Aliassime",
             name = "Felix",

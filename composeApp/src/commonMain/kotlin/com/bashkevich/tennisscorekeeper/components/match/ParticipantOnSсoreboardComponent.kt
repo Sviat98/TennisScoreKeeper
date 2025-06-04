@@ -16,11 +16,11 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.bashkevich.tennisscorekeeper.model.match.domain.DoublesParticipant
-import com.bashkevich.tennisscorekeeper.model.match.domain.DoublesPlayer
+import com.bashkevich.tennisscorekeeper.model.participant.domain.DoublesParticipantInMatch
+import com.bashkevich.tennisscorekeeper.model.player.domain.DoublesPlayerInMatch
 import com.bashkevich.tennisscorekeeper.model.match.domain.Match
-import com.bashkevich.tennisscorekeeper.model.match.domain.SinglesParticipant
-import com.bashkevich.tennisscorekeeper.model.match.domain.TennisParticipant
+import com.bashkevich.tennisscorekeeper.model.participant.domain.SinglesParticipantInMatch
+import com.bashkevich.tennisscorekeeper.model.participant.domain.TennisParticipantInMatch
 
 @Composable
 fun ParticipantOnScoreboardView(modifier: Modifier = Modifier, match: Match) {
@@ -42,11 +42,11 @@ fun ParticipantOnScoreboardView(modifier: Modifier = Modifier, match: Match) {
 }
 
 @Composable
-fun DoublesParticipantOnScoreboard(participant: DoublesParticipant) {
+fun DoublesParticipantOnScoreboard(participant: DoublesParticipantInMatch) {
     val (firstPlayerDisplayName, secondPlayerDisplayName) = participant.displayName.split("/")
 
-    val firstPlayer = participant.firstPlayer as DoublesPlayer
-    val secondPlayer = participant.secondPlayer as DoublesPlayer
+    val firstPlayer = participant.firstPlayer as DoublesPlayerInMatch
+    val secondPlayer = participant.secondPlayer as DoublesPlayerInMatch
 
     Text(
         text = buildAnnotatedString {
@@ -68,7 +68,7 @@ fun DoublesParticipantOnScoreboard(participant: DoublesParticipant) {
 @Composable
 fun ParticipantOnScoreboardRow(
     modifier: Modifier = Modifier,
-    participant: TennisParticipant,
+    participant: TennisParticipantInMatch,
 ) {
     val hasParticipantWonMatch = participant.isWinner
 
@@ -78,7 +78,7 @@ fun ParticipantOnScoreboardRow(
         horizontalArrangement = Arrangement.spacedBy(4.dp)
     ) {
         when (participant) {
-            is SinglesParticipant -> {
+            is SinglesParticipantInMatch -> {
                 Text(
                     text = participant.displayName,
                     fontSize = 20.sp,
@@ -86,7 +86,7 @@ fun ParticipantOnScoreboardRow(
                 )
             }
 
-            is DoublesParticipant -> {
+            is DoublesParticipantInMatch -> {
                 DoublesParticipantOnScoreboard(
                     participant = participant,
                 )

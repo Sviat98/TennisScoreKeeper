@@ -63,7 +63,9 @@ fun MatchListContent(
             }
         }
     ) {
-        Box(modifier = Modifier.fillMaxSize()){
+        Box(
+            modifier = Modifier.fillMaxSize()
+        ){
             LazyColumn(
                 modifier = Modifier.align(Alignment.Center),
                 verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterVertically),

@@ -13,6 +13,7 @@ import androidx.navigation.toRoute
 import com.bashkevich.tennisscorekeeper.di.coreModule
 import com.bashkevich.tennisscorekeeper.di.counterModule
 import com.bashkevich.tennisscorekeeper.di.matchModule
+import com.bashkevich.tennisscorekeeper.di.participantModule
 import com.bashkevich.tennisscorekeeper.di.platformModule
 import com.bashkevich.tennisscorekeeper.di.tournamentModule
 import com.bashkevich.tennisscorekeeper.navigation.AddCounterDialogRoute
@@ -20,7 +21,6 @@ import com.bashkevich.tennisscorekeeper.navigation.AddTournamentRoute
 import com.bashkevich.tennisscorekeeper.navigation.CounterDetailsRoute
 import com.bashkevich.tennisscorekeeper.navigation.CounterListRoute
 import com.bashkevich.tennisscorekeeper.navigation.MatchDetailsRoute
-import com.bashkevich.tennisscorekeeper.navigation.MatchesRoute
 import com.bashkevich.tennisscorekeeper.navigation.TournamentRoute
 import com.bashkevich.tennisscorekeeper.navigation.TournamentTab
 import com.bashkevich.tennisscorekeeper.navigation.TournamentsRoute
@@ -35,8 +35,6 @@ import com.bashkevich.tennisscorekeeper.screens.counterlist.CounterListScreen
 import com.bashkevich.tennisscorekeeper.screens.counterlist.CounterListViewModel
 import com.bashkevich.tennisscorekeeper.screens.matchdetails.MatchDetailsScreen
 import com.bashkevich.tennisscorekeeper.screens.matchdetails.MatchDetailsViewModel
-import com.bashkevich.tennisscorekeeper.screens.matchlist.MatchListScreen
-import com.bashkevich.tennisscorekeeper.screens.matchlist.MatchListViewModel
 import com.bashkevich.tennisscorekeeper.screens.tournamentdetails.TournamentScreen
 import com.bashkevich.tennisscorekeeper.screens.tournamentdetails.TournamentViewModel
 import com.bashkevich.tennisscorekeeper.screens.tournamentlist.TournamentListScreen
@@ -52,11 +50,12 @@ fun App(navController: NavHostController = rememberNavController()) {
     KoinMultiplatformApplication(config = KoinConfiguration {
         modules(
             coreModule,
+            platformModule,
             counterModule,
-            matchModule,
             tournamentModule,
-            platformModule
-        )
+            matchModule,
+            participantModule
+            )
     }) {
         MaterialTheme {
             NavHost(navController = navController, startDestination = TournamentsRoute) {
@@ -91,7 +90,15 @@ fun App(navController: NavHostController = rememberNavController()) {
                                     currentTab
                                 )
                             )
-                        }
+                        },
+                        onMatchClick = { match ->
+                            navController.navigate(
+                                MatchDetailsRoute(
+                                    match.id
+                                )
+                            )
+                        },
+                        onMatchAdd = {}
                     )
                 }
                 dialog<AddTournamentRoute>(
@@ -104,21 +111,21 @@ fun App(navController: NavHostController = rememberNavController()) {
                         onDismissRequest = { navController.navigateUp() }
                     )
                 }
-                composable<MatchesRoute> {
-                    val matchListViewModel = koinViewModel<MatchListViewModel>()
-
-                    MatchListScreen(
-                        viewModel = matchListViewModel,
-                        onMatchClick = { match ->
-                            navController.navigate(
-                                MatchDetailsRoute(
-                                    match.id
-                                )
-                            )
-                        },
-                        onMatchAdd = {}
-                    )
-                }
+//                composable<MatchesRoute> {
+//                    val matchListViewModel = koinViewModel<MatchListViewModel>()
+//
+//                    MatchListScreen(
+//                        viewModel = matchListViewModel,
+//                        onMatchClick = { match ->
+//                            navController.navigate(
+//                                MatchDetailsRoute(
+//                                    match.id
+//                                )
+//                            )
+//                        },
+//                        onMatchAdd = {}
+//                    )
+//                }
                 composable<MatchDetailsRoute> {
                     val matchDetailsViewModel = koinViewModel<MatchDetailsViewModel>()
 

@@ -1,5 +1,6 @@
 package com.bashkevich.tennisscorekeeper.model.match.remote
 
+import com.bashkevich.tennisscorekeeper.model.participant.remote.ParticipantInMatchDto
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerialName
 
@@ -10,9 +11,9 @@ data class MatchDto(
     @SerialName("point_shift")
     val pointShift: Int,
     @SerialName("first_participant")
-    val firstParticipant: ParticipantDto,
+    val firstParticipant: ParticipantInMatchDto,
     @SerialName("second_participant")
-    val secondParticipant: ParticipantDto,
+    val secondParticipant: ParticipantInMatchDto,
     @SerialName("previous_sets")
     val previousSets: List<TennisSetDto>,
     @SerialName("current_set")

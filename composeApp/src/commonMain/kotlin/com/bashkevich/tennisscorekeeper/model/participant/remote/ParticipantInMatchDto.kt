@@ -1,10 +1,11 @@
-package com.bashkevich.tennisscorekeeper.model.match.remote
+package com.bashkevich.tennisscorekeeper.model.participant.remote
 
+import com.bashkevich.tennisscorekeeper.model.player.remote.PlayerInMatchDto
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-sealed class ParticipantDto {
+sealed class ParticipantInMatchDto {
     @SerialName("id")
     abstract val id: String
 
@@ -23,7 +24,7 @@ sealed class ParticipantDto {
 
 @Serializable
 @SerialName("singles_participant")
-data class SinglesParticipantDto(
+data class SinglesParticipantInMatchDto(
     @SerialName("id")
     override val id: String,
     @SerialName("seed")
@@ -36,12 +37,12 @@ data class SinglesParticipantDto(
     override val isWinner: Boolean,
     @SerialName("player")
     val player: PlayerInMatchDto,
-) : ParticipantDto()
+) : ParticipantInMatchDto()
 
 
 @Serializable
 @SerialName("doubles_participant")
-data class DoublesParticipantDto(
+data class DoublesParticipantInMatchDto(
     @SerialName("id")
     override val id: String,
     @SerialName("seed")
@@ -56,4 +57,4 @@ data class DoublesParticipantDto(
     val firstPlayer: PlayerInMatchDto,
     @SerialName("second_player")
     val secondPlayer: PlayerInMatchDto,
-) : ParticipantDto()
+) : ParticipantInMatchDto()

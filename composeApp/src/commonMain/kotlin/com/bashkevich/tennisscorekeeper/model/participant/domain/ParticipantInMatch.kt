@@ -1,6 +1,8 @@
-package com.bashkevich.tennisscorekeeper.model.match.domain
+package com.bashkevich.tennisscorekeeper.model.participant.domain
 
-sealed class TennisParticipant{
+import com.bashkevich.tennisscorekeeper.model.player.domain.TennisPlayerInMatch
+
+sealed class TennisParticipantInMatch{
     abstract val id: String
     abstract val seed: Int?
     abstract val displayName: String
@@ -8,21 +10,21 @@ sealed class TennisParticipant{
     abstract val isWinner: Boolean
 }
 
-data class SinglesParticipant(
+data class SinglesParticipantInMatch(
     override val id: String,
     override val seed: Int?,
     override val displayName: String,
     override val isServing: Boolean,
     override val isWinner: Boolean,
-    val player: TennisPlayer
-): TennisParticipant()
+    val player: TennisPlayerInMatch
+): TennisParticipantInMatch()
 
-data class DoublesParticipant(
+data class DoublesParticipantInMatch(
     override val id: String,
     override val seed: Int?,
     override val displayName: String,
     override val isServing: Boolean,
     override val isWinner: Boolean,
-    val firstPlayer: TennisPlayer,
-    val secondPlayer: TennisPlayer
-): TennisParticipant()
+    val firstPlayer: TennisPlayerInMatch,
+    val secondPlayer: TennisPlayerInMatch
+): TennisParticipantInMatch()
