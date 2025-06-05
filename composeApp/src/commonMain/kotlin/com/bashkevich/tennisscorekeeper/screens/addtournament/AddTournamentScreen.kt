@@ -30,6 +30,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.bashkevich.tennisscorekeeper.LocalNavHostController
 import com.bashkevich.tennisscorekeeper.model.tournament.remote.TournamentType
 import com.bashkevich.tennisscorekeeper.model.tournament.remote.mapToDisplayedString
 
@@ -37,7 +38,6 @@ import com.bashkevich.tennisscorekeeper.model.tournament.remote.mapToDisplayedSt
 fun AddTournamentScreen(
     modifier: Modifier = Modifier,
     viewModel: AddTournamentViewModel,
-    onDismissRequest: () -> Unit
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 
@@ -46,11 +46,13 @@ fun AddTournamentScreen(
         }
     }
 
+    val navController = LocalNavHostController.current
+
     AddTournamentContent(
         modifier = Modifier.then(modifier),
         state = state,
         onEvent = { event -> viewModel.onEvent(event) },
-        onDismissRequest = onDismissRequest
+        onDismissRequest = { navController.navigateUp() }
     )
 }
 

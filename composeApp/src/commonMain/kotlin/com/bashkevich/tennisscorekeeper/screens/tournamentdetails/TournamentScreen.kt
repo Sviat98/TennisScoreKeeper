@@ -17,7 +17,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.bashkevich.tennisscorekeeper.model.match.SimpleMatch
 import com.bashkevich.tennisscorekeeper.navigation.TournamentTab
 import com.bashkevich.tennisscorekeeper.navigation.toRouteString
 import com.bashkevich.tennisscorekeeper.screens.matchlist.MatchListScreen
@@ -30,8 +29,6 @@ import org.koin.compose.viewmodel.koinViewModel
 fun TournamentScreen(
     modifier: Modifier = Modifier,
     viewModel: TournamentViewModel,
-    onMatchClick: (SimpleMatch) -> Unit,
-    onMatchAdd: () -> Unit
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 
@@ -45,8 +42,6 @@ fun TournamentScreen(
         modifier = Modifier.then(modifier),
         state = state,
         onEvent = { viewModel.onEvent(it) },
-        onMatchClick = onMatchClick,
-        onMatchAdd = onMatchAdd
     )
 }
 
@@ -55,8 +50,6 @@ fun TournamentContent(
     modifier: Modifier = Modifier,
     state: TournamentState,
     onEvent: (TournamentUiEvent) -> Unit,
-    onMatchClick: (SimpleMatch) -> Unit,
-    onMatchAdd: () -> Unit
 ) {
     val currentTab = state.currentTab
 
@@ -94,8 +87,6 @@ fun TournamentContent(
             when (currentTab) {
                 TournamentTab.Matches -> MatchListScreen(
                     viewModel = matchListViewModel,
-                    onMatchClick = onMatchClick,
-                    onMatchAdd = onMatchAdd
                 )
                 TournamentTab.Participants -> ParticipantListScreen(viewModel = participantListViewModel)
             }

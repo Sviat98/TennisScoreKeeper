@@ -20,15 +20,15 @@ data class Match(
     val firstParticipant: TennisParticipantInMatch,
     val secondParticipant: TennisParticipantInMatch,
     val previousSets: List<TennisSet>,
-    val currentSet: TennisSet,
-    val currentGame: TennisGame
+    val currentSet: TennisSet?,
+    val currentSetMode: SpecialSetMode?,
+    val currentGame: TennisGame?
 )
 
 
 data class TennisSet(
     val firstParticipantGamesWon: Int,
     val secondParticipantGamesWon: Int,
-    val specialSetMode: SpecialSetMode? = null
 )
 
 data class TennisGame(
@@ -36,9 +36,9 @@ data class TennisGame(
     val secondParticipantPointsWon: String,
 )
 
-val EMPTY_TENNIS_GAME = TennisGame("0", "0")
-
-val EMPTY_TENNIS_SET = TennisSet(0, 0)
+//val EMPTY_TENNIS_GAME = TennisGame("0", "0")
+// пока что пустые сеты и геймы равны null
+//val EMPTY_TENNIS_SET = TennisSet(0, 0)
 
 fun MatchDto.toDomain() = Match(
     id = this.id,
@@ -46,8 +46,9 @@ fun MatchDto.toDomain() = Match(
     firstParticipant = this.firstParticipant.toDomain(),
     secondParticipant = this.secondParticipant.toDomain(),
     previousSets = this.previousSets.map { it.toDomain() },
-    currentSet = this.currentSet.toDomain(),
-    currentGame = this.currentGame.toDomain()
+    currentSet = this.currentSet?.toDomain(),
+    currentSetMode = this.currentSetMode,
+    currentGame = this.currentGame?.toDomain()
 )
 
 fun ParticipantInMatchDto.toDomain() =
@@ -79,7 +80,6 @@ fun ParticipantInMatchDto.toDomain() =
 fun TennisSetDto.toDomain() = TennisSet(
     firstParticipantGamesWon = this.firstParticipantGames,
     secondParticipantGamesWon = this.secondParticipantGames,
-    specialSetMode = this.specialSetMode
 )
 
 fun TennisGameDto.toDomain() = TennisGame(
@@ -112,7 +112,9 @@ val SAMPLE_MATCH = Match(
         TennisSet(firstParticipantGamesWon = 3, secondParticipantGamesWon = 6),
     ),
     currentSet = TennisSet(firstParticipantGamesWon = 10, secondParticipantGamesWon = 9),
-    currentGame = TennisGame(firstParticipantPointsWon = "30", secondParticipantPointsWon = "15")
+    currentSetMode = null,
+    currentGame = null
+        //TennisGame(firstParticipantPointsWon = "30", secondParticipantPointsWon = "15")
 )
 
 val DOUBLES_SAMPLE_MATCH = Match(
@@ -156,6 +158,7 @@ val DOUBLES_SAMPLE_MATCH = Match(
         TennisSet(firstParticipantGamesWon = 3, secondParticipantGamesWon = 6),
     ),
     currentSet = TennisSet(firstParticipantGamesWon = 10, secondParticipantGamesWon = 9),
+    currentSetMode = null,
     currentGame = TennisGame(firstParticipantPointsWon = "30", secondParticipantPointsWon = "15")
 )
 
@@ -190,5 +193,6 @@ val SECOND_SAMPLE_MATCH = Match(
         TennisSet(firstParticipantGamesWon = 10, secondParticipantGamesWon = 12),
     ),
     currentSet = TennisSet(firstParticipantGamesWon = 10, secondParticipantGamesWon = 9),
+    currentSetMode = null,
     currentGame = TennisGame(firstParticipantPointsWon = "30", secondParticipantPointsWon = "15")
 )

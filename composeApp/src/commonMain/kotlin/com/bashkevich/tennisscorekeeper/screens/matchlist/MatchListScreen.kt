@@ -20,17 +20,17 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.bashkevich.tennisscorekeeper.LocalNavHostController
 import com.bashkevich.tennisscorekeeper.components.hoverScaleEffect
 import com.bashkevich.tennisscorekeeper.components.match.MatchCard
 import com.bashkevich.tennisscorekeeper.model.match.SimpleMatch
+import com.bashkevich.tennisscorekeeper.navigation.MatchDetailsRoute
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun MatchListScreen(
     modifier: Modifier = Modifier,
     viewModel: MatchListViewModel = koinViewModel(),
-    onMatchClick: (SimpleMatch) -> Unit,
-    onMatchAdd: () -> Unit
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 
@@ -39,11 +39,13 @@ fun MatchListScreen(
         }
     }
 
+    val navController = LocalNavHostController.current
+
     MatchListContent(
         modifier = Modifier.then(modifier),
         state = state,
-        onItemClick = onMatchClick,
-        onCounterAdd = onMatchAdd
+        onItemClick = {match-> navController.navigate(MatchDetailsRoute(match.id)) },
+        onMatchAdd = { }
     )
 
 }
@@ -53,12 +55,12 @@ fun MatchListContent(
     modifier: Modifier = Modifier,
     state: MatchListState,
     onItemClick: (SimpleMatch) -> Unit,
-    onCounterAdd: () -> Unit
+    onMatchAdd: () -> Unit
 ) {
     Scaffold(
         modifier = Modifier.then(modifier),
         floatingActionButton = {
-            FloatingActionButton(onClick = onCounterAdd) {
+            FloatingActionButton(onClick = onMatchAdd) {
                 Icon(Icons.Filled.Add, contentDescription = "Add Match")
             }
         }

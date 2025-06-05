@@ -55,22 +55,16 @@ fun MatchView(
                 modifier = Modifier.height(columnHeight).width(columnHeight / 2),
                 prevSet = prevSet
             )
-//            if (index != match.previousSets.size - 1) {
-//                Spacer(modifier = Modifier.width(4.dp)) // Отступ между сетами
-//            }
         }
 
-        val currentGameStarted =
-            match.currentGame.firstParticipantPointsWon != "0" || match.currentGame.secondParticipantPointsWon != "0"
-
-        if (currentGameStarted || match.currentSet.firstParticipantGamesWon != 0 || match.currentSet.secondParticipantGamesWon != 0) {
+        match.currentSet?.let {
             CurrentSetComponent(
                 modifier = Modifier.height(columnHeight).width(columnHeight / 2),
                 currentSet = match.currentSet
             )
+            Spacer(modifier = Modifier.width(1.dp))
         }
-        Spacer(modifier = Modifier.width(1.dp))
-        if (currentGameStarted) {
+        match.currentGame?.let{
             CurrentGameComponent(
                 modifier = Modifier.height(columnHeight).width(columnHeight / 2),
                 currentGame = match.currentGame

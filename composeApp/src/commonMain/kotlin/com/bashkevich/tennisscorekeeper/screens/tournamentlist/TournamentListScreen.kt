@@ -19,16 +19,17 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.bashkevich.tennisscorekeeper.LocalNavHostController
 import com.bashkevich.tennisscorekeeper.components.hoverScaleEffect
 import com.bashkevich.tennisscorekeeper.components.tournament.TournamentListItem
 import com.bashkevich.tennisscorekeeper.model.tournament.domain.Tournament
+import com.bashkevich.tennisscorekeeper.navigation.AddTournamentRoute
+import com.bashkevich.tennisscorekeeper.navigation.TournamentRoute
 
 @Composable
 fun TournamentListScreen(
     modifier: Modifier = Modifier,
     viewModel: TournamentListViewModel,
-    onTournamentAdd: () -> Unit,
-    onTournamentClick: (Tournament) -> Unit
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 
@@ -37,11 +38,13 @@ fun TournamentListScreen(
         }
     }
 
+    val navController = LocalNavHostController.current
+
     TournamentListContent(
         modifier = Modifier.then(modifier),
         state = state,
-        onTournamentAdd = onTournamentAdd,
-        onTournamentClick = onTournamentClick
+        onTournamentAdd = { navController.navigate(AddTournamentRoute) },
+        onTournamentClick = { tournament -> navController.navigate(TournamentRoute(tournament.id)) }
     )
 }
 
@@ -51,7 +54,7 @@ fun TournamentListContent(
     state: TournamentListState,
     onTournamentAdd: () -> Unit,
     onTournamentClick: (Tournament) -> Unit
-){
+) {
     Scaffold(
         modifier = Modifier.then(modifier),
         floatingActionButton = {
@@ -60,14 +63,15 @@ fun TournamentListContent(
             }
         }
     ) {
-        Box(modifier = Modifier.fillMaxSize()){
+        Box(modifier = Modifier.fillMaxSize()) {
             LazyColumn(
                 modifier = Modifier.align(Alignment.Center),
                 verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterVertically),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 contentPadding = PaddingValues(16.dp)
             ) {
-                items(state.tournaments,
+                items(
+                    state.tournaments,
                     key = { it.id }) { tournament ->
                     TournamentListItem(
                         modifier = Modifier.hoverScaleEffect(),

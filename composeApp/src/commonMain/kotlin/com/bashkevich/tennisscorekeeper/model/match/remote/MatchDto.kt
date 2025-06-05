@@ -17,9 +17,11 @@ data class MatchDto(
     @SerialName("previous_sets")
     val previousSets: List<TennisSetDto>,
     @SerialName("current_set")
-    val currentSet: TennisSetDto,
+    val currentSet: TennisSetDto?=null,
+    @SerialName("current_set_mode")
+    val currentSetMode: SpecialSetMode? = null,
     @SerialName("current_game")
-    val currentGame: TennisGameDto,
+    val currentGame: TennisGameDto?=null,
 )
 
 @Serializable
@@ -28,8 +30,6 @@ data class TennisSetDto(
     val firstParticipantGames: Int,
     @SerialName("second_participant_games")
     val secondParticipantGames: Int,
-    @SerialName("special_set_mode")
-    val specialSetMode: SpecialSetMode? = null,
 )
 
 // SUPER_TIEBREAK - помечаем, что это супер-тайбрейк (на клиенте нужно залочить кнопки GAME)

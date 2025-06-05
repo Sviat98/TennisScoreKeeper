@@ -4,17 +4,9 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.window.ComposeViewport
 import androidx.navigation.ExperimentalBrowserHistoryApi
-import androidx.navigation.NavDestination
-import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavHostController
 import androidx.navigation.bindToNavigation
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.toRoute
-import com.bashkevich.tennisscorekeeper.navigation.COUNTERS_ROUTE_STRING
-import com.bashkevich.tennisscorekeeper.navigation.COUNTER_OVERLAY_ROUTE_STRING
-import com.bashkevich.tennisscorekeeper.navigation.CounterDetailsRoute
-import com.bashkevich.tennisscorekeeper.navigation.CounterListRoute
-import com.bashkevich.tennisscorekeeper.navigation.CounterOverlayRoute
 import kotlinx.browser.document
 import kotlinx.browser.window
 
@@ -23,6 +15,7 @@ fun main() {
 
     ComposeViewport(document.body!!) {
         val navController: NavHostController = rememberNavController()
+
         App(navController = navController)
 
         LaunchedEffect(Unit) {

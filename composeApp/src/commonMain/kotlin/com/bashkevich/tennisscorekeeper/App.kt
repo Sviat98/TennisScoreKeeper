@@ -42,6 +42,10 @@ import org.koin.compose.KoinMultiplatformApplication
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.dsl.KoinConfiguration
 
+val LocalNavHostController = staticCompositionLocalOf<NavHostController> {
+    error("NavController not provided!")
+}
+
 @Composable
 @Preview
 fun App(navController: NavHostController = rememberNavController()) {
@@ -55,84 +59,71 @@ fun App(navController: NavHostController = rememberNavController()) {
             participantModule
             )
     }) {
-        MaterialTheme {
-            NavHost(navController = navController, startDestination = TournamentsRoute) {
-                composable<TournamentsRoute> {
-                    val tournamentListViewModel = koinViewModel<TournamentListViewModel>()
+        CompositionLocalProvider(
+            LocalNavHostController provides navController
+        ){
+            MaterialTheme {
+                NavHost(navController = navController, startDestination = TournamentsRoute) {
+                    composable<TournamentsRoute> {
+                        val tournamentListViewModel = koinViewModel<TournamentListViewModel>()
 
-                    TournamentListScreen(
-                        modifier = Modifier.fillMaxSize(),
-                        viewModel = tournamentListViewModel,
-                        onTournamentAdd = { navController.navigate(AddTournamentRoute) },
-                        onTournamentClick = { tournament ->
-                            navController.navigate(
-                                TournamentRoute(
-                                    tournament.id
+                        TournamentListScreen(
+                            modifier = Modifier.fillMaxSize(),
+                            viewModel = tournamentListViewModel,
+                        )
+                    }
+                    composable<TournamentRoute> {
+                        val tournamentViewModel = koinViewModel<TournamentViewModel>()
+
+                        TournamentScreen(
+                            modifier = Modifier.fillMaxSize(),
+                            viewModel = tournamentViewModel,
+                        )
+                    }
+                    dialog<AddTournamentRoute>(
+
+                    ) {
+                        val addTournamentViewModel = koinViewModel<AddTournamentViewModel>()
+
+                        AddTournamentScreen(
+                            viewModel = addTournamentViewModel,
+                        )
+                    }
+                    composable<MatchDetailsRoute> {
+                        val matchDetailsViewModel = koinViewModel<MatchDetailsViewModel>()
+
+                        MatchDetailsScreen(viewModel = matchDetailsViewModel)
+                    }
+                    composable<CounterListRoute> {
+                        val counterListViewModel = koinViewModel<CounterListViewModel>()
+                        CounterListScreen(
+                            viewModel = counterListViewModel,
+                            onCounterClick = { counter ->
+                                navController.navigate(
+                                    CounterDetailsRoute(
+                                        counter.id
+                                    )
                                 )
-                            )
-                        }
-                    )
-                }
-                composable<TournamentRoute> {
-                    val tournamentViewModel = koinViewModel<TournamentViewModel>()
+                            },
+                            onCounterAdd = {
+                                navController.navigate(AddCounterDialogRoute)
+                            }
+                        )
+                    }
+                    composable<CounterDetailsRoute> {
+                        val counterDetailsViewModel = koinViewModel<CounterDetailsViewModel>()
 
-                    TournamentScreen(
-                        modifier = Modifier.fillMaxSize(),
-                        viewModel = tournamentViewModel,
-                        onMatchClick = { match ->
-                            navController.navigate(
-                                MatchDetailsRoute(
-                                    match.id
-                                )
-                            )
-                        },
-                        onMatchAdd = {}
-                    )
-                }
-                dialog<AddTournamentRoute>(
+                        CounterDetailsScreen(viewModel = counterDetailsViewModel)
+                    }
+                    dialog<AddCounterDialogRoute> {
+                        val addCounterDialogViewModel = koinViewModel<AddCounterDialogViewModel>()
 
-                ) {
-                    val addTournamentViewModel = koinViewModel<AddTournamentViewModel>()
-
-                    AddTournamentScreen(
-                        viewModel = addTournamentViewModel,
-                        onDismissRequest = { navController.navigateUp() }
-                    )
+                        AddCounterDialogScreen(
+                            viewModel = addCounterDialogViewModel,
+                            onDismissRequest = { navController.navigateUp() })
+                    }
+                    platformSpecificRoutes()
                 }
-                composable<MatchDetailsRoute> {
-                    val matchDetailsViewModel = koinViewModel<MatchDetailsViewModel>()
-
-                    MatchDetailsScreen(viewModel = matchDetailsViewModel)
-                }
-                composable<CounterListRoute> {
-                    val counterListViewModel = koinViewModel<CounterListViewModel>()
-                    CounterListScreen(
-                        viewModel = counterListViewModel,
-                        onCounterClick = { counter ->
-                            navController.navigate(
-                                CounterDetailsRoute(
-                                    counter.id
-                                )
-                            )
-                        },
-                        onCounterAdd = {
-                            navController.navigate(AddCounterDialogRoute)
-                        }
-                    )
-                }
-                composable<CounterDetailsRoute> {
-                    val counterDetailsViewModel = koinViewModel<CounterDetailsViewModel>()
-
-                    CounterDetailsScreen(viewModel = counterDetailsViewModel)
-                }
-                dialog<AddCounterDialogRoute> {
-                    val addCounterDialogViewModel = koinViewModel<AddCounterDialogViewModel>()
-
-                    AddCounterDialogScreen(
-                        viewModel = addCounterDialogViewModel,
-                        onDismissRequest = { navController.navigateUp() })
-                }
-                platformSpecificRoutes()
             }
         }
     }
