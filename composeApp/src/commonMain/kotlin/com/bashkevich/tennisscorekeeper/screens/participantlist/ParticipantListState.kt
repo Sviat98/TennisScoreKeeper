@@ -9,6 +9,7 @@ import com.bashkevich.tennisscorekeeper.mvi.UiState
 
 @Immutable
 sealed class ParticipantListUiEvent : UiEvent {
+    class ShowParticipants(val participants: List<TennisParticipant>) : ParticipantListUiEvent()
 }
 
 @Immutable

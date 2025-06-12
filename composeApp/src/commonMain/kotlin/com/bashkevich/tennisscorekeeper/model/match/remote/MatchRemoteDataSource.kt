@@ -9,6 +9,7 @@ import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.plugins.websocket.DefaultClientWebSocketSession
 import io.ktor.client.plugins.websocket.webSocketSession
+import io.ktor.client.request.get
 import io.ktor.client.request.patch
 import io.ktor.client.request.setBody
 import io.ktor.http.URLProtocol
@@ -39,27 +40,6 @@ class MatchRemoteDataSource(
         extraBufferCapacity = 5
     )
 
-//    suspend fun getCounters(): LoadResult<List<CounterDto>, Throwable> {
-//        return runOperationCatching {
-//            val counters = httpClient.get("/counters").body<List<CounterDto>>()
-//
-//            counters
-//        }
-//    }
-
-//    suspend fun addCounter(
-//        counterBody: AddCounterBody,
-//    ): LoadResult<CounterDto, Throwable> {
-//        return runOperationCatching {
-//            val counterDto = httpClient.post("/counters") {
-//                setBody(counterBody)
-//            }.body<CounterDto>()
-//
-//            println(counterDto)
-//            counterDto
-//        }
-//    }
-
     suspend fun updateMatchScore(
         matchId: String,
         changeScoreBody: ChangeScoreBody
@@ -78,8 +58,7 @@ class MatchRemoteDataSource(
         matchId: String,
     ): LoadResult<ResponseMessage, Throwable> {
         return runOperationCatching {
-            val message = httpClient.patch("/matches/$matchId/undo") {
-            }.body<ResponseMessage>()
+            val message = httpClient.patch("/matches/$matchId/undo").body<ResponseMessage>()
 
             message
         }
@@ -89,10 +68,32 @@ class MatchRemoteDataSource(
         matchId: String,
     ): LoadResult<ResponseMessage, Throwable> {
         return runOperationCatching {
-            val message = httpClient.patch("/matches/$matchId/redo") {
+            val message = httpClient.patch("/matches/$matchId/redo").body<ResponseMessage>()
+
+            message
+        }
+    }
+
+    suspend fun updateMatchStatus(
+        matchId: String,
+        matchStatusBody: MatchStatusBody
+    ): LoadResult<ResponseMessage, Throwable> {
+        return runOperationCatching {
+            val message = httpClient.patch("/matches/$matchId/status") {
+                setBody(matchStatusBody)
             }.body<ResponseMessage>()
 
             message
+        }
+    }
+
+    suspend fun getMatchesByTournament(
+        tournamentId: String,
+    ): LoadResult<List<ShortMatchDto>, Throwable> {
+        return runOperationCatching {
+            val matches = httpClient.get("/tournaments/$tournamentId/matches").body<List<ShortMatchDto>>()
+
+            matches
         }
     }
 

@@ -14,6 +14,8 @@ data class MatchDto(
     val firstParticipant: ParticipantInMatchDto,
     @SerialName("second_participant")
     val secondParticipant: ParticipantInMatchDto,
+    @SerialName("status")
+    val status: MatchStatus,
     @SerialName("previous_sets")
     val previousSets: List<TennisSetDto>,
     @SerialName("current_set")

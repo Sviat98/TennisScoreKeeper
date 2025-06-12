@@ -2,12 +2,12 @@ package com.bashkevich.tennisscorekeeper.model.match.repository
 
 import com.bashkevich.tennisscorekeeper.core.LoadResult
 import com.bashkevich.tennisscorekeeper.model.match.domain.Match
-import com.bashkevich.tennisscorekeeper.model.match.SimpleMatch
+import com.bashkevich.tennisscorekeeper.model.match.domain.ShortMatch
 import com.bashkevich.tennisscorekeeper.model.match.remote.ScoreType
 import kotlinx.coroutines.flow.Flow
 
 interface MatchRepository {
-    suspend fun getMatches(): LoadResult<List<SimpleMatch>, Throwable>
+    suspend fun getMatchesForTournament(tournamentId: String): LoadResult<List<ShortMatch>, Throwable>
     suspend fun closeSession()
     fun connectToMatchUpdates(matchId: String)
     fun observeMatchUpdates(): Flow<LoadResult<Match, Throwable>>

@@ -23,7 +23,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.bashkevich.tennisscorekeeper.LocalNavHostController
 import com.bashkevich.tennisscorekeeper.components.hoverScaleEffect
 import com.bashkevich.tennisscorekeeper.components.match.MatchCard
-import com.bashkevich.tennisscorekeeper.model.match.SimpleMatch
+import com.bashkevich.tennisscorekeeper.model.match.domain.ShortMatch
 import com.bashkevich.tennisscorekeeper.navigation.MatchDetailsRoute
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -44,7 +44,7 @@ fun MatchListScreen(
     MatchListContent(
         modifier = Modifier.then(modifier),
         state = state,
-        onItemClick = {match-> navController.navigate(MatchDetailsRoute(match.id)) },
+        onItemClick = { match -> navController.navigate(MatchDetailsRoute(match.id)) },
         onMatchAdd = { }
     )
 
@@ -54,7 +54,7 @@ fun MatchListScreen(
 fun MatchListContent(
     modifier: Modifier = Modifier,
     state: MatchListState,
-    onItemClick: (SimpleMatch) -> Unit,
+    onItemClick: (ShortMatch) -> Unit,
     onMatchAdd: () -> Unit
 ) {
     Scaffold(
@@ -67,14 +67,15 @@ fun MatchListContent(
     ) {
         Box(
             modifier = Modifier.fillMaxSize()
-        ){
+        ) {
             LazyColumn(
                 modifier = Modifier.align(Alignment.Center),
                 verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterVertically),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 contentPadding = PaddingValues(16.dp)
             ) {
-                items(state.matches,
+                items(
+                    state.matches,
                     key = { it.id }) { match ->
                     MatchCard(
                         modifier = Modifier.hoverScaleEffect(),

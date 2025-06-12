@@ -16,10 +16,10 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.bashkevich.tennisscorekeeper.model.participant.domain.DoublesParticipantInMatch
+import com.bashkevich.tennisscorekeeper.model.participant.domain.ParticipantInDoublesMatch
 import com.bashkevich.tennisscorekeeper.model.player.domain.DoublesPlayerInMatch
 import com.bashkevich.tennisscorekeeper.model.match.domain.Match
-import com.bashkevich.tennisscorekeeper.model.participant.domain.SinglesParticipantInMatch
+import com.bashkevich.tennisscorekeeper.model.participant.domain.ParticipantInSinglesMatch
 import com.bashkevich.tennisscorekeeper.model.participant.domain.TennisParticipantInMatch
 
 @Composable
@@ -42,7 +42,7 @@ fun ParticipantOnScoreboardView(modifier: Modifier = Modifier, match: Match) {
 }
 
 @Composable
-fun DoublesParticipantOnScoreboard(participant: DoublesParticipantInMatch) {
+fun DoublesParticipantOnScoreboard(participant: ParticipantInDoublesMatch) {
     val (firstPlayerDisplayName, secondPlayerDisplayName) = participant.displayName.split("/")
 
     val firstPlayer = participant.firstPlayer as DoublesPlayerInMatch
@@ -78,7 +78,7 @@ fun ParticipantOnScoreboardRow(
         horizontalArrangement = Arrangement.spacedBy(4.dp)
     ) {
         when (participant) {
-            is SinglesParticipantInMatch -> {
+            is ParticipantInSinglesMatch -> {
                 Text(
                     text = participant.displayName,
                     fontSize = 20.sp,
@@ -86,7 +86,7 @@ fun ParticipantOnScoreboardRow(
                 )
             }
 
-            is DoublesParticipantInMatch -> {
+            is ParticipantInDoublesMatch -> {
                 DoublesParticipantOnScoreboard(
                     participant = participant,
                 )

@@ -2,6 +2,7 @@ package com.bashkevich.tennisscorekeeper.screens.matchlist
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.toRoute
 import com.bashkevich.tennisscorekeeper.core.LoadResult
 import com.bashkevich.tennisscorekeeper.model.match.repository.MatchRepository
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -11,10 +12,11 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.flow.Flow
 
 import com.bashkevich.tennisscorekeeper.mvi.BaseViewModel
-import com.bashkevich.tennisscorekeeper.screens.counterlist.CounterListUiEvent
+import com.bashkevich.tennisscorekeeper.navigation.TournamentRoute
 import kotlinx.coroutines.launch
 
 class MatchListViewModel(
+    savedStateHandle: SavedStateHandle,
     private val matchRepository: MatchRepository
 ) : BaseViewModel<MatchListState, MatchListUiEvent, MatchListAction>() {
 
@@ -26,8 +28,11 @@ class MatchListViewModel(
         get() = super.action
 
     init {
+
+        val tournamentId = savedStateHandle.toRoute<TournamentRoute>().tournamentId
+
         viewModelScope.launch {
-            val loadResult = matchRepository.getMatches()
+            val loadResult = matchRepository.getMatchesForTournament(tournamentId)
 
             println(loadResult)
 

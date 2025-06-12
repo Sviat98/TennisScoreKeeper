@@ -1,24 +1,24 @@
 package com.bashkevich.tennisscorekeeper.model.match.domain
 
-import com.bashkevich.tennisscorekeeper.model.participant.remote.DoublesParticipantInMatchDto
 import com.bashkevich.tennisscorekeeper.model.match.remote.MatchDto
-import com.bashkevich.tennisscorekeeper.model.participant.remote.ParticipantInMatchDto
-import com.bashkevich.tennisscorekeeper.model.participant.remote.SinglesParticipantInMatchDto
+import com.bashkevich.tennisscorekeeper.model.match.remote.MatchStatus
 import com.bashkevich.tennisscorekeeper.model.match.remote.SpecialSetMode
 import com.bashkevich.tennisscorekeeper.model.match.remote.TennisGameDto
 import com.bashkevich.tennisscorekeeper.model.match.remote.TennisSetDto
-import com.bashkevich.tennisscorekeeper.model.participant.domain.DoublesParticipantInMatch
-import com.bashkevich.tennisscorekeeper.model.participant.domain.SinglesParticipantInMatch
+import com.bashkevich.tennisscorekeeper.model.match.remote.convertToString
+import com.bashkevich.tennisscorekeeper.model.participant.domain.ParticipantInDoublesMatch
+import com.bashkevich.tennisscorekeeper.model.participant.domain.ParticipantInSinglesMatch
 import com.bashkevich.tennisscorekeeper.model.participant.domain.TennisParticipantInMatch
+import com.bashkevich.tennisscorekeeper.model.participant.domain.toDomain
 import com.bashkevich.tennisscorekeeper.model.player.domain.DoublesPlayerInMatch
 import com.bashkevich.tennisscorekeeper.model.player.domain.SinglesPlayerInMatch
-import com.bashkevich.tennisscorekeeper.model.player.domain.toDomain
 
 data class Match(
     val id: String,
     val pointShift: Int,
     val firstParticipant: TennisParticipantInMatch,
     val secondParticipant: TennisParticipantInMatch,
+    val status: String,
     val previousSets: List<TennisSet>,
     val currentSet: TennisSet?,
     val currentSetMode: SpecialSetMode?,
@@ -45,37 +45,13 @@ fun MatchDto.toDomain() = Match(
     pointShift = this.pointShift,
     firstParticipant = this.firstParticipant.toDomain(),
     secondParticipant = this.secondParticipant.toDomain(),
+    status = this.status.convertToString(),
     previousSets = this.previousSets.map { it.toDomain() },
     currentSet = this.currentSet?.toDomain(),
     currentSetMode = this.currentSetMode,
     currentGame = this.currentGame?.toDomain()
 )
 
-fun ParticipantInMatchDto.toDomain() =
-    when (this) {
-        is SinglesParticipantInMatchDto -> {
-            SinglesParticipantInMatch(
-                id = this.id,
-                seed = this.seed,
-                displayName = this.displayName,
-                isWinner = this.isWinner,
-                isServing = this.isServing,
-                player = this.player.toDomain()
-            )
-        }
-
-        is DoublesParticipantInMatchDto -> {
-            DoublesParticipantInMatch(
-                id = this.id,
-                seed = this.seed,
-                displayName = this.displayName,
-                isServing = this.isServing,
-                isWinner = this.isWinner,
-                firstPlayer = this.firstPlayer.toDomain(),
-                secondPlayer = this.secondPlayer.toDomain()
-            )
-        }
-    }
 
 fun TennisSetDto.toDomain() = TennisSet(
     firstParticipantGamesWon = this.firstParticipantGames,
@@ -91,7 +67,7 @@ fun TennisGameDto.toDomain() = TennisGame(
 val SAMPLE_MATCH = Match(
     id = "1",
     pointShift = 0,
-    firstParticipant = SinglesParticipantInMatch(
+    firstParticipant = ParticipantInSinglesMatch(
         id = "1",
         seed = 1,
         displayName = "Djokovic",
@@ -99,7 +75,7 @@ val SAMPLE_MATCH = Match(
         isWinner = true,
         player = SinglesPlayerInMatch(id = "1", surname = "Djokovic", name = "Novak")
     ),
-    secondParticipant = SinglesParticipantInMatch(
+    secondParticipant = ParticipantInSinglesMatch(
         id = "2",
         seed = null,
         displayName = "Auger-Aliassime",
@@ -107,6 +83,7 @@ val SAMPLE_MATCH = Match(
         isWinner = false,
         player = SinglesPlayerInMatch(id = "2", surname = "Auger-Aliassime", name = "Felix")
     ),
+    status = MatchStatus.IN_PROGRESS.convertToString(),
     previousSets = listOf(
         TennisSet(firstParticipantGamesWon = 6, secondParticipantGamesWon = 4),
         TennisSet(firstParticipantGamesWon = 3, secondParticipantGamesWon = 6),
@@ -120,7 +97,7 @@ val SAMPLE_MATCH = Match(
 val DOUBLES_SAMPLE_MATCH = Match(
     id = "2",
     pointShift = 0,
-    firstParticipant = DoublesParticipantInMatch(
+    firstParticipant = ParticipantInDoublesMatch(
         id = "5",
         seed = 1,
         displayName = "Djokovic/Nadal",
@@ -139,7 +116,7 @@ val DOUBLES_SAMPLE_MATCH = Match(
             isServing = false
         )
     ),
-    secondParticipant = DoublesParticipantInMatch(
+    secondParticipant = ParticipantInDoublesMatch(
         id = "6",
         seed = null,
         displayName = "Murray/Federer",
@@ -153,6 +130,7 @@ val DOUBLES_SAMPLE_MATCH = Match(
             isServing = true
         ),
     ),
+    status = MatchStatus.IN_PROGRESS.convertToString(),
     previousSets = listOf(
         TennisSet(firstParticipantGamesWon = 6, secondParticipantGamesWon = 4),
         TennisSet(firstParticipantGamesWon = 3, secondParticipantGamesWon = 6),
@@ -165,7 +143,7 @@ val DOUBLES_SAMPLE_MATCH = Match(
 val SECOND_SAMPLE_MATCH = Match(
     id = "2",
     pointShift = 0,
-    firstParticipant = SinglesParticipantInMatch(
+    firstParticipant = ParticipantInSinglesMatch(
         id = "1",
         seed = 10,
         displayName = "Djokovic",
@@ -173,7 +151,7 @@ val SECOND_SAMPLE_MATCH = Match(
         isWinner = false,
         player = DoublesPlayerInMatch(id = "1", surname = "Djokovic", name = "Novak", isServing = false)
     ),
-    secondParticipant = SinglesParticipantInMatch(
+    secondParticipant = ParticipantInSinglesMatch(
         id = "2",
         seed = null,
         displayName = "Auger-Aliassime",
@@ -186,6 +164,7 @@ val SECOND_SAMPLE_MATCH = Match(
             isServing = true
         )
     ),
+    status = MatchStatus.IN_PROGRESS.convertToString(),
     previousSets = listOf(
         TennisSet(firstParticipantGamesWon = 12, secondParticipantGamesWon = 10),
         TennisSet(firstParticipantGamesWon = 10, secondParticipantGamesWon = 12),

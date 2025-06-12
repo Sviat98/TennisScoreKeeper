@@ -3,7 +3,7 @@ package com.bashkevich.tennisscorekeeper.model.match.repository
 import com.bashkevich.tennisscorekeeper.core.LoadResult
 import com.bashkevich.tennisscorekeeper.core.mapSuccess
 import com.bashkevich.tennisscorekeeper.model.match.domain.Match
-import com.bashkevich.tennisscorekeeper.model.match.SimpleMatch
+import com.bashkevich.tennisscorekeeper.model.match.domain.ShortMatch
 import com.bashkevich.tennisscorekeeper.model.match.domain.toDomain
 import com.bashkevich.tennisscorekeeper.model.match.remote.ChangeScoreBody
 import com.bashkevich.tennisscorekeeper.model.match.remote.MatchRemoteDataSource
@@ -14,12 +14,8 @@ import kotlinx.coroutines.flow.map
 class MatchRepositoryImpl(
     private val matchRemoteDataSource: MatchRemoteDataSource
 ) : MatchRepository{
-    override suspend fun getMatches(): LoadResult<List<SimpleMatch>, Throwable> {
-        return LoadResult.Success(listOf(
-            SimpleMatch("1","Djokovic", "Auger Aliassime", "not started"),
-            SimpleMatch("2","Djokovic/Nadal", "Murray/Federer", "not started"),
-            )
-        )
+    override suspend fun getMatchesForTournament(tournamentId: String): LoadResult<List<ShortMatch>, Throwable> {
+        return matchRemoteDataSource.getMatchesByTournament(tournamentId).mapSuccess { shortMatches -> shortMatches.map { it.toDomain() } }
     }
 
     override suspend fun closeSession() {

@@ -16,7 +16,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.bashkevich.tennisscorekeeper.model.match.SimpleMatch
+import com.bashkevich.tennisscorekeeper.model.match.domain.ShortMatch
+import com.bashkevich.tennisscorekeeper.model.match.remote.convertToString
+import com.bashkevich.tennisscorekeeper.model.participant.domain.toShortMatchDisplayFormat
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -24,7 +26,7 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 @Preview
 fun MatchCard(
     modifier: Modifier = Modifier,
-    match: SimpleMatch,
+    match: ShortMatch,
     onClick: () -> Unit
 ) {
     Card(
@@ -47,7 +49,7 @@ fun MatchCard(
 @Composable
 fun MatchItemView(
     modifier: Modifier = Modifier,
-    match: SimpleMatch
+    match: ShortMatch
 ) {
     Column(
         modifier = Modifier.then(modifier).wrapContentSize().background(
@@ -55,8 +57,8 @@ fun MatchItemView(
         ).padding(8.dp),
         verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {
-        Text(match.firstPlayer)
-        Text(match.status)
-        Text(match.secondPlayer)
+        Text(match.firstParticipant.toShortMatchDisplayFormat())
+        Text(match.status.convertToString())
+        Text(match.secondParticipant.toShortMatchDisplayFormat())
     }
 }

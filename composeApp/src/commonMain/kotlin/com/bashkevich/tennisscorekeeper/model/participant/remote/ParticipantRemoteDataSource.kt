@@ -9,10 +9,10 @@ import io.ktor.client.request.get
 class ParticipantRemoteDataSource(
     private val httpClient: HttpClient,
 ) {
-        suspend fun getParticipants(tournamentId: String): LoadResult<List<ParticipantInMatchDto>, Throwable> {
+        suspend fun getParticipants(tournamentId: String): LoadResult<List<ParticipantDto>, Throwable> {
 
         return runOperationCatching {
-            val participants = httpClient.get("/tournaments/$tournamentId/participants").body<List<ParticipantInMatchDto>>()
+            val participants = httpClient.get("/tournaments/$tournamentId/participants").body<List<ParticipantDto>>()
 
             participants
         }
