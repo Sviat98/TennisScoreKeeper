@@ -14,23 +14,18 @@ import com.bashkevich.tennisscorekeeper.di.counterModule
 import com.bashkevich.tennisscorekeeper.di.matchModule
 import com.bashkevich.tennisscorekeeper.di.participantModule
 import com.bashkevich.tennisscorekeeper.di.platformModule
+import com.bashkevich.tennisscorekeeper.di.setTemplateModule
 import com.bashkevich.tennisscorekeeper.di.tournamentModule
-import com.bashkevich.tennisscorekeeper.navigation.AddCounterDialogRoute
+import com.bashkevich.tennisscorekeeper.navigation.AddMatchRoute
 import com.bashkevich.tennisscorekeeper.navigation.AddTournamentRoute
-import com.bashkevich.tennisscorekeeper.navigation.CounterDetailsRoute
-import com.bashkevich.tennisscorekeeper.navigation.CounterListRoute
 import com.bashkevich.tennisscorekeeper.navigation.MatchDetailsRoute
 import com.bashkevich.tennisscorekeeper.navigation.TournamentRoute
 import com.bashkevich.tennisscorekeeper.navigation.TournamentsRoute
 import com.bashkevich.tennisscorekeeper.navigation.platformSpecificRoutes
-import com.bashkevich.tennisscorekeeper.screens.addcounterdialog.AddCounterDialogScreen
-import com.bashkevich.tennisscorekeeper.screens.addcounterdialog.AddCounterDialogViewModel
+import com.bashkevich.tennisscorekeeper.screens.addmatch.AddMatchScreen
+import com.bashkevich.tennisscorekeeper.screens.addmatch.AddMatchViewModel
 import com.bashkevich.tennisscorekeeper.screens.addtournament.AddTournamentScreen
 import com.bashkevich.tennisscorekeeper.screens.addtournament.AddTournamentViewModel
-import com.bashkevich.tennisscorekeeper.screens.counterdetails.CounterDetailsScreen
-import com.bashkevich.tennisscorekeeper.screens.counterdetails.CounterDetailsViewModel
-import com.bashkevich.tennisscorekeeper.screens.counterlist.CounterListScreen
-import com.bashkevich.tennisscorekeeper.screens.counterlist.CounterListViewModel
 import com.bashkevich.tennisscorekeeper.screens.matchdetails.MatchDetailsScreen
 import com.bashkevich.tennisscorekeeper.screens.matchdetails.MatchDetailsViewModel
 import com.bashkevich.tennisscorekeeper.screens.tournamentdetails.TournamentScreen
@@ -56,6 +51,7 @@ fun App(navController: NavHostController = rememberNavController()) {
             counterModule,
             tournamentModule,
             matchModule,
+            setTemplateModule,
             participantModule
             )
     }) {
@@ -80,9 +76,7 @@ fun App(navController: NavHostController = rememberNavController()) {
                             viewModel = tournamentViewModel,
                         )
                     }
-                    dialog<AddTournamentRoute>(
-
-                    ) {
+                    dialog<AddTournamentRoute>{
                         val addTournamentViewModel = koinViewModel<AddTournamentViewModel>()
 
                         AddTournamentScreen(
@@ -94,34 +88,44 @@ fun App(navController: NavHostController = rememberNavController()) {
 
                         MatchDetailsScreen(viewModel = matchDetailsViewModel)
                     }
-                    composable<CounterListRoute> {
-                        val counterListViewModel = koinViewModel<CounterListViewModel>()
-                        CounterListScreen(
-                            viewModel = counterListViewModel,
-                            onCounterClick = { counter ->
-                                navController.navigate(
-                                    CounterDetailsRoute(
-                                        counter.id
-                                    )
-                                )
-                            },
-                            onCounterAdd = {
-                                navController.navigate(AddCounterDialogRoute)
-                            }
+                    composable<AddMatchRoute> {
+                        val addMatchViewModel = koinViewModel<AddMatchViewModel>()
+
+                        AddMatchScreen(
+                            modifier = Modifier.fillMaxSize(),
+                            viewModel = addMatchViewModel
                         )
                     }
-                    composable<CounterDetailsRoute> {
-                        val counterDetailsViewModel = koinViewModel<CounterDetailsViewModel>()
 
-                        CounterDetailsScreen(viewModel = counterDetailsViewModel)
-                    }
-                    dialog<AddCounterDialogRoute> {
-                        val addCounterDialogViewModel = koinViewModel<AddCounterDialogViewModel>()
 
-                        AddCounterDialogScreen(
-                            viewModel = addCounterDialogViewModel,
-                            onDismissRequest = { navController.navigateUp() })
-                    }
+//                    composable<CounterListRoute> {
+//                        val counterListViewModel = koinViewModel<CounterListViewModel>()
+//                        CounterListScreen(
+//                            viewModel = counterListViewModel,
+//                            onCounterClick = { counter ->
+//                                navController.navigate(
+//                                    CounterDetailsRoute(
+//                                        counter.id
+//                                    )
+//                                )
+//                            },
+//                            onCounterAdd = {
+//                                navController.navigate(AddCounterDialogRoute)
+//                            }
+//                        )
+//                    }
+//                    composable<CounterDetailsRoute> {
+//                        val counterDetailsViewModel = koinViewModel<CounterDetailsViewModel>()
+//
+//                        CounterDetailsScreen(viewModel = counterDetailsViewModel)
+//                    }
+//                    dialog<AddCounterDialogRoute> {
+//                        val addCounterDialogViewModel = koinViewModel<AddCounterDialogViewModel>()
+//
+//                        AddCounterDialogScreen(
+//                            viewModel = addCounterDialogViewModel,
+//                            onDismissRequest = { navController.navigateUp() })
+//                    }
                     platformSpecificRoutes()
                 }
             }

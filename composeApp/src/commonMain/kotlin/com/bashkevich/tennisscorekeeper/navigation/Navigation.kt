@@ -13,26 +13,21 @@ data object TournamentsRoute
 
 @Serializable
 @SerialName("tournaments")
-data class TournamentRoute(val tournamentId: String){
-//    companion object {
-//        fun create(id: String, tab: TournamentTab): TournamentRoute =
-//            TournamentRoute(id, tab.toRouteString())
-//    }
-//
-//    fun getTab(): TournamentTab = routeStringToTournamentTab(currentTab)
-}
+data class TournamentRoute(val tournamentId: String)
 
 @Serializable
-@SerialName("tournaments/add")
+@SerialName("addTournament")
+//@SerialName("tournaments/add") распознает как TournamentRoute(id=add) на НЕ-Андроид
 data object AddTournamentRoute
 
 @Serializable
 @SerialName("matches")
-data object MatchesRoute
+data class MatchDetailsRoute(val id: String)
 
 @Serializable
-@SerialName("matches")
-data class MatchDetailsRoute(val id: String)
+@SerialName("addMatch")
+//@SerialName("matches/add") распознает как MatchDetailsRoute(id=add) на НЕ-Андроид
+data class AddMatchRoute(val tournamentId: String = "")
 
 @Serializable
 data object CounterListRoute

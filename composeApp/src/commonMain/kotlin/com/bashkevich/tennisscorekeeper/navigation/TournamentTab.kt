@@ -18,9 +18,3 @@ fun TournamentTab.toRouteString(): String = when (this) {
     TournamentTab.Matches -> "matches"
     TournamentTab.Participants -> "participants"
 }
-
-fun routeStringToTournamentTab(value: String): TournamentTab = when (value) {
-    "matches" -> TournamentTab.Matches
-    "participants" -> TournamentTab.Participants
-    else -> error("Invalid TournamentTab: $value") // Fails fast if invalid
-}

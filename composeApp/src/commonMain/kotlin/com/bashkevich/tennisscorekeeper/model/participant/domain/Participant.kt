@@ -17,12 +17,26 @@ data class SinglesParticipant(
     val player: PlayerInParticipant
 ) : TennisParticipant()
 
+val SINGLES_PARTICIPANT_DEFAULT = SinglesParticipant(
+    id = "0",
+    seed = null,
+    player = PlayerInParticipant(id = "0", surname = "", name = "")
+)
+
 data class DoublesParticipant(
     override val id: String,
     override val seed: Int?,
     val firstPlayer: PlayerInParticipant,
     val secondPlayer: PlayerInParticipant
 ) : TennisParticipant()
+
+val DOUBLES_PARTICIPANT_DEFAULT = DoublesParticipant(
+    id = "0",
+    seed = null,
+    firstPlayer = PlayerInParticipant(id = "0", surname = "", name = ""),
+    secondPlayer = PlayerInParticipant(id = "0", surname = "", name = "")
+)
+
 
 fun ParticipantDto.toDomain(): TennisParticipant = when (this) {
     is SinglesParticipantDto ->

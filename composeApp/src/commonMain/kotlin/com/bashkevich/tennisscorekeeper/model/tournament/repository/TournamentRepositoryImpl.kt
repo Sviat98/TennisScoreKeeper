@@ -23,6 +23,12 @@ class TournamentRepositoryImpl(
         }
     }
 
+    override suspend fun getTournamentById(id: String): LoadResult<Tournament, Throwable> {
+        return tournamentRemoteDataSource.getTournamentById(id).mapSuccess { tournamentDto ->
+            tournamentDto.toDomain()
+        }
+    }
+
     override suspend fun addTournament(addTournamentBody: AddTournamentBody): LoadResult<Tournament, Throwable> {
         return tournamentRemoteDataSource.addTournament(addTournamentBody)
             .mapSuccess { tournamentDto ->

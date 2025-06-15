@@ -40,6 +40,8 @@ fun TournamentListScreen(
 
     val navController = LocalNavHostController.current
 
+    println(navController)
+
     TournamentListContent(
         modifier = Modifier.then(modifier),
         state = state,

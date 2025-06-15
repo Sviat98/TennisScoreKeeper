@@ -11,5 +11,7 @@ data class Tournament(
     val status: TournamentStatus,
 )
 
+val TOURNAMENT_DEFAULT = Tournament(id = "0", name = "", type = TournamentType.SINGLES, status = TournamentStatus.NOT_STARTED)
+
 fun TournamentDto.toDomain() =
     Tournament(id = this.id, name = this.name, type = this.type, status = this.status)

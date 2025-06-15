@@ -11,7 +11,7 @@ import io.ktor.client.request.setBody
 class TournamentRemoteDataSource(
     private val httpClient: HttpClient
 ) {
-    suspend fun getTournaments() : LoadResult<List<TournamentDto>, Throwable> {
+    suspend fun getTournaments(): LoadResult<List<TournamentDto>, Throwable> {
         return runOperationCatching {
             val tournaments = httpClient.get("/tournaments").body<List<TournamentDto>>()
 
@@ -19,13 +19,21 @@ class TournamentRemoteDataSource(
         }
     }
 
-    suspend fun addTournament(tournamentBody: AddTournamentBody) :  LoadResult<TournamentDto, Throwable> {
-            return runOperationCatching {
-                val tournamentDto = httpClient.post("/tournaments") {
-                    setBody(tournamentBody)
-                }.body<TournamentDto>()
+    suspend fun getTournamentById(id: String): LoadResult<TournamentDto, Throwable> {
+        return runOperationCatching {
+            val tournament = httpClient.get("/tournaments/$id").body<TournamentDto>()
 
-                tournamentDto
-            }
+            tournament
         }
+    }
+
+    suspend fun addTournament(tournamentBody: AddTournamentBody): LoadResult<TournamentDto, Throwable> {
+        return runOperationCatching {
+            val tournamentDto = httpClient.post("/tournaments") {
+                setBody(tournamentBody)
+            }.body<TournamentDto>()
+
+            tournamentDto
+        }
+    }
 }

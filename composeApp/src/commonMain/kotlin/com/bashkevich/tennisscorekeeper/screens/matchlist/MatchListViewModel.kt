@@ -32,6 +32,8 @@ class MatchListViewModel(
         val tournamentId = savedStateHandle.toRoute<TournamentRoute>().tournamentId
 
         viewModelScope.launch {
+            onEvent(MatchListUiEvent.SetTournamentId(tournamentId))
+
             val loadResult = matchRepository.getMatchesForTournament(tournamentId)
 
             println(loadResult)
@@ -44,6 +46,9 @@ class MatchListViewModel(
 
     fun onEvent(uiEvent: MatchListUiEvent) {
         when(uiEvent){
+            is MatchListUiEvent.SetTournamentId -> {
+                reduceState { oldState-> oldState.copy(tournamentId = uiEvent.tournamentId) }
+            }
             is MatchListUiEvent.ShowMatches -> {
                 reduceState { oldState-> oldState.copy(matches = uiEvent.matches) }
             }

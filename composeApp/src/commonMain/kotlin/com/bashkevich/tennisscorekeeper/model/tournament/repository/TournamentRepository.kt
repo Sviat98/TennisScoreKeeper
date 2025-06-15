@@ -10,4 +10,5 @@ interface TournamentRepository {
     suspend fun addTournament(addTournamentBody: AddTournamentBody): LoadResult<Tournament, Throwable>
     fun emitNewTournament(addTournamentBody: AddTournamentBody)
     fun observeNewTournament(): SharedFlow<AddTournamentBody>
+    suspend fun getTournamentById(id: String): LoadResult<Tournament, Throwable>
 }

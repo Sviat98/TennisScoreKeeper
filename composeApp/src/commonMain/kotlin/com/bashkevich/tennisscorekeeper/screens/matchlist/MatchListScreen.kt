@@ -24,6 +24,7 @@ import com.bashkevich.tennisscorekeeper.LocalNavHostController
 import com.bashkevich.tennisscorekeeper.components.hoverScaleEffect
 import com.bashkevich.tennisscorekeeper.components.match.MatchCard
 import com.bashkevich.tennisscorekeeper.model.match.domain.ShortMatch
+import com.bashkevich.tennisscorekeeper.navigation.AddMatchRoute
 import com.bashkevich.tennisscorekeeper.navigation.MatchDetailsRoute
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -45,7 +46,9 @@ fun MatchListScreen(
         modifier = Modifier.then(modifier),
         state = state,
         onItemClick = { match -> navController.navigate(MatchDetailsRoute(match.id)) },
-        onMatchAdd = { }
+        onMatchAdd = { tournamentId ->
+            navController.navigate(AddMatchRoute(tournamentId))
+        }
     )
 
 }
@@ -55,12 +58,12 @@ fun MatchListContent(
     modifier: Modifier = Modifier,
     state: MatchListState,
     onItemClick: (ShortMatch) -> Unit,
-    onMatchAdd: () -> Unit
+    onMatchAdd: (String) -> Unit
 ) {
     Scaffold(
         modifier = Modifier.then(modifier),
         floatingActionButton = {
-            FloatingActionButton(onClick = onMatchAdd) {
+            FloatingActionButton(onClick = {onMatchAdd(state.tournamentId)}) {
                 Icon(Icons.Filled.Add, contentDescription = "Add Match")
             }
         }
