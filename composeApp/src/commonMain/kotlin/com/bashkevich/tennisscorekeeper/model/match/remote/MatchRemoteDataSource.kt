@@ -11,6 +11,7 @@ import io.ktor.client.plugins.websocket.DefaultClientWebSocketSession
 import io.ktor.client.plugins.websocket.webSocketSession
 import io.ktor.client.request.get
 import io.ktor.client.request.patch
+import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.http.URLProtocol
 import io.ktor.http.path
@@ -39,6 +40,20 @@ class MatchRemoteDataSource(
         replay = 1, // Always emit the latest counter update
         extraBufferCapacity = 5
     )
+
+    suspend fun addNewMatch(
+        tournamentId: String,
+        matchBody: MatchBody
+    ): LoadResult<ShortMatchDto, Throwable> {
+        return runOperationCatching {
+            val shortMatchDto = httpClient.post("/tournaments/$tournamentId/matches") {
+                setBody(matchBody)
+            }.body<ShortMatchDto>()
+
+            println(shortMatchDto)
+            shortMatchDto
+        }
+    }
 
     suspend fun updateMatchScore(
         matchId: String,
@@ -91,7 +106,8 @@ class MatchRemoteDataSource(
         tournamentId: String,
     ): LoadResult<List<ShortMatchDto>, Throwable> {
         return runOperationCatching {
-            val matches = httpClient.get("/tournaments/$tournamentId/matches").body<List<ShortMatchDto>>()
+            val matches =
+                httpClient.get("/tournaments/$tournamentId/matches").body<List<ShortMatchDto>>()
 
             matches
         }
@@ -123,14 +139,17 @@ class MatchRemoteDataSource(
                                 when (frame) {
                                     is Frame.Text -> {
                                         println(frame.readText())
-                                        val matchDto = Json.decodeFromString<MatchDto>(frame.readText())
+                                        val matchDto =
+                                            Json.decodeFromString<MatchDto>(frame.readText())
                                         _matchFlow.emit(LoadResult.Success(matchDto))
                                     }
+
                                     is Frame.Close -> {
                                         println("Connection closed: ${frame.readReason()}")
                                         webSocketSession?.close()
                                         break@innerloop
                                     }
+
                                     else -> Unit
                                 }
                             }

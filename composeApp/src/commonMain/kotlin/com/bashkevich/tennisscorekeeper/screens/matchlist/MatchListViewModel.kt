@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.Flow
 
 import com.bashkevich.tennisscorekeeper.mvi.BaseViewModel
 import com.bashkevich.tennisscorekeeper.navigation.TournamentRoute
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 
 class MatchListViewModel(
@@ -38,19 +39,37 @@ class MatchListViewModel(
 
             println(loadResult)
 
-            if (loadResult is LoadResult.Success){
+            if (loadResult is LoadResult.Success) {
                 onEvent(MatchListUiEvent.ShowMatches(matches = loadResult.result))
+            }
+        }
+
+        viewModelScope.launch {
+            matchRepository.observeNewMatch().distinctUntilChanged { old, new ->
+                old === new
+            }.collect { matchBody ->
+
+                val loadResult = matchRepository.addNewMatch(tournamentId,matchBody)
+
+                if (loadResult is LoadResult.Success) {
+                    val newMatch = loadResult.result
+                    val matches = state.value.matches.toMutableList()
+
+                    matches.add(newMatch)
+                    onEvent(MatchListUiEvent.ShowMatches(matches = matches))
+                }
             }
         }
     }
 
     fun onEvent(uiEvent: MatchListUiEvent) {
-        when(uiEvent){
+        when (uiEvent) {
             is MatchListUiEvent.SetTournamentId -> {
-                reduceState { oldState-> oldState.copy(tournamentId = uiEvent.tournamentId) }
+                reduceState { oldState -> oldState.copy(tournamentId = uiEvent.tournamentId) }
             }
+
             is MatchListUiEvent.ShowMatches -> {
-                reduceState { oldState-> oldState.copy(matches = uiEvent.matches) }
+                reduceState { oldState -> oldState.copy(matches = uiEvent.matches) }
             }
         }
     }

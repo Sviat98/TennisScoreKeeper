@@ -1,4 +1,4 @@
-package com.bashkevich.tennisscorekeeper.components.match
+package com.bashkevich.tennisscorekeeper.components.scoreboard
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column

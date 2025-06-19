@@ -49,3 +49,8 @@ fun ParticipantDto.toDomain(): TennisParticipant = when (this) {
         secondPlayer = this.secondPlayer.toDomain()
     )
 }
+
+fun TennisParticipant.toDisplayFormat() = when (this) {
+    is SinglesParticipant -> "${this.player.surname} ${this.player.name}"
+    is DoublesParticipant -> "${this.firstPlayer.surname} ${this.firstPlayer.name} / ${this.secondPlayer.surname} ${this.secondPlayer.name}"
+}

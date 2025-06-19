@@ -13,9 +13,31 @@ data class SetTemplate(
     val isDeciding: Boolean,
 )
 
+val EMPTY_REGULAR_SET_TEMPLATE = SetTemplate(
+    id = "0",
+    name = "",
+    gamesToWin = 0,
+    hasDecidingPoint = false,
+    tiebreakMode = TiebreakMode.NO,
+    tiebreakPointsToWin = 0,
+    isRegular = true,
+    isDeciding = false
+)
+
+val EMPTY_DECIDING_SET_TEMPLATE = SetTemplate(
+    id = "0",
+    name = "",
+    gamesToWin = 0,
+    hasDecidingPoint = false,
+    tiebreakMode = TiebreakMode.NO,
+    tiebreakPointsToWin = 0,
+    isRegular = false,
+    isDeciding = true
+)
+
 fun SetTemplateDto.toDomain() = SetTemplate(
     id = this.id,
-    name = this.name,
+    name = this.name.replace(";", "\n"),
     gamesToWin = this.gamesToWin,
     hasDecidingPoint = this.hasDecidingPoint,
     tiebreakMode = this.tiebreakMode,

@@ -3,7 +3,6 @@ package com.bashkevich.tennisscorekeeper.screens.addmatch
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.Text
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -12,7 +11,8 @@ import androidx.compose.ui.Alignment
 
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.bashkevich.tennisscorekeeper.model.tournament.remote.TournamentType
+import com.bashkevich.tennisscorekeeper.LocalNavHostController
+import com.bashkevich.tennisscorekeeper.components.match.AddMatchComponent
 
 @Composable
 fun AddMatchScreen(
@@ -26,10 +26,13 @@ fun AddMatchScreen(
         }
     }
 
+    val navController = LocalNavHostController.current
+
     AddMatchContent(
         modifier = Modifier.then(modifier),
         state = state,
-        onMatchAdded = {}
+        onEvent = { viewModel.onEvent(it) },
+        onNavigateAfterMatchAdd = { navController.navigateUp() }
     )
 }
 
@@ -37,7 +40,8 @@ fun AddMatchScreen(
 fun AddMatchContent(
     modifier: Modifier = Modifier,
     state: AddMatchState,
-    onMatchAdded: () -> Unit
+    onEvent: (AddMatchUiEvent) -> Unit,
+    onNavigateAfterMatchAdd: () -> Unit
 ) {
     Column(
         modifier = Modifier.then(modifier),
@@ -46,12 +50,13 @@ fun AddMatchContent(
     ) {
         if (state.isLoading) {
             CircularProgressIndicator()
-        }else{
-            if (state.tournament.type == TournamentType.SINGLES){
-                Text("Add Singles Match Screen")
-            }else{
-                Text("Add Doubles Match Screen")
-            }
+        } else {
+            AddMatchComponent(
+                modifier = Modifier.then(modifier),
+                state = state,
+                onEvent = onEvent,
+                onNavigateAfterMatchAdd = onNavigateAfterMatchAdd
+            )
         }
     }
 }

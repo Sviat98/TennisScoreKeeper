@@ -3,6 +3,7 @@ package com.bashkevich.tennisscorekeeper.model.match.repository
 import com.bashkevich.tennisscorekeeper.core.LoadResult
 import com.bashkevich.tennisscorekeeper.model.match.domain.Match
 import com.bashkevich.tennisscorekeeper.model.match.domain.ShortMatch
+import com.bashkevich.tennisscorekeeper.model.match.remote.MatchBody
 import com.bashkevich.tennisscorekeeper.model.match.remote.ScoreType
 import kotlinx.coroutines.flow.Flow
 
@@ -15,4 +16,11 @@ interface MatchRepository {
     suspend fun undoPoint(matchId: String)
     suspend fun redoPoint(matchId: String)
 
+    fun emitNewMatch(matchBody: MatchBody)
+    suspend fun addNewMatch(
+        tournamentId: String,
+        matchBody: MatchBody
+    ): LoadResult<ShortMatch, Throwable>
+
+    fun observeNewMatch(): Flow<MatchBody>
 }
