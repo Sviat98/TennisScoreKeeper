@@ -1,5 +1,6 @@
 package com.bashkevich.tennisscorekeeper.model.participant.domain
 
+import androidx.compose.ui.graphics.Color
 import com.bashkevich.tennisscorekeeper.model.participant.remote.ParticipantInDoublesMatchDto
 import com.bashkevich.tennisscorekeeper.model.participant.remote.ParticipantInMatchDto
 import com.bashkevich.tennisscorekeeper.model.participant.remote.ParticipantInSinglesMatchDto
@@ -10,16 +11,22 @@ sealed class TennisParticipantInMatch{
     abstract val id: String
     abstract val seed: Int?
     abstract val displayName: String
+    abstract val primaryColor: Color
+    abstract val secondaryColor: Color?
     abstract val isServing: Boolean
     abstract val isWinner: Boolean
+    abstract val isRetired: Boolean
 }
 
 data class ParticipantInSinglesMatch(
     override val id: String,
     override val seed: Int?,
     override val displayName: String,
+    override val primaryColor: Color,
+    override val secondaryColor: Color?,
     override val isServing: Boolean,
     override val isWinner: Boolean,
+    override val isRetired: Boolean,
     val player: TennisPlayerInMatch
 ): TennisParticipantInMatch()
 
@@ -27,8 +34,11 @@ data class ParticipantInDoublesMatch(
     override val id: String,
     override val seed: Int?,
     override val displayName: String,
+    override val primaryColor: Color,
+    override val secondaryColor: Color?,
     override val isServing: Boolean,
     override val isWinner: Boolean,
+    override val isRetired: Boolean,
     val firstPlayer: TennisPlayerInMatch,
     val secondPlayer: TennisPlayerInMatch
 ): TennisParticipantInMatch()
@@ -39,8 +49,11 @@ fun ParticipantInMatchDto.toDomain() =
                 id = this.id,
                 seed = this.seed,
                 displayName = this.displayName,
-                isWinner = this.isWinner,
+                primaryColor = Color(this.primaryColor.convertColor()),
+                secondaryColor = this.secondaryColor?.convertColor()?.let { Color(it) },
                 isServing = this.isServing,
+                isWinner = this.isWinner,
+                isRetired = this.isRetired,
                 player = this.player.toDomain()
             )
         }
@@ -50,11 +63,14 @@ fun ParticipantInMatchDto.toDomain() =
                 id = this.id,
                 seed = this.seed,
                 displayName = this.displayName,
+                primaryColor = Color(this.primaryColor.convertColor()),
+                secondaryColor = this.secondaryColor?.convertColor()?.let { Color(it) },
                 isServing = this.isServing,
                 isWinner = this.isWinner,
+                isRetired = this.isRetired,
                 firstPlayer = this.firstPlayer.toDomain(),
                 secondPlayer = this.secondPlayer.toDomain()
             )
         }
     }
-
+ fun String.convertColor() =  "FF$this".toLong(16)

@@ -1,5 +1,6 @@
 package com.bashkevich.tennisscorekeeper.model.match.domain
 
+import androidx.compose.ui.graphics.Color
 import com.bashkevich.tennisscorekeeper.model.match.remote.MatchDto
 import com.bashkevich.tennisscorekeeper.model.match.remote.MatchStatus
 import com.bashkevich.tennisscorekeeper.model.match.remote.SpecialSetMode
@@ -71,16 +72,22 @@ val SAMPLE_MATCH = Match(
         id = "1",
         seed = 1,
         displayName = "Djokovic",
+        primaryColor = Color.White,
+        secondaryColor = null,
         isServing = false,
         isWinner = true,
+        isRetired = false,
         player = SinglesPlayerInMatch(id = "1", surname = "Djokovic", name = "Novak")
     ),
     secondParticipant = ParticipantInSinglesMatch(
         id = "2",
         seed = null,
         displayName = "Auger-Aliassime",
+        primaryColor = Color.White,
+        secondaryColor = null,
         isServing = true,
         isWinner = false,
+        isRetired = false,
         player = SinglesPlayerInMatch(id = "2", surname = "Auger-Aliassime", name = "Felix")
     ),
     status = MatchStatus.IN_PROGRESS.convertToString(),
@@ -101,8 +108,11 @@ val DOUBLES_SAMPLE_MATCH = Match(
         id = "5",
         seed = 1,
         displayName = "Djokovic/Nadal",
+        primaryColor = Color.White,
+        secondaryColor = null,
         isServing = false,
         isWinner = false,
+        isRetired = false,
         firstPlayer = DoublesPlayerInMatch(
             id = "1",
             surname = "Djokovic",
@@ -120,8 +130,11 @@ val DOUBLES_SAMPLE_MATCH = Match(
         id = "6",
         seed = null,
         displayName = "Murray/Federer",
+        primaryColor = Color.White,
+        secondaryColor = null,
         isServing = true,
         isWinner = false,
+        isRetired = false,
         firstPlayer = DoublesPlayerInMatch(id = "4", surname = "Murray", name = "Andy", isServing = false),
         secondPlayer = DoublesPlayerInMatch(
             id = "5",
@@ -147,16 +160,22 @@ val SECOND_SAMPLE_MATCH = Match(
         id = "1",
         seed = 10,
         displayName = "Djokovic",
+        primaryColor = Color.White,
+        secondaryColor = null,
         isServing = false,
         isWinner = false,
+        isRetired = false,
         player = DoublesPlayerInMatch(id = "1", surname = "Djokovic", name = "Novak", isServing = false)
     ),
     secondParticipant = ParticipantInSinglesMatch(
         id = "2",
         seed = null,
         displayName = "Auger-Aliassime",
+        primaryColor = Color.White,
+        secondaryColor = null,
         isServing = true,
         isWinner = false,
+        isRetired = false,
         player = DoublesPlayerInMatch(
             id = "2",
             surname = "Auger-Aliassime",

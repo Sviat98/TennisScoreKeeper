@@ -12,6 +12,8 @@ sealed class ParticipantInShortMatchDto{
     abstract val seed: Int?
     @SerialName("is_winner")
     abstract val isWinner: Boolean
+    @SerialName("is_retired")
+    abstract val isRetired: Boolean
 }
 
 @Serializable
@@ -23,6 +25,8 @@ data class ParticipantInShortSinglesMatchDto(
     override val seed: Int? = null,
     @SerialName("is_winner")
     override val isWinner: Boolean,
+    @SerialName("is_retired")
+    override val isRetired: Boolean,
     @SerialName("player")
     val player: PlayerInParticipantDto
 ) : ParticipantInShortMatchDto()
@@ -36,6 +40,8 @@ data class ParticipantInShortDoublesMatchDto(
     override val seed: Int? = null,
     @SerialName("is_winner")
     override val isWinner: Boolean,
+    @SerialName("is_retired")
+    override val isRetired: Boolean,
     @SerialName("first_player")
     val firstPlayer: PlayerInParticipantDto,
     @SerialName("second_player")

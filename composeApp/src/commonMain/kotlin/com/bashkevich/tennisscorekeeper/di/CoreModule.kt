@@ -19,6 +19,7 @@ val coreModule = module {
     val jsonSerializer = Json {
         prettyPrint = true
         isLenient = true
+        explicitNulls = false
     }
 
     single {

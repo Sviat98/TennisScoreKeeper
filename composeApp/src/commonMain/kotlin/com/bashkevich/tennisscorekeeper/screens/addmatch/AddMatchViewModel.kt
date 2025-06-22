@@ -166,7 +166,7 @@ class AddMatchViewModel(
         }
     }
 
-    private fun buildAndEmitMatchBody(){
+    private fun buildAndEmitMatchBody() {
         val state = state.value
 
         val firstParticipantDisplayName = when (state.firstParticipantDisplayName) {
@@ -187,11 +187,15 @@ class AddMatchViewModel(
             displayName = secondParticipantDisplayName.toString()
         )
 
+        val regularSetTemplate = state.regularSetTemplate
+
+        val regularSetTemplateId = if (regularSetTemplate == EMPTY_REGULAR_SET_TEMPLATE) null else regularSetTemplate.id
+
         val matchBody = MatchBody(
             firstParticipant = firstParticipantInMatchBody,
             secondParticipant = secondParticipantInMatchBody,
             setsToWin = state.setsToWin,
-            regularSet = state.regularSetTemplate.id,
+            regularSet = regularSetTemplateId,
             decidingSet = state.decidingSetTemplate.id
         )
 
