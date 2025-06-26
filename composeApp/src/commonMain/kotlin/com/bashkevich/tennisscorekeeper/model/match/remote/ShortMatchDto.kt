@@ -1,5 +1,6 @@
 package com.bashkevich.tennisscorekeeper.model.match.remote
 
+import com.bashkevich.tennisscorekeeper.model.match.remote.body.MatchStatus
 import com.bashkevich.tennisscorekeeper.model.participant.remote.ParticipantInShortMatchDto
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerialName

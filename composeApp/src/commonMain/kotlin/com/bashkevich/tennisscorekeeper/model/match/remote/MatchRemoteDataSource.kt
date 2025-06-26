@@ -5,6 +5,10 @@ import com.bashkevich.tennisscorekeeper.core.LoadResult
 import com.bashkevich.tennisscorekeeper.core.ResponseMessage
 import com.bashkevich.tennisscorekeeper.core.runOperationCatching
 import com.bashkevich.tennisscorekeeper.core.webSocketDispatcher
+import com.bashkevich.tennisscorekeeper.model.match.remote.body.ChangeScoreBody
+import com.bashkevich.tennisscorekeeper.model.match.remote.body.MatchStatusBody
+import com.bashkevich.tennisscorekeeper.model.match.remote.body.ServeBody
+import com.bashkevich.tennisscorekeeper.model.match.remote.body.ServeInPairBody
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.plugins.websocket.DefaultClientWebSocketSession
@@ -84,6 +88,32 @@ class MatchRemoteDataSource(
     ): LoadResult<ResponseMessage, Throwable> {
         return runOperationCatching {
             val message = httpClient.patch("/matches/$matchId/redo").body<ResponseMessage>()
+
+            message
+        }
+    }
+
+    suspend fun setFirstParticipantToServe(
+        matchId: String,
+        serveBody: ServeBody
+    ): LoadResult<ResponseMessage, Throwable> {
+        return runOperationCatching {
+            val message = httpClient.patch("/matches/$matchId/firstServe"){
+                setBody(serveBody)
+            }.body<ResponseMessage>()
+
+            message
+        }
+    }
+
+    suspend fun setFirstServeInPair(
+        matchId: String,
+        serveInPairBody: ServeInPairBody
+    ): LoadResult<ResponseMessage, Throwable> {
+        return runOperationCatching {
+            val message = httpClient.patch("/matches/$matchId/firstServeInPair"){
+                setBody(serveInPairBody)
+            }.body<ResponseMessage>()
 
             message
         }

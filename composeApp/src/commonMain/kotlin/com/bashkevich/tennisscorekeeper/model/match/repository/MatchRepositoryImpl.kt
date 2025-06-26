@@ -5,10 +5,14 @@ import com.bashkevich.tennisscorekeeper.core.mapSuccess
 import com.bashkevich.tennisscorekeeper.model.match.domain.Match
 import com.bashkevich.tennisscorekeeper.model.match.domain.ShortMatch
 import com.bashkevich.tennisscorekeeper.model.match.domain.toDomain
-import com.bashkevich.tennisscorekeeper.model.match.remote.ChangeScoreBody
+import com.bashkevich.tennisscorekeeper.model.match.remote.body.ChangeScoreBody
 import com.bashkevich.tennisscorekeeper.model.match.remote.MatchBody
 import com.bashkevich.tennisscorekeeper.model.match.remote.MatchRemoteDataSource
-import com.bashkevich.tennisscorekeeper.model.match.remote.ScoreType
+import com.bashkevich.tennisscorekeeper.model.match.remote.body.MatchStatus
+import com.bashkevich.tennisscorekeeper.model.match.remote.body.MatchStatusBody
+import com.bashkevich.tennisscorekeeper.model.match.remote.body.ScoreType
+import com.bashkevich.tennisscorekeeper.model.match.remote.body.ServeBody
+import com.bashkevich.tennisscorekeeper.model.match.remote.body.ServeInPairBody
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -24,12 +28,15 @@ class MatchRepositoryImpl(
         _newMatch.tryEmit(matchBody)
     }
 
-    override suspend fun addNewMatch(tournamentId: String, matchBody: MatchBody): LoadResult<ShortMatch, Throwable> {
+    override suspend fun addNewMatch(
+        tournamentId: String,
+        matchBody: MatchBody
+    ): LoadResult<ShortMatch, Throwable> {
         return matchRemoteDataSource.addNewMatch(tournamentId = tournamentId, matchBody = matchBody)
             .mapSuccess { shortMatchDto -> shortMatchDto.toDomain() }
     }
 
-    override fun observeNewMatch(): Flow<MatchBody>  = _newMatch.asSharedFlow()
+    override fun observeNewMatch(): Flow<MatchBody> = _newMatch.asSharedFlow()
 
     override suspend fun getMatchesForTournament(tournamentId: String): LoadResult<List<ShortMatch>, Throwable> {
         return matchRemoteDataSource.getMatchesByTournament(tournamentId)
@@ -61,6 +68,29 @@ class MatchRepositoryImpl(
     override suspend fun redoPoint(matchId: String) {
         matchRemoteDataSource.redoPoint(matchId = matchId)
     }
+
+    override suspend fun setFirstParticipantToServe(matchId: String, participantId: String) {
+        val serveBody = ServeBody(participantId)
+
+        matchRemoteDataSource.setFirstParticipantToServe(matchId = matchId, serveBody = serveBody)
+    }
+
+    override suspend fun setFirstPlayerInPairToServe(matchId: String, playerId: String) {
+        val serveInPairBody = ServeInPairBody(playerId)
+
+        matchRemoteDataSource.setFirstServeInPair(
+            matchId = matchId,
+            serveInPairBody = serveInPairBody
+        )
+    }
+
+    override suspend fun setMatchStatus(matchId: String, status: MatchStatus) {
+        val matchStatusBody = MatchStatusBody(status)
+
+        matchRemoteDataSource.updateMatchStatus(
+            matchId = matchId,
+            matchStatusBody = matchStatusBody
+        )    }
 
 
 }

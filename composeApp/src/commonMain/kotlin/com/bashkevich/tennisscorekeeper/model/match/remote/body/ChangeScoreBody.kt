@@ -1,4 +1,4 @@
-package com.bashkevich.tennisscorekeeper.model.match.remote
+package com.bashkevich.tennisscorekeeper.model.match.remote.body
 
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerialName

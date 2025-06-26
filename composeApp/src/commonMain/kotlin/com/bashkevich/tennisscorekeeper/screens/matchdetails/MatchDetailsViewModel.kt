@@ -60,6 +60,21 @@ class MatchDetailsViewModel(
                     matchRepository.updateMatchScore(uiEvent.matchId,uiEvent.playerId,uiEvent.scoreType)
                 }
             }
+            is MatchDetailsUiEvent.SetFirstParticipantToServe->{
+                viewModelScope.launch {
+                    matchRepository.setFirstParticipantToServe(uiEvent.matchId,uiEvent.participantId)
+                }
+            }
+            is MatchDetailsUiEvent.SetFirstPlayerInPairToServe->{
+                viewModelScope.launch {
+                    matchRepository.setFirstPlayerInPairToServe(uiEvent.matchId,uiEvent.playerId)
+                }
+            }
+            is MatchDetailsUiEvent.ChangeMatchStatus->{
+                viewModelScope.launch {
+                    matchRepository.setMatchStatus(uiEvent.matchId,uiEvent.status)
+                }
+            }
             is MatchDetailsUiEvent.UndoPoint->{
                 viewModelScope.launch {
                     matchRepository.undoPoint(uiEvent.matchId)

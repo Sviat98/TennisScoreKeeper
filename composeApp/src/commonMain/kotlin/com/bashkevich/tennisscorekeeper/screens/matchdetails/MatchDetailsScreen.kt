@@ -23,8 +23,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.bashkevich.tennisscorekeeper.components.scoreboard.MatchView
-import com.bashkevich.tennisscorekeeper.model.match.remote.ScoreType
+import com.bashkevich.tennisscorekeeper.model.match.remote.body.ScoreType
 import com.bashkevich.tennisscorekeeper.model.match.remote.SpecialSetMode
+import com.bashkevich.tennisscorekeeper.model.match.remote.body.MatchStatus
+import com.bashkevich.tennisscorekeeper.model.match.remote.body.convertToString
+import com.bashkevich.tennisscorekeeper.model.participant.domain.ParticipantInDoublesMatch
+import com.bashkevich.tennisscorekeeper.model.player.domain.DoublesPlayerInMatch
 
 @Composable
 fun MatchDetailsScreen(
@@ -76,112 +80,286 @@ fun MatchDetailsContent(
             match = match
         )
         val matchId = match.id
-        val firstPlayerId = match.firstParticipant.id
-        val secondPlayerId = match.secondParticipant.id
 
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Button(
-                onClick = {
-                    onEvent(
-                        MatchDetailsUiEvent.UpdateScore(
-                            matchId = matchId,
-                            playerId = firstPlayerId,
-                            scoreType = ScoreType.POINT
-                        )
-                    )
-                },
-                enabled = !isWinnerInMatch
-            ) {
-                Text("Player 1 Point")
+        val firstParticipant = match.firstParticipant
+        val secondParticipant = match.secondParticipant
+
+        val firstParticipantId = firstParticipant.id
+        val secondParticipantId = secondParticipant.id
+
+        Text("Status: ${match.status.convertToString()}")
+
+        val enableStartMatchButton =
+            if (firstParticipant is ParticipantInDoublesMatch && secondParticipant is ParticipantInDoublesMatch) {
+                val firstParticipantFirstPlayer = firstParticipant.firstPlayer as DoublesPlayerInMatch
+                val firstParticipantSecondPlayer = firstParticipant.secondPlayer as DoublesPlayerInMatch
+                val secondParticipantFirstPlayer = secondParticipant.firstPlayer as DoublesPlayerInMatch
+                val secondParticipantSecondPlayer = secondParticipant.secondPlayer as DoublesPlayerInMatch
+
+                (firstParticipant.isServing || secondParticipant.isServing) && (firstParticipantFirstPlayer.isServing || firstParticipantSecondPlayer.isServing)
+                        && (secondParticipantFirstPlayer.isServing || secondParticipantSecondPlayer.isServing)
+            } else {
+                (firstParticipant.isServing || secondParticipant.isServing)
             }
-            Button(
-                onClick = {
-                    onEvent(
-                        MatchDetailsUiEvent.UpdateScore(
-                            matchId = matchId,
-                            playerId = secondPlayerId,
-                            scoreType = ScoreType.POINT
+
+        when (match.status) {
+            MatchStatus.NOT_STARTED -> {
+                Button(
+                    onClick = {
+                        onEvent(
+                            MatchDetailsUiEvent.ChangeMatchStatus(
+                                matchId,
+                                MatchStatus.IN_PROGRESS
+                            )
                         )
-                    )
-                },
-                enabled = !isWinnerInMatch
-            ) {
-                Text("Player 2 Point")
+                    },
+                    enabled = enableStartMatchButton
+                ) {
+                    Text("Start match")
+                }
             }
-        }
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Button(
-                onClick = {
-                    onEvent(
-                        MatchDetailsUiEvent.UpdateScore(
-                            matchId = matchId,
-                            playerId = firstPlayerId,
-                            scoreType = ScoreType.GAME
+            MatchStatus.IN_PROGRESS -> {
+                if (isWinnerInMatch) {
+                    Button(
+                        onClick = {
+                            onEvent(
+                                MatchDetailsUiEvent.ChangeMatchStatus(
+                                    matchId,
+                                    MatchStatus.COMPLETED
+                                )
+                            )
+                        },
+                    ) {
+                        Text("Finish match")
+                    }
+                } else {
+                    Button(
+                        onClick = {
+                            onEvent(
+                                MatchDetailsUiEvent.ChangeMatchStatus(
+                                    matchId,
+                                    MatchStatus.PAUSED
+                                )
+                            )
+                        },
+                    ) {
+                        Text("Pause match")
+                    }
+                }
+            }
+            MatchStatus.PAUSED -> {
+                Button(
+                    onClick = {
+                        onEvent(
+                            MatchDetailsUiEvent.ChangeMatchStatus(
+                                matchId,
+                                MatchStatus.IN_PROGRESS
+                            )
                         )
-                    )
-                },
-                // нужно залочить, когда начался гейм, когда определился победитель и во время супер-тайбрейка
-                enabled = !isGameStarted && !isWinnerInMatch && !isSuperTiebreak
-            ) {
-                Text("Player 1 Game")
+                    },
+                ) {
+                    Text("Resume match")
+                }
             }
-            Button(
-                onClick = {
-                    onEvent(
-                        MatchDetailsUiEvent.UpdateScore(
-                            matchId = matchId,
-                            playerId = secondPlayerId,
-                            scoreType = ScoreType.GAME
-                        )
-                    )
-                },
-                // нужно залочить, когда начался гейм, когда определился победитель и во время супер-тайбрейка
-                enabled = !isGameStarted && !isWinnerInMatch && !isSuperTiebreak
-            ) {
-                Text("Player 2 Game")
-            }
+            else->{}
         }
 
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            IconButton(
-                onClick = {
-                    onEvent(
-                        MatchDetailsUiEvent.UndoPoint(
-                            matchId = matchId
-                        )
-                    )
-                },
-                enabled = hasFirstPointPlayed
-            ) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = "Undo point"
-                )
+        when (match.status) {
+            MatchStatus.NOT_STARTED -> {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Button(
+                        onClick = {
+                            onEvent(
+                                MatchDetailsUiEvent.SetFirstParticipantToServe(
+                                    matchId = matchId,
+                                    participantId = firstParticipantId,
+                                )
+                            )
+                        },
+                    ) {
+                        Text("Participant 1 first serve")
+                    }
+                    Button(
+                        onClick = {
+                            onEvent(
+                                MatchDetailsUiEvent.SetFirstParticipantToServe(
+                                    matchId = matchId,
+                                    participantId = secondParticipantId,
+                                )
+                            )
+                        },
+                    ) {
+                        Text("Participant 2 first serve")
+                    }
+                }
+                if (firstParticipant is ParticipantInDoublesMatch && secondParticipant is ParticipantInDoublesMatch) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Button(
+                            onClick = {
+                                onEvent(
+                                    MatchDetailsUiEvent.SetFirstPlayerInPairToServe(
+                                        matchId = matchId,
+                                        playerId = firstParticipant.firstPlayer.id,
+                                    )
+                                )
+                            },
+                        ) {
+                            Text("Player 1.1 first serve")
+                        }
+                        Button(
+                            onClick = {
+                                onEvent(
+                                    MatchDetailsUiEvent.SetFirstPlayerInPairToServe(
+                                        matchId = matchId,
+                                        playerId = firstParticipant.secondPlayer.id,
+                                    )
+                                )
+                            },
+                        ) {
+                            Text("Player 1.2 first serve")
+                        }
+                        Button(
+                            onClick = {
+                                onEvent(
+                                    MatchDetailsUiEvent.SetFirstPlayerInPairToServe(
+                                        matchId = matchId,
+                                        playerId = secondParticipant.firstPlayer.id,
+                                    )
+                                )
+                            },
+                        ) {
+                            Text("Player 2.1 first serve")
+                        }
+                        Button(
+                            onClick = {
+                                onEvent(
+                                    MatchDetailsUiEvent.SetFirstPlayerInPairToServe(
+                                        matchId = matchId,
+                                        playerId = secondParticipant.secondPlayer.id,
+                                    )
+                                )
+                            },
+                        ) {
+                            Text("Player 2.2 first serve")
+                        }
+                    }
+                }
             }
-            IconButton(
-                onClick = {
-                    onEvent(
-                        MatchDetailsUiEvent.RedoPoint(
-                            matchId = matchId
+
+            MatchStatus.IN_PROGRESS -> {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Button(
+                        onClick = {
+                            onEvent(
+                                MatchDetailsUiEvent.UpdateScore(
+                                    matchId = matchId,
+                                    playerId = firstParticipantId,
+                                    scoreType = ScoreType.POINT
+                                )
+                            )
+                        },
+                        enabled = !isWinnerInMatch
+                    ) {
+                        Text("Player 1 Point")
+                    }
+                    Button(
+                        onClick = {
+                            onEvent(
+                                MatchDetailsUiEvent.UpdateScore(
+                                    matchId = matchId,
+                                    playerId = secondParticipantId,
+                                    scoreType = ScoreType.POINT
+                                )
+                            )
+                        },
+                        enabled = !isWinnerInMatch
+                    ) {
+                        Text("Player 2 Point")
+                    }
+                }
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Button(
+                        onClick = {
+                            onEvent(
+                                MatchDetailsUiEvent.UpdateScore(
+                                    matchId = matchId,
+                                    playerId = firstParticipantId,
+                                    scoreType = ScoreType.GAME
+                                )
+                            )
+                        },
+                        // нужно залочить, когда начался гейм, когда определился победитель и во время супер-тайбрейка
+                        enabled = !isGameStarted && !isWinnerInMatch && !isSuperTiebreak
+                    ) {
+                        Text("Player 1 Game")
+                    }
+                    Button(
+                        onClick = {
+                            onEvent(
+                                MatchDetailsUiEvent.UpdateScore(
+                                    matchId = matchId,
+                                    playerId = secondParticipantId,
+                                    scoreType = ScoreType.GAME
+                                )
+                            )
+                        },
+                        // нужно залочить, когда начался гейм, когда определился победитель и во время супер-тайбрейка
+                        enabled = !isGameStarted && !isWinnerInMatch && !isSuperTiebreak
+                    ) {
+                        Text("Player 2 Game")
+                    }
+                }
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    IconButton(
+                        onClick = {
+                            onEvent(
+                                MatchDetailsUiEvent.UndoPoint(
+                                    matchId = matchId
+                                )
+                            )
+                        },
+                        enabled = hasFirstPointPlayed
+                    ) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "Undo point"
                         )
-                    )
-                },
-                enabled = isPointShift
-            ) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ArrowForward,
-                    contentDescription = "Redo point"
-                )
+                    }
+                    IconButton(
+                        onClick = {
+                            onEvent(
+                                MatchDetailsUiEvent.RedoPoint(
+                                    matchId = matchId
+                                )
+                            )
+                        },
+                        enabled = isPointShift
+                    ) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowForward,
+                            contentDescription = "Redo point"
+                        )
+                    }
+                }
             }
+            else -> {}
         }
+
+
     }
 }

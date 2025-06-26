@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.material.Button
 import androidx.compose.material.Text
 
 import androidx.compose.runtime.Composable
@@ -17,6 +18,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.bashkevich.tennisscorekeeper.model.match.remote.body.MatchStatus
+import com.bashkevich.tennisscorekeeper.model.match.remote.body.convertToString
+import com.bashkevich.tennisscorekeeper.model.tournament.remote.TournamentStatus
 import com.bashkevich.tennisscorekeeper.navigation.TournamentTab
 import com.bashkevich.tennisscorekeeper.navigation.toRouteString
 import com.bashkevich.tennisscorekeeper.screens.matchlist.MatchListScreen
@@ -51,11 +55,20 @@ fun TournamentContent(
     state: TournamentState,
     onEvent: (TournamentUiEvent) -> Unit,
 ) {
+    val tournament = state.tournament
     val currentTab = state.currentTab
 
     val matchListViewModel = koinViewModel<MatchListViewModel>()
 
+    val matchListState by matchListViewModel.state.collectAsStateWithLifecycle()
+
+    val uncompletedMatches = matchListState.matches.filter { it.status!= MatchStatus.COMPLETED }.size
+
     val participantListViewModel = koinViewModel<ParticipantListViewModel>()
+
+    val participantListState by participantListViewModel.state.collectAsStateWithLifecycle()
+
+    val participantsAmount = participantListState.participants.size
 
     val pagerState = rememberPagerState(pageCount = { 2 })
 
@@ -63,6 +76,26 @@ fun TournamentContent(
         modifier = Modifier.then(modifier),
         verticalArrangement = Arrangement.Center
     ) {
+
+        Text(tournament.name)
+        Text("Status: ${tournament.status.convertToString()}")
+        when{
+            tournament.status==TournamentStatus.NOT_STARTED && participantsAmount > 1 ->{
+                Button(onClick = {
+                    onEvent(TournamentUiEvent.ChangeTournamentStatus(TournamentStatus.IN_PROGRESS))
+                }){
+                    Text("Start tournament")
+                }
+            }
+            tournament.status==TournamentStatus.IN_PROGRESS && uncompletedMatches < 1 ->{
+                Button(onClick = {
+                    onEvent(TournamentUiEvent.ChangeTournamentStatus(TournamentStatus.COMPLETED))
+                }){
+                    Text("Finish tournament")
+                }
+            }
+        }
+
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(16.dp)

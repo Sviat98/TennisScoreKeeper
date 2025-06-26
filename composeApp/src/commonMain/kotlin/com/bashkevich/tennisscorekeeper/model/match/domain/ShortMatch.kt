@@ -1,6 +1,6 @@
 package com.bashkevich.tennisscorekeeper.model.match.domain
 
-import com.bashkevich.tennisscorekeeper.model.match.remote.MatchStatus
+import com.bashkevich.tennisscorekeeper.model.match.remote.body.MatchStatus
 import com.bashkevich.tennisscorekeeper.model.match.remote.ShortMatchDto
 import com.bashkevich.tennisscorekeeper.model.participant.domain.ParticipantInShortMatch
 import com.bashkevich.tennisscorekeeper.model.participant.domain.toDomain

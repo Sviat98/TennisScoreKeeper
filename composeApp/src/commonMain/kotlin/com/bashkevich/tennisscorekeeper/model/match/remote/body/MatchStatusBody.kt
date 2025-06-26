@@ -1,4 +1,4 @@
-package com.bashkevich.tennisscorekeeper.model.match.remote
+package com.bashkevich.tennisscorekeeper.model.match.remote.body
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -13,4 +13,4 @@ enum class MatchStatus{
     NOT_STARTED,IN_PROGRESS,PAUSED,COMPLETED
 }
 
-fun MatchStatus.convertToString() = this.name.lowercase().replace('_', ' ')
+fun <T : Enum<*>> T.convertToString() = this.name.lowercase().replace('_', ' ')

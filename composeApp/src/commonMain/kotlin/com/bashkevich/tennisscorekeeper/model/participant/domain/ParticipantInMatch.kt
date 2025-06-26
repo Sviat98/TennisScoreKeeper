@@ -42,6 +42,7 @@ data class ParticipantInDoublesMatch(
     val firstPlayer: TennisPlayerInMatch,
     val secondPlayer: TennisPlayerInMatch
 ): TennisParticipantInMatch()
+
 fun ParticipantInMatchDto.toDomain() =
     when (this) {
         is ParticipantInSinglesMatchDto -> {
@@ -73,4 +74,5 @@ fun ParticipantInMatchDto.toDomain() =
             )
         }
     }
- fun String.convertColor() =  "FF$this".toLong(16)
+
+fun String.convertColor() =  "FF$this".toLong(16)

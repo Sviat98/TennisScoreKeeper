@@ -2,11 +2,10 @@ package com.bashkevich.tennisscorekeeper.model.match.domain
 
 import androidx.compose.ui.graphics.Color
 import com.bashkevich.tennisscorekeeper.model.match.remote.MatchDto
-import com.bashkevich.tennisscorekeeper.model.match.remote.MatchStatus
+import com.bashkevich.tennisscorekeeper.model.match.remote.body.MatchStatus
 import com.bashkevich.tennisscorekeeper.model.match.remote.SpecialSetMode
 import com.bashkevich.tennisscorekeeper.model.match.remote.TennisGameDto
 import com.bashkevich.tennisscorekeeper.model.match.remote.TennisSetDto
-import com.bashkevich.tennisscorekeeper.model.match.remote.convertToString
 import com.bashkevich.tennisscorekeeper.model.participant.domain.ParticipantInDoublesMatch
 import com.bashkevich.tennisscorekeeper.model.participant.domain.ParticipantInSinglesMatch
 import com.bashkevich.tennisscorekeeper.model.participant.domain.TennisParticipantInMatch
@@ -19,7 +18,7 @@ data class Match(
     val pointShift: Int,
     val firstParticipant: TennisParticipantInMatch,
     val secondParticipant: TennisParticipantInMatch,
-    val status: String,
+    val status: MatchStatus,
     val previousSets: List<TennisSet>,
     val currentSet: TennisSet?,
     val currentSetMode: SpecialSetMode?,
@@ -46,7 +45,7 @@ fun MatchDto.toDomain() = Match(
     pointShift = this.pointShift,
     firstParticipant = this.firstParticipant.toDomain(),
     secondParticipant = this.secondParticipant.toDomain(),
-    status = this.status.convertToString(),
+    status = this.status,
     previousSets = this.previousSets.map { it.toDomain() },
     currentSet = this.currentSet?.toDomain(),
     currentSetMode = this.currentSetMode,
@@ -90,7 +89,7 @@ val SAMPLE_MATCH = Match(
         isRetired = false,
         player = SinglesPlayerInMatch(id = "2", surname = "Auger-Aliassime", name = "Felix")
     ),
-    status = MatchStatus.IN_PROGRESS.convertToString(),
+    status = MatchStatus.IN_PROGRESS,
     previousSets = listOf(
         TennisSet(firstParticipantGamesWon = 6, secondParticipantGamesWon = 4),
         TennisSet(firstParticipantGamesWon = 3, secondParticipantGamesWon = 6),
@@ -143,7 +142,7 @@ val DOUBLES_SAMPLE_MATCH = Match(
             isServing = true
         ),
     ),
-    status = MatchStatus.IN_PROGRESS.convertToString(),
+    status = MatchStatus.IN_PROGRESS,
     previousSets = listOf(
         TennisSet(firstParticipantGamesWon = 6, secondParticipantGamesWon = 4),
         TennisSet(firstParticipantGamesWon = 3, secondParticipantGamesWon = 6),
@@ -153,44 +152,44 @@ val DOUBLES_SAMPLE_MATCH = Match(
     currentGame = TennisGame(firstParticipantPointsWon = "30", secondParticipantPointsWon = "15")
 )
 
-val SECOND_SAMPLE_MATCH = Match(
-    id = "2",
-    pointShift = 0,
-    firstParticipant = ParticipantInSinglesMatch(
-        id = "1",
-        seed = 10,
-        displayName = "Djokovic",
-        primaryColor = Color.White,
-        secondaryColor = null,
-        isServing = false,
-        isWinner = false,
-        isRetired = false,
-        player = DoublesPlayerInMatch(id = "1", surname = "Djokovic", name = "Novak", isServing = false)
-    ),
-    secondParticipant = ParticipantInSinglesMatch(
-        id = "2",
-        seed = null,
-        displayName = "Auger-Aliassime",
-        primaryColor = Color.White,
-        secondaryColor = null,
-        isServing = true,
-        isWinner = false,
-        isRetired = false,
-        player = DoublesPlayerInMatch(
-            id = "2",
-            surname = "Auger-Aliassime",
-            name = "Felix",
-            isServing = true
-        )
-    ),
-    status = MatchStatus.IN_PROGRESS.convertToString(),
-    previousSets = listOf(
-        TennisSet(firstParticipantGamesWon = 12, secondParticipantGamesWon = 10),
-        TennisSet(firstParticipantGamesWon = 10, secondParticipantGamesWon = 12),
-        TennisSet(firstParticipantGamesWon = 12, secondParticipantGamesWon = 10),
-        TennisSet(firstParticipantGamesWon = 10, secondParticipantGamesWon = 12),
-    ),
-    currentSet = TennisSet(firstParticipantGamesWon = 10, secondParticipantGamesWon = 9),
-    currentSetMode = null,
-    currentGame = TennisGame(firstParticipantPointsWon = "30", secondParticipantPointsWon = "15")
-)
+//val SECOND_SAMPLE_MATCH = Match(
+//    id = "2",
+//    pointShift = 0,
+//    firstParticipant = ParticipantInSinglesMatch(
+//        id = "1",
+//        seed = 10,
+//        displayName = "Djokovic",
+//        primaryColor = Color.White,
+//        secondaryColor = null,
+//        isServing = false,
+//        isWinner = false,
+//        isRetired = false,
+//        player = DoublesPlayerInMatch(id = "1", surname = "Djokovic", name = "Novak", isServing = false)
+//    ),
+//    secondParticipant = ParticipantInDoublesMatch(
+//        id = "2",
+//        seed = null,
+//        displayName = "Auger-Aliassime",
+//        primaryColor = Color.White,
+//        secondaryColor = null,
+//        isServing = true,
+//        isWinner = false,
+//        isRetired = false,
+//        player = SinglesPlayerInMatch(
+//            id = "2",
+//            surname = "Auger-Aliassime",
+//            name = "Felix",
+//            isServing = true
+//        )
+//    ),
+//    status = MatchStatus.IN_PROGRESS,
+//    previousSets = listOf(
+//        TennisSet(firstParticipantGamesWon = 12, secondParticipantGamesWon = 10),
+//        TennisSet(firstParticipantGamesWon = 10, secondParticipantGamesWon = 12),
+//        TennisSet(firstParticipantGamesWon = 12, secondParticipantGamesWon = 10),
+//        TennisSet(firstParticipantGamesWon = 10, secondParticipantGamesWon = 12),
+//    ),
+//    currentSet = TennisSet(firstParticipantGamesWon = 10, secondParticipantGamesWon = 9),
+//    currentSetMode = null,
+//    currentGame = TennisGame(firstParticipantPointsWon = "30", secondParticipantPointsWon = "15")
+//)

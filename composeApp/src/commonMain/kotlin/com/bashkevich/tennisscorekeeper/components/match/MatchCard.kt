@@ -17,7 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.bashkevich.tennisscorekeeper.model.match.domain.ShortMatch
-import com.bashkevich.tennisscorekeeper.model.match.remote.convertToString
+import com.bashkevich.tennisscorekeeper.model.match.remote.body.convertToString
 import com.bashkevich.tennisscorekeeper.model.participant.domain.toShortMatchDisplayFormat
 import org.jetbrains.compose.ui.tooling.preview.Preview
 

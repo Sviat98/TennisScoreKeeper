@@ -1,10 +1,12 @@
 package com.bashkevich.tennisscorekeeper.model.tournament.remote
 
 import com.bashkevich.tennisscorekeeper.core.LoadResult
+import com.bashkevich.tennisscorekeeper.core.ResponseMessage
 import com.bashkevich.tennisscorekeeper.core.runOperationCatching
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
+import io.ktor.client.request.patch
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 
@@ -34,6 +36,16 @@ class TournamentRemoteDataSource(
             }.body<TournamentDto>()
 
             tournamentDto
+        }
+    }
+
+    suspend fun changeTournamentStatus(tournamentId: String, tournamentStatusBody: TournamentStatusBody): LoadResult<ResponseMessage, Throwable>{
+        return runOperationCatching {
+            val tournamentStatusUpdateResult = httpClient.patch("/tournaments/$tournamentId/status") {
+                setBody(tournamentStatusBody)
+            }.body<ResponseMessage>()
+
+            tournamentStatusUpdateResult
         }
     }
 }
