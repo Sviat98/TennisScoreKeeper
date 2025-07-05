@@ -13,32 +13,25 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.bashkevich.tennisscorekeeper.LocalNavHostController
 import com.bashkevich.tennisscorekeeper.components.hoverScaleEffect
 import com.bashkevich.tennisscorekeeper.components.match.MatchCard
 import com.bashkevich.tennisscorekeeper.model.match.domain.ShortMatch
 import com.bashkevich.tennisscorekeeper.navigation.AddMatchRoute
 import com.bashkevich.tennisscorekeeper.navigation.MatchDetailsRoute
-import org.koin.compose.viewmodel.koinViewModel
+import com.bashkevich.tennisscorekeeper.screens.tournamentdetails.TournamentState
+import com.bashkevich.tennisscorekeeper.screens.tournamentdetails.TournamentUiEvent
 
 @Composable
 fun MatchListScreen(
     modifier: Modifier = Modifier,
-    viewModel: MatchListViewModel = koinViewModel(),
+    state: TournamentState,
+    onEvent: (TournamentUiEvent) -> Unit
 ) {
-    val state by viewModel.state.collectAsStateWithLifecycle()
-
-    LaunchedEffect(Unit) {
-        viewModel.actions.collect { action ->
-        }
-    }
 
     val navController = LocalNavHostController.current
 
@@ -56,14 +49,17 @@ fun MatchListScreen(
 @Composable
 fun MatchListContent(
     modifier: Modifier = Modifier,
-    state: MatchListState,
+    state: TournamentState,
     onItemClick: (ShortMatch) -> Unit,
     onMatchAdd: (String) -> Unit
 ) {
+    val tournament  = state.tournament
+
+    val matchListState = state.matchListState
     Scaffold(
         modifier = Modifier.then(modifier),
         floatingActionButton = {
-            FloatingActionButton(onClick = {onMatchAdd(state.tournamentId)}) {
+            FloatingActionButton(onClick = {onMatchAdd(tournament.id)}) {
                 Icon(Icons.Filled.Add, contentDescription = "Add Match")
             }
         }
@@ -78,7 +74,7 @@ fun MatchListContent(
                 contentPadding = PaddingValues(16.dp)
             ) {
                 items(
-                    state.matches,
+                    matchListState.matches,
                     key = { it.id }) { match ->
                     MatchCard(
                         modifier = Modifier.hoverScaleEffect(),

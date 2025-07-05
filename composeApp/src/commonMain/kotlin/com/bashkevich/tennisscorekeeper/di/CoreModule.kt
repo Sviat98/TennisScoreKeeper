@@ -2,6 +2,7 @@ package com.bashkevich.tennisscorekeeper.di
 
 import com.bashkevich.tennisscorekeeper.core.BASE_URL_BACKEND
 import com.bashkevich.tennisscorekeeper.core.httpClient
+import io.ktor.client.plugins.HttpTimeout
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.defaultRequest
 import io.ktor.client.plugins.logging.LogLevel
@@ -36,6 +37,9 @@ val coreModule = module {
             }
             install(ContentNegotiation) {
                 json(jsonSerializer)
+            }
+            install(HttpTimeout){
+                socketTimeoutMillis =20_000
             }
             install(WebSockets) {
                 pingIntervalMillis = 15_000

@@ -24,10 +24,7 @@ import com.bashkevich.tennisscorekeeper.model.tournament.remote.TournamentStatus
 import com.bashkevich.tennisscorekeeper.navigation.TournamentTab
 import com.bashkevich.tennisscorekeeper.navigation.toRouteString
 import com.bashkevich.tennisscorekeeper.screens.matchlist.MatchListScreen
-import com.bashkevich.tennisscorekeeper.screens.matchlist.MatchListViewModel
 import com.bashkevich.tennisscorekeeper.screens.participantlist.ParticipantListScreen
-import com.bashkevich.tennisscorekeeper.screens.participantlist.ParticipantListViewModel
-import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun TournamentScreen(
@@ -58,15 +55,12 @@ fun TournamentContent(
     val tournament = state.tournament
     val currentTab = state.currentTab
 
-    val matchListViewModel = koinViewModel<MatchListViewModel>()
 
-    val matchListState by matchListViewModel.state.collectAsStateWithLifecycle()
+    val matchListState = state.matchListState
 
     val uncompletedMatches = matchListState.matches.filter { it.status!= MatchStatus.COMPLETED }.size
 
-    val participantListViewModel = koinViewModel<ParticipantListViewModel>()
-
-    val participantListState by participantListViewModel.state.collectAsStateWithLifecycle()
+    val participantListState = state.participantListState
 
     val participantsAmount = participantListState.participants.size
 
@@ -119,9 +113,13 @@ fun TournamentContent(
         HorizontalPager(state = pagerState) { _ ->
             when (currentTab) {
                 TournamentTab.Matches -> MatchListScreen(
-                    viewModel = matchListViewModel,
+                    state = state,
+                    onEvent = onEvent
                 )
-                TournamentTab.Participants -> ParticipantListScreen(viewModel = participantListViewModel)
+                TournamentTab.Participants -> ParticipantListScreen(
+                    state = state,
+                    onEvent = onEvent
+                )
             }
         }
     }

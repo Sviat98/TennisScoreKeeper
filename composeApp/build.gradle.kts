@@ -78,6 +78,7 @@ kotlin {
             implementation(libs.ktor.serialization.kotlinx.json)
             implementation(libs.ktor.client.websockets)
 
+            implementation(libs.calf.file.picker)
         }
 
         val desktopMain by getting
@@ -116,8 +117,14 @@ android {
         }
     }
     compileOptions {
+        isCoreLibraryDesugaringEnabled = true
+
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
+    }
+
+    dependencies{
+        coreLibraryDesugaring(libs.android.core.desugaring)
     }
 }
 

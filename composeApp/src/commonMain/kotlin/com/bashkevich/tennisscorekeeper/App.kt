@@ -35,12 +35,14 @@ import com.bashkevich.tennisscorekeeper.screens.tournamentlist.TournamentListVie
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.KoinMultiplatformApplication
 import org.koin.compose.viewmodel.koinViewModel
+import org.koin.core.annotation.KoinExperimentalAPI
 import org.koin.dsl.KoinConfiguration
 
 val LocalNavHostController = staticCompositionLocalOf<NavHostController> {
     error("NavController not provided!")
 }
 
+@OptIn(KoinExperimentalAPI::class)
 @Composable
 @Preview
 fun App(navController: NavHostController = rememberNavController()) {
@@ -52,7 +54,8 @@ fun App(navController: NavHostController = rememberNavController()) {
             tournamentModule,
             matchModule,
             setTemplateModule,
-            participantModule
+            participantModule,
+            //fileModule
             )
     }) {
         CompositionLocalProvider(

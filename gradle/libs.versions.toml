@@ -1,8 +1,9 @@
 [versions]
 agp = "8.7.3"
 android-compileSdk = "35"
-android-minSdk = "26"
+android-minSdk = "24"
 android-targetSdk = "35"
+android-desugaring = "2.0.3"
 androidx-activityCompose = "1.10.1"
 androidx-appcompat = "1.7.1"
 androidx-constraintlayout = "2.2.0"
@@ -21,6 +22,7 @@ kotlinx-serialization = "1.8.1"
 koinBom = "4.1.0-RC1"
 ktor = "3.1.3"
 coroutines = "1.10.2"
+calf-file-picker = "0.8.0"
 
 kotlinx-datetime = "0.6.2"
 
@@ -29,6 +31,7 @@ kotlinx-datetime = "0.6.2"
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
 kotlin-test-junit = { module = "org.jetbrains.kotlin:kotlin-test-junit", version.ref = "kotlin" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
+android-core-desugaring = { group = "com.android.tools", name = "desugar_jdk_libs", version.ref = "android-desugaring" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "androidx-core-ktx" }
 androidx-test-junit = { group = "androidx.test.ext", name = "junit", version.ref = "androidx-test-junit" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "androidx-espresso-core" }
@@ -52,6 +55,7 @@ ktor-serialization-kotlinx-json = { group = "io.ktor", name = "ktor-serializatio
 ktor-client-websockets = { group = "io.ktor", name = "ktor-client-websockets", version.ref = "ktor" }
 
 kotlinx-coroutines-swing = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-swing", version.ref = "coroutines" }
+calf-file-picker = { group = "com.mohamedrejeb.calf", name = "calf-file-picker", version.ref = "calf-file-picker"}
 
 koin-bom = { group = "io.insert-koin", name = "koin-bom", version.ref = "koinBom" }
 koin-core = { group = "io.insert-koin", name = "koin-core" }

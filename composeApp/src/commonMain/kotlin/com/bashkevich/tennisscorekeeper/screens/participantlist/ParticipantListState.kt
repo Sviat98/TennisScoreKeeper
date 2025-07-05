@@ -1,29 +1,21 @@
 package com.bashkevich.tennisscorekeeper.screens.participantlist
 
 import androidx.compose.runtime.Immutable
+import com.bashkevich.tennisscorekeeper.model.file.domain.EMPTY_EXCEL_FILE
+import com.bashkevich.tennisscorekeeper.model.file.domain.ExcelFile
 import com.bashkevich.tennisscorekeeper.model.participant.domain.TennisParticipant
 
-import com.bashkevich.tennisscorekeeper.mvi.UiAction
-import com.bashkevich.tennisscorekeeper.mvi.UiEvent
 import com.bashkevich.tennisscorekeeper.mvi.UiState
 
 @Immutable
-sealed class ParticipantListUiEvent : UiEvent {
-    class ShowParticipants(val participants: List<TennisParticipant>) : ParticipantListUiEvent()
-}
-
-@Immutable
 data class ParticipantListState(
-    val participants: List<TennisParticipant>
+    val participants: List<TennisParticipant>,
+    val participantsFile: ExcelFile
 ) : UiState {
     companion object {
         fun initial() = ParticipantListState(
-            participants = emptyList()
+            participants = emptyList(),
+            participantsFile = EMPTY_EXCEL_FILE
         )
     }
-}
-
-@Immutable
-sealed class ParticipantListAction : UiAction {
-
 }
