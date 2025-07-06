@@ -79,6 +79,7 @@ kotlin {
             implementation(libs.ktor.client.websockets)
 
             implementation(libs.calf.file.picker)
+            implementation(libs.compose.colorpicker)
         }
 
         val desktopMain by getting

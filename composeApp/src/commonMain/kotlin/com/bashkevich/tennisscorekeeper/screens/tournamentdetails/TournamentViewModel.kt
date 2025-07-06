@@ -39,9 +39,7 @@ class TournamentViewModel(
         viewModelScope.launch {
             showTournament()
 
-            val state = state.value
-
-            val tournamentId = state.tournament.id
+            val tournamentId = state.value.tournament.id
 
             coroutineScope {
                 launch {
@@ -68,7 +66,8 @@ class TournamentViewModel(
 
                         if (loadResult is LoadResult.Success) {
                             val newMatch = loadResult.result
-                            val matches = state.matchListState.matches.toMutableList()
+                            val matches = state.value.matchListState.matches.toMutableList()
+
 
                             matches.add(newMatch)
                             reduceState { oldState ->

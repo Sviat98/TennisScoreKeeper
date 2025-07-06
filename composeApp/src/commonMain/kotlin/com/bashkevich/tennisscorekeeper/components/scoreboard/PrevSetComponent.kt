@@ -24,12 +24,12 @@ fun PrevSetScoreboardComponent(
         horizontalAlignment = Alignment.CenterHorizontally, // Выравнивание по центру
     ) {
         PrevSetNumber(
-            modifier = Modifier.weight(0.5f),
+            modifier = Modifier.weight(1f),
             gamesEarned = prevSet.firstParticipantGamesWon,
             alpha = if (isFirstPlayerWon) 1f else 0.5f
         )
         PrevSetNumber(
-            modifier = Modifier.weight(0.5f),
+            modifier = Modifier.weight(1f),
             gamesEarned = prevSet.secondParticipantGamesWon,
             alpha = if (!isFirstPlayerWon) 1f else 0.5f
         )

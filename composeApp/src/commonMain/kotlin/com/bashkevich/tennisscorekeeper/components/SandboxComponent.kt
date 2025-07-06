@@ -36,8 +36,8 @@ fun SandboxComponent() {
         modifier = Modifier.background(Color.Blue)
     ) {
         Column(modifier = Modifier.width(32.dp).height(totalHeightDp).background(Color.Yellow)) {
-            Box(modifier = Modifier.fillMaxWidth().weight(0.5f).background(Color.Red))
-            Box(modifier = Modifier.fillMaxWidth().weight(0.5f).background(Color.Green))
+            Box(modifier = Modifier.fillMaxWidth().weight(1f).background(Color.Red))
+            Box(modifier = Modifier.fillMaxWidth().weight(1f).background(Color.Green))
         }
         Column(
             modifier = Modifier

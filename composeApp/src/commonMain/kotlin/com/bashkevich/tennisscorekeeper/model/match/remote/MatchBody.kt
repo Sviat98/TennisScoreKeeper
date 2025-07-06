@@ -1,5 +1,6 @@
 package com.bashkevich.tennisscorekeeper.model.match.remote
 
+import androidx.compose.ui.graphics.Color
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -17,19 +18,16 @@ data class MatchBody(
     val decidingSet: String
 )
 
-val EMPTY_MATCH_BODY =
-    MatchBody(
-        firstParticipant = ParticipantInMatchBody(id = "0", displayName = ""),
-        secondParticipant = ParticipantInMatchBody(id = "0", displayName = ""),
-        setsToWin = 1,
-        regularSet = "",
-        decidingSet = ""
-    )
-
 @Serializable
 data class ParticipantInMatchBody(
     @SerialName("id")
     val id: String,
     @SerialName("display_name")
     val displayName: String,
+    @SerialName("primary_color")
+    val primaryColor: String,
+    @SerialName("secondary_color")
+    val secondaryColor: String?,
 )
+
+fun Color.convertToHexString() = this.value.toString(16).take(6)

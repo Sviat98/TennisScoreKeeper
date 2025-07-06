@@ -1,17 +1,25 @@
 package com.bashkevich.tennisscorekeeper.screens.addmatch
 
+import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import com.bashkevich.tennisscorekeeper.core.LoadResult
 import com.bashkevich.tennisscorekeeper.model.match.remote.MatchBody
 import com.bashkevich.tennisscorekeeper.model.match.remote.ParticipantInMatchBody
+import com.bashkevich.tennisscorekeeper.model.match.remote.convertToHexString
 import com.bashkevich.tennisscorekeeper.model.match.repository.MatchRepository
+import com.bashkevich.tennisscorekeeper.model.participant.domain.DoublesParticipant
+import com.bashkevich.tennisscorekeeper.model.participant.domain.ParticipantInDoublesMatch
+import com.bashkevich.tennisscorekeeper.model.participant.domain.ParticipantInSinglesMatch
+import com.bashkevich.tennisscorekeeper.model.participant.domain.SinglesParticipant
+import com.bashkevich.tennisscorekeeper.model.participant.domain.TennisParticipant
 import com.bashkevich.tennisscorekeeper.model.participant.repository.ParticipantRepository
+import com.bashkevich.tennisscorekeeper.model.player.domain.DoublesPlayerInMatch
+import com.bashkevich.tennisscorekeeper.model.player.domain.SinglesPlayerInMatch
 import com.bashkevich.tennisscorekeeper.model.set_template.domain.EMPTY_REGULAR_SET_TEMPLATE
 import com.bashkevich.tennisscorekeeper.model.set_template.domain.SetTemplateTypeFilter
 import com.bashkevich.tennisscorekeeper.model.set_template.repository.SetTemplateRepository
-import com.bashkevich.tennisscorekeeper.model.tournament.remote.TournamentType
 import com.bashkevich.tennisscorekeeper.model.tournament.repository.TournamentRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -47,23 +55,34 @@ class AddMatchViewModel(
         when (uiEvent) {
             is AddMatchUiEvent.FetchParticipants -> fetchParticipants()
             is AddMatchUiEvent.FetchSetTemplates -> fetchSetTemplates(uiEvent.setTemplateTypeFilter)
-            is AddMatchUiEvent.SelectParticipant -> {
-                val participant = uiEvent.participant
-                when (uiEvent.participantNumber) {
-                    1 -> reduceState { oldState ->
-                        oldState.copy(
-                            firstParticipant = participant,
-                            firstParticipantDisplayName = participant.toDisplayNameState()
-                        )
-                    }
+            is AddMatchUiEvent.SelectParticipant -> selectParticipant(
+                participantNumber = uiEvent.participantNumber,
+                participant = uiEvent.participant
+            )
 
-                    2 -> reduceState { oldState ->
-                        oldState.copy(
-                            secondParticipant = participant,
-                            secondParticipantDisplayName = participant.toDisplayNameState()
+            is AddMatchUiEvent.SelectPrimaryColor -> selectPrimaryColor(
+                participantNumber = uiEvent.participantNumber,
+                color = uiEvent.color
+            )
+
+            is AddMatchUiEvent.SelectSecondaryColor -> selectSecondaryColor(
+                participantNumber = uiEvent.participantNumber,
+                color = uiEvent.color
+            )
+
+            is AddMatchUiEvent.OpenColorPickerDialog -> {
+                reduceState { oldState ->
+                    oldState.copy(
+                        dialogState = OpenColorPickerDialogState.OpenColorPicker(
+                            participantNumber = uiEvent.participantNumber,
+                            colorNumber = uiEvent.colorNumber
                         )
-                    }
+                    )
                 }
+            }
+
+            AddMatchUiEvent.CloseColorPickerDialog -> {
+                reduceState { oldState -> oldState.copy(dialogState = OpenColorPickerDialogState.None) }
             }
 
             is AddMatchUiEvent.ChangeSetsToWin -> {
@@ -102,6 +121,128 @@ class AddMatchViewModel(
         }
     }
 
+    private fun selectPrimaryColor(
+        participantNumber: Int,
+        color: Color
+    ) {
+        val state = state.value
+
+        when (participantNumber) {
+            1 -> {
+                val firstParticipant = state.firstParticipant
+                when (firstParticipant) {
+                    is ParticipantInSinglesMatch -> {
+                        reduceState { oldState ->
+                            oldState.copy(
+                                firstParticipant = firstParticipant.copy(
+                                    primaryColor = color
+                                )
+                            )
+                        }
+                    }
+
+                    is ParticipantInDoublesMatch -> {
+                        reduceState { oldState ->
+                            oldState.copy(
+                                firstParticipant = firstParticipant.copy(
+                                    primaryColor = color
+                                )
+                            )
+                        }
+                    }
+                }
+            }
+
+            2 -> {
+                val secondParticipant = state.secondParticipant
+                when (secondParticipant) {
+                    is ParticipantInSinglesMatch -> {
+                        reduceState { oldState ->
+                            oldState.copy(
+                                secondParticipant = secondParticipant.copy(
+                                    primaryColor = color
+                                )
+                            )
+                        }
+                    }
+
+                    is ParticipantInDoublesMatch -> {
+                        reduceState { oldState ->
+                            oldState.copy(
+                                secondParticipant = secondParticipant.copy(
+                                    primaryColor = color
+                                )
+                            )
+                        }
+                    }
+                }
+            }
+        }
+
+        reduceState { oldState -> oldState.copy(dialogState = OpenColorPickerDialogState.None) }
+    }
+
+    private fun selectSecondaryColor(
+        participantNumber: Int,
+        color: Color?
+    ) {
+        val state = state.value
+
+        when (participantNumber) {
+            1 -> {
+                val firstParticipant = state.firstParticipant
+                when (firstParticipant) {
+                    is ParticipantInSinglesMatch -> {
+                        reduceState { oldState ->
+                            oldState.copy(
+                                firstParticipant = firstParticipant.copy(
+                                    secondaryColor = color
+                                )
+                            )
+                        }
+                    }
+
+                    is ParticipantInDoublesMatch -> {
+                        reduceState { oldState ->
+                            oldState.copy(
+                                firstParticipant = firstParticipant.copy(
+                                    secondaryColor = color
+                                )
+                            )
+                        }
+                    }
+                }
+            }
+
+            2 -> {
+                val secondParticipant = state.secondParticipant
+                when (secondParticipant) {
+                    is ParticipantInSinglesMatch -> {
+                        reduceState { oldState ->
+                            oldState.copy(
+                                secondParticipant = secondParticipant.copy(
+                                    secondaryColor = color
+                                )
+                            )
+                        }
+                    }
+
+                    is ParticipantInDoublesMatch -> {
+                        reduceState { oldState ->
+                            oldState.copy(
+                                secondParticipant = secondParticipant.copy(
+                                    secondaryColor = color
+                                )
+                            )
+                        }
+                    }
+                }
+            }
+        }
+        reduceState { oldState -> oldState.copy(dialogState = OpenColorPickerDialogState.None) }
+
+    }
+
     private fun fetchTournament() {
         viewModelScope.launch {
             val tournamentId = savedStateHandle.toRoute<AddMatchRoute>().tournamentId
@@ -113,17 +254,10 @@ class AddMatchViewModel(
 
                 val tournament = tournamentResult.result
 
-                val participantDisplayNameState = when (tournament.type) {
-                    TournamentType.SINGLES -> EMPTY_SINGLES_PARTICIPANT_DISPLAY_NAME
-                    TournamentType.DOUBLES -> EMPTY_DOUBLES_PARTICIPANT_DISPLAY_NAME
-                }
-
                 reduceState { oldState ->
                     oldState.copy(
                         isLoading = false,
                         tournament = tournament,
-                        firstParticipantDisplayName = participantDisplayNameState,
-                        secondParticipantDisplayName = participantDisplayNameState
                     )
                 }
             }
@@ -166,30 +300,148 @@ class AddMatchViewModel(
         }
     }
 
+    private fun selectParticipant(participantNumber: Int, participant: TennisParticipant) {
+        val state = state.value
+        when (participant) {
+            is SinglesParticipant -> {
+                val displayName = participant.player.surname.uppercase()
+
+                when (participantNumber) {
+                    1 -> {
+                        val participantToUpdate =
+                            state.firstParticipant as ParticipantInSinglesMatch
+
+                        val playerToUpdate = participantToUpdate.player as SinglesPlayerInMatch
+                        reduceState { oldState ->
+                            oldState.copy(
+                                firstParticipant = participantToUpdate.copy(
+                                    id = participant.id,
+                                    seed = participant.seed,
+                                    displayName = displayName,
+                                    player = playerToUpdate.copy(
+                                        id = participant.player.id,
+                                        surname = participant.player.surname,
+                                        name = participant.player.name
+                                    )
+                                ),
+                            )
+                        }
+                    }
+
+                    2 -> {
+                        val participantToUpdate =
+                            state.secondParticipant as ParticipantInSinglesMatch
+
+                        val playerToUpdate = participantToUpdate.player as SinglesPlayerInMatch
+                        reduceState { oldState ->
+                            oldState.copy(
+                                secondParticipant = participantToUpdate.copy(
+                                    id = participant.id,
+                                    seed = participant.seed,
+                                    displayName = displayName,
+                                    player = playerToUpdate.copy(
+                                        id = participant.player.id,
+                                        surname = participant.player.surname,
+                                        name = participant.player.name
+                                    )
+                                ),
+                            )
+                        }
+                    }
+                }
+            }
+
+            is DoublesParticipant -> {
+
+
+                val participantDisplayName =
+                    "${participant.firstPlayer.surname}/${participant.secondPlayer.surname}".uppercase()
+
+                when (participantNumber) {
+                    1 -> {
+                        val participantToUpdate =
+                            state.firstParticipant as ParticipantInDoublesMatch
+
+                        val firstPlayerToUpdate =
+                            participantToUpdate.firstPlayer as DoublesPlayerInMatch
+                        val secondPlayerToUpdate =
+                            participantToUpdate.secondPlayer as DoublesPlayerInMatch
+
+                        reduceState { oldState ->
+                            oldState.copy(
+                                firstParticipant = participantToUpdate.copy(
+                                    id = participant.id,
+                                    seed = participant.seed,
+                                    displayName = participantDisplayName,
+                                    firstPlayer = firstPlayerToUpdate.copy(
+                                        id = participant.firstPlayer.id,
+                                        surname = participant.firstPlayer.surname,
+                                        name = participant.firstPlayer.name
+                                    ),
+                                    secondPlayer = secondPlayerToUpdate.copy(
+                                        id = participant.secondPlayer.id,
+                                        surname = participant.secondPlayer.surname,
+                                        name = participant.secondPlayer.name
+                                    ),
+                                ),
+                            )
+                        }
+                    }
+
+                    2 -> {
+                        val participantToUpdate =
+                            state.secondParticipant as ParticipantInDoublesMatch
+
+                        val firstPlayerToUpdate =
+                            participantToUpdate.firstPlayer as DoublesPlayerInMatch
+                        val secondPlayerToUpdate =
+                            participantToUpdate.secondPlayer as DoublesPlayerInMatch
+                        reduceState { oldState ->
+                            oldState.copy(
+                                secondParticipant = participantToUpdate.copy(
+                                    id = participant.id,
+                                    seed = participant.seed,
+                                    displayName = participantDisplayName,
+                                    firstPlayer = firstPlayerToUpdate.copy(
+                                        id = participant.firstPlayer.id,
+                                        surname = participant.firstPlayer.surname,
+                                        name = participant.firstPlayer.name
+                                    ),
+                                    secondPlayer = secondPlayerToUpdate.copy(
+                                        id = participant.secondPlayer.id,
+                                        surname = participant.secondPlayer.surname,
+                                        name = participant.secondPlayer.name
+                                    ),
+                                ),
+                            )
+                        }
+                    }
+                }
+            }
+        }
+
+    }
+
     private fun buildAndEmitMatchBody() {
         val state = state.value
-
-        val firstParticipantDisplayName = when (state.firstParticipantDisplayName) {
-            is SinglesParticipantDisplayNameState -> state.firstParticipantDisplayName.playerDisplayName.text
-            is DoublesParticipantDisplayNameState -> "${state.firstParticipantDisplayName.firstPlayerDisplayName.text}/${state.firstParticipantDisplayName.secondPlayerDisplayName.text}"
-        }
-
-        val secondParticipantDisplayName = when (state.secondParticipantDisplayName) {
-            is SinglesParticipantDisplayNameState -> state.secondParticipantDisplayName.playerDisplayName.text
-            is DoublesParticipantDisplayNameState -> "${state.secondParticipantDisplayName.firstPlayerDisplayName.text}/${state.secondParticipantDisplayName.secondPlayerDisplayName.text}"
-        }
+        
         val firstParticipantInMatchBody = ParticipantInMatchBody(
             id = state.firstParticipant.id,
-            displayName = firstParticipantDisplayName.toString()
+            displayName = state.firstParticipant.displayName,
+            primaryColor = state.firstParticipant.primaryColor.convertToHexString(),
+            secondaryColor = state.firstParticipant.secondaryColor?.convertToHexString()
         )
         val secondParticipantInMatchBody = ParticipantInMatchBody(
             id = state.secondParticipant.id,
-            displayName = secondParticipantDisplayName.toString()
+            displayName = state.secondParticipant.displayName,
+            primaryColor = state.secondParticipant.primaryColor.convertToHexString(),
+            secondaryColor = state.secondParticipant.secondaryColor?.convertToHexString()
         )
 
         val regularSetTemplate = state.regularSetTemplate
 
-        val regularSetTemplateId = if (regularSetTemplate == EMPTY_REGULAR_SET_TEMPLATE) null else regularSetTemplate.id
+        val regularSetTemplateId =
+            if (regularSetTemplate == EMPTY_REGULAR_SET_TEMPLATE) null else regularSetTemplate.id
 
         val matchBody = MatchBody(
             firstParticipant = firstParticipantInMatchBody,

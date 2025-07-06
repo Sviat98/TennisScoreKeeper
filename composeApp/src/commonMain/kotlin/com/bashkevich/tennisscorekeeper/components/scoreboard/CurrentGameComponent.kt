@@ -26,11 +26,11 @@ fun CurrentGameComponent(
             horizontalAlignment = Alignment.CenterHorizontally, // Выравнивание по центру
         ) {
             CurrentGameNumber(
-                modifier = Modifier.weight(0.5f),
+                modifier = Modifier.weight(1f),
                 pointsEarned = currentGame.firstParticipantPointsWon
             )
             CurrentGameNumber(
-                modifier = Modifier.weight(0.5f),
+                modifier = Modifier.weight(1f),
                 pointsEarned = currentGame.secondParticipantPointsWon
             )
         }

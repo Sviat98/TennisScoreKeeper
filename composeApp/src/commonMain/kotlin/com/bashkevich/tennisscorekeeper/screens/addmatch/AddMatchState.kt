@@ -1,11 +1,10 @@
 package com.bashkevich.tennisscorekeeper.screens.addmatch
 
-import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.runtime.Immutable
-import com.bashkevich.tennisscorekeeper.model.match.remote.EMPTY_MATCH_BODY
-import com.bashkevich.tennisscorekeeper.model.match.remote.MatchBody
-import com.bashkevich.tennisscorekeeper.model.participant.domain.SINGLES_PARTICIPANT_DEFAULT
+import androidx.compose.ui.graphics.Color
+import com.bashkevich.tennisscorekeeper.model.participant.domain.SINGLES_PARTICIPANT_IN_MATCH_DEFAULT
 import com.bashkevich.tennisscorekeeper.model.participant.domain.TennisParticipant
+import com.bashkevich.tennisscorekeeper.model.participant.domain.TennisParticipantInMatch
 import com.bashkevich.tennisscorekeeper.model.set_template.domain.EMPTY_DECIDING_SET_TEMPLATE
 import com.bashkevich.tennisscorekeeper.model.set_template.domain.EMPTY_REGULAR_SET_TEMPLATE
 import com.bashkevich.tennisscorekeeper.model.set_template.domain.SetTemplate
@@ -22,6 +21,12 @@ sealed class AddMatchUiEvent : UiEvent {
     data object FetchParticipants : AddMatchUiEvent()
     class SelectParticipant(val participantNumber: Int, val participant: TennisParticipant) :
         AddMatchUiEvent()
+    class OpenColorPickerDialog(val participantNumber: Int, val colorNumber: Int) : AddMatchUiEvent()
+
+    data object CloseColorPickerDialog : AddMatchUiEvent()
+
+    class SelectPrimaryColor(val participantNumber: Int, val color: Color) : AddMatchUiEvent()
+    class SelectSecondaryColor(val participantNumber: Int, val color: Color?) : AddMatchUiEvent()
 
     class ChangeSetsToWin(val delta: Int) : AddMatchUiEvent()
 
@@ -34,16 +39,19 @@ sealed class AddMatchUiEvent : UiEvent {
     data object AddMatch : AddMatchUiEvent()
 }
 
+sealed class OpenColorPickerDialogState {
+    data object None : OpenColorPickerDialogState()
+    class OpenColorPicker(val participantNumber: Int, val colorNumber: Int) : OpenColorPickerDialogState()
+}
+
 @Immutable
 data class AddMatchState(
     val isLoading: Boolean,
     val tournament: Tournament,
     val participantOptions: List<TennisParticipant>,
-    val firstParticipant: TennisParticipant,
-    val secondParticipant: TennisParticipant,
-    val firstParticipantDisplayName: ParticipantDisplayNameState,
-    val secondParticipantDisplayName: ParticipantDisplayNameState,
-    val matchBody: MatchBody,
+    val firstParticipant: TennisParticipantInMatch,
+    val secondParticipant: TennisParticipantInMatch,
+    val dialogState: OpenColorPickerDialogState,
     val setsToWin: Int,
     val setTemplateOptions: List<SetTemplate>,
     val regularSetTemplate: SetTemplate,
@@ -54,11 +62,9 @@ data class AddMatchState(
             isLoading = true,
             tournament = TOURNAMENT_DEFAULT,
             participantOptions = emptyList(),
-            firstParticipant = SINGLES_PARTICIPANT_DEFAULT,
-            secondParticipant = SINGLES_PARTICIPANT_DEFAULT,
-            firstParticipantDisplayName = SinglesParticipantDisplayNameState(TextFieldState("")),
-            secondParticipantDisplayName = SinglesParticipantDisplayNameState(TextFieldState("")),
-            matchBody = EMPTY_MATCH_BODY,
+            firstParticipant = SINGLES_PARTICIPANT_IN_MATCH_DEFAULT,
+            secondParticipant = SINGLES_PARTICIPANT_IN_MATCH_DEFAULT,
+            dialogState = OpenColorPickerDialogState.None,
             setsToWin = 1,
             setTemplateOptions = emptyList(),
             regularSetTemplate = EMPTY_REGULAR_SET_TEMPLATE,

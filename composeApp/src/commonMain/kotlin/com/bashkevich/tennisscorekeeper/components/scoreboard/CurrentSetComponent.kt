@@ -27,11 +27,11 @@ fun CurrentSetComponent(
             horizontalAlignment = Alignment.CenterHorizontally, // Выравнивание по центру
         ) {
             CurrentSetNumber(
-                modifier = Modifier.weight(0.5f),
+                modifier = Modifier.weight(1f),
                 gamesEarned = currentSet.firstParticipantGamesWon
             )
             CurrentSetNumber(
-                modifier = Modifier.weight(0.5f),
+                modifier = Modifier.weight(1f),
                 gamesEarned = currentSet.secondParticipantGamesWon
             )
         }

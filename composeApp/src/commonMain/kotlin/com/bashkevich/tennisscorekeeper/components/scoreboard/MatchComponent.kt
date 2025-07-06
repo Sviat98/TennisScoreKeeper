@@ -30,6 +30,10 @@ fun MatchView(
         modifier = Modifier.then(modifier).background(color = Color(0xFF142c6c))
     ) {
         val density = LocalDensity.current
+        ColorScoreboardComponent(
+            modifier = Modifier.height(columnHeight),
+            match = match
+        )
         SeedScoreboardComponent(
             modifier = Modifier.height(columnHeight),
             match = match

@@ -27,8 +27,8 @@ fun ServeScoreboardComponent(
         Column(
             modifier = Modifier.then(modifier)
         ) {
-            ServingBox(modifier = Modifier.weight(0.5f), showServe = firstParticipant.isServing)
-            ServingBox(modifier = Modifier.weight(0.5f), showServe = secondParticipant.isServing)
+            ServingBox(modifier = Modifier.weight(1f), showServe = firstParticipant.isServing)
+            ServingBox(modifier = Modifier.weight(1f), showServe = secondParticipant.isServing)
         }
     }
 

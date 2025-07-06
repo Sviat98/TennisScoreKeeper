@@ -36,7 +36,7 @@ fun SeedScoreboardComponent(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         SeedNumber(
-            modifier = Modifier.weight(0.5f).onGloballyPositioned { layoutCoordinates ->
+            modifier = Modifier.weight(1f).onGloballyPositioned { layoutCoordinates ->
 
                 val currentWidth = layoutCoordinates.size.width
 
@@ -47,7 +47,7 @@ fun SeedScoreboardComponent(
             seedNumber = firstParticipantSeed
         )
         SeedNumber(
-            modifier = Modifier.weight(0.5f).onGloballyPositioned { layoutCoordinates ->
+            modifier = Modifier.weight(1f).onGloballyPositioned { layoutCoordinates ->
 
                 val currentWidth = layoutCoordinates.size.width
 
