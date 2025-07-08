@@ -7,7 +7,7 @@ import androidx.navigation.toRoute
 import com.bashkevich.tennisscorekeeper.core.LoadResult
 import com.bashkevich.tennisscorekeeper.model.match.remote.MatchBody
 import com.bashkevich.tennisscorekeeper.model.match.remote.ParticipantInMatchBody
-import com.bashkevich.tennisscorekeeper.model.match.remote.convertToHexString
+import com.bashkevich.tennisscorekeeper.model.match.remote.convertToRgbString
 import com.bashkevich.tennisscorekeeper.model.match.repository.MatchRepository
 import com.bashkevich.tennisscorekeeper.model.participant.domain.DoublesParticipant
 import com.bashkevich.tennisscorekeeper.model.participant.domain.PARTICIPANT_IN_DOUBLES_MATCH_DEFAULT
@@ -437,14 +437,14 @@ class AddMatchViewModel(
         val firstParticipantInMatchBody = ParticipantInMatchBody(
             id = state.firstParticipant.id,
             displayName = state.firstParticipant.displayName,
-            primaryColor = state.firstParticipant.primaryColor.convertToHexString(),
-            secondaryColor = state.firstParticipant.secondaryColor?.convertToHexString()
+            primaryColor = state.firstParticipant.primaryColor.convertToRgbString(),
+            secondaryColor = state.firstParticipant.secondaryColor?.convertToRgbString()
         )
         val secondParticipantInMatchBody = ParticipantInMatchBody(
             id = state.secondParticipant.id,
             displayName = state.secondParticipant.displayName,
-            primaryColor = state.secondParticipant.primaryColor.convertToHexString(),
-            secondaryColor = state.secondParticipant.secondaryColor?.convertToHexString()
+            primaryColor = state.secondParticipant.primaryColor.convertToRgbString(),
+            secondaryColor = state.secondParticipant.secondaryColor?.convertToRgbString()
         )
 
         val regularSetTemplate = state.regularSetTemplate

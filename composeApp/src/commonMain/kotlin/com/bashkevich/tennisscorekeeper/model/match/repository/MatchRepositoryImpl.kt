@@ -55,8 +55,8 @@ class MatchRepositoryImpl(
         matchRemoteDataSource.observeMatchUpdates()
             .map { result -> result.mapSuccess { matchDto -> matchDto.toDomain() } }
 
-    override suspend fun updateMatchScore(matchId: String, playerId: String, scoreType: ScoreType) {
-        val changeScoreBody = ChangeScoreBody(playerId = playerId, scoreType = scoreType)
+    override suspend fun updateMatchScore(matchId: String, participantId: String, scoreType: ScoreType) {
+        val changeScoreBody = ChangeScoreBody(playerId = participantId, scoreType = scoreType)
 
         matchRemoteDataSource.updateMatchScore(matchId = matchId, changeScoreBody = changeScoreBody)
     }

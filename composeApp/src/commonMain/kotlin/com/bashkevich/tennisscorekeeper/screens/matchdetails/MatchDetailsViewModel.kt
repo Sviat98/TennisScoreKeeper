@@ -4,6 +4,8 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import com.bashkevich.tennisscorekeeper.core.LoadResult
+import com.bashkevich.tennisscorekeeper.model.match.remote.body.MatchStatus
+import com.bashkevich.tennisscorekeeper.model.match.remote.body.ScoreType
 import com.bashkevich.tennisscorekeeper.model.match.repository.MatchRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -35,13 +37,14 @@ class MatchDetailsViewModel(
         matchRepository.connectToMatchUpdates(matchId = matchId)
 
         viewModelScope.launch {
-            matchRepository.observeMatchUpdates().distinctUntilChanged().collect {result->
+            matchRepository.observeMatchUpdates().distinctUntilChanged().collect { result ->
                 println(result)
-                when(result){
-                    is LoadResult.Success->{
-                        onEvent(MatchDetailsUiEvent.ShowMatch(result.result))
+                when (result) {
+                    is LoadResult.Success -> {
+                        reduceState { oldState -> oldState.copy(match = result.result) }
                     }
-                    is LoadResult.Error->{
+
+                    is LoadResult.Error -> {
                         println(result.result.message)
                     }
                 }
@@ -51,40 +54,99 @@ class MatchDetailsViewModel(
 
     fun onEvent(uiEvent: MatchDetailsUiEvent) {
         // some feature-specific logic
-        when(uiEvent){
-            is MatchDetailsUiEvent.ShowMatch->{
-                reduceState { oldState-> oldState.copy(match = uiEvent.match) }
+        when (uiEvent) {
+            is MatchDetailsUiEvent.ShowMatch -> {
             }
-            is MatchDetailsUiEvent.UpdateScore->{
-                viewModelScope.launch {
-                    matchRepository.updateMatchScore(uiEvent.matchId,uiEvent.playerId,uiEvent.scoreType)
-                }
-            }
-            is MatchDetailsUiEvent.SetFirstParticipantToServe->{
-                viewModelScope.launch {
-                    matchRepository.setFirstParticipantToServe(uiEvent.matchId,uiEvent.participantId)
-                }
-            }
-            is MatchDetailsUiEvent.SetFirstPlayerInPairToServe->{
-                viewModelScope.launch {
-                    matchRepository.setFirstPlayerInPairToServe(uiEvent.matchId,uiEvent.playerId)
-                }
-            }
-            is MatchDetailsUiEvent.ChangeMatchStatus->{
-                viewModelScope.launch {
-                    matchRepository.setMatchStatus(uiEvent.matchId,uiEvent.status)
-                }
-            }
-            is MatchDetailsUiEvent.UndoPoint->{
-                viewModelScope.launch {
-                    matchRepository.undoPoint(uiEvent.matchId)
-                }
-            }
-            is MatchDetailsUiEvent.RedoPoint->{
-                viewModelScope.launch {
-                    matchRepository.redoPoint(uiEvent.matchId)
-                }
-            }
+
+            is MatchDetailsUiEvent.UpdateScore -> updateMatchScore(
+                participantId = uiEvent.participantId,
+                scoreType = uiEvent.scoreType
+            )
+
+            is MatchDetailsUiEvent.SetFirstParticipantToServe -> setFirstParticipantToServe(
+                participantId = uiEvent.participantId
+            )
+
+            is MatchDetailsUiEvent.SetFirstPlayerInPairToServe -> setFirstPlayerInPairToServe(
+                playerId = uiEvent.playerId
+            )
+
+            is MatchDetailsUiEvent.ChangeMatchStatus -> changeMatchStatus(status = uiEvent.status)
+
+            is MatchDetailsUiEvent.UndoPoint -> undoPoint()
+
+            is MatchDetailsUiEvent.RedoPoint -> redoPoint()
+        }
+    }
+
+    private fun updateMatchScore(participantId: String, scoreType: ScoreType) {
+        viewModelScope.launch {
+            val state = state.value
+
+            val matchId = state.match.id
+            matchRepository.updateMatchScore(
+                matchId = matchId,
+                participantId = participantId,
+                scoreType = scoreType
+            )
+        }
+    }
+
+    private fun setFirstParticipantToServe(participantId: String) {
+        viewModelScope.launch {
+            val state = state.value
+
+            val matchId = state.match.id
+            matchRepository.setFirstParticipantToServe(
+                matchId = matchId,
+                participantId = participantId,
+            )
+        }
+    }
+
+    private fun setFirstPlayerInPairToServe(playerId: String) {
+        viewModelScope.launch {
+            val state = state.value
+
+            val matchId = state.match.id
+            matchRepository.setFirstPlayerInPairToServe(
+                matchId = matchId,
+                playerId = playerId,
+            )
+        }
+    }
+
+    private fun changeMatchStatus(status: MatchStatus) {
+        viewModelScope.launch {
+            val state = state.value
+
+            val matchId = state.match.id
+            matchRepository.setMatchStatus(
+                matchId = matchId,
+                status = status,
+            )
+        }
+    }
+
+    private fun undoPoint(){
+        viewModelScope.launch {
+            val state = state.value
+
+            val matchId = state.match.id
+            matchRepository.undoPoint(
+                matchId = matchId,
+            )
+        }
+    }
+
+    private fun redoPoint(){
+        viewModelScope.launch {
+            val state = state.value
+
+            val matchId = state.match.id
+            matchRepository.redoPoint(
+                matchId = matchId,
+            )
         }
     }
 

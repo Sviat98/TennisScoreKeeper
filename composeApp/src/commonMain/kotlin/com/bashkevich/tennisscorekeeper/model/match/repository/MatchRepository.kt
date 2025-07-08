@@ -13,7 +13,7 @@ interface MatchRepository {
     suspend fun closeSession()
     fun connectToMatchUpdates(matchId: String)
     fun observeMatchUpdates(): Flow<LoadResult<Match, Throwable>>
-    suspend fun updateMatchScore(matchId: String,playerId: String, scoreType: ScoreType)
+    suspend fun updateMatchScore(matchId: String, participantId: String, scoreType: ScoreType)
     suspend fun undoPoint(matchId: String)
     suspend fun redoPoint(matchId: String)
     suspend fun setFirstParticipantToServe(matchId: String,participantId: String)

@@ -21,6 +21,9 @@ sealed class AddMatchUiEvent : UiEvent {
     data object FetchParticipants : AddMatchUiEvent()
     class SelectParticipant(val participantNumber: Int, val participant: TennisParticipant) :
         AddMatchUiEvent()
+    //Почему используется participantNumber, а не id
+    // Могут быть ситуации, когда участник не выбран, но надо выбрать цвет,
+    // тогда по id невозможно понять, кудв ставить цвет
     class OpenColorPickerDialog(val participantNumber: Int, val colorNumber: Int) : AddMatchUiEvent()
 
     data object CloseColorPickerDialog : AddMatchUiEvent()

@@ -30,4 +30,4 @@ data class ParticipantInMatchBody(
     val secondaryColor: String?,
 )
 
-fun Color.convertToHexString() = this.value.toString(16).take(6)
+fun Color.convertToRgbString() = this.value.toHexString().substring(2,8)

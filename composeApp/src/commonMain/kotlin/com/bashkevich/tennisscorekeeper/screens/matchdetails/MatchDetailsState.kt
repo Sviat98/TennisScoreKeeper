@@ -14,18 +14,16 @@ import com.bashkevich.tennisscorekeeper.mvi.UiState
 @Immutable
 sealed class MatchDetailsUiEvent : UiEvent {
     class ShowMatch(val match: Match) : MatchDetailsUiEvent()
-    class SetFirstParticipantToServe(val matchId: String, val participantId: String) :
+    class SetFirstParticipantToServe(val participantId: String) :
         MatchDetailsUiEvent()
-    class SetFirstPlayerInPairToServe(val matchId: String, val playerId: String) :
+    class SetFirstPlayerInPairToServe(val playerId: String) :
         MatchDetailsUiEvent()
-    class ChangeMatchStatus(val matchId: String, val status: MatchStatus) :
+    class ChangeMatchStatus(val status: MatchStatus) :
         MatchDetailsUiEvent()
-    class UpdateScore(val matchId: String, val playerId: String, val scoreType: ScoreType) :
+    class UpdateScore(val participantId: String, val scoreType: ScoreType) :
         MatchDetailsUiEvent()
-    class UndoPoint(val matchId: String) :
-        MatchDetailsUiEvent()
-    class RedoPoint(val matchId: String) :
-        MatchDetailsUiEvent()
+    data object UndoPoint : MatchDetailsUiEvent()
+    data object RedoPoint : MatchDetailsUiEvent()
 }
 
 @Immutable

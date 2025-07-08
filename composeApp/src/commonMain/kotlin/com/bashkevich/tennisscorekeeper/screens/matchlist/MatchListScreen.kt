@@ -33,7 +33,6 @@ fun MatchListScreen(
     state: TournamentState,
     onEvent: (TournamentUiEvent) -> Unit
 ) {
-
     val navController = LocalNavHostController.current
 
     MatchListContent(
