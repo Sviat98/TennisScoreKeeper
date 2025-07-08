@@ -10,13 +10,13 @@ sealed class TennisPlayerInMatch{
     abstract val name: String
 }
 
-data class SinglesPlayerInMatch(
+data class PlayerInSinglesMatch(
     override val id: String,
     override val surname: String,
     override val name: String,
 ) : TennisPlayerInMatch()
 
-data class DoublesPlayerInMatch(
+data class PlayerInDoublesMatch(
     override val id: String,
     override val surname: String,
     override val name: String,
@@ -24,12 +24,12 @@ data class DoublesPlayerInMatch(
 ): TennisPlayerInMatch()
 
 fun PlayerInMatchDto.toDomain(): TennisPlayerInMatch = when(this) {
-    is PlayerInSinglesMatchDto -> SinglesPlayerInMatch(
+    is PlayerInSinglesMatchDto -> PlayerInSinglesMatch(
         id = this.id,
         surname = this.surname,
         name = this.name,
     )
-    is PlayerInDoublesMatchDto -> DoublesPlayerInMatch(
+    is PlayerInDoublesMatchDto -> PlayerInDoublesMatch(
         id = this.id,
         surname = this.surname,
         name = this.name,

@@ -2,7 +2,7 @@ package com.bashkevich.tennisscorekeeper.screens.addmatch
 
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.graphics.Color
-import com.bashkevich.tennisscorekeeper.model.participant.domain.SINGLES_PARTICIPANT_IN_MATCH_DEFAULT
+import com.bashkevich.tennisscorekeeper.model.participant.domain.PARTICIPANT_IN_SINGLES_MATCH_DEFAULT
 import com.bashkevich.tennisscorekeeper.model.participant.domain.TennisParticipant
 import com.bashkevich.tennisscorekeeper.model.participant.domain.TennisParticipantInMatch
 import com.bashkevich.tennisscorekeeper.model.set_template.domain.EMPTY_DECIDING_SET_TEMPLATE
@@ -62,8 +62,8 @@ data class AddMatchState(
             isLoading = true,
             tournament = TOURNAMENT_DEFAULT,
             participantOptions = emptyList(),
-            firstParticipant = SINGLES_PARTICIPANT_IN_MATCH_DEFAULT,
-            secondParticipant = SINGLES_PARTICIPANT_IN_MATCH_DEFAULT,
+            firstParticipant = PARTICIPANT_IN_SINGLES_MATCH_DEFAULT,
+            secondParticipant = PARTICIPANT_IN_SINGLES_MATCH_DEFAULT,
             dialogState = OpenColorPickerDialogState.None,
             setsToWin = 1,
             setTemplateOptions = emptyList(),

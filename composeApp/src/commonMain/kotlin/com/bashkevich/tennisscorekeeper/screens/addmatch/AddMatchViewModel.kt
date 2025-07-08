@@ -10,16 +10,19 @@ import com.bashkevich.tennisscorekeeper.model.match.remote.ParticipantInMatchBod
 import com.bashkevich.tennisscorekeeper.model.match.remote.convertToHexString
 import com.bashkevich.tennisscorekeeper.model.match.repository.MatchRepository
 import com.bashkevich.tennisscorekeeper.model.participant.domain.DoublesParticipant
+import com.bashkevich.tennisscorekeeper.model.participant.domain.PARTICIPANT_IN_DOUBLES_MATCH_DEFAULT
 import com.bashkevich.tennisscorekeeper.model.participant.domain.ParticipantInDoublesMatch
 import com.bashkevich.tennisscorekeeper.model.participant.domain.ParticipantInSinglesMatch
+import com.bashkevich.tennisscorekeeper.model.participant.domain.PARTICIPANT_IN_SINGLES_MATCH_DEFAULT
 import com.bashkevich.tennisscorekeeper.model.participant.domain.SinglesParticipant
 import com.bashkevich.tennisscorekeeper.model.participant.domain.TennisParticipant
 import com.bashkevich.tennisscorekeeper.model.participant.repository.ParticipantRepository
-import com.bashkevich.tennisscorekeeper.model.player.domain.DoublesPlayerInMatch
-import com.bashkevich.tennisscorekeeper.model.player.domain.SinglesPlayerInMatch
+import com.bashkevich.tennisscorekeeper.model.player.domain.PlayerInDoublesMatch
+import com.bashkevich.tennisscorekeeper.model.player.domain.PlayerInSinglesMatch
 import com.bashkevich.tennisscorekeeper.model.set_template.domain.EMPTY_REGULAR_SET_TEMPLATE
 import com.bashkevich.tennisscorekeeper.model.set_template.domain.SetTemplateTypeFilter
 import com.bashkevich.tennisscorekeeper.model.set_template.repository.SetTemplateRepository
+import com.bashkevich.tennisscorekeeper.model.tournament.remote.TournamentType
 import com.bashkevich.tennisscorekeeper.model.tournament.repository.TournamentRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -249,15 +252,21 @@ class AddMatchViewModel(
 
             val tournamentResult = tournamentRepository.getTournamentById(tournamentId)
 
-
             if (tournamentResult is LoadResult.Success) {
 
                 val tournament = tournamentResult.result
+
+                val defaultParticipant = when(tournament.type){
+                    TournamentType.SINGLES -> PARTICIPANT_IN_SINGLES_MATCH_DEFAULT
+                    TournamentType.DOUBLES -> PARTICIPANT_IN_DOUBLES_MATCH_DEFAULT
+                }
 
                 reduceState { oldState ->
                     oldState.copy(
                         isLoading = false,
                         tournament = tournament,
+                        firstParticipant = defaultParticipant,
+                        secondParticipant = defaultParticipant
                     )
                 }
             }
@@ -311,7 +320,7 @@ class AddMatchViewModel(
                         val participantToUpdate =
                             state.firstParticipant as ParticipantInSinglesMatch
 
-                        val playerToUpdate = participantToUpdate.player as SinglesPlayerInMatch
+                        val playerToUpdate = participantToUpdate.player as PlayerInSinglesMatch
                         reduceState { oldState ->
                             oldState.copy(
                                 firstParticipant = participantToUpdate.copy(
@@ -332,7 +341,7 @@ class AddMatchViewModel(
                         val participantToUpdate =
                             state.secondParticipant as ParticipantInSinglesMatch
 
-                        val playerToUpdate = participantToUpdate.player as SinglesPlayerInMatch
+                        val playerToUpdate = participantToUpdate.player as PlayerInSinglesMatch
                         reduceState { oldState ->
                             oldState.copy(
                                 secondParticipant = participantToUpdate.copy(
@@ -363,9 +372,9 @@ class AddMatchViewModel(
                             state.firstParticipant as ParticipantInDoublesMatch
 
                         val firstPlayerToUpdate =
-                            participantToUpdate.firstPlayer as DoublesPlayerInMatch
+                            participantToUpdate.firstPlayer as PlayerInDoublesMatch
                         val secondPlayerToUpdate =
-                            participantToUpdate.secondPlayer as DoublesPlayerInMatch
+                            participantToUpdate.secondPlayer as PlayerInDoublesMatch
 
                         reduceState { oldState ->
                             oldState.copy(
@@ -393,9 +402,9 @@ class AddMatchViewModel(
                             state.secondParticipant as ParticipantInDoublesMatch
 
                         val firstPlayerToUpdate =
-                            participantToUpdate.firstPlayer as DoublesPlayerInMatch
+                            participantToUpdate.firstPlayer as PlayerInDoublesMatch
                         val secondPlayerToUpdate =
-                            participantToUpdate.secondPlayer as DoublesPlayerInMatch
+                            participantToUpdate.secondPlayer as PlayerInDoublesMatch
                         reduceState { oldState ->
                             oldState.copy(
                                 secondParticipant = participantToUpdate.copy(

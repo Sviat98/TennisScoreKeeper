@@ -10,8 +10,8 @@ import com.bashkevich.tennisscorekeeper.model.participant.domain.ParticipantInDo
 import com.bashkevich.tennisscorekeeper.model.participant.domain.ParticipantInSinglesMatch
 import com.bashkevich.tennisscorekeeper.model.participant.domain.TennisParticipantInMatch
 import com.bashkevich.tennisscorekeeper.model.participant.domain.toDomain
-import com.bashkevich.tennisscorekeeper.model.player.domain.DoublesPlayerInMatch
-import com.bashkevich.tennisscorekeeper.model.player.domain.SinglesPlayerInMatch
+import com.bashkevich.tennisscorekeeper.model.player.domain.PlayerInDoublesMatch
+import com.bashkevich.tennisscorekeeper.model.player.domain.PlayerInSinglesMatch
 
 data class Match(
     val id: String,
@@ -76,7 +76,7 @@ val SAMPLE_MATCH = Match(
         isServing = false,
         isWinner = true,
         isRetired = false,
-        player = SinglesPlayerInMatch(id = "1", surname = "Djokovic", name = "Novak")
+        player = PlayerInSinglesMatch(id = "1", surname = "Djokovic", name = "Novak")
     ),
     secondParticipant = ParticipantInSinglesMatch(
         id = "2",
@@ -87,7 +87,7 @@ val SAMPLE_MATCH = Match(
         isServing = true,
         isWinner = false,
         isRetired = false,
-        player = SinglesPlayerInMatch(id = "2", surname = "Auger-Aliassime", name = "Felix")
+        player = PlayerInSinglesMatch(id = "2", surname = "Auger-Aliassime", name = "Felix")
     ),
     status = MatchStatus.IN_PROGRESS,
     previousSets = listOf(
@@ -112,13 +112,13 @@ val DOUBLES_SAMPLE_MATCH = Match(
         isServing = false,
         isWinner = false,
         isRetired = false,
-        firstPlayer = DoublesPlayerInMatch(
+        firstPlayer = PlayerInDoublesMatch(
             id = "1",
             surname = "Djokovic",
             name = "Novak",
             isServing = false
         ),
-        secondPlayer = DoublesPlayerInMatch(
+        secondPlayer = PlayerInDoublesMatch(
             id = "3",
             surname = "Nadal",
             name = "Rafael",
@@ -134,8 +134,8 @@ val DOUBLES_SAMPLE_MATCH = Match(
         isServing = true,
         isWinner = false,
         isRetired = false,
-        firstPlayer = DoublesPlayerInMatch(id = "4", surname = "Murray", name = "Andy", isServing = false),
-        secondPlayer = DoublesPlayerInMatch(
+        firstPlayer = PlayerInDoublesMatch(id = "4", surname = "Murray", name = "Andy", isServing = false),
+        secondPlayer = PlayerInDoublesMatch(
             id = "5",
             surname = "Federer",
             name = "Roger",

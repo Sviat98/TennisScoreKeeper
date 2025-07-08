@@ -96,8 +96,9 @@ class TournamentViewModel(
                         }
                     }
                 }
-            }
 
+                reduceState { oldState -> oldState.copy(isLoading = false) }
+            }
 
         }
     }

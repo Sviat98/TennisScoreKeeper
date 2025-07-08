@@ -17,7 +17,7 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.bashkevich.tennisscorekeeper.model.participant.domain.ParticipantInDoublesMatch
-import com.bashkevich.tennisscorekeeper.model.player.domain.DoublesPlayerInMatch
+import com.bashkevich.tennisscorekeeper.model.player.domain.PlayerInDoublesMatch
 import com.bashkevich.tennisscorekeeper.model.match.domain.Match
 import com.bashkevich.tennisscorekeeper.model.participant.domain.ParticipantInSinglesMatch
 import com.bashkevich.tennisscorekeeper.model.participant.domain.TennisParticipantInMatch
@@ -45,8 +45,8 @@ fun ParticipantOnScoreboardView(modifier: Modifier = Modifier, match: Match) {
 fun DoublesParticipantOnScoreboard(participant: ParticipantInDoublesMatch) {
     val (firstPlayerDisplayName, secondPlayerDisplayName) = participant.displayName.split("/")
 
-    val firstPlayer = participant.firstPlayer as DoublesPlayerInMatch
-    val secondPlayer = participant.secondPlayer as DoublesPlayerInMatch
+    val firstPlayer = participant.firstPlayer as PlayerInDoublesMatch
+    val secondPlayer = participant.secondPlayer as PlayerInDoublesMatch
 
     Text(
         text = buildAnnotatedString {

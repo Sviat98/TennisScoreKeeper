@@ -5,13 +5,12 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.Button
 import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.Icon
 import androidx.compose.material.Scaffold
-import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 
@@ -21,8 +20,10 @@ import androidx.compose.ui.Alignment
 
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.bashkevich.tennisscorekeeper.components.UploadFileComponent
 import com.bashkevich.tennisscorekeeper.components.participant.ParticipantCard
 import com.bashkevich.tennisscorekeeper.model.file.domain.ExcelFile
+import com.bashkevich.tennisscorekeeper.model.tournament.remote.TournamentStatus
 import com.bashkevich.tennisscorekeeper.screens.tournamentdetails.TournamentState
 import com.bashkevich.tennisscorekeeper.screens.tournamentdetails.TournamentUiEvent
 import com.mohamedrejeb.calf.core.LocalPlatformContext
@@ -91,16 +92,17 @@ fun ParticipantListContent(
                 verticalArrangement = Arrangement.spacedBy(8.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Button(onClick = {
-                    excelPickerLauncher.launch()
-                }) {
-                    Text("Open file storage")
-                }
-                Button(
-                    onClick = { onEvent(TournamentUiEvent.UploadFile) },
-                    enabled = participantListState.participantsFile.name.isNotBlank()
-                ) {
-                    Text("Upload file")
+                if (state.tournament.status == TournamentStatus.NOT_STARTED){
+                    UploadFileComponent(
+                        modifier = Modifier.fillMaxWidth(),
+                        file = participantListState.participantsFile,
+                        onFileStorageOpen = {
+                            excelPickerLauncher.launch()
+                        },
+                        onUploadFile = {
+                            onEvent(TournamentUiEvent.UploadFile)
+                        }
+                    )
                 }
                 LazyColumn(
                     verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterVertically),

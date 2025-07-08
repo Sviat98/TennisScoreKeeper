@@ -18,6 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.bashkevich.tennisscorekeeper.components.DefaultLoadingComponent
 import com.bashkevich.tennisscorekeeper.model.match.remote.body.MatchStatus
 import com.bashkevich.tennisscorekeeper.model.match.remote.body.convertToString
 import com.bashkevich.tennisscorekeeper.model.tournament.remote.TournamentStatus
@@ -38,12 +39,19 @@ fun TournamentScreen(
         }
     }
 
+    if (state.isLoading) {
+        DefaultLoadingComponent(
+            modifier = Modifier.then(modifier),
+            progressIndicatorSize = 128.dp
+        )
+    } else {
+        TournamentContent(
+            modifier = Modifier.then(modifier),
+            state = state,
+            onEvent = { viewModel.onEvent(it) },
+        )
+    }
 
-    TournamentContent(
-        modifier = Modifier.then(modifier),
-        state = state,
-        onEvent = { viewModel.onEvent(it) },
-    )
 }
 
 @Composable
@@ -58,7 +66,8 @@ fun TournamentContent(
 
     val matchListState = state.matchListState
 
-    val uncompletedMatches = matchListState.matches.filter { it.status!= MatchStatus.COMPLETED }.size
+    val uncompletedMatches =
+        matchListState.matches.filter { it.status != MatchStatus.COMPLETED }.size
 
     val participantListState = state.participantListState
 
@@ -73,18 +82,19 @@ fun TournamentContent(
 
         Text(tournament.name)
         Text("Status: ${tournament.status.convertToString()}")
-        when{
-            tournament.status==TournamentStatus.NOT_STARTED && participantsAmount > 1 ->{
+        when {
+            tournament.status == TournamentStatus.NOT_STARTED && participantsAmount > 1 -> {
                 Button(onClick = {
                     onEvent(TournamentUiEvent.ChangeTournamentStatus(TournamentStatus.IN_PROGRESS))
-                }){
+                }) {
                     Text("Start tournament")
                 }
             }
-            tournament.status==TournamentStatus.IN_PROGRESS && uncompletedMatches < 1 ->{
+
+            tournament.status == TournamentStatus.IN_PROGRESS && uncompletedMatches < 1 -> {
                 Button(onClick = {
                     onEvent(TournamentUiEvent.ChangeTournamentStatus(TournamentStatus.COMPLETED))
-                }){
+                }) {
                     Text("Finish tournament")
                 }
             }
@@ -116,6 +126,7 @@ fun TournamentContent(
                     state = state,
                     onEvent = onEvent
                 )
+
                 TournamentTab.Participants -> ParticipantListScreen(
                     state = state,
                     onEvent = onEvent

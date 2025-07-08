@@ -27,6 +27,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.bashkevich.tennisscorekeeper.components.match.ParticipantDisplayNameComponent
+import com.bashkevich.tennisscorekeeper.model.participant.domain.ParticipantInDoublesMatch
 import com.bashkevich.tennisscorekeeper.model.participant.domain.TennisParticipant
 import com.bashkevich.tennisscorekeeper.model.participant.domain.TennisParticipantInMatch
 
@@ -47,8 +48,9 @@ fun AddMatchParticipantComponent(
         verticalArrangement = Arrangement.spacedBy(8.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        val comboboxWidth = if (participant is ParticipantInDoublesMatch) 320.dp else 256.dp
         ParticipantCombobox(
-            modifier = Modifier.width(256.dp),
+            modifier = Modifier.width(comboboxWidth),
             participantOptions = participantOptions,
             currentParticipant = participant,
             onParticipantsFetch = onParticipantsFetch,
@@ -56,7 +58,7 @@ fun AddMatchParticipantComponent(
         )
 
         ParticipantDisplayNameComponent(
-            participantDisplayName = participant.displayName,
+            participant = participant,
         )
 
         ParticipantColorPickerBlock(

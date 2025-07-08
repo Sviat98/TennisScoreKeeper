@@ -36,7 +36,7 @@ fun ParticipantCombobox(
 
     val participantText = currentParticipant.toDisplayFormat()
 
-    val participantState = rememberTextFieldState(participantText)
+    val participantState = rememberTextFieldState("")
 
     LaunchedEffect(participantText){
         participantState.updateTextField(participantText)

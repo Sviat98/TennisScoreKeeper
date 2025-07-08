@@ -28,7 +28,7 @@ import com.bashkevich.tennisscorekeeper.model.match.remote.SpecialSetMode
 import com.bashkevich.tennisscorekeeper.model.match.remote.body.MatchStatus
 import com.bashkevich.tennisscorekeeper.model.match.remote.body.convertToString
 import com.bashkevich.tennisscorekeeper.model.participant.domain.ParticipantInDoublesMatch
-import com.bashkevich.tennisscorekeeper.model.player.domain.DoublesPlayerInMatch
+import com.bashkevich.tennisscorekeeper.model.player.domain.PlayerInDoublesMatch
 
 @Composable
 fun MatchDetailsScreen(
@@ -91,10 +91,10 @@ fun MatchDetailsContent(
 
         val enableStartMatchButton =
             if (firstParticipant is ParticipantInDoublesMatch && secondParticipant is ParticipantInDoublesMatch) {
-                val firstParticipantFirstPlayer = firstParticipant.firstPlayer as DoublesPlayerInMatch
-                val firstParticipantSecondPlayer = firstParticipant.secondPlayer as DoublesPlayerInMatch
-                val secondParticipantFirstPlayer = secondParticipant.firstPlayer as DoublesPlayerInMatch
-                val secondParticipantSecondPlayer = secondParticipant.secondPlayer as DoublesPlayerInMatch
+                val firstParticipantFirstPlayer = firstParticipant.firstPlayer as PlayerInDoublesMatch
+                val firstParticipantSecondPlayer = firstParticipant.secondPlayer as PlayerInDoublesMatch
+                val secondParticipantFirstPlayer = secondParticipant.firstPlayer as PlayerInDoublesMatch
+                val secondParticipantSecondPlayer = secondParticipant.secondPlayer as PlayerInDoublesMatch
 
                 (firstParticipant.isServing || secondParticipant.isServing) && (firstParticipantFirstPlayer.isServing || firstParticipantSecondPlayer.isServing)
                         && (secondParticipantFirstPlayer.isServing || secondParticipantSecondPlayer.isServing)

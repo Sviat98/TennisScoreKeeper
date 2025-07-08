@@ -25,6 +25,7 @@ sealed class TournamentUiEvent : UiEvent {
 
 @Immutable
 data class TournamentState(
+    val isLoading: Boolean,
     val tournament: Tournament,
     val currentTab: TournamentTab,
     val matchListState: MatchListState,
@@ -32,6 +33,7 @@ data class TournamentState(
 ) : UiState {
     companion object {
         fun initial() = TournamentState(
+            isLoading = true,
             tournament = TOURNAMENT_DEFAULT,
             currentTab = TournamentTab.Matches,
             matchListState = MatchListState.initial(),

@@ -4,7 +4,8 @@ import androidx.compose.ui.graphics.Color
 import com.bashkevich.tennisscorekeeper.model.participant.remote.ParticipantInDoublesMatchDto
 import com.bashkevich.tennisscorekeeper.model.participant.remote.ParticipantInMatchDto
 import com.bashkevich.tennisscorekeeper.model.participant.remote.ParticipantInSinglesMatchDto
-import com.bashkevich.tennisscorekeeper.model.player.domain.SinglesPlayerInMatch
+import com.bashkevich.tennisscorekeeper.model.player.domain.PlayerInDoublesMatch
+import com.bashkevich.tennisscorekeeper.model.player.domain.PlayerInSinglesMatch
 import com.bashkevich.tennisscorekeeper.model.player.domain.TennisPlayerInMatch
 import com.bashkevich.tennisscorekeeper.model.player.domain.toDomain
 
@@ -78,7 +79,7 @@ fun ParticipantInMatchDto.toDomain() =
 
 fun String.convertColor() =  "FF$this".toLong(16)
 
-val SINGLES_PARTICIPANT_IN_MATCH_DEFAULT = ParticipantInSinglesMatch(
+val PARTICIPANT_IN_SINGLES_MATCH_DEFAULT = ParticipantInSinglesMatch(
     id = "0",
     seed = null,
     displayName = "",
@@ -87,5 +88,18 @@ val SINGLES_PARTICIPANT_IN_MATCH_DEFAULT = ParticipantInSinglesMatch(
     isServing = false,
     isWinner = false,
     isRetired = false,
-    player = SinglesPlayerInMatch(id = "0", surname = "", name = ""),
+    player = PlayerInSinglesMatch(id = "0", surname = "", name = ""),
     )
+
+val PARTICIPANT_IN_DOUBLES_MATCH_DEFAULT = ParticipantInDoublesMatch(
+    id = "0",
+    seed = null,
+    displayName = "",
+    primaryColor = Color.White,
+    secondaryColor = null,
+    isServing = false,
+    isWinner = false,
+    isRetired = false,
+    firstPlayer = PlayerInDoublesMatch(id = "0", surname = "", name = "", isServing = false),
+    secondPlayer = PlayerInDoublesMatch(id = "0", surname = "", name = "", isServing = false),
+)

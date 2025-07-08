@@ -21,6 +21,8 @@ import com.bashkevich.tennisscorekeeper.components.ColorPickerDialog
 import com.bashkevich.tennisscorekeeper.components.participant.AddMatchParticipantComponent
 import com.bashkevich.tennisscorekeeper.components.set_template.SetTemplateCombobox
 import com.bashkevich.tennisscorekeeper.components.updateTextField
+import com.bashkevich.tennisscorekeeper.model.participant.domain.ParticipantInDoublesMatch
+import com.bashkevich.tennisscorekeeper.model.participant.domain.TennisParticipantInMatch
 import com.bashkevich.tennisscorekeeper.model.set_template.domain.SetTemplateTypeFilter
 import com.bashkevich.tennisscorekeeper.screens.addmatch.AddMatchState
 import com.bashkevich.tennisscorekeeper.screens.addmatch.AddMatchUiEvent
@@ -46,8 +48,10 @@ fun AddMatchComponent(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            val firstParticipantOptions = participantOptions.filter { it.id != secondParticipant.id }
-            val secondParticipantOptions = participantOptions.filter { it.id != firstParticipant.id }
+            val firstParticipantOptions =
+                participantOptions.filter { it.id != secondParticipant.id }
+            val secondParticipantOptions =
+                participantOptions.filter { it.id != firstParticipant.id }
             AddMatchParticipantComponent(
                 modifier = Modifier.weight(1f),
                 participantOptions = firstParticipantOptions,
@@ -63,11 +67,21 @@ fun AddMatchComponent(
                 },
                 participantPrimaryColor = firstParticipant.primaryColor,
                 participantSecondaryColor = firstParticipant.secondaryColor,
-                onColorPickerOpen = {colorNumber ->
-                    onEvent(AddMatchUiEvent.OpenColorPickerDialog(participantNumber = 1, colorNumber = colorNumber))
+                onColorPickerOpen = { colorNumber ->
+                    onEvent(
+                        AddMatchUiEvent.OpenColorPickerDialog(
+                            participantNumber = 1,
+                            colorNumber = colorNumber
+                        )
+                    )
                 },
                 onToggleSecondaryColor = { color ->
-                    onEvent(AddMatchUiEvent.SelectSecondaryColor(participantNumber = 1, color = color))
+                    onEvent(
+                        AddMatchUiEvent.SelectSecondaryColor(
+                            participantNumber = 1,
+                            color = color
+                        )
+                    )
                 }
             )
 
@@ -86,11 +100,21 @@ fun AddMatchComponent(
                 },
                 participantPrimaryColor = secondParticipant.primaryColor,
                 participantSecondaryColor = secondParticipant.secondaryColor,
-                onColorPickerOpen = {colorNumber ->
-                    onEvent(AddMatchUiEvent.OpenColorPickerDialog(participantNumber = 2, colorNumber = colorNumber))
+                onColorPickerOpen = { colorNumber ->
+                    onEvent(
+                        AddMatchUiEvent.OpenColorPickerDialog(
+                            participantNumber = 2,
+                            colorNumber = colorNumber
+                        )
+                    )
                 },
                 onToggleSecondaryColor = { color ->
-                    onEvent(AddMatchUiEvent.SelectSecondaryColor(participantNumber = 2, color = color))
+                    onEvent(
+                        AddMatchUiEvent.SelectSecondaryColor(
+                            participantNumber = 2,
+                            color = color
+                        )
+                    )
                 }
             )
         }
@@ -176,16 +200,16 @@ fun AddMatchComponent(
             val colorNumber = dialogState.colorNumber
             val participantNumber = dialogState.participantNumber
 
-            val initialColor = if(colorNumber==1){
-                if(participantNumber==1){
+            val initialColor = if (colorNumber == 1) {
+                if (participantNumber == 1) {
                     state.firstParticipant.primaryColor
-                }else{
+                } else {
                     state.secondParticipant.primaryColor
                 }
-            }else{
-                if(participantNumber==1){
+            } else {
+                if (participantNumber == 1) {
                     state.firstParticipant.secondaryColor!!
-                }else{
+                } else {
                     state.secondParticipant.secondaryColor!!
                 }
             }
@@ -216,11 +240,15 @@ fun AddMatchComponent(
 
 @Composable
 fun ParticipantDisplayNameComponent(
-    participantDisplayName: String
+    participant: TennisParticipantInMatch
 ) {
-
-    if (participantDisplayName.contains('/')) {
-        val (firstPlayerDisplayName, secondPlayerDisplayName) = participantDisplayName.split('/')
+    val participantDisplayName = participant.displayName
+    if (participant is ParticipantInDoublesMatch) {
+        val (firstPlayerDisplayName, secondPlayerDisplayName) = if (participantDisplayName.isNotEmpty()) {
+            participantDisplayName.split('/')
+        } else {
+            listOf("", "")
+        }
 
         val firstPlayerDisplayNameState = rememberTextFieldState(firstPlayerDisplayName)
         val secondPlayerDisplayNameState = rememberTextFieldState(secondPlayerDisplayName)

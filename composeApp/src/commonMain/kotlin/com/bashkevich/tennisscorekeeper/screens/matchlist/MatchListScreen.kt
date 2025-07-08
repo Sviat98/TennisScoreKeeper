@@ -21,6 +21,7 @@ import com.bashkevich.tennisscorekeeper.LocalNavHostController
 import com.bashkevich.tennisscorekeeper.components.hoverScaleEffect
 import com.bashkevich.tennisscorekeeper.components.match.MatchCard
 import com.bashkevich.tennisscorekeeper.model.match.domain.ShortMatch
+import com.bashkevich.tennisscorekeeper.model.tournament.remote.TournamentStatus
 import com.bashkevich.tennisscorekeeper.navigation.AddMatchRoute
 import com.bashkevich.tennisscorekeeper.navigation.MatchDetailsRoute
 import com.bashkevich.tennisscorekeeper.screens.tournamentdetails.TournamentState
@@ -59,8 +60,10 @@ fun MatchListContent(
     Scaffold(
         modifier = Modifier.then(modifier),
         floatingActionButton = {
-            FloatingActionButton(onClick = {onMatchAdd(tournament.id)}) {
-                Icon(Icons.Filled.Add, contentDescription = "Add Match")
+            if (tournament.status == TournamentStatus.IN_PROGRESS){
+                FloatingActionButton(onClick = {onMatchAdd(tournament.id)}) {
+                    Icon(Icons.Filled.Add, contentDescription = "Add Match")
+                }
             }
         }
     ) {
