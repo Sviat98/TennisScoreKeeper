@@ -50,12 +50,12 @@ fun DoublesParticipantOnScoreboard(participant: ParticipantInDoublesMatch) {
 
     Text(
         text = buildAnnotatedString {
-            val firstPlayerColor = if (firstPlayer.isServing) Color.Yellow else Color.White
+            val firstPlayerColor = if (firstPlayer.isServingNow) Color.Yellow else Color.White
             withStyle(SpanStyle(color = firstPlayerColor)) {
                 append(firstPlayerDisplayName)
             }
             append(" / ")
-            val secondPlayerColor = if (secondPlayer.isServing) Color.Yellow else Color.White
+            val secondPlayerColor = if (secondPlayer.isServingNow) Color.Yellow else Color.White
             withStyle(SpanStyle(color = secondPlayerColor)) {
                 append(secondPlayerDisplayName)
             }

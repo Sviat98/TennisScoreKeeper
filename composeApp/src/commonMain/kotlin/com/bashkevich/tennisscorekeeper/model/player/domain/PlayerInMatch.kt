@@ -20,8 +20,9 @@ data class PlayerInDoublesMatch(
     override val id: String,
     override val surname: String,
     override val name: String,
-    val isServing: Boolean,
-): TennisPlayerInMatch()
+    val isServingNow: Boolean,
+    val isServingNext: Boolean,
+    ): TennisPlayerInMatch()
 
 fun PlayerInMatchDto.toDomain(): TennisPlayerInMatch = when(this) {
     is PlayerInSinglesMatchDto -> PlayerInSinglesMatch(
@@ -33,6 +34,7 @@ fun PlayerInMatchDto.toDomain(): TennisPlayerInMatch = when(this) {
         id = this.id,
         surname = this.surname,
         name = this.name,
-        isServing = this.isServing
+        isServingNow = this.isServingNow,
+        isServingNext = this.isServingNext
     )
 }

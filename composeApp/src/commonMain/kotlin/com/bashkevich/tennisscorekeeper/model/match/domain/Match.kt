@@ -97,7 +97,7 @@ val SAMPLE_MATCH = Match(
     currentSet = TennisSet(firstParticipantGamesWon = 10, secondParticipantGamesWon = 9),
     currentSetMode = null,
     currentGame = null
-        //TennisGame(firstParticipantPointsWon = "30", secondParticipantPointsWon = "15")
+    //TennisGame(firstParticipantPointsWon = "30", secondParticipantPointsWon = "15")
 )
 
 val DOUBLES_SAMPLE_MATCH = Match(
@@ -116,13 +116,15 @@ val DOUBLES_SAMPLE_MATCH = Match(
             id = "1",
             surname = "Djokovic",
             name = "Novak",
-            isServing = false
+            isServingNow = false,
+            isServingNext = true
         ),
         secondPlayer = PlayerInDoublesMatch(
             id = "3",
             surname = "Nadal",
             name = "Rafael",
-            isServing = false
+            isServingNow = false,
+            isServingNext = false
         )
     ),
     secondParticipant = ParticipantInDoublesMatch(
@@ -134,12 +136,19 @@ val DOUBLES_SAMPLE_MATCH = Match(
         isServing = true,
         isWinner = false,
         isRetired = false,
-        firstPlayer = PlayerInDoublesMatch(id = "4", surname = "Murray", name = "Andy", isServing = false),
+        firstPlayer = PlayerInDoublesMatch(
+            id = "4",
+            surname = "Murray",
+            name = "Andy",
+            isServingNow = false,
+            isServingNext = false
+        ),
         secondPlayer = PlayerInDoublesMatch(
             id = "5",
             surname = "Federer",
             name = "Roger",
-            isServing = true
+            isServingNow = true,
+            isServingNext = false
         ),
     ),
     status = MatchStatus.IN_PROGRESS,

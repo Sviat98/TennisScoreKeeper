@@ -35,6 +35,8 @@ data class PlayerInDoublesMatchDto(
     override val surname: String,
     @SerialName("name")
     override val name: String,
-    @SerialName("is_serving")
-    val isServing: Boolean,
+    @SerialName("is_serving_now")
+    val isServingNow: Boolean,
+    @SerialName("is_serving_next")
+    val isServingNext: Boolean,
 ) : PlayerInMatchDto()

@@ -29,8 +29,19 @@ fun MatchStatusButton(
             val secondParticipantSecondPlayer =
                 secondParticipant.secondPlayer as PlayerInDoublesMatch
 
-            (firstParticipant.isServing || secondParticipant.isServing) && (firstParticipantFirstPlayer.isServing || firstParticipantSecondPlayer.isServing)
-                    && (secondParticipantFirstPlayer.isServing || secondParticipantSecondPlayer.isServing)
+            val isFirstServingPlayerInFirstParticipantSet = if (firstParticipant.isServing) {
+                firstParticipantFirstPlayer.isServingNow || firstParticipantSecondPlayer.isServingNow
+            }else{
+                firstParticipantFirstPlayer.isServingNext || firstParticipantSecondPlayer.isServingNext
+            }
+
+            val isFirstServingPlayerInSecondParticipantSet = if (secondParticipant.isServing) {
+                secondParticipantFirstPlayer.isServingNow || secondParticipantSecondPlayer.isServingNow
+            }else{
+                secondParticipantFirstPlayer.isServingNext || secondParticipantSecondPlayer.isServingNext
+            }
+
+            (firstParticipant.isServing || secondParticipant.isServing) && isFirstServingPlayerInFirstParticipantSet && isFirstServingPlayerInSecondParticipantSet
         } else {
             (firstParticipant.isServing || secondParticipant.isServing)
         }
