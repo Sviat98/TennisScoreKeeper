@@ -1,4 +1,4 @@
-package com.bashkevich.tennisscorekeeper.components.participant
+package com.bashkevich.tennisscorekeeper.components.player
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -20,42 +20,41 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import com.bashkevich.tennisscorekeeper.components.updateTextField
-import com.bashkevich.tennisscorekeeper.model.participant.domain.TennisParticipant
-import com.bashkevich.tennisscorekeeper.model.participant.domain.TennisParticipantInMatch
-import com.bashkevich.tennisscorekeeper.model.participant.domain.toDisplayFormat
+import com.bashkevich.tennisscorekeeper.model.player.domain.TennisPlayerInMatch
+import com.bashkevich.tennisscorekeeper.model.player.domain.toDisplayFormat
 
 @Composable
-fun ParticipantCombobox(
+fun ChooseFirstPlayerInPairToServeCombobox(
     modifier: Modifier = Modifier,
-    participantOptions: List<TennisParticipant>,
-    currentParticipant: TennisParticipantInMatch,
-    onParticipantsFetch: ()-> Unit,
-    onParticipantChange: (TennisParticipant) -> Unit
+    playerOptions: List<TennisPlayerInMatch>,
+    currentPlayer: TennisPlayerInMatch,
+    onPlayerChange: (TennisPlayerInMatch) -> Unit,
+    enabled: Boolean
 ) {
     var expanded by remember { mutableStateOf(false) }
 
-    val participantText = currentParticipant.toDisplayFormat()
+    val playerText = currentPlayer.toDisplayFormat()
 
-    val participantState = rememberTextFieldState(participantText)
+    val playerState = rememberTextFieldState(playerText)
 
-    LaunchedEffect(participantText){
-        participantState.updateTextField(participantText)
+    LaunchedEffect(playerText){
+        playerState.updateTextField(playerText)
     }
 
     Box {
         // Поле ввода с заблокированным редактированием
         TextField(
             modifier = Modifier.then(modifier),
-            state = participantState,
-            placeholder = { Text("Participant") },
+            state = playerState,
+            placeholder = { Text("Player") },
             readOnly = true,
+            enabled = enabled,
             trailingIcon = {
                 Icon(
                     imageVector = Icons.Default.ArrowDropDown,
                     contentDescription = "Open dropdown",
                     modifier = Modifier.clickable {
                         expanded = true
-                        onParticipantsFetch()
                     }
                 )
             },
@@ -72,10 +71,10 @@ fun ParticipantCombobox(
             expanded = expanded,
             onDismissRequest = { expanded = false },
         ) {
-            participantOptions.forEach { option ->
+            playerOptions.forEach { option ->
                 DropdownMenuItem(
                     onClick = {
-                        onParticipantChange(option)
+                        onPlayerChange(option)
                         expanded = false
                     }
                 ) {

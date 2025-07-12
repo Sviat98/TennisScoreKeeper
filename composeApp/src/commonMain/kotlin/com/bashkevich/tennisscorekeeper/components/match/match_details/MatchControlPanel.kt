@@ -31,7 +31,7 @@ fun ParticipantsPointsControlPanel(
     val firstParticipantId = firstParticipant.id
     val secondParticipantId = secondParticipant.id
 
-    val isWinnerInMatch = firstParticipant.isWinner || firstParticipant.isWinner
+    val isWinnerInMatch = firstParticipant.isWinner || secondParticipant.isWinner
 
     val isGameStarted = match.currentGame != null
 

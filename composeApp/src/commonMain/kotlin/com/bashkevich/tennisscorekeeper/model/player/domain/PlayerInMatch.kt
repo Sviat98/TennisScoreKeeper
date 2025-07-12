@@ -38,3 +38,15 @@ fun PlayerInMatchDto.toDomain(): TennisPlayerInMatch = when(this) {
         isServingNext = this.isServingNext
     )
 }
+
+val PLAYER_IN_DOUBLES_MATCH_DEFAULT = PlayerInDoublesMatch(
+    id = "0",
+    surname = "",
+    name = "",
+    isServingNow = false,
+    isServingNext = false
+)
+fun TennisPlayerInMatch.toDisplayFormat() = when(this){
+    PLAYER_IN_DOUBLES_MATCH_DEFAULT -> ""
+    else -> "${this.surname} ${this.name}"
+}

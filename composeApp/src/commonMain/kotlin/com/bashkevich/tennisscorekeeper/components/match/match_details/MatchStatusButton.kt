@@ -16,7 +16,7 @@ fun MatchStatusButton(
     val firstParticipant = match.firstParticipant
     val secondParticipant = match.secondParticipant
 
-    val isWinnerInMatch = firstParticipant.isWinner || firstParticipant.isWinner
+    val isWinnerInMatch = firstParticipant.isWinner || secondParticipant.isWinner
 
     val enableStartMatchButton =
         if (firstParticipant is ParticipantInDoublesMatch && secondParticipant is ParticipantInDoublesMatch) {
