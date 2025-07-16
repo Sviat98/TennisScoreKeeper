@@ -13,12 +13,30 @@ import com.bashkevich.tennisscorekeeper.model.match.domain.TennisSet
 @Composable
 fun PrevSetScoreboardComponent(
     modifier: Modifier = Modifier,
-    prevSet: TennisSet
+    prevSet: TennisSet,
+    markSetAsRetired: Boolean,
 ) {
-    val firstPlayerGamesWon = prevSet.firstParticipantGamesWon
-    val secondPlayerGamesWon = prevSet.secondParticipantGamesWon
+    val firstParticipantGamesWon = prevSet.firstParticipantGamesWon
+    val secondParticipantGamesWon = prevSet.secondParticipantGamesWon
 
-    val isFirstPlayerWon = firstPlayerGamesWon > secondPlayerGamesWon
+    val isFirstParticipantWon = firstParticipantGamesWon > secondParticipantGamesWon
+
+    var firstParticipantAlpha: Float
+    var secondParticipantAlpha: Float
+
+    if (markSetAsRetired){
+        firstParticipantAlpha = 1f
+        secondParticipantAlpha = 1f
+    }else{
+        if (isFirstParticipantWon){
+            firstParticipantAlpha = 1f
+            secondParticipantAlpha = 0.5f
+        }else{
+            firstParticipantAlpha = 0.5f
+            secondParticipantAlpha = 1f
+        }
+    }
+
     Column(
         modifier = Modifier.then(modifier),
         horizontalAlignment = Alignment.CenterHorizontally, // Выравнивание по центру
@@ -26,12 +44,12 @@ fun PrevSetScoreboardComponent(
         PrevSetNumber(
             modifier = Modifier.weight(1f),
             gamesEarned = prevSet.firstParticipantGamesWon,
-            alpha = if (isFirstPlayerWon) 1f else 0.5f
+            alpha = firstParticipantAlpha
         )
         PrevSetNumber(
             modifier = Modifier.weight(1f),
             gamesEarned = prevSet.secondParticipantGamesWon,
-            alpha = if (!isFirstPlayerWon) 1f else 0.5f
+            alpha = secondParticipantAlpha
         )
     }
 }

@@ -18,6 +18,9 @@ sealed class MatchDetailsUiEvent : UiEvent {
         MatchDetailsUiEvent()
     class SetFirstPlayerInPairToServe(val playerId: String) :
         MatchDetailsUiEvent()
+
+    class SetParticipantRetired(val participantId: String) :
+        MatchDetailsUiEvent()
     class ChangeMatchStatus(val status: MatchStatus) :
         MatchDetailsUiEvent()
     class UpdateScore(val participantId: String, val scoreType: ScoreType) :

@@ -17,6 +17,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
+import com.bashkevich.tennisscorekeeper.model.match.domain.EMPTY_TENNIS_SET
 import com.bashkevich.tennisscorekeeper.model.match.domain.Match
 
 @Composable
@@ -25,6 +26,9 @@ fun MatchView(
     match: Match,
 ) {
     var columnHeight by remember { mutableStateOf(0.dp) }
+
+    val firstParticipant = match.firstParticipant
+    val secondParticipant = match.secondParticipant
 
     Row(
         modifier = Modifier.then(modifier).background(color = Color(0xFF142c6c))
@@ -44,7 +48,8 @@ fun MatchView(
                     columnHeight = with(density) {
                         layoutCoordinates.size.height.toDp()
                     }
-                }.padding(top = 4.dp, bottom = 4.dp, start = 4.dp, end = 8.dp), match = match,
+                }.padding(top = 4.dp, bottom = 4.dp, start = 4.dp, end = 8.dp),
+            match = match,
         )
         ServeScoreboardComponent(
             modifier = Modifier.height(columnHeight),
@@ -52,14 +57,34 @@ fun MatchView(
         )
         Spacer(modifier = Modifier.width(4.dp))
 
-        match.previousSets.forEach { prevSet ->
+        val hasParticipantRetired = firstParticipant.isRetired || secondParticipant.isRetired
+
+        val prevSets = match.previousSets
+
+        val lastSetIndex = prevSets.size - 1
+
+        match.previousSets.forEachIndexed { index, prevSet ->
             // Колонка для счета (выравнивание по центру)
 
-            PrevSetScoreboardComponent(
-                modifier = Modifier.height(columnHeight).width(columnHeight / 2),
-                prevSet = prevSet
-            )
+            // переменная для того, чтобы определить, завершился ли текущий сет досрочно.
+            // Если да, то счет сета не блюрим у проигравшего
+            val markSetAsRetired =
+                index == lastSetIndex && hasParticipantRetired
+
+            // Если сет закончился на счете 0:0 (остановка произошла в начале матча или после сыгранного сета), то его не выводим
+            if (prevSet != EMPTY_TENNIS_SET) {
+                PrevSetScoreboardComponent(
+                    modifier = Modifier.height(columnHeight).width(columnHeight / 2),
+                    prevSet = prevSet,
+                    markSetAsRetired = markSetAsRetired
+                )
+            }
         }
+
+        RetiredParticipantComponent(
+            modifier = Modifier.height(columnHeight),
+            match = match
+        )
 
         match.currentSet?.let {
             CurrentSetComponent(
@@ -68,7 +93,7 @@ fun MatchView(
             )
             Spacer(modifier = Modifier.width(1.dp))
         }
-        match.currentGame?.let{
+        match.currentGame?.let {
             CurrentGameComponent(
                 modifier = Modifier.height(columnHeight).width(columnHeight / 2),
                 currentGame = match.currentGame

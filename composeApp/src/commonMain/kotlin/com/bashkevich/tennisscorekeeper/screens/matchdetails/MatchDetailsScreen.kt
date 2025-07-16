@@ -18,6 +18,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.bashkevich.tennisscorekeeper.components.match.match_details.ChooseServePanel
 import com.bashkevich.tennisscorekeeper.components.match.match_details.MatchStatusButton
 import com.bashkevich.tennisscorekeeper.components.match.match_details.ParticipantsPointsControlPanel
+import com.bashkevich.tennisscorekeeper.components.match.match_details.RetireParticipantPanel
 import com.bashkevich.tennisscorekeeper.components.scoreboard.MatchView
 import com.bashkevich.tennisscorekeeper.model.match.remote.body.MatchStatus
 import com.bashkevich.tennisscorekeeper.model.match.remote.body.convertToString
@@ -68,7 +69,7 @@ fun MatchDetailsContent(
 
         when (match.status) {
             MatchStatus.NOT_STARTED -> {
-                    ChooseServePanel(
+                ChooseServePanel(
                     modifier = Modifier.fillMaxWidth(),
                     match = match,
                     onFirstParticipantToServeChoose = { participantId ->
@@ -102,6 +103,19 @@ fun MatchDetailsContent(
                     },
                     onUndoPoint = { onEvent(MatchDetailsUiEvent.UndoPoint) },
                     onRedoPoint = { onEvent(MatchDetailsUiEvent.RedoPoint) }
+                )
+            }
+
+            MatchStatus.PAUSED -> {
+                RetireParticipantPanel(
+                    match = match,
+                    onParticipantRetire = { participantId ->
+                        onEvent(
+                            MatchDetailsUiEvent.SetParticipantRetired(
+                                participantId = participantId
+                            )
+                        )
+                    }
                 )
             }
 

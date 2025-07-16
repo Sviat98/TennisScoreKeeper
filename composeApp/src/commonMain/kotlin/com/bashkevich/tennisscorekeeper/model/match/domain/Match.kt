@@ -38,7 +38,7 @@ data class TennisGame(
 
 //val EMPTY_TENNIS_GAME = TennisGame("0", "0")
 // пока что пустые сеты и геймы равны null
-//val EMPTY_TENNIS_SET = TennisSet(0, 0)
+val EMPTY_TENNIS_SET = TennisSet(firstParticipantGamesWon = 0, secondParticipantGamesWon = 0)
 
 fun MatchDto.toDomain() = Match(
     id = this.id,

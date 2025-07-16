@@ -7,6 +7,7 @@ import com.bashkevich.tennisscorekeeper.core.runOperationCatching
 import com.bashkevich.tennisscorekeeper.core.webSocketDispatcher
 import com.bashkevich.tennisscorekeeper.model.match.remote.body.ChangeScoreBody
 import com.bashkevich.tennisscorekeeper.model.match.remote.body.MatchStatusBody
+import com.bashkevich.tennisscorekeeper.model.match.remote.body.RetiredParticipantBody
 import com.bashkevich.tennisscorekeeper.model.match.remote.body.ServeBody
 import com.bashkevich.tennisscorekeeper.model.match.remote.body.ServeInPairBody
 import io.ktor.client.HttpClient
@@ -113,6 +114,19 @@ class MatchRemoteDataSource(
         return runOperationCatching {
             val message = httpClient.patch("/matches/$matchId/firstServeInPair"){
                 setBody(serveInPairBody)
+            }.body<ResponseMessage>()
+
+            message
+        }
+    }
+
+    suspend fun setParticipantRetired(
+        matchId: String,
+        retiredParticipantBody: RetiredParticipantBody
+    ): LoadResult<ResponseMessage, Throwable> {
+        return runOperationCatching {
+            val message = httpClient.patch("/matches/$matchId/retire"){
+                setBody(retiredParticipantBody)
             }.body<ResponseMessage>()
 
             message

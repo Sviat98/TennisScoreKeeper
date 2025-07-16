@@ -70,7 +70,9 @@ class MatchDetailsViewModel(
             is MatchDetailsUiEvent.SetFirstPlayerInPairToServe -> setFirstPlayerInPairToServe(
                 playerId = uiEvent.playerId
             )
-
+            is MatchDetailsUiEvent.SetParticipantRetired-> setParticipantRetired(
+                participantId = uiEvent.participantId
+            )
             is MatchDetailsUiEvent.ChangeMatchStatus -> changeMatchStatus(status = uiEvent.status)
 
             is MatchDetailsUiEvent.UndoPoint -> undoPoint()
@@ -115,6 +117,17 @@ class MatchDetailsViewModel(
             )
         }
     }
+
+    private fun setParticipantRetired(participantId: String) {
+        viewModelScope.launch {
+            val state = state.value
+
+            val matchId = state.match.id
+            matchRepository.setParticipantRetired(
+                matchId = matchId,
+                participantId = participantId,
+            )
+        }    }
 
     private fun changeMatchStatus(status: MatchStatus) {
         viewModelScope.launch {

@@ -10,6 +10,7 @@ import com.bashkevich.tennisscorekeeper.model.match.remote.MatchBody
 import com.bashkevich.tennisscorekeeper.model.match.remote.MatchRemoteDataSource
 import com.bashkevich.tennisscorekeeper.model.match.remote.body.MatchStatus
 import com.bashkevich.tennisscorekeeper.model.match.remote.body.MatchStatusBody
+import com.bashkevich.tennisscorekeeper.model.match.remote.body.RetiredParticipantBody
 import com.bashkevich.tennisscorekeeper.model.match.remote.body.ScoreType
 import com.bashkevich.tennisscorekeeper.model.match.remote.body.ServeBody
 import com.bashkevich.tennisscorekeeper.model.match.remote.body.ServeInPairBody
@@ -82,6 +83,12 @@ class MatchRepositoryImpl(
             matchId = matchId,
             serveInPairBody = serveInPairBody
         )
+    }
+
+    override suspend fun setParticipantRetired(matchId: String, participantId: String) {
+        val retiredParticipantBody = RetiredParticipantBody(retiredParticipantId = participantId)
+
+        matchRemoteDataSource.setParticipantRetired(matchId = matchId, retiredParticipantBody = retiredParticipantBody)
     }
 
     override suspend fun setMatchStatus(matchId: String, status: MatchStatus) {
