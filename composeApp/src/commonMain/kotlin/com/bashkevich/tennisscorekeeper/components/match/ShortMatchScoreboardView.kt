@@ -5,12 +5,10 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
 import androidx.compose.material.ExperimentalMaterialApi
@@ -20,7 +18,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onGloballyPositioned
@@ -31,7 +28,6 @@ import com.bashkevich.tennisscorekeeper.components.scoreboard.SeedScoreboardComp
 import com.bashkevich.tennisscorekeeper.components.scoreboard_short.ParticipantOnShortScoreboardView
 import com.bashkevich.tennisscorekeeper.model.match.domain.ShortMatch
 import com.bashkevich.tennisscorekeeper.model.match.remote.body.convertToString
-import com.bashkevich.tennisscorekeeper.model.participant.domain.toShortMatchDisplayFormat
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @OptIn(ExperimentalMaterialApi::class)

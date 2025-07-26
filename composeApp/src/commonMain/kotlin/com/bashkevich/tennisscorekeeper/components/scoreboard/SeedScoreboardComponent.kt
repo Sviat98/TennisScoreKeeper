@@ -16,7 +16,6 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.bashkevich.tennisscorekeeper.model.match.domain.Match
 
 @Composable
 fun SeedScoreboardComponent(

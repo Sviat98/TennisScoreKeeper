@@ -13,7 +13,6 @@ import androidx.compose.ui.unit.sp
 import com.bashkevich.tennisscorekeeper.components.scoreboard.WinnerIcon
 import com.bashkevich.tennisscorekeeper.model.match.domain.ShortMatch
 import com.bashkevich.tennisscorekeeper.model.match.remote.body.MatchStatus
-import com.bashkevich.tennisscorekeeper.model.participant.domain.DoublesParticipant
 import com.bashkevich.tennisscorekeeper.model.participant.domain.ParticipantInShortDoublesMatch
 import com.bashkevich.tennisscorekeeper.model.participant.domain.ParticipantInShortMatch
 import com.bashkevich.tennisscorekeeper.model.participant.domain.ParticipantInShortSinglesMatch

@@ -1,14 +1,10 @@
 package com.bashkevich.tennisscorekeeper.model.match.domain
 
-import androidx.compose.ui.graphics.Color
 import com.bashkevich.tennisscorekeeper.model.match.remote.body.MatchStatus
 import com.bashkevich.tennisscorekeeper.model.match.remote.ShortMatchDto
-import com.bashkevich.tennisscorekeeper.model.participant.domain.ParticipantInDoublesMatch
 import com.bashkevich.tennisscorekeeper.model.participant.domain.ParticipantInShortMatch
 import com.bashkevich.tennisscorekeeper.model.participant.domain.ParticipantInShortSinglesMatch
-import com.bashkevich.tennisscorekeeper.model.participant.domain.ParticipantInSinglesMatch
 import com.bashkevich.tennisscorekeeper.model.participant.domain.toDomain
-import com.bashkevich.tennisscorekeeper.model.player.domain.PlayerInDoublesMatch
 import com.bashkevich.tennisscorekeeper.model.player.domain.PlayerInParticipant
 
 data class ShortMatch(
