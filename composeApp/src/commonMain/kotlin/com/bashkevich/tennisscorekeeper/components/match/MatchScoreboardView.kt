@@ -1,4 +1,4 @@
-package com.bashkevich.tennisscorekeeper.components.scoreboard
+package com.bashkevich.tennisscorekeeper.components.match
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Row
@@ -17,11 +17,19 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
+import com.bashkevich.tennisscorekeeper.components.scoreboard.ColorScoreboardComponent
+import com.bashkevich.tennisscorekeeper.components.scoreboard.CurrentGameComponent
+import com.bashkevich.tennisscorekeeper.components.scoreboard.CurrentSetComponent
+import com.bashkevich.tennisscorekeeper.components.scoreboard.ParticipantOnScoreboardView
+import com.bashkevich.tennisscorekeeper.components.scoreboard.PrevSetScoreboardComponent
+import com.bashkevich.tennisscorekeeper.components.scoreboard.RetiredParticipantComponent
+import com.bashkevich.tennisscorekeeper.components.scoreboard.SeedScoreboardComponent
+import com.bashkevich.tennisscorekeeper.components.scoreboard.ServeScoreboardComponent
 import com.bashkevich.tennisscorekeeper.model.match.domain.EMPTY_TENNIS_SET
 import com.bashkevich.tennisscorekeeper.model.match.domain.Match
 
 @Composable
-fun MatchView(
+fun MatchScoreboardView(
     modifier: Modifier = Modifier,
     match: Match,
 ) {
@@ -40,8 +48,9 @@ fun MatchView(
         )
         SeedScoreboardComponent(
             modifier = Modifier.height(columnHeight),
-            match = match
-        )
+            firstParticipantSeed = match.firstParticipant.seed,
+            secondParticipantSeed = match.secondParticipant.seed
+            )
         ParticipantOnScoreboardView(
             modifier = Modifier.widthIn(min = 80.dp)
                 .onGloballyPositioned { layoutCoordinates ->

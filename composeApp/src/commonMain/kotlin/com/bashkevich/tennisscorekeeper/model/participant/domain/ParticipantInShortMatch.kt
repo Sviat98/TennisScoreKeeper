@@ -50,18 +50,8 @@ fun ParticipantInShortMatchDto.toDomain(): ParticipantInShortMatch = when (this)
     )
 }
 
-fun ParticipantInShortMatch.toShortMatchDisplayFormat() = when (this) {
-    is ParticipantInShortSinglesMatch -> {
-        val firstLetterInName = this.player.name.substring(0, 1)
+fun PlayerInParticipant.toShortMatchDisplayFormat(): String {
+        val firstLetterInName = this.name.substring(0, 1)
 
-        "$firstLetterInName. ${this.player.surname}"
+        return "$firstLetterInName. ${this.surname}"
     }
-
-    is ParticipantInShortDoublesMatch -> {
-        val firstPlayerFirstLetterInName = this.firstPlayer.name.substring(0, 1)
-        val secondPlayerFirstLetterInName = this.firstPlayer.name.substring(0, 1)
-
-
-        "$firstPlayerFirstLetterInName. ${this.firstPlayer.surname} / $secondPlayerFirstLetterInName. ${this.secondPlayer.surname}"
-    }
-}

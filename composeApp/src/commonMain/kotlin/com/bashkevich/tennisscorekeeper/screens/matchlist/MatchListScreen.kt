@@ -4,6 +4,8 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.FloatingActionButton
@@ -19,7 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.bashkevich.tennisscorekeeper.LocalNavHostController
 import com.bashkevich.tennisscorekeeper.components.hoverScaleEffect
-import com.bashkevich.tennisscorekeeper.components.match.MatchCard
+import com.bashkevich.tennisscorekeeper.components.match.ShortMatchScoreboardCard
 import com.bashkevich.tennisscorekeeper.model.match.domain.ShortMatch
 import com.bashkevich.tennisscorekeeper.model.tournament.remote.TournamentStatus
 import com.bashkevich.tennisscorekeeper.navigation.AddMatchRoute
@@ -78,8 +80,8 @@ fun MatchListContent(
                 items(
                     matchListState.matches,
                     key = { it.id }) { match ->
-                    MatchCard(
-                        modifier = Modifier.hoverScaleEffect(),
+                    ShortMatchScoreboardCard(
+                        modifier = Modifier.widthIn(max = 360.dp).fillMaxWidth().hoverScaleEffect(),
                         match = match,
                         onClick = { onItemClick(match) }
                     )

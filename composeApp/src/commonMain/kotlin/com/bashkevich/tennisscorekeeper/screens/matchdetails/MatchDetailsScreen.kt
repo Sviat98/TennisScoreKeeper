@@ -22,7 +22,7 @@ import com.bashkevich.tennisscorekeeper.components.match.match_details.ChooseSer
 import com.bashkevich.tennisscorekeeper.components.match.match_details.MatchStatusButton
 import com.bashkevich.tennisscorekeeper.components.match.match_details.ParticipantsPointsControlPanel
 import com.bashkevich.tennisscorekeeper.components.match.match_details.RetireParticipantPanel
-import com.bashkevich.tennisscorekeeper.components.scoreboard.MatchView
+import com.bashkevich.tennisscorekeeper.components.match.MatchScoreboardView
 import com.bashkevich.tennisscorekeeper.model.match.remote.body.MatchStatus
 import com.bashkevich.tennisscorekeeper.model.match.remote.body.convertToString
 
@@ -62,7 +62,7 @@ fun MatchDetailsContent(
             verticalArrangement = Arrangement.SpaceAround,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            MatchView(
+            MatchScoreboardView(
                 match = match
             )
 

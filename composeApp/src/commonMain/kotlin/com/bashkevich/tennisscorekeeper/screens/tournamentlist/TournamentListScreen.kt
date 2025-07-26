@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.requiredWidthIn
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -78,7 +79,10 @@ fun TournamentListContent(
                     state.tournaments,
                     key = { it.id }) { tournament ->
                     TournamentListItem(
-                        modifier = Modifier.widthIn(max = 360.dp).fillMaxWidth().hoverScaleEffect(),
+                        modifier = Modifier
+                            .widthIn(max = 360.dp)
+                            .fillMaxWidth()
+                            .hoverScaleEffect(),
                         tournament = tournament,
                         onTournamentClick = onTournamentClick
                     )
