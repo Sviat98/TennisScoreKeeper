@@ -6,21 +6,21 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.material.Button
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
-import com.bashkevich.tennisscorekeeper.screens.counterdetails.CounterDetailsViewModel
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalClipboard
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
@@ -55,6 +55,7 @@ fun CounterDetailsContent(
     onEvent: (CounterDetailsUiEvent) -> Unit,
 ) {
     val clipboardManager = LocalClipboardManager.current
+    val clipboard = LocalClipboard.current
     Column(
         modifier = Modifier.then(modifier).fillMaxSize(),
         verticalArrangement = Arrangement.Center,
@@ -91,8 +92,12 @@ fun CounterDetailsContent(
                 Icon(Icons.AutoMirrored.Filled.ArrowForward, contentDescription = "Counter forward")
             }
         }
+        val scope = rememberCoroutineScope()
 
         Button(onClick = {
+//            scope.launch {
+//                clipboard.setClipEntry(ClipEntry(clipMetadata = AnnotatedString("$BASE_URL_FRONTEND#com.bashkevich.tennisscorekeeper.navigation.CounterDetailsRoute/${counter.id}"))
+//            }
             clipboardManager.setText(AnnotatedString("$BASE_URL_FRONTEND#com.bashkevich.tennisscorekeeper.navigation.CounterDetailsRoute/${counter.id}"))
         }) {
             Text("Copy Control Panel URL")

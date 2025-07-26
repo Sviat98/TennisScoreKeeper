@@ -3,6 +3,7 @@ package com.bashkevich.tennisscorekeeper.screens.addmatch
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material.Scaffold
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -12,6 +13,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.bashkevich.tennisscorekeeper.LocalNavHostController
+import com.bashkevich.tennisscorekeeper.components.AddMatchAppBar
 import com.bashkevich.tennisscorekeeper.components.match.AddMatchComponent
 
 @Composable
@@ -43,20 +45,26 @@ fun AddMatchContent(
     onEvent: (AddMatchUiEvent) -> Unit,
     onNavigateAfterMatchAdd: () -> Unit
 ) {
-    Column(
+    val navController = LocalNavHostController.current
+    Scaffold(
         modifier = Modifier.then(modifier),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+        topBar = { AddMatchAppBar(onBack = { navController.navigateUp() }) }
     ) {
-        if (state.isLoading) {
-            CircularProgressIndicator()
-        } else {
-            AddMatchComponent(
-                modifier = Modifier.then(modifier),
-                state = state,
-                onEvent = onEvent,
-                onNavigateAfterMatchAdd = onNavigateAfterMatchAdd
-            )
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            if (state.isLoading) {
+                CircularProgressIndicator()
+            } else {
+                AddMatchComponent(
+                    modifier = Modifier.then(modifier),
+                    state = state,
+                    onEvent = onEvent,
+                    onNavigateAfterMatchAdd = onNavigateAfterMatchAdd
+                )
+            }
         }
     }
+
 }

@@ -1,8 +1,7 @@
 package com.bashkevich.tennisscorekeeper.components
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.width
 import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -21,21 +20,19 @@ fun UploadFileComponent(
     val fileName = file.name
     Row(
         modifier = Modifier.then(modifier),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Button(onClick = onFileStorageOpen) {
             Text("Open file storage")
         }
         if(fileName.isNotBlank()){
-            Text(fileName, modifier = Modifier.width(100.dp))
-        }else{
-            Spacer(modifier = Modifier.width(100.dp))
-        }
-        Button(
-            onClick = onUploadFile,
-            enabled = fileName.isNotBlank()
-        ) {
-            Text("Upload file")
+            Text(fileName)
+            Button(
+                onClick = onUploadFile,
+            ) {
+                Text("Upload file")
+            }
         }
     }
 }

@@ -4,6 +4,8 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.FloatingActionButton
@@ -20,6 +22,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.bashkevich.tennisscorekeeper.LocalNavHostController
+import com.bashkevich.tennisscorekeeper.components.TournamentListAppBar
 import com.bashkevich.tennisscorekeeper.components.hoverScaleEffect
 import com.bashkevich.tennisscorekeeper.components.tournament.TournamentListItem
 import com.bashkevich.tennisscorekeeper.model.tournament.domain.Tournament
@@ -57,6 +60,7 @@ fun TournamentListContent(
 ) {
     Scaffold(
         modifier = Modifier.then(modifier),
+        topBar = { TournamentListAppBar() },
         floatingActionButton = {
             FloatingActionButton(onClick = onTournamentAdd) {
                 Icon(Icons.Filled.Add, contentDescription = "Add Tournament")
@@ -74,7 +78,7 @@ fun TournamentListContent(
                     state.tournaments,
                     key = { it.id }) { tournament ->
                     TournamentListItem(
-                        modifier = Modifier.hoverScaleEffect(),
+                        modifier = Modifier.widthIn(max = 360.dp).fillMaxWidth().hoverScaleEffect(),
                         tournament = tournament,
                         onTournamentClick = onTournamentClick
                     )
