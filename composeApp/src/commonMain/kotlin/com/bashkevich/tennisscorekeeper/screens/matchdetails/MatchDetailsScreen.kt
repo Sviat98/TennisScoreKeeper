@@ -11,9 +11,11 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalClipboard
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.bashkevich.tennisscorekeeper.LocalNavHostController
@@ -23,8 +25,10 @@ import com.bashkevich.tennisscorekeeper.components.match.match_details.MatchStat
 import com.bashkevich.tennisscorekeeper.components.match.match_details.ParticipantsPointsControlPanel
 import com.bashkevich.tennisscorekeeper.components.match.match_details.RetireParticipantPanel
 import com.bashkevich.tennisscorekeeper.components.match.MatchScoreboardView
+import com.bashkevich.tennisscorekeeper.components.setText
 import com.bashkevich.tennisscorekeeper.model.match.remote.body.MatchStatus
 import com.bashkevich.tennisscorekeeper.model.match.remote.body.convertToString
+import kotlinx.coroutines.launch
 
 @Composable
 fun MatchDetailsScreen(
@@ -53,10 +57,24 @@ fun MatchDetailsContent(
 ) {
     val navController = LocalNavHostController.current
     val match = state.match
+
+    val clipboard = LocalClipboard.current
+
+    val scope = rememberCoroutineScope()
     Scaffold(
         modifier = Modifier.then(modifier),
-        topBar = { MatchDetailsAppBar(onBack = { navController.navigateUp() }) }
-    ) {paddingValues ->
+        topBar = {
+            MatchDetailsAppBar(
+                matchId = match.id,
+                onBack = { navController.navigateUp() },
+                onCopyLink = { link->
+                    scope.launch {
+                        clipboard.setText(link)
+                    }
+                },
+            )
+        }
+    ) { paddingValues ->
         Column(
             modifier = Modifier.padding(all = 16.dp),
             verticalArrangement = Arrangement.SpaceAround,

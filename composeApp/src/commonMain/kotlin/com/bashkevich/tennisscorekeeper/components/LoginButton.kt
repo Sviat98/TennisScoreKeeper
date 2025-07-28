@@ -10,28 +10,23 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 
-
 @Composable
-@Preview
-fun SandboxPreviewComponent() {
-    SandboxComponent()
-}
-
-@Composable
-@Preview
-fun BoxButtonComponentPreview() {
+fun LoginButton(
+    modifier: Modifier = Modifier,
+    onNavigateToLogin: () -> Unit
+) {
     Box(
         modifier = Modifier
+            .then(modifier)
             .border(
                 width = 1.dp,
                 color = Color.White,
                 shape = RoundedCornerShape(4.dp)
             )
             .clip(RoundedCornerShape(4.dp))
-            .clickable {}
+            .clickable { onNavigateToLogin() }
             .padding(4.dp),
     ) {
         Text("Log In")
