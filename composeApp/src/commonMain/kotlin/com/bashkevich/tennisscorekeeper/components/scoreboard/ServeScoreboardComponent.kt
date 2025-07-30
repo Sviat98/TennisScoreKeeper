@@ -3,6 +3,7 @@ package com.bashkevich.tennisscorekeeper.components.scoreboard
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.Composable
@@ -12,6 +13,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.bashkevich.tennisscorekeeper.model.match.domain.Match
+import com.bashkevich.tennisscorekeeper.model.match.remote.body.MatchStatus
 
 @Composable
 fun ServeScoreboardComponent(
@@ -22,10 +24,12 @@ fun ServeScoreboardComponent(
     val secondParticipant = match.secondParticipant
 
     val isWinnerInMatch = firstParticipant.isWinner || secondParticipant.isWinner
+    val isMatchPaused = match.status == MatchStatus.PAUSED
 
-    if (!isWinnerInMatch) {
+    if (!isWinnerInMatch && !isMatchPaused) {
         Column(
             modifier = Modifier.then(modifier)
+                .padding(end=4.dp)
         ) {
             ServingBox(modifier = Modifier.weight(1f), showServe = firstParticipant.isServing)
             ServingBox(modifier = Modifier.weight(1f), showServe = secondParticipant.isServing)
@@ -39,9 +43,9 @@ fun ServeScoreboardComponent(
 fun ServingBox(
     modifier: Modifier = Modifier,
     showServe: Boolean
-){
-    Box(modifier = Modifier.then(modifier)){
-        if (showServe){
+) {
+    Box(modifier = Modifier.then(modifier)) {
+        if (showServe) {
             Box(
                 modifier = Modifier.size(8.dp).clip(
                     CircleShape

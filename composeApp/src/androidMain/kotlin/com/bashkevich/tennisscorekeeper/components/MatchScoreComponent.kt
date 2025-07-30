@@ -10,9 +10,12 @@ import androidx.compose.ui.unit.dp
 import com.bashkevich.tennisscorekeeper.components.scoreboard.ColorScoreboardComponent
 import com.bashkevich.tennisscorekeeper.components.match.MatchScoreboardView
 import com.bashkevich.tennisscorekeeper.components.match.ShortMatchScoreboardCard
+import com.bashkevich.tennisscorekeeper.components.scoreboard.CurrentGamePausedComponent
+import com.bashkevich.tennisscorekeeper.components.scoreboard.ParticipantColor
 import com.bashkevich.tennisscorekeeper.model.match.domain.DOUBLES_SAMPLE_MATCH
 import com.bashkevich.tennisscorekeeper.model.match.domain.SAMPLE_MATCH
 import com.bashkevich.tennisscorekeeper.model.match.domain.SAMPLE_SINGLES_SHORT_MATCH
+import com.bashkevich.tennisscorekeeper.model.match.domain.TennisGame
 
 
 @Composable
@@ -35,10 +38,24 @@ fun DoublesMatchViewPreview() {
 
 @Composable
 @Preview
+fun ParticipantColorPreview(){
+    ParticipantColor(primaryColor = Color.Red, secondaryColor = null)
+}
+
+@Composable
+@Preview
 fun ShortMatchScoreboardCardPreview(){
     ShortMatchScoreboardCard(
         modifier = Modifier,
         match = SAMPLE_SINGLES_SHORT_MATCH,
         onClick = {}
+    )
+}
+@Composable
+@Preview
+fun CurrentGamePausedComponentPreview(){
+    CurrentGamePausedComponent(
+        modifier = Modifier,
+        currentGame = TennisGame("40","15"),
     )
 }

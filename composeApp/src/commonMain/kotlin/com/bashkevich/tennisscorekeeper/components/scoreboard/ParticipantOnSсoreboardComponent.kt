@@ -19,6 +19,7 @@ import androidx.compose.ui.unit.sp
 import com.bashkevich.tennisscorekeeper.model.participant.domain.ParticipantInDoublesMatch
 import com.bashkevich.tennisscorekeeper.model.player.domain.PlayerInDoublesMatch
 import com.bashkevich.tennisscorekeeper.model.match.domain.Match
+import com.bashkevich.tennisscorekeeper.model.match.remote.body.MatchStatus
 import com.bashkevich.tennisscorekeeper.model.participant.domain.ParticipantInSinglesMatch
 import com.bashkevich.tennisscorekeeper.model.participant.domain.TennisParticipantInMatch
 
@@ -28,47 +29,55 @@ fun ParticipantOnScoreboardView(modifier: Modifier = Modifier, match: Match) {
     val firstParticipant = match.firstParticipant
     val secondParticipant = match.secondParticipant
 
+    val matchStatus = match.status
+
     Column(
         modifier = Modifier.then(modifier),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         ParticipantOnScoreboardRow(
             participant = firstParticipant,
+            matchStatus = matchStatus
         )
         ParticipantOnScoreboardRow(
             participant = secondParticipant,
+            matchStatus = matchStatus
         )
     }
 }
 
 @Composable
-fun DoublesParticipantOnScoreboard(participant: ParticipantInDoublesMatch) {
+fun DoublesParticipantOnScoreboard(
+    participant: ParticipantInDoublesMatch,
+    showServingPlayer: Boolean
+) {
     val (firstPlayerDisplayName, secondPlayerDisplayName) = participant.displayName.split("/")
 
     val firstPlayer = participant.firstPlayer as PlayerInDoublesMatch
-    val secondPlayer = participant.secondPlayer as PlayerInDoublesMatch
 
-    Text(
-        text = buildAnnotatedString {
-            val firstPlayerColor = if (firstPlayer.isServingNow) Color.Yellow else Color.White
-            withStyle(SpanStyle(color = firstPlayerColor)) {
-                append(firstPlayerDisplayName)
-            }
-            append(" / ")
-            val secondPlayerColor = if (secondPlayer.isServingNow) Color.Yellow else Color.White
-            withStyle(SpanStyle(color = secondPlayerColor)) {
-                append(secondPlayerDisplayName)
-            }
-        },
-        fontSize = 20.sp,
-        color = Color.White
-    )
+    val secondPlayer = participant.secondPlayer as PlayerInDoublesMatch
+        Text(
+            text = buildAnnotatedString {
+                val firstPlayerColor = if (firstPlayer.isServingNow && showServingPlayer) Color.Yellow else Color.White
+                withStyle(SpanStyle(color = firstPlayerColor)) {
+                    append(firstPlayerDisplayName)
+                }
+                append(" / ")
+                val secondPlayerColor = if (secondPlayer.isServingNow && showServingPlayer) Color.Yellow else Color.White
+                withStyle(SpanStyle(color = secondPlayerColor)) {
+                    append(secondPlayerDisplayName)
+                }
+            },
+            fontSize = 20.sp,
+            color = Color.White
+        )
 }
 
 @Composable
 fun ParticipantOnScoreboardRow(
     modifier: Modifier = Modifier,
     participant: TennisParticipantInMatch,
+    matchStatus: MatchStatus
 ) {
     val hasParticipantWonMatch = participant.isWinner
 
@@ -87,8 +96,12 @@ fun ParticipantOnScoreboardRow(
             }
 
             is ParticipantInDoublesMatch -> {
+                // когда матч в статусе PAUSED, то не выделяем
+                val showServingPlayer = matchStatus != MatchStatus.PAUSED
+
                 DoublesParticipantOnScoreboard(
                     participant = participant,
+                    showServingPlayer = showServingPlayer
                 )
             }
         }

@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
@@ -23,6 +24,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
+import com.bashkevich.tennisscorekeeper.components.scoreboard.CurrentGamePausedComponent
 import com.bashkevich.tennisscorekeeper.components.scoreboard.PrevSetScoreboardComponent
 import com.bashkevich.tennisscorekeeper.components.scoreboard.SeedScoreboardComponent
 import com.bashkevich.tennisscorekeeper.components.scoreboard_short.ParticipantOnShortScoreboardView
@@ -68,7 +70,6 @@ fun ShortMatchScoreboardView(
             color = Color(0xFF142c6c)
         ).padding(8.dp),
         horizontalArrangement = Arrangement.SpaceBetween
-        //verticalAlignment = Alignment.spacedBy(4.dp)
     ) {
         Row {
             SeedScoreboardComponent(
@@ -88,8 +89,15 @@ fun ShortMatchScoreboardView(
         }
 
         Row {
-            match.finalScore.forEach { prevSet ->
-                PrevSetScoreboardComponent(modifier = Modifier.height(columnHeight), prevSet = prevSet, markSetAsRetired = false)
+            match.previousSets.forEach { prevSet ->
+                PrevSetScoreboardComponent(modifier = Modifier.height(columnHeight).width(32.dp), prevSet = prevSet, showWithoutHighlighting = false)
+            }
+            //currentSet и currentGame появляются ТОЛЬКО если матч в статусе PAUSED
+            match.currentSet?.let { currentSet ->
+                PrevSetScoreboardComponent(modifier = Modifier.height(columnHeight).width(32.dp), prevSet = currentSet, showWithoutHighlighting = true)
+            }
+            match.currentGame?.let {
+                CurrentGamePausedComponent(modifier = Modifier.height(columnHeight).width(48.dp), currentGame = match.currentGame )
             }
         }
 

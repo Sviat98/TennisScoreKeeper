@@ -74,7 +74,7 @@ val SAMPLE_MATCH = Match(
         primaryColor = Color.Green,
         secondaryColor = Color.Blue,
         isServing = false,
-        isWinner = true,
+        isWinner = false,
         isRetired = false,
         player = PlayerInSinglesMatch(id = "1", surname = "Djokovic", name = "Novak")
     ),

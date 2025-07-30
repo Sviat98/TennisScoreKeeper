@@ -6,12 +6,10 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.Divider
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.sp
 import com.bashkevich.tennisscorekeeper.model.match.domain.TennisSet
 
 @Composable
@@ -26,13 +24,16 @@ fun CurrentSetComponent(
                 .background(color = Color.Yellow),
             horizontalAlignment = Alignment.CenterHorizontally, // Выравнивание по центру
         ) {
-            CurrentSetNumber(
+            val textColor = Color.Black
+            ScoreboardNumber(
                 modifier = Modifier.weight(1f),
-                gamesEarned = currentSet.firstParticipantGamesWon
+                scoreNumber = currentSet.firstParticipantGamesWon.toString(),
+                textColor = textColor
             )
-            CurrentSetNumber(
+            ScoreboardNumber(
                 modifier = Modifier.weight(1f),
-                gamesEarned = currentSet.secondParticipantGamesWon
+                scoreNumber = currentSet.secondParticipantGamesWon.toString(),
+                textColor = textColor
             )
         }
         Divider(
@@ -49,19 +50,4 @@ fun CurrentSetComponent(
         )
     }
 
-}
-
-@Composable
-fun CurrentSetNumber(
-    modifier: Modifier = Modifier,
-    gamesEarned: Int,
-) {
-    Box(modifier = Modifier.then(modifier)) {
-        Text(
-            modifier = Modifier.align(Alignment.Center),
-            text = gamesEarned.toString(),
-            fontSize = 20.sp,
-            color = Color.Black
-        )
-    }
 }

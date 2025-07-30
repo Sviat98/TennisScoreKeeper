@@ -4,9 +4,6 @@ import androidx.navigation.NavGraphBuilder
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
-const val COUNTERS_ROUTE_STRING = "counters"
-const val COUNTER_OVERLAY_ROUTE_STRING = "counterOverlay"
-
 @Serializable
 @SerialName("tournaments")
 data object TournamentsRoute
@@ -28,14 +25,5 @@ data class MatchDetailsRoute(val id: String)
 @SerialName("addMatch")
 //@SerialName("matches/add") распознает как MatchDetailsRoute(id=add) на НЕ-Андроид
 data class AddMatchRoute(val tournamentId: String = "")
-
-@Serializable
-data object CounterListRoute
-
-@Serializable
-data object AddCounterDialogRoute
-
-@Serializable
-data class CounterDetailsRoute(val id: String)
 
 expect fun NavGraphBuilder.platformSpecificRoutes()

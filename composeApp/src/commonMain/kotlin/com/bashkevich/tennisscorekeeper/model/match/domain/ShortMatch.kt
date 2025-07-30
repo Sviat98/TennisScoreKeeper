@@ -12,15 +12,19 @@ data class ShortMatch(
     val firstParticipant: ParticipantInShortMatch,
     val secondParticipant: ParticipantInShortMatch,
     val status: MatchStatus,
-    val finalScore: List<TennisSet>,
-)
+    val previousSets: List<TennisSet>,
+    val currentSet: TennisSet? = null,
+    val currentGame: TennisGame? = null,
+    )
 
 fun ShortMatchDto.toDomain() = ShortMatch(
     id = this.id,
     firstParticipant = this.firstParticipant.toDomain(),
     secondParticipant = this.secondParticipant.toDomain(),
     status = this.status,
-    finalScore = this.finalScore.map { it.toDomain() }
+    previousSets = this.previousSets.map { it.toDomain() },
+    currentSet = this.currentSet?.toDomain(),
+    currentGame = this.currentGame?.toDomain()
 )
 
 val SAMPLE_SINGLES_SHORT_MATCH = ShortMatch(
@@ -48,11 +52,11 @@ val SAMPLE_SINGLES_SHORT_MATCH = ShortMatch(
         ),
     ),
     status = MatchStatus.PAUSED,
-    finalScore = listOf(
+    previousSets = listOf(
         TennisSet(firstParticipantGamesWon = 6, secondParticipantGamesWon = 4),
         TennisSet(firstParticipantGamesWon = 3, secondParticipantGamesWon = 6),
     ),
 //    currentSet = TennisSet(firstParticipantGamesWon = 10, secondParticipantGamesWon = 9),
 //    currentSetMode = null,
-//    currentGame = TennisGame(firstParticipantPointsWon = "30", secondParticipantPointsWon = "15")
+    currentGame = TennisGame(firstParticipantPointsWon = "30", secondParticipantPointsWon = "15")
 )

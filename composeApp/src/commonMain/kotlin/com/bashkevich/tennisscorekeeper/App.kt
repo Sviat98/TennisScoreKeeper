@@ -10,7 +10,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.dialog
 import androidx.navigation.compose.rememberNavController
 import com.bashkevich.tennisscorekeeper.di.coreModule
-import com.bashkevich.tennisscorekeeper.di.counterModule
 import com.bashkevich.tennisscorekeeper.di.matchModule
 import com.bashkevich.tennisscorekeeper.di.participantModule
 import com.bashkevich.tennisscorekeeper.di.platformModule
@@ -50,7 +49,6 @@ fun App(navController: NavHostController = rememberNavController()) {
         modules(
             coreModule,
             platformModule,
-            counterModule,
             tournamentModule,
             matchModule,
             setTemplateModule,
@@ -99,36 +97,6 @@ fun App(navController: NavHostController = rememberNavController()) {
                             viewModel = addMatchViewModel
                         )
                     }
-
-
-//                    composable<CounterListRoute> {
-//                        val counterListViewModel = koinViewModel<CounterListViewModel>()
-//                        CounterListScreen(
-//                            viewModel = counterListViewModel,
-//                            onCounterClick = { counter ->
-//                                navController.navigate(
-//                                    CounterDetailsRoute(
-//                                        counter.id
-//                                    )
-//                                )
-//                            },
-//                            onCounterAdd = {
-//                                navController.navigate(AddCounterDialogRoute)
-//                            }
-//                        )
-//                    }
-//                    composable<CounterDetailsRoute> {
-//                        val counterDetailsViewModel = koinViewModel<CounterDetailsViewModel>()
-//
-//                        CounterDetailsScreen(viewModel = counterDetailsViewModel)
-//                    }
-//                    dialog<AddCounterDialogRoute> {
-//                        val addCounterDialogViewModel = koinViewModel<AddCounterDialogViewModel>()
-//
-//                        AddCounterDialogScreen(
-//                            viewModel = addCounterDialogViewModel,
-//                            onDismissRequest = { navController.navigateUp() })
-//                    }
                     platformSpecificRoutes()
                 }
             }
