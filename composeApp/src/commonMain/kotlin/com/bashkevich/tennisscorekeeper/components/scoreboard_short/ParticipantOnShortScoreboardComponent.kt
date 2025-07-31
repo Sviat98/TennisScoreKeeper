@@ -81,7 +81,7 @@ fun DoublesParticipantOnShortScoreboardView(
     participant: ParticipantInShortDoublesMatch
 ){
     Column(
-        verticalArrangement = Arrangement.spacedBy(2.dp)
+        verticalArrangement = Arrangement.spacedBy(1.dp)
     ) {
         PlayerOnShortScoreboardView(
             player = participant.firstPlayer

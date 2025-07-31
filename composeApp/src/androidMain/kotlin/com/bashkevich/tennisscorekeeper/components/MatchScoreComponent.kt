@@ -1,7 +1,9 @@
 package com.bashkevich.tennisscorekeeper.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -13,6 +15,7 @@ import com.bashkevich.tennisscorekeeper.components.match.ShortMatchScoreboardCar
 import com.bashkevich.tennisscorekeeper.components.scoreboard.CurrentGamePausedComponent
 import com.bashkevich.tennisscorekeeper.components.scoreboard.ParticipantColor
 import com.bashkevich.tennisscorekeeper.model.match.domain.DOUBLES_SAMPLE_MATCH
+import com.bashkevich.tennisscorekeeper.model.match.domain.SAMPLE_DOUBLES_SHORT_MATCH
 import com.bashkevich.tennisscorekeeper.model.match.domain.SAMPLE_MATCH
 import com.bashkevich.tennisscorekeeper.model.match.domain.SAMPLE_SINGLES_SHORT_MATCH
 import com.bashkevich.tennisscorekeeper.model.match.domain.TennisGame
@@ -51,6 +54,17 @@ fun ShortMatchScoreboardCardPreview(){
         onClick = {}
     )
 }
+
+@Composable
+@Preview
+fun ShortDoublesMatchScoreboardCardPreview(){
+    ShortMatchScoreboardCard(
+        modifier = Modifier.widthIn(max = 360.dp).fillMaxWidth().hoverScaleEffect(),
+        match = SAMPLE_DOUBLES_SHORT_MATCH,
+        onClick = {}
+    )
+}
+
 @Composable
 @Preview
 fun CurrentGamePausedComponentPreview(){

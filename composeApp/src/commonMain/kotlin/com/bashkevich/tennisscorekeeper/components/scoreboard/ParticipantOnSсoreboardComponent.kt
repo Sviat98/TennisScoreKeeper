@@ -46,6 +46,7 @@ fun ParticipantOnScoreboardView(modifier: Modifier = Modifier, match: Match) {
     }
 }
 
+@Suppress("SuspiciousIndentation")
 @Composable
 fun DoublesParticipantOnScoreboard(
     participant: ParticipantInDoublesMatch,
