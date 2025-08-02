@@ -57,7 +57,7 @@ fun ColorPickerDialog(
             )
             AlphaTile(
                 modifier = Modifier
-                    .size(80.dp)
+                    .size(40.dp)
                     .border(width = 1.dp, color = Color.Black, shape = RoundedCornerShape(6.dp))
                     .clip(shape = RoundedCornerShape(6.dp)),
                 controller = controller

@@ -1,14 +1,17 @@
 package com.bashkevich.tennisscorekeeper.components.match
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.input.InputTransformation
 import androidx.compose.foundation.text.input.TextFieldBuffer
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.input.rememberTextFieldState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
@@ -18,8 +21,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.bashkevich.tennisscorekeeper.components.ColorPickerDialog
-import com.bashkevich.tennisscorekeeper.components.participant.AddMatchParticipantComponent
-import com.bashkevich.tennisscorekeeper.components.set_template.SetTemplateCombobox
+import com.bashkevich.tennisscorekeeper.components.match.add_match.AddMatchParticipantsBlock
+import com.bashkevich.tennisscorekeeper.components.match.add_match.SetsToWinComponent
+import com.bashkevich.tennisscorekeeper.components.set_template.SetTemplateComponent
 import com.bashkevich.tennisscorekeeper.components.updateTextField
 import com.bashkevich.tennisscorekeeper.model.participant.domain.ParticipantInDoublesMatch
 import com.bashkevich.tennisscorekeeper.model.participant.domain.TennisParticipantInMatch
@@ -39,151 +43,107 @@ fun AddMatchComponent(
     val firstParticipant = state.firstParticipant
     val secondParticipant = state.secondParticipant
 
+//    SideEffect {
+//        println(state.toString())
+//    }
+
     Column(
-        modifier = Modifier.then(modifier).padding(16.dp),
-        verticalArrangement = Arrangement.SpaceBetween,
+        modifier = Modifier.then(modifier).padding(16.dp)
+            .verticalScroll(state = rememberScrollState()),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Row(
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            val firstParticipantOptions =
-                participantOptions.filter { it.id != secondParticipant.id }
-            val secondParticipantOptions =
-                participantOptions.filter { it.id != firstParticipant.id }
-            AddMatchParticipantComponent(
-                modifier = Modifier.weight(1f),
-                participantOptions = firstParticipantOptions,
-                participant = firstParticipant,
-                onParticipantsFetch = { onEvent(AddMatchUiEvent.FetchParticipants) },
-                onParticipantChange = { participant ->
-                    onEvent(
-                        AddMatchUiEvent.SelectParticipant(
-                            participantNumber = 1,
-                            participant = participant
-                        )
+        AddMatchParticipantsBlock(
+            modifier = Modifier.fillMaxWidth(),
+            participantOptions = participantOptions,
+            firstParticipant = firstParticipant,
+            secondParticipant = secondParticipant,
+            onParticipantsFetch = { onEvent(AddMatchUiEvent.FetchParticipants) },
+            onParticipantChange = { participantNumber, participant ->
+                onEvent(
+                    AddMatchUiEvent.SelectParticipant(
+                        participantNumber = participantNumber,
+                        participant = participant
                     )
-                },
-                participantPrimaryColor = firstParticipant.primaryColor,
-                participantSecondaryColor = firstParticipant.secondaryColor,
-                onColorPickerOpen = { colorNumber ->
-                    onEvent(
-                        AddMatchUiEvent.OpenColorPickerDialog(
-                            participantNumber = 1,
-                            colorNumber = colorNumber
-                        )
+                )
+            },
+            onColorPickerOpen = { participantNumber, colorNumber ->
+                onEvent(
+                    AddMatchUiEvent.OpenColorPickerDialog(
+                        participantNumber = participantNumber,
+                        colorNumber = colorNumber
                     )
-                },
-                onToggleSecondaryColor = { color ->
-                    onEvent(
-                        AddMatchUiEvent.SelectSecondaryColor(
-                            participantNumber = 1,
-                            color = color
-                        )
+                )
+            },
+            onToggleSecondaryColor = { participantNumber, color ->
+                onEvent(
+                    AddMatchUiEvent.SelectSecondaryColor(
+                        participantNumber = participantNumber,
+                        color = color
                     )
-                }
-            )
-
-            AddMatchParticipantComponent(
-                modifier = Modifier.weight(1f),
-                participantOptions = secondParticipantOptions,
-                participant = secondParticipant,
-                onParticipantsFetch = { onEvent(AddMatchUiEvent.FetchParticipants) },
-                onParticipantChange = { participant ->
-                    onEvent(
-                        AddMatchUiEvent.SelectParticipant(
-                            participantNumber = 2,
-                            participant = participant
-                        )
-                    )
-                },
-                participantPrimaryColor = secondParticipant.primaryColor,
-                participantSecondaryColor = secondParticipant.secondaryColor,
-                onColorPickerOpen = { colorNumber ->
-                    onEvent(
-                        AddMatchUiEvent.OpenColorPickerDialog(
-                            participantNumber = 2,
-                            colorNumber = colorNumber
-                        )
-                    )
-                },
-                onToggleSecondaryColor = { color ->
-                    onEvent(
-                        AddMatchUiEvent.SelectSecondaryColor(
-                            participantNumber = 2,
-                            color = color
-                        )
-                    )
-                }
-            )
-        }
+                )
+            }
+        )
 
         val setsToWin = state.setsToWin
-        Row {
-            Button(
-                onClick = { onEvent(AddMatchUiEvent.ChangeSetsToWin(-1)) },
-                enabled = setsToWin > 1
-            ) {
-                Text(" - ")
-            }
-            Text(setsToWin.toString())
-            Button(
-                onClick = { onEvent(AddMatchUiEvent.ChangeSetsToWin(1)) },
-                enabled = setsToWin < 4
-            ) {
-                Text(" + ")
-            }
-        }
+
+        SetsToWinComponent(
+            modifier = Modifier.widthIn(max = 300.dp).fillMaxWidth(),
+            setsToWin = setsToWin,
+            onValueChange = {delta -> onEvent(AddMatchUiEvent.ChangeSetsToWin(delta))}
+        )
+
         val setTemplateOptions = state.setTemplateOptions
 
         val regularSetTemplate = state.regularSetTemplate
         val decidingSetTemplate = state.decidingSetTemplate
 
 
-        Row(horizontalArrangement = Arrangement.SpaceBetween) {
-            val regularSetTemplateOptions = setTemplateOptions.filter { it.isRegular }
-            val decidingSetTemplateOptions = setTemplateOptions.filter { it.isDeciding }
+        val regularSetTemplateOptions = setTemplateOptions.filter { it.isRegular }
+        val decidingSetTemplateOptions = setTemplateOptions.filter { it.isDeciding }
 
-            SetTemplateCombobox(
-                setTemplateOptions = regularSetTemplateOptions,
-                enabled = setsToWin > 1,
-                currentSetTemplate = regularSetTemplate,
-                onSetTemplatesFetch = {
-                    onEvent(
-                        AddMatchUiEvent.FetchSetTemplates(
-                            SetTemplateTypeFilter.ALL
-                        )
+        SetTemplateComponent(
+            label = "Regular Set Template",
+            setTemplateOptions = regularSetTemplateOptions,
+            enabled = setsToWin > 1,
+            currentSetTemplate = regularSetTemplate,
+            onSetTemplatesFetch = {
+                onEvent(
+                    AddMatchUiEvent.FetchSetTemplates(
+                        SetTemplateTypeFilter.ALL
                     )
-                },
-                onSetTemplateChange = { setTemplate ->
-                    onEvent(
-                        AddMatchUiEvent.SelectSetTemplate(
-                            SetTemplateTypeFilter.REGULAR,
-                            setTemplate
-                        )
+                )
+            },
+            onSetTemplateChange = { setTemplate ->
+                onEvent(
+                    AddMatchUiEvent.SelectSetTemplate(
+                        SetTemplateTypeFilter.REGULAR,
+                        setTemplate
                     )
-                })
-            SetTemplateCombobox(
-                setTemplateOptions = decidingSetTemplateOptions,
-                enabled = true,
-                currentSetTemplate = decidingSetTemplate,
-                onSetTemplatesFetch = {
-                    onEvent(
-                        AddMatchUiEvent.FetchSetTemplates(
-                            SetTemplateTypeFilter.ALL
-                        )
+                )
+            }
+        )
+        SetTemplateComponent(
+            label = "Deciding Set Template",
+            setTemplateOptions = decidingSetTemplateOptions,
+            enabled = true,
+            currentSetTemplate = decidingSetTemplate,
+            onSetTemplatesFetch = {
+                onEvent(
+                    AddMatchUiEvent.FetchSetTemplates(
+                        SetTemplateTypeFilter.ALL
                     )
-                },
-                onSetTemplateChange = { setTemplate ->
-                    onEvent(
-                        AddMatchUiEvent.SelectSetTemplate(
-                            SetTemplateTypeFilter.DECIDER,
-                            setTemplate
-                        )
+                )
+            },
+            onSetTemplateChange = { setTemplate ->
+                onEvent(
+                    AddMatchUiEvent.SelectSetTemplate(
+                        SetTemplateTypeFilter.DECIDER,
+                        setTemplate
                     )
-                })
-        }
+                )
+            }
+        )
 
         Button(
             onClick = {
@@ -240,48 +200,56 @@ fun AddMatchComponent(
 
 @Composable
 fun ParticipantDisplayNameComponent(
+    modifier: Modifier = Modifier,
     participant: TennisParticipantInMatch
 ) {
     val participantDisplayName = participant.displayName
-    if (participant is ParticipantInDoublesMatch) {
-        val (firstPlayerDisplayName, secondPlayerDisplayName) = if (participantDisplayName.isNotEmpty()) {
-            participantDisplayName.split('/')
+
+    Box(modifier = Modifier.then(modifier)) {
+        if (participant is ParticipantInDoublesMatch) {
+            val (firstPlayerDisplayName, secondPlayerDisplayName) = if (participantDisplayName.isNotEmpty()) {
+                participantDisplayName.split('/')
+            } else {
+                listOf("", "")
+            }
+
+            val firstPlayerDisplayNameState = rememberTextFieldState(firstPlayerDisplayName)
+            val secondPlayerDisplayNameState = rememberTextFieldState(secondPlayerDisplayName)
+
+            LaunchedEffect(firstPlayerDisplayName) {
+                firstPlayerDisplayNameState.updateTextField(firstPlayerDisplayName)
+            }
+
+            LaunchedEffect(secondPlayerDisplayName) {
+                secondPlayerDisplayNameState.updateTextField(secondPlayerDisplayName)
+            }
+            Column(
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                PlayerDisplayNameTextField(
+                    modifier = Modifier.fillMaxWidth(),
+                    state = firstPlayerDisplayNameState,
+                )
+                Text("/")
+                PlayerDisplayNameTextField(
+                    modifier = Modifier.fillMaxWidth(),
+                    state = secondPlayerDisplayNameState,
+                )
+            }
         } else {
-            listOf("", "")
-        }
+            val playerDisplayNameState = rememberTextFieldState(participantDisplayName)
 
-        val firstPlayerDisplayNameState = rememberTextFieldState(firstPlayerDisplayName)
-        val secondPlayerDisplayNameState = rememberTextFieldState(secondPlayerDisplayName)
-
-        LaunchedEffect(firstPlayerDisplayName) {
-            firstPlayerDisplayNameState.updateTextField(firstPlayerDisplayName)
-        }
-
-        LaunchedEffect(secondPlayerDisplayName) {
-            secondPlayerDisplayNameState.updateTextField(secondPlayerDisplayName)
-        }
-        Column(
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
+            LaunchedEffect(participantDisplayName) {
+                playerDisplayNameState.updateTextField(participantDisplayName)
+            }
             PlayerDisplayNameTextField(
-                state = firstPlayerDisplayNameState,
-            )
-            Text("/")
-            PlayerDisplayNameTextField(
-                state = secondPlayerDisplayNameState,
+                modifier = Modifier.fillMaxWidth(),
+                state = playerDisplayNameState,
             )
         }
-    } else {
-        val playerDisplayNameState = rememberTextFieldState(participantDisplayName)
-
-        LaunchedEffect(participantDisplayName) {
-            playerDisplayNameState.updateTextField(participantDisplayName)
-        }
-        PlayerDisplayNameTextField(
-            state = playerDisplayNameState,
-        )
     }
+
 }
 
 @Composable
@@ -290,7 +258,7 @@ fun PlayerDisplayNameTextField(
     state: TextFieldState
 ) {
     TextField(
-        modifier = Modifier.then(modifier).width(200.dp),
+        modifier = Modifier.then(modifier),
         state = state,
         inputTransformation = UppercaseVisualTransformation
     )

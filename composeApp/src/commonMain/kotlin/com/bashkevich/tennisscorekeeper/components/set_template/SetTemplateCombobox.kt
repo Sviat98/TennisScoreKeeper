@@ -1,6 +1,8 @@
 package com.bashkevich.tennisscorekeeper.components.set_template
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.text.input.TextFieldLineLimits
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.material.DropdownMenu
 import androidx.compose.material.DropdownMenuItem
@@ -16,11 +18,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import com.bashkevich.tennisscorekeeper.model.set_template.domain.SetTemplate
 
 @Composable
 fun SetTemplateCombobox(
+    modifier: Modifier = Modifier,
     setTemplateOptions: List<SetTemplate>,
     enabled: Boolean,
     currentSetTemplate: SetTemplate,
@@ -33,9 +37,12 @@ fun SetTemplateCombobox(
 
     val setTemplateState = TextFieldState(setTemplateText)
 
-    Box {
+    Box(
+        modifier = Modifier.then(modifier)
+    ) {
         // Поле ввода с заблокированным редактированием
         TextField(
+            modifier = Modifier.fillMaxWidth(),
             state = setTemplateState,
             placeholder = { Text("Set Template") },
             readOnly = true,
@@ -54,6 +61,7 @@ fun SetTemplateCombobox(
                     )
                 }
             },
+            lineLimits = TextFieldLineLimits.MultiLine(minHeightInLines = 2, maxHeightInLines = 3),
             colors = TextFieldDefaults.textFieldColors(
                 disabledIndicatorColor = Color.Transparent,
                 disabledTextColor = Color.Black,

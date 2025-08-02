@@ -91,7 +91,7 @@ fun TournamentContent(
         topBar = { TournamentDetailsAppBar(onBack = { navController.navigateUp() }) }
     ) {
         Column(
-            modifier = Modifier.padding(it),
+            modifier = Modifier.padding(it).padding(horizontal = 16.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterVertically)
         ) {
             Row(
@@ -119,7 +119,7 @@ fun TournamentContent(
                 )
             }
             Box(
-                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)
+                modifier = Modifier.fillMaxWidth()
             ) {
                 Row(
                     modifier = Modifier.widthIn(max = 480.dp).fillMaxWidth()

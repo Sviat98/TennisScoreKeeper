@@ -58,7 +58,6 @@ fun AddMatchContent(
                 CircularProgressIndicator()
             } else {
                 AddMatchComponent(
-                    modifier = Modifier.then(modifier),
                     state = state,
                     onEvent = onEvent,
                     onNavigateAfterMatchAdd = onNavigateAfterMatchAdd

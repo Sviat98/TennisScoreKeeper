@@ -55,8 +55,9 @@ fun TennisParticipant.toDisplayFormat() = when (this) {
     is DoublesParticipant -> "${this.firstPlayer.surname} ${this.firstPlayer.name} / ${this.secondPlayer.surname} ${this.secondPlayer.name}"
 }
 
-fun TennisParticipantInMatch.toDisplayFormat() = when (this) {
-    in listOf(PARTICIPANT_IN_SINGLES_MATCH_DEFAULT, PARTICIPANT_IN_DOUBLES_MATCH_DEFAULT) -> ""
-    is ParticipantInSinglesMatch -> "${this.player.surname} ${this.player.name}"
-    is ParticipantInDoublesMatch -> "${this.firstPlayer.surname} ${this.firstPlayer.name} / ${this.secondPlayer.surname} ${this.secondPlayer.name}"
+fun TennisParticipantInMatch.toDisplayFormat() = when {
+    this.id == "0" -> ""
+    this is ParticipantInSinglesMatch -> "${this.player.surname} ${this.player.name}"
+    this is ParticipantInDoublesMatch -> "${this.firstPlayer.surname} ${this.firstPlayer.name} / ${this.secondPlayer.surname} ${this.secondPlayer.name}"
+    else -> ""
 }

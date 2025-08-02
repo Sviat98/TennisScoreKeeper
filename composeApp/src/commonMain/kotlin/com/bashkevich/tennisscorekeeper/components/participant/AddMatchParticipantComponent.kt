@@ -8,9 +8,10 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
@@ -27,7 +28,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.bashkevich.tennisscorekeeper.components.match.ParticipantDisplayNameComponent
-import com.bashkevich.tennisscorekeeper.model.participant.domain.ParticipantInDoublesMatch
 import com.bashkevich.tennisscorekeeper.model.participant.domain.TennisParticipant
 import com.bashkevich.tennisscorekeeper.model.participant.domain.TennisParticipantInMatch
 
@@ -48,9 +48,8 @@ fun AddMatchParticipantComponent(
         verticalArrangement = Arrangement.spacedBy(8.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        val comboboxWidth = if (participant is ParticipantInDoublesMatch) 320.dp else 256.dp
         ParticipantCombobox(
-            modifier = Modifier.width(comboboxWidth),
+            modifier = Modifier.widthIn(max = 300.dp).fillMaxWidth(),
             participantOptions = participantOptions,
             currentParticipant = participant,
             onParticipantsFetch = onParticipantsFetch,
@@ -58,6 +57,7 @@ fun AddMatchParticipantComponent(
         )
 
         ParticipantDisplayNameComponent(
+            modifier = Modifier.widthIn(max = 300.dp).fillMaxWidth(),
             participant = participant,
         )
 

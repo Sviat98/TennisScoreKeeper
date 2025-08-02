@@ -63,7 +63,9 @@ fun MatchScoreboardView(
                         columnHeight = with(density) {
                             layoutCoordinates.size.height.toDp()
                         }
-                    }.padding(top = 4.dp, bottom = 4.dp, start = 4.dp, end = 8.dp),
+                    }
+                    .padding(top = 4.dp, bottom = 4.dp, start = 4.dp, end = 8.dp)
+                        ,
                 match = match,
             )
             ServeScoreboardComponent(
