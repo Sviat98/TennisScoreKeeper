@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.input.InputTransformation
 import androidx.compose.foundation.text.input.TextFieldBuffer
@@ -22,8 +21,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.bashkevich.tennisscorekeeper.components.ColorPickerDialog
 import com.bashkevich.tennisscorekeeper.components.match.add_match.AddMatchParticipantsBlock
-import com.bashkevich.tennisscorekeeper.components.match.add_match.SetsToWinComponent
-import com.bashkevich.tennisscorekeeper.components.set_template.SetTemplateComponent
+import com.bashkevich.tennisscorekeeper.components.match.add_match.MatchScoringSettingsBlock
+import com.bashkevich.tennisscorekeeper.components.match.add_match.SetsToWinBlock
 import com.bashkevich.tennisscorekeeper.components.updateTextField
 import com.bashkevich.tennisscorekeeper.model.participant.domain.ParticipantInDoublesMatch
 import com.bashkevich.tennisscorekeeper.model.participant.domain.TennisParticipantInMatch
@@ -43,14 +42,11 @@ fun AddMatchComponent(
     val firstParticipant = state.firstParticipant
     val secondParticipant = state.secondParticipant
 
-//    SideEffect {
-//        println(state.toString())
-//    }
 
     Column(
         modifier = Modifier.then(modifier).padding(16.dp)
             .verticalScroll(state = rememberScrollState()),
-        verticalArrangement = Arrangement.spacedBy(16.dp),
+        verticalArrangement = Arrangement.spacedBy(32.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         AddMatchParticipantsBlock(
@@ -87,59 +83,33 @@ fun AddMatchComponent(
 
         val setsToWin = state.setsToWin
 
-        SetsToWinComponent(
-            modifier = Modifier.widthIn(max = 300.dp).fillMaxWidth(),
-            setsToWin = setsToWin,
-            onValueChange = {delta -> onEvent(AddMatchUiEvent.ChangeSetsToWin(delta))}
-        )
-
         val setTemplateOptions = state.setTemplateOptions
 
         val regularSetTemplate = state.regularSetTemplate
         val decidingSetTemplate = state.decidingSetTemplate
 
-
-        val regularSetTemplateOptions = setTemplateOptions.filter { it.isRegular }
-        val decidingSetTemplateOptions = setTemplateOptions.filter { it.isDeciding }
-
-        SetTemplateComponent(
-            label = "Regular Set Template",
-            setTemplateOptions = regularSetTemplateOptions,
-            enabled = setsToWin > 1,
-            currentSetTemplate = regularSetTemplate,
-            onSetTemplatesFetch = {
-                onEvent(
-                    AddMatchUiEvent.FetchSetTemplates(
-                        SetTemplateTypeFilter.ALL
-                    )
-                )
-            },
-            onSetTemplateChange = { setTemplate ->
-                onEvent(
-                    AddMatchUiEvent.SelectSetTemplate(
-                        SetTemplateTypeFilter.REGULAR,
-                        setTemplate
-                    )
-                )
-            }
+        SetsToWinBlock(
+            modifier = Modifier.fillMaxWidth(),
+            setsToWin = setsToWin,
+            onValueChange = {delta -> onEvent(AddMatchUiEvent.ChangeSetsToWin(delta))}
         )
-        SetTemplateComponent(
-            label = "Deciding Set Template",
-            setTemplateOptions = decidingSetTemplateOptions,
-            enabled = true,
-            currentSetTemplate = decidingSetTemplate,
+
+        MatchScoringSettingsBlock(
+            modifier = Modifier.fillMaxWidth(),
+            setsToWin = setsToWin,
+            setTemplateOptions = setTemplateOptions,
+            regularSetTemplate = regularSetTemplate,
+            decidingSetTemplate = decidingSetTemplate,
             onSetTemplatesFetch = {
-                onEvent(
-                    AddMatchUiEvent.FetchSetTemplates(
-                        SetTemplateTypeFilter.ALL
-                    )
+                AddMatchUiEvent.FetchSetTemplates(
+                    SetTemplateTypeFilter.ALL
                 )
             },
-            onSetTemplateChange = { setTemplate ->
+            onSetTemplateChange = { setTemplateType, setTemplate ->
                 onEvent(
                     AddMatchUiEvent.SelectSetTemplate(
-                        SetTemplateTypeFilter.DECIDER,
-                        setTemplate
+                        setTemplateTypeFilter = setTemplateType,
+                        setTemplate = setTemplate
                     )
                 )
             }

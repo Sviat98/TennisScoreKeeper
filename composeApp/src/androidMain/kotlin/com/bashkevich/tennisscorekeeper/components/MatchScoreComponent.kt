@@ -86,8 +86,17 @@ fun CurrentGamePausedComponentPreview() {
 }
 
 @Composable
-@Preview(device = "spec:width=1920dp,height=1080dp,dpi=160")
+@Preview(device = "spec:width=3000dp,height=1080dp,dpi=160")
 fun AddMatchComponentPreview() {
+    AddMatchComponent(
+        modifier = Modifier.background(Color.White),
+        state = AddMatchState.initial(),
+        onEvent = {}) { }
+}
+
+@Composable
+@Preview(device = "spec:width=411dp,height=891dp", showBackground = false)
+fun AddMatchComponentPreviewPhone() {
     AddMatchComponent(
         modifier = Modifier.background(Color.White).width(1000.dp).height(700.dp),
         state = AddMatchState.initial(),

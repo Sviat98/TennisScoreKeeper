@@ -1,6 +1,9 @@
 package com.bashkevich.tennisscorekeeper.components
 
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -11,6 +14,7 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.bashkevich.tennisscorekeeper.components.match.add_match.SetsToWinBlock
 
 
 @Composable
@@ -45,4 +49,14 @@ fun SampleCanvas(
         }
         drawPath(path, Color.White)
     }
+}
+
+@Composable
+@Preview
+fun SetsToWinComponentPreview(){
+    SetsToWinBlock(
+        modifier = Modifier.fillMaxWidth().background(Color.White).padding(horizontal = 32.dp),
+        setsToWin = 1,
+        onValueChange = {}
+    )
 }
