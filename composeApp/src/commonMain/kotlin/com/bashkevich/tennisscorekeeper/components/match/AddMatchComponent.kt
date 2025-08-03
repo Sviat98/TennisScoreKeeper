@@ -91,7 +91,7 @@ fun AddMatchComponent(
         SetsToWinBlock(
             modifier = Modifier.fillMaxWidth(),
             setsToWin = setsToWin,
-            onValueChange = {delta -> onEvent(AddMatchUiEvent.ChangeSetsToWin(delta))}
+            onValueChange = { delta -> onEvent(AddMatchUiEvent.ChangeSetsToWin(delta)) }
         )
 
         MatchScoringSettingsBlock(
@@ -101,8 +101,10 @@ fun AddMatchComponent(
             regularSetTemplate = regularSetTemplate,
             decidingSetTemplate = decidingSetTemplate,
             onSetTemplatesFetch = {
-                AddMatchUiEvent.FetchSetTemplates(
-                    SetTemplateTypeFilter.ALL
+                onEvent(
+                    AddMatchUiEvent.FetchSetTemplates(
+                        SetTemplateTypeFilter.ALL
+                    )
                 )
             },
             onSetTemplateChange = { setTemplateType, setTemplate ->
