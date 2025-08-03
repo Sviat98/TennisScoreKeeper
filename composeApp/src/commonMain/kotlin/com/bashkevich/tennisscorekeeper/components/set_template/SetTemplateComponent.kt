@@ -32,7 +32,6 @@ fun SetTemplateComponent(
         ) {
             Text(label)
             SetTemplateCombobox(
-                modifier = Modifier.fillMaxWidth(),
                 setTemplateOptions = setTemplateOptions,
                 enabled = enabled,
                 currentSetTemplate = currentSetTemplate,

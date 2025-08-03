@@ -32,8 +32,7 @@ fun SetsToWinBlock(
                 modifier = Modifier
                     .widthIn(max = 1000.dp)
                     .fillMaxWidth()
-                    .align(Alignment.Center)
-                    .padding(horizontal = 32.dp),
+                    .align(Alignment.Center),
             ) {
                 Row(
                     modifier = Modifier.fillMaxWidth(0.5f).padding(end = 32.dp),

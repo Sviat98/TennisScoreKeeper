@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.runtime.Composable
@@ -40,11 +39,11 @@ fun AddMatchParticipantsBlock(
         if (windowSize.isWidthAtLeastBreakpoint(WindowSizeClass.WIDTH_DP_MEDIUM_LOWER_BOUND)) {
             Row(
                 modifier = Modifier.widthIn(max = 1000.dp).fillMaxWidth().align(Alignment.Center),
-                horizontalArrangement = Arrangement.SpaceBetween,
+                horizontalArrangement = Arrangement.spacedBy(64.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 AddMatchParticipantComponent(
-                    modifier = Modifier.weight(weight = 1f).padding(horizontal = 32.dp),
+                    modifier = Modifier.weight(weight = 1f),
                     participantOptions = firstParticipantOptions,
                     participant = firstParticipant,
                     onParticipantsFetch = onParticipantsFetch,
@@ -62,7 +61,7 @@ fun AddMatchParticipantsBlock(
                 )
 
                 AddMatchParticipantComponent(
-                    modifier = Modifier.weight(weight = 1f).padding(horizontal = 32.dp),
+                    modifier = Modifier.weight(weight = 1f),
                     participantOptions = secondParticipantOptions,
                     participant = secondParticipant,
                     onParticipantsFetch = onParticipantsFetch,
@@ -86,7 +85,6 @@ fun AddMatchParticipantsBlock(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 AddMatchParticipantComponent(
-                    modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
                     participantOptions = firstParticipantOptions,
                     participant = firstParticipant,
                     onParticipantsFetch = onParticipantsFetch,
@@ -104,7 +102,6 @@ fun AddMatchParticipantsBlock(
                 )
 
                 AddMatchParticipantComponent(
-                    modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
                     participantOptions = secondParticipantOptions,
                     participant = secondParticipant,
                     onParticipantsFetch = onParticipantsFetch,

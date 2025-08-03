@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.runtime.Composable
@@ -36,11 +35,11 @@ fun MatchScoringSettingsBlock(
         if (windowSize.isWidthAtLeastBreakpoint(WindowSizeClass.WIDTH_DP_MEDIUM_LOWER_BOUND)) {
             Row(
                 modifier = Modifier.widthIn(max = 1000.dp).fillMaxWidth().align(Alignment.Center),
-                horizontalArrangement = Arrangement.SpaceBetween,
+                horizontalArrangement = Arrangement.spacedBy(64.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 SetTemplateComponent(
-                    modifier = Modifier.weight(1f).padding(horizontal = 32.dp),
+                    modifier = Modifier.weight(1f),
                     label = "Regular Set Template",
                     setTemplateOptions = regularSetTemplateOptions,
                     enabled = setsToWin > 1,
@@ -51,7 +50,7 @@ fun MatchScoringSettingsBlock(
                     }
                 )
                 SetTemplateComponent(
-                    modifier = Modifier.weight(1f).padding(horizontal = 32.dp),
+                    modifier = Modifier.weight(1f),
                     label = "Deciding Set Template",
                     setTemplateOptions = decidingSetTemplateOptions,
                     enabled = true,
@@ -69,7 +68,6 @@ fun MatchScoringSettingsBlock(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 SetTemplateComponent(
-                    modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
                     label = "Regular Set Template",
                     setTemplateOptions = regularSetTemplateOptions,
                     enabled = setsToWin > 1,
@@ -80,7 +78,6 @@ fun MatchScoringSettingsBlock(
                     }
                 )
                 SetTemplateComponent(
-                    modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
                     label = "Deciding Set Template",
                     setTemplateOptions = decidingSetTemplateOptions,
                     enabled = true,
