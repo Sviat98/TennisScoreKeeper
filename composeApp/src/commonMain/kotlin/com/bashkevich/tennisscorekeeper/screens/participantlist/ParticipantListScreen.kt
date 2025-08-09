@@ -3,12 +3,9 @@ package com.bashkevich.tennisscorekeeper.screens.participantlist
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.Icon
 import androidx.compose.material.Scaffold
@@ -22,7 +19,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.bashkevich.tennisscorekeeper.components.UploadFileComponent
-import com.bashkevich.tennisscorekeeper.components.participant.ParticipantCard
+import com.bashkevich.tennisscorekeeper.components.participant.ParticipantListComponent
 import com.bashkevich.tennisscorekeeper.model.file.domain.ExcelFile
 import com.bashkevich.tennisscorekeeper.model.tournament.remote.TournamentStatus
 import com.bashkevich.tennisscorekeeper.screens.tournamentdetails.TournamentState
@@ -93,7 +90,7 @@ fun ParticipantListContent(
                 verticalArrangement = Arrangement.spacedBy(8.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                if (state.tournament.status == TournamentStatus.NOT_STARTED){
+                if (state.tournament.status == TournamentStatus.NOT_STARTED) {
                     UploadFileComponent(
                         modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
                         file = participantListState.participantsFile,
@@ -105,17 +102,10 @@ fun ParticipantListContent(
                         }
                     )
                 }
-                LazyColumn(
-                    verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterVertically),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    contentPadding = PaddingValues(16.dp)
-                ) {
-                    items(
-                        participantListState.participants,
-                        key = { it.id }) { participant ->
-                        ParticipantCard(participant = participant)
-                    }
-                }
+
+                ParticipantListComponent(
+                    participants = participantListState.participants
+                )
             }
         }
     }

@@ -108,10 +108,6 @@ class TournamentViewModel(
         // some feature-specific logic
         when (uiEvent) {
             is TournamentUiEvent.ChangeTournamentStatus -> changeTournamentStatus(uiEvent.tournamentStatus)
-            is TournamentUiEvent.SelectTab -> {
-                reduceState { oldState -> oldState.copy(currentTab = uiEvent.tournamentTab) }
-            }
-
             TournamentUiEvent.UploadFile -> uploadFile()
             is TournamentUiEvent.SelectFile -> {
                 reduceState { oldState ->

@@ -20,6 +20,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 
 import androidx.compose.ui.Modifier
@@ -34,9 +35,10 @@ import com.bashkevich.tennisscorekeeper.components.tournament.ChangeTournamentSt
 import com.bashkevich.tennisscorekeeper.model.match.remote.body.MatchStatus
 import com.bashkevich.tennisscorekeeper.model.match.remote.body.convertToString
 import com.bashkevich.tennisscorekeeper.navigation.TournamentTab
-import com.bashkevich.tennisscorekeeper.navigation.toRouteString
+import com.bashkevich.tennisscorekeeper.navigation.toDisplayString
 import com.bashkevich.tennisscorekeeper.screens.matchlist.MatchListScreen
 import com.bashkevich.tennisscorekeeper.screens.participantlist.ParticipantListScreen
+import kotlinx.coroutines.launch
 
 @Composable
 fun TournamentScreen(
@@ -72,7 +74,6 @@ fun TournamentContent(
     onEvent: (TournamentUiEvent) -> Unit,
 ) {
     val tournament = state.tournament
-    val currentTab = state.currentTab
 
     val navController = LocalNavHostController.current
     val matchListState = state.matchListState
@@ -85,6 +86,8 @@ fun TournamentContent(
     val participantsAmount = participantListState.participants.size
 
     val pagerState = rememberPagerState(pageCount = { 2 })
+
+    val scope = rememberCoroutineScope()
 
     Scaffold(
         modifier = Modifier.then(modifier),
@@ -128,32 +131,35 @@ fun TournamentContent(
                     horizontalArrangement = Arrangement.SpaceEvenly
                 ) {
                     Text(
-                        text = TournamentTab.Matches.toRouteString(),
+                        text = TournamentTab.MATCHES.toDisplayString(),
                         modifier = Modifier.clickable {
-                            onEvent(TournamentUiEvent.SelectTab(TournamentTab.Matches))
+                            scope.launch {
+                                pagerState.animateScrollToPage(TournamentTab.MATCHES.ordinal)
+                            }
                         },
-                        color = if (currentTab == TournamentTab.Matches) MaterialTheme.colors.primary else Color.DarkGray
+                        color = if (pagerState.currentPage == TournamentTab.MATCHES.ordinal) MaterialTheme.colors.primary else Color.DarkGray
                     )
                     Text(
-                        text = TournamentTab.Participants.toRouteString(),
+                        text = TournamentTab.PARTICIPANTS.toDisplayString(),
                         modifier = Modifier.clickable {
-                            onEvent(TournamentUiEvent.SelectTab(TournamentTab.Participants))
+                            scope.launch {
+                                pagerState.animateScrollToPage(TournamentTab.PARTICIPANTS.ordinal)
+                            }
                         },
-                        color = if (currentTab == TournamentTab.Participants) MaterialTheme.colors.primary else Color.DarkGray
+                        color = if (pagerState.currentPage == TournamentTab.PARTICIPANTS.ordinal) MaterialTheme.colors.primary else Color.DarkGray
                     )
                 }
 
             }
 
-            HorizontalPager(state = pagerState) { _ ->
-                when (currentTab) {
-                    TournamentTab.Matches -> MatchListScreen(
+            HorizontalPager(state = pagerState) { index ->
+                when (index) {
+                    TournamentTab.MATCHES.ordinal -> MatchListScreen(
                         modifier = Modifier.fillMaxSize(),
                         state = state,
                         onEvent = onEvent
                     )
-
-                    TournamentTab.Participants -> ParticipantListScreen(
+                    TournamentTab.PARTICIPANTS.ordinal -> ParticipantListScreen(
                         modifier = Modifier.fillMaxSize(),
                         state = state,
                         onEvent = onEvent

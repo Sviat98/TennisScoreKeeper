@@ -30,6 +30,12 @@ data class DoublesParticipant(
     val secondPlayer: PlayerInParticipant
 ) : TennisParticipant()
 
+data class ParticipantListItem(
+    val id: String,
+    val seedNumber: String,
+    val displayName: String
+)
+
 val DOUBLES_PARTICIPANT_DEFAULT = DoublesParticipant(
     id = "0",
     seed = null,
@@ -50,9 +56,15 @@ fun ParticipantDto.toDomain(): TennisParticipant = when (this) {
     )
 }
 
-fun TennisParticipant.toDisplayFormat() = when (this) {
+fun TennisParticipant.toDisplayFormat(isCompact: Boolean = false) = when (this) {
     is SinglesParticipant -> "${this.player.surname} ${this.player.name}"
-    is DoublesParticipant -> "${this.firstPlayer.surname} ${this.firstPlayer.name} / ${this.secondPlayer.surname} ${this.secondPlayer.name}"
+    is DoublesParticipant -> {
+        if (isCompact){
+            "${this.firstPlayer.surname} ${this.firstPlayer.name} /\n${this.secondPlayer.surname} ${this.secondPlayer.name}"
+        }else{
+            "${this.firstPlayer.surname} ${this.firstPlayer.name} / ${this.secondPlayer.surname} ${this.secondPlayer.name}"
+        }
+    }
 }
 
 fun TennisParticipantInMatch.toDisplayFormat() = when {
