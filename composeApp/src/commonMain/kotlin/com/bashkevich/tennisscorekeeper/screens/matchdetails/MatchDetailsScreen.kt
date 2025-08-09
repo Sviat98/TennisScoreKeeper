@@ -1,10 +1,12 @@
 package com.bashkevich.tennisscorekeeper.screens.matchdetails
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 
@@ -75,77 +77,84 @@ fun MatchDetailsContent(
             )
         }
     ) { paddingValues ->
-        Column(
-            modifier = Modifier.padding(all = 16.dp),
-            verticalArrangement = Arrangement.SpaceAround,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            MatchScoreboardView(
-                match = match
-            )
+        Box(
+            modifier = Modifier.fillMaxWidth().padding(all = 16.dp)
+        ){
+            Column(
+                modifier = Modifier.widthIn(max = 600.dp).fillMaxWidth().align(Alignment.Center),
+                verticalArrangement = Arrangement.SpaceAround,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                MatchScoreboardView(
+                    match = match
+                )
 
-            Text("Status: ${match.status.convertToString()}")
+                Text("Status: ${match.status.convertToString()}")
 
-            MatchStatusButton(
-                match = match,
-                onStatusChange = { status -> onEvent(MatchDetailsUiEvent.ChangeMatchStatus(status = status)) }
-            )
+                MatchStatusButton(
+                    match = match,
+                    onStatusChange = { status -> onEvent(MatchDetailsUiEvent.ChangeMatchStatus(status = status)) }
+                )
 
-            when (match.status) {
-                MatchStatus.NOT_STARTED -> {
-                    ChooseServePanel(
-                        modifier = Modifier.fillMaxWidth(),
-                        match = match,
-                        onFirstParticipantToServeChoose = { participantId ->
-                            onEvent(
-                                MatchDetailsUiEvent.SetFirstParticipantToServe(
-                                    participantId = participantId
+                when (match.status) {
+                    MatchStatus.NOT_STARTED -> {
+                        ChooseServePanel(
+                            modifier = Modifier.fillMaxWidth(),
+                            match = match,
+                            onFirstParticipantToServeChoose = { participantId ->
+                                onEvent(
+                                    MatchDetailsUiEvent.SetFirstParticipantToServe(
+                                        participantId = participantId
+                                    )
                                 )
-                            )
-                        },
-                        onFirstPlayerInPairToServeChoose = { playerId ->
-                            onEvent(
-                                MatchDetailsUiEvent.SetFirstPlayerInPairToServe(
-                                    playerId = playerId
+                            },
+                            onFirstPlayerInPairToServeChoose = { playerId ->
+                                onEvent(
+                                    MatchDetailsUiEvent.SetFirstPlayerInPairToServe(
+                                        playerId = playerId
+                                    )
                                 )
-                            )
-                        }
-                    )
+                            }
+                        )
+                    }
+
+                    MatchStatus.IN_PROGRESS -> {
+                        ParticipantsPointsControlPanel(
+                            modifier = Modifier.fillMaxWidth(),
+                            match = match,
+                            onUpdateScore = { participantId, scoreType ->
+                                onEvent(
+                                    MatchDetailsUiEvent.UpdateScore(
+                                        participantId = participantId,
+                                        scoreType = scoreType
+                                    )
+                                )
+                            },
+                            onUndoPoint = { onEvent(MatchDetailsUiEvent.UndoPoint) },
+                            onRedoPoint = { onEvent(MatchDetailsUiEvent.RedoPoint) }
+                        )
+                    }
+
+                    MatchStatus.PAUSED -> {
+                        RetireParticipantPanel(
+                            modifier = Modifier.fillMaxWidth(),
+                            match = match,
+                            onParticipantRetire = { participantId ->
+                                onEvent(
+                                    MatchDetailsUiEvent.SetParticipantRetired(
+                                        participantId = participantId
+                                    )
+                                )
+                            }
+                        )
+                    }
+
+                    else -> {}
                 }
-
-                MatchStatus.IN_PROGRESS -> {
-                    ParticipantsPointsControlPanel(
-                        modifier = Modifier.fillMaxWidth(),
-                        match = match,
-                        onUpdateScore = { participantId, scoreType ->
-                            onEvent(
-                                MatchDetailsUiEvent.UpdateScore(
-                                    participantId = participantId,
-                                    scoreType = scoreType
-                                )
-                            )
-                        },
-                        onUndoPoint = { onEvent(MatchDetailsUiEvent.UndoPoint) },
-                        onRedoPoint = { onEvent(MatchDetailsUiEvent.RedoPoint) }
-                    )
-                }
-
-                MatchStatus.PAUSED -> {
-                    RetireParticipantPanel(
-                        match = match,
-                        onParticipantRetire = { participantId ->
-                            onEvent(
-                                MatchDetailsUiEvent.SetParticipantRetired(
-                                    participantId = participantId
-                                )
-                            )
-                        }
-                    )
-                }
-
-                else -> {}
             }
         }
+
+
     }
 
 }
