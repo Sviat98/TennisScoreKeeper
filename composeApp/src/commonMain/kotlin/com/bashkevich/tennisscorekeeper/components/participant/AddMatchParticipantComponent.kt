@@ -27,7 +27,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.bashkevich.tennisscorekeeper.components.match.ParticipantDisplayNameComponent
 import com.bashkevich.tennisscorekeeper.model.participant.domain.TennisParticipant
 import com.bashkevich.tennisscorekeeper.model.participant.domain.TennisParticipantInMatch
 
@@ -38,6 +37,7 @@ fun AddMatchParticipantComponent(
     participant: TennisParticipantInMatch,
     onParticipantsFetch: () -> Unit,
     onParticipantChange: (TennisParticipant) -> Unit,
+    onParticipantDisplayNameChange: (String) -> Unit,
     participantPrimaryColor: Color,
     participantSecondaryColor: Color?,
     onColorPickerOpen: (Int) -> Unit,
@@ -59,6 +59,7 @@ fun AddMatchParticipantComponent(
         ParticipantDisplayNameComponent(
             modifier = Modifier.widthIn(max = 300.dp).fillMaxWidth(),
             participant = participant,
+            onParticipantDisplayNameChange = onParticipantDisplayNameChange
         )
 
         ParticipantColorPickerBlock(

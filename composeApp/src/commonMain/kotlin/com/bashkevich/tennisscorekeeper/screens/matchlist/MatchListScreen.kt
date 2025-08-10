@@ -75,18 +75,17 @@ fun MatchListContent(
                 modifier = Modifier.align(Alignment.Center),
                 verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterVertically),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                contentPadding = PaddingValues(16.dp)
+                contentPadding = PaddingValues(vertical = 16.dp)
             ) {
                 items(
                     matchListState.matches,
                     key = { it.id }) { match ->
                     ShortMatchScoreboardCard(
-                        modifier = Modifier.widthIn(max = 360.dp).fillMaxWidth().hoverScaleEffect(),
+                        modifier = Modifier.widthIn(max = 400.dp).fillMaxWidth().hoverScaleEffect(),
                         match = match,
                         onClick = { onItemClick(match) }
                     )
                 }
-
             }
         }
     }

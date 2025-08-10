@@ -24,6 +24,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.bashkevich.tennisscorekeeper.components.scoreboard.CurrentGamePausedComponent
 import com.bashkevich.tennisscorekeeper.components.scoreboard.PrevSetScoreboardComponent
 import com.bashkevich.tennisscorekeeper.components.scoreboard.SeedScoreboardComponent
@@ -75,7 +76,8 @@ fun ShortMatchScoreboardView(
             SeedScoreboardComponent(
                 modifier = Modifier.height(columnHeight),
                 firstParticipantSeed = match.firstParticipant.seed,
-                secondParticipantSeed = match.secondParticipant.seed
+                secondParticipantSeed = match.secondParticipant.seed,
+                paddingFromCenter = 4.dp
             )
             ParticipantOnShortScoreboardView(
                 modifier = Modifier.widthIn(min = 80.dp)
@@ -83,21 +85,54 @@ fun ShortMatchScoreboardView(
                         columnHeight = with(density) {
                             layoutCoordinates.size.height.toDp()
                         }
-                    }.padding(top = 4.dp, bottom = 4.dp, start = 4.dp, end = 8.dp),
+                    }
+                    .padding(top = 4.dp, bottom = 4.dp, start = 4.dp, end = 8.dp),
                 match = match
             )
         }
 
+        val numberFontSize = 16.sp
+
+        val firstParticipant = match.firstParticipant
+        val secondParticipant = match.secondParticipant
+
+        val prevSets = match.previousSets
+
+        val lastSetIndex = prevSets.size - 1
+
         Row {
-            match.previousSets.forEach { prevSet ->
-                PrevSetScoreboardComponent(modifier = Modifier.height(columnHeight).width(32.dp), prevSet = prevSet, showWithoutHighlighting = false)
+            prevSets.forEachIndexed { index, prevSet ->
+                // смотрим, есть ли досрочное завершение сета
+                val retiredParticipantNumber = if (index == lastSetIndex) {
+                    when {
+                        firstParticipant.isRetired -> 1
+                        secondParticipant.isRetired -> 2
+                        else -> null
+                    }
+                } else null
+
+                PrevSetScoreboardComponent(
+                    modifier = Modifier.height(columnHeight).padding(horizontal = 4.dp),
+                    prevSet = prevSet,
+                    numberFontSize = numberFontSize,
+                    retiredParticipantNumber = retiredParticipantNumber
+                )
             }
+
             //currentSet и currentGame появляются ТОЛЬКО если матч в статусе PAUSED
             match.currentSet?.let { currentSet ->
-                PrevSetScoreboardComponent(modifier = Modifier.height(columnHeight).width(32.dp), prevSet = currentSet, showWithoutHighlighting = true)
+                PrevSetScoreboardComponent(
+                    modifier = Modifier.height(columnHeight).padding(horizontal = 4.dp),
+                    prevSet = currentSet,
+                    numberFontSize = numberFontSize,
+                    isSetFinished = false,
+                )
             }
             match.currentGame?.let {
-                CurrentGamePausedComponent(modifier = Modifier.height(columnHeight).width(48.dp), currentGame = match.currentGame )
+                CurrentGamePausedComponent(
+                    modifier = Modifier.height(columnHeight).width(48.dp),
+                    currentGame = match.currentGame
+                )
             }
         }
 

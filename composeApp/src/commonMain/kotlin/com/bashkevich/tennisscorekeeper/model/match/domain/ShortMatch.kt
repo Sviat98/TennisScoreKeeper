@@ -69,11 +69,14 @@ val SAMPLE_DOUBLES_SHORT_MATCH = ShortMatch(
         seed = 1,
         isWinner = true,
         isRetired = false,
-        firstPlayer = PlayerInParticipant(id = "1", surname = "Djokovic", name = "Novak"),
+        firstPlayer = PlayerInParticipant(
+            id = "1",
+            surname = "Vennegoor of Hesselink",
+            name = "Jan"
+        ),
         secondPlayer = PlayerInParticipant(
             id = "3",
-            surname = "Nadal",
-            name = "Rafael",
+            surname = "Vennegoor of Hesselink", name = "Lucas"
         ),
     ),
     secondParticipant = ParticipantInShortDoublesMatch(
@@ -94,10 +97,11 @@ val SAMPLE_DOUBLES_SHORT_MATCH = ShortMatch(
     ),
     status = MatchStatus.PAUSED,
     previousSets = listOf(
-        TennisSet(firstParticipantGamesWon=1, secondParticipantGamesWon=4),
-        TennisSet(firstParticipantGamesWon = 3, secondParticipantGamesWon = 6),
+        TennisSet(firstParticipantGamesWon = 10, secondParticipantGamesWon = 4),
+        TennisSet(firstParticipantGamesWon = 3, secondParticipantGamesWon = 10),
+        TennisSet(firstParticipantGamesWon = 10, secondParticipantGamesWon = 4),
+        TennisSet(firstParticipantGamesWon = 10, secondParticipantGamesWon = 6),
     ),
-//    currentSet = TennisSet(firstParticipantGamesWon = 10, secondParticipantGamesWon = 9),
-//    currentSetMode = null,
+    currentSet = TennisSet(firstParticipantGamesWon = 10, secondParticipantGamesWon = 9),
     currentGame = TennisGame(firstParticipantPointsWon = "30", secondParticipantPointsWon = "15")
 )

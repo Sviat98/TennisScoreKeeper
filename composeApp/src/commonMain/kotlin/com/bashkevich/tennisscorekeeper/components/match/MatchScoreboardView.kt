@@ -23,10 +23,9 @@ import com.bashkevich.tennisscorekeeper.components.scoreboard.CurrentGamePausedC
 import com.bashkevich.tennisscorekeeper.components.scoreboard.CurrentSetComponent
 import com.bashkevich.tennisscorekeeper.components.scoreboard.ParticipantOnScoreboardView
 import com.bashkevich.tennisscorekeeper.components.scoreboard.PrevSetScoreboardComponent
-import com.bashkevich.tennisscorekeeper.components.scoreboard.RetiredParticipantComponent
+import com.bashkevich.tennisscorekeeper.components.scoreboard.WinnerAndRetiredParticipantComponent
 import com.bashkevich.tennisscorekeeper.components.scoreboard.SeedScoreboardComponent
 import com.bashkevich.tennisscorekeeper.components.scoreboard.ServeScoreboardComponent
-import com.bashkevich.tennisscorekeeper.model.match.domain.EMPTY_TENNIS_SET
 import com.bashkevich.tennisscorekeeper.model.match.domain.Match
 import com.bashkevich.tennisscorekeeper.model.match.remote.body.MatchStatus
 
@@ -64,9 +63,12 @@ fun MatchScoreboardView(
                             layoutCoordinates.size.height.toDp()
                         }
                     }
-                    .padding(top = 4.dp, bottom = 4.dp, start = 4.dp, end = 8.dp)
-                        ,
+                    .padding(top = 4.dp, bottom = 4.dp, start = 4.dp, end = 8.dp),
                 match = match,
+            )
+            WinnerAndRetiredParticipantComponent(
+                modifier = Modifier.height(columnHeight),
+                match = match
             )
             ServeScoreboardComponent(
                 modifier = Modifier.height(columnHeight),
@@ -81,53 +83,52 @@ fun MatchScoreboardView(
             val lastSetIndex = prevSets.size - 1
 
             match.previousSets.forEachIndexed { index, prevSet ->
-                // Колонка для счета (выравнивание по центру)
+                // смотрим, есть ли досрочное завершение сета
+                val retiredParticipantNumber = if (index == lastSetIndex) {
+                    when {
+                        firstParticipant.isRetired -> 1
+                        secondParticipant.isRetired -> 2
+                        else -> null
+                    }
+                } else null
 
-                // переменная для того, чтобы определить, завершился ли текущий сет досрочно.
-                // Если да, то счет сета не блюрим у проигравшего
-                val showWithoutHighlighting =
-                    index == lastSetIndex && hasParticipantRetired
 
                 // Если сет закончился на счете 0:0 (остановка произошла в начале матча или после сыгранного сета), то его не выводим
-                if (prevSet != EMPTY_TENNIS_SET) {
-                    PrevSetScoreboardComponent(
-                        modifier = Modifier.height(columnHeight).width(columnHeight / 2),
-                        prevSet = prevSet,
-                        showWithoutHighlighting = showWithoutHighlighting
-                    )
-                }
+                PrevSetScoreboardComponent(
+                    modifier = Modifier.height(columnHeight).width(columnHeight / 2),
+                    prevSet = prevSet,
+                    retiredParticipantNumber = retiredParticipantNumber
+                )
             }
-
-            RetiredParticipantComponent(
-                modifier = Modifier.height(columnHeight),
-                match = match
-            )
             val currentSet = match.currentSet
             currentSet?.let {
-                when(match.status){
+                when (match.status) {
                     MatchStatus.IN_PROGRESS -> {
                         CurrentSetComponent(
-                            modifier = Modifier.height(columnHeight).width(columnHeight / 2).padding(horizontal = 1.dp),
+                            modifier = Modifier.height(columnHeight).width(columnHeight / 2)
+                                .padding(horizontal = 1.dp),
                             currentSet = currentSet
                         )
                     }
+
                     MatchStatus.PAUSED -> {
                         PrevSetScoreboardComponent(
                             modifier = Modifier.height(columnHeight).width(columnHeight / 2),
                             prevSet = currentSet,
-                            showWithoutHighlighting = true
+                            isSetFinished = false
                         )
                     }
+
                     else -> {}
                 }
             }
             match.currentGame?.let {
-                if (match.status== MatchStatus.PAUSED){
+                if (match.status == MatchStatus.PAUSED) {
                     CurrentGamePausedComponent(
                         modifier = Modifier.height(columnHeight).wrapContentWidth(),
                         currentGame = match.currentGame
                     )
-                }else{
+                } else {
                     CurrentGameInProgressComponent(
                         modifier = Modifier.height(columnHeight).width(columnHeight / 2),
                         currentGame = match.currentGame

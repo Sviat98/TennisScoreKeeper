@@ -5,33 +5,36 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.TextUnit
+import androidx.compose.ui.unit.sp
 import com.bashkevich.tennisscorekeeper.model.match.domain.TennisSet
 
 @Composable
 fun PrevSetScoreboardComponent(
     modifier: Modifier = Modifier,
     prevSet: TennisSet,
-    showWithoutHighlighting: Boolean,
+    numberFontSize: TextUnit = 20.sp,
+    isSetFinished: Boolean = true,
+    retiredParticipantNumber: Int? = null
 ) {
     val firstParticipantGamesWon = prevSet.firstParticipantGamesWon
     val secondParticipantGamesWon = prevSet.secondParticipantGamesWon
 
-    val isFirstParticipantWon = firstParticipantGamesWon > secondParticipantGamesWon
+    val isFirstParticipantWon =
+        (retiredParticipantNumber == 2) || (isSetFinished && (firstParticipantGamesWon > secondParticipantGamesWon))
+    val isSecondParticipantWon =
+        (retiredParticipantNumber == 1) || (isSetFinished && (firstParticipantGamesWon < secondParticipantGamesWon))
 
-    var firstParticipantAlpha: Float
-    var secondParticipantAlpha: Float
+    var firstParticipantAlpha = 1f
+    var secondParticipantAlpha = 1f
 
-    if (showWithoutHighlighting){
-        firstParticipantAlpha = 1f
-        secondParticipantAlpha = 1f
-    }else{
-        if (isFirstParticipantWon){
-            firstParticipantAlpha = 1f
-            secondParticipantAlpha = 0.5f
-        }else{
-            firstParticipantAlpha = 0.5f
-            secondParticipantAlpha = 1f
-        }
+    // может быть ситуация, когда в сете ПОКА нет победителя (если к примеру матч остановили посреди сета)
+    if (isFirstParticipantWon) {
+        secondParticipantAlpha = 0.5f
+    }
+
+    if (isSecondParticipantWon) {
+        firstParticipantAlpha = 0.5f
     }
 
     val textColor = Color.White
@@ -43,12 +46,14 @@ fun PrevSetScoreboardComponent(
         ScoreboardNumber(
             modifier = Modifier.weight(1f),
             scoreNumber = prevSet.firstParticipantGamesWon.toString(),
-            textColor = textColor.copy(alpha = firstParticipantAlpha)
+            textColor = textColor.copy(alpha = firstParticipantAlpha),
+            textFontSize = numberFontSize
         )
         ScoreboardNumber(
             modifier = Modifier.weight(1f),
             scoreNumber = prevSet.secondParticipantGamesWon.toString(),
-            textColor = textColor.copy(alpha = secondParticipantAlpha)
+            textColor = textColor.copy(alpha = secondParticipantAlpha),
+            textFontSize = numberFontSize
         )
     }
 }

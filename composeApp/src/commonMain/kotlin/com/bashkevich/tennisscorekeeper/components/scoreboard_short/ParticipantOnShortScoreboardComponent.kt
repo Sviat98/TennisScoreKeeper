@@ -3,6 +3,9 @@ package com.bashkevich.tennisscorekeeper.components.scoreboard_short
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.text.BasicText
+import androidx.compose.foundation.text.TextAutoSize
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -10,9 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.bashkevich.tennisscorekeeper.components.scoreboard.WinnerIcon
 import com.bashkevich.tennisscorekeeper.model.match.domain.ShortMatch
-import com.bashkevich.tennisscorekeeper.model.match.remote.body.MatchStatus
 import com.bashkevich.tennisscorekeeper.model.participant.domain.ParticipantInShortDoublesMatch
 import com.bashkevich.tennisscorekeeper.model.participant.domain.ParticipantInShortMatch
 import com.bashkevich.tennisscorekeeper.model.participant.domain.ParticipantInShortSinglesMatch
@@ -25,19 +26,15 @@ fun ParticipantOnShortScoreboardView(modifier: Modifier = Modifier, match: Short
     val firstParticipant = match.firstParticipant
     val secondParticipant = match.secondParticipant
 
-    val isMatchCompleted = match.status == MatchStatus.COMPLETED
-
     Column(
         modifier = Modifier.then(modifier),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
+        verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         ParticipantOnShortScoreboardRow(
             participant = firstParticipant,
-            isMatchCompleted = isMatchCompleted
         )
         ParticipantOnShortScoreboardRow(
             participant = secondParticipant,
-            isMatchCompleted = isMatchCompleted
         )
     }
 }
@@ -46,61 +43,70 @@ fun ParticipantOnShortScoreboardView(modifier: Modifier = Modifier, match: Short
 fun ParticipantOnShortScoreboardRow(
     modifier: Modifier = Modifier,
     participant: ParticipantInShortMatch,
-    isMatchCompleted: Boolean
 ) {
-    val hasParticipantWonMatch = participant.isWinner
-
-    val showWinningSign = hasParticipantWonMatch && isMatchCompleted
-
     Row(
         modifier = Modifier.then(modifier),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(4.dp)
     ) {
-        when(participant){
+        when (participant) {
             is ParticipantInShortSinglesMatch -> {
-                PlayerOnShortScoreboardView(
+                SinglesPlayerOnShortScoreboardView(
+                    modifier = Modifier.widthIn(max = 200.dp),
                     player = participant.player
                 )
             }
-            is ParticipantInShortDoublesMatch ->{
+
+            is ParticipantInShortDoublesMatch -> {
                 DoublesParticipantOnShortScoreboardView(
                     participant = participant
                 )
             }
-        }
-
-        if (showWinningSign) {
-            WinnerIcon(contentDescription = "Player won")
         }
     }
 }
 
 @Composable
 fun DoublesParticipantOnShortScoreboardView(
+    modifier: Modifier = Modifier,
     participant: ParticipantInShortDoublesMatch
-){
+) {
     Column(
-        verticalArrangement = Arrangement.spacedBy(1.dp)
+        modifier = Modifier.then(modifier),
     ) {
-        PlayerOnShortScoreboardView(
+        DoublesPlayerOnShortScoreboardView(
             player = participant.firstPlayer
         )
-        PlayerOnShortScoreboardView(
+        DoublesPlayerOnShortScoreboardView(
             player = participant.secondPlayer
         )
     }
 }
 
 @Composable
-fun PlayerOnShortScoreboardView(
+fun SinglesPlayerOnShortScoreboardView(
+    modifier: Modifier = Modifier,
+    player: PlayerInParticipant,
+) {
+    BasicText(
+        modifier = Modifier.then(modifier),
+        text = player.toShortMatchDisplayFormat(),
+        color = { Color.White },
+        maxLines = 1,
+        autoSize = TextAutoSize.StepBased(maxFontSize = 16.sp, minFontSize = 10.sp, stepSize = 1.sp)
+    )
+}
+
+@Composable
+fun DoublesPlayerOnShortScoreboardView(
     modifier: Modifier = Modifier,
     player: PlayerInParticipant,
 ) {
     Text(
         modifier = Modifier.then(modifier),
         text = player.toShortMatchDisplayFormat(),
-        fontSize = 20.sp,
-        color = Color.White
+        color = Color.White,
+        fontSize = 12.sp,
+        lineHeight = 12.sp
     )
 }

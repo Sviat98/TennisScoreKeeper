@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -66,14 +67,16 @@ fun ShortMatchScoreboardCardPreview() {
 @Composable
 @Preview
 fun ShortDoublesMatchScoreboardCardPreview() {
-    ShortMatchScoreboardCard(
-        modifier = Modifier
-            .widthIn(max = 360.dp)
-            .fillMaxWidth()
-            .hoverScaleEffect(),
-        match = SAMPLE_DOUBLES_SHORT_MATCH,
-        onClick = {}
-    )
+    MaterialTheme {
+        ShortMatchScoreboardCard(
+            modifier = Modifier
+                .widthIn(max = 360.dp)
+                .fillMaxWidth()
+                .hoverScaleEffect(),
+            match = SAMPLE_DOUBLES_SHORT_MATCH,
+            onClick = {}
+        )
+    }
 }
 
 @Composable

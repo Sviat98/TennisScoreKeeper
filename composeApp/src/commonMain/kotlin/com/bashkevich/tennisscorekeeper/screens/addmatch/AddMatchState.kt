@@ -21,6 +21,9 @@ sealed class AddMatchUiEvent : UiEvent {
     data object FetchParticipants : AddMatchUiEvent()
     class SelectParticipant(val participantNumber: Int, val participant: TennisParticipant) :
         AddMatchUiEvent()
+
+    class ChangeDisplayName(val participantNumber: Int, val displayName: String) : AddMatchUiEvent()
+
     //Почему используется participantNumber, а не id
     // Могут быть ситуации, когда участник не выбран, но надо выбрать цвет,
     // тогда по id невозможно понять, кудв ставить цвет

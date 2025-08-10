@@ -1,21 +1,14 @@
 package com.bashkevich.tennisscorekeeper.components.match
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.text.input.InputTransformation
-import androidx.compose.foundation.text.input.TextFieldBuffer
-import androidx.compose.foundation.text.input.TextFieldState
-import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Button
 import androidx.compose.material.Text
-import androidx.compose.material.TextField
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -23,9 +16,6 @@ import com.bashkevich.tennisscorekeeper.components.ColorPickerDialog
 import com.bashkevich.tennisscorekeeper.components.match.add_match.AddMatchParticipantsBlock
 import com.bashkevich.tennisscorekeeper.components.match.add_match.MatchScoringSettingsBlock
 import com.bashkevich.tennisscorekeeper.components.match.add_match.SetsToWinBlock
-import com.bashkevich.tennisscorekeeper.components.updateTextField
-import com.bashkevich.tennisscorekeeper.model.participant.domain.ParticipantInDoublesMatch
-import com.bashkevich.tennisscorekeeper.model.participant.domain.TennisParticipantInMatch
 import com.bashkevich.tennisscorekeeper.model.set_template.domain.SetTemplateTypeFilter
 import com.bashkevich.tennisscorekeeper.screens.addmatch.AddMatchState
 import com.bashkevich.tennisscorekeeper.screens.addmatch.AddMatchUiEvent
@@ -60,6 +50,14 @@ fun AddMatchComponent(
                     AddMatchUiEvent.SelectParticipant(
                         participantNumber = participantNumber,
                         participant = participant
+                    )
+                )
+            },
+            onParticipantDisplayNameChange = { participantNumber, displayName ->
+                onEvent(
+                    AddMatchUiEvent.ChangeDisplayName(
+                        participantNumber = participantNumber,
+                        displayName = displayName
                     )
                 )
             },
@@ -170,84 +168,3 @@ fun AddMatchComponent(
     }
 }
 
-@Composable
-fun ParticipantDisplayNameComponent(
-    modifier: Modifier = Modifier,
-    participant: TennisParticipantInMatch
-) {
-    val participantDisplayName = participant.displayName
-
-    Box(modifier = Modifier.then(modifier)) {
-        if (participant is ParticipantInDoublesMatch) {
-            val (firstPlayerDisplayName, secondPlayerDisplayName) = if (participantDisplayName.isNotEmpty()) {
-                participantDisplayName.split('/')
-            } else {
-                listOf("", "")
-            }
-
-            val firstPlayerDisplayNameState = rememberTextFieldState(firstPlayerDisplayName)
-            val secondPlayerDisplayNameState = rememberTextFieldState(secondPlayerDisplayName)
-
-            LaunchedEffect(firstPlayerDisplayName) {
-                firstPlayerDisplayNameState.updateTextField(firstPlayerDisplayName)
-            }
-
-            LaunchedEffect(secondPlayerDisplayName) {
-                secondPlayerDisplayNameState.updateTextField(secondPlayerDisplayName)
-            }
-            Column(
-                verticalArrangement = Arrangement.spacedBy(8.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                PlayerDisplayNameTextField(
-                    modifier = Modifier.fillMaxWidth(),
-                    state = firstPlayerDisplayNameState,
-                )
-                Text("/")
-                PlayerDisplayNameTextField(
-                    modifier = Modifier.fillMaxWidth(),
-                    state = secondPlayerDisplayNameState,
-                )
-            }
-        } else {
-            val playerDisplayNameState = rememberTextFieldState(participantDisplayName)
-
-            LaunchedEffect(participantDisplayName) {
-                playerDisplayNameState.updateTextField(participantDisplayName)
-            }
-            PlayerDisplayNameTextField(
-                modifier = Modifier.fillMaxWidth(),
-                state = playerDisplayNameState,
-            )
-        }
-    }
-
-}
-
-@Composable
-fun PlayerDisplayNameTextField(
-    modifier: Modifier = Modifier,
-    state: TextFieldState
-) {
-    TextField(
-        modifier = Modifier.then(modifier),
-        state = state,
-        inputTransformation = UppercaseVisualTransformation
-    )
-}
-
-object UppercaseVisualTransformation : InputTransformation {
-    override fun TextFieldBuffer.transformInput() {
-        // Получаем текущее содержимое буфера
-        val currentText = this.asCharSequence()
-
-        // Проверяем, отличается ли текущий текст от его версии в верхнем регистре
-        if (currentText.any { it.isLowerCase() }) { // Проверяем, есть ли хотя бы один символ в нижнем регистре
-            // Если да, преобразуем весь буфер в верхний регистр
-            val transformedText = currentText.map { it.uppercaseChar() }.joinToString("")
-
-            // Заменяем содержимое буфера на преобразованный текст
-            replace(0, length, transformedText)
-        }
-    }
-}

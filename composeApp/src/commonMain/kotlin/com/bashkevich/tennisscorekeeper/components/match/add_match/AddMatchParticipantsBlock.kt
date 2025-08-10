@@ -25,6 +25,7 @@ fun AddMatchParticipantsBlock(
     secondParticipant: TennisParticipantInMatch,
     onParticipantsFetch: () -> Unit,
     onParticipantChange: (Int, TennisParticipant) -> Unit,
+    onParticipantDisplayNameChange: (Int, String) -> Unit,
     onColorPickerOpen: (Int, Int) -> Unit,
     onToggleSecondaryColor: (Int, Color?) -> Unit
 ) {
@@ -50,6 +51,9 @@ fun AddMatchParticipantsBlock(
                     onParticipantChange = { participant ->
                         onParticipantChange(1, participant)
                     },
+                    onParticipantDisplayNameChange = { displayName ->
+                        onParticipantDisplayNameChange(1, displayName)
+                    },
                     participantPrimaryColor = firstParticipant.primaryColor,
                     participantSecondaryColor = firstParticipant.secondaryColor,
                     onColorPickerOpen = { colorNumber ->
@@ -67,6 +71,9 @@ fun AddMatchParticipantsBlock(
                     onParticipantsFetch = onParticipantsFetch,
                     onParticipantChange = { participant ->
                         onParticipantChange(2, participant)
+                    },
+                    onParticipantDisplayNameChange = { displayName ->
+                        onParticipantDisplayNameChange(2, displayName)
                     },
                     participantPrimaryColor = secondParticipant.primaryColor,
                     participantSecondaryColor = secondParticipant.secondaryColor,
@@ -91,6 +98,9 @@ fun AddMatchParticipantsBlock(
                     onParticipantChange = { participant ->
                         onParticipantChange(1, participant)
                     },
+                    onParticipantDisplayNameChange = { displayName ->
+                        onParticipantDisplayNameChange(1, displayName)
+                    },
                     participantPrimaryColor = firstParticipant.primaryColor,
                     participantSecondaryColor = firstParticipant.secondaryColor,
                     onColorPickerOpen = { colorNumber ->
@@ -107,6 +117,9 @@ fun AddMatchParticipantsBlock(
                     onParticipantsFetch = onParticipantsFetch,
                     onParticipantChange = { participant ->
                         onParticipantChange(2, participant)
+                    },
+                    onParticipantDisplayNameChange = { displayName ->
+                        onParticipantDisplayNameChange(1, displayName)
                     },
                     participantPrimaryColor = secondParticipant.primaryColor,
                     participantSecondaryColor = secondParticipant.secondaryColor,

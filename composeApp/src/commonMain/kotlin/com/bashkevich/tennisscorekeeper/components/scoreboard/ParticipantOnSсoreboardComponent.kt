@@ -1,14 +1,10 @@
 package com.bashkevich.tennisscorekeeper.components.scoreboard
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.material.Icon
 import androidx.compose.material.Text
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Check
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.SpanStyle
@@ -57,21 +53,23 @@ fun DoublesParticipantOnScoreboard(
     val firstPlayer = participant.firstPlayer as PlayerInDoublesMatch
 
     val secondPlayer = participant.secondPlayer as PlayerInDoublesMatch
-        Text(
-            text = buildAnnotatedString {
-                val firstPlayerColor = if (firstPlayer.isServingNow && showServingPlayer) Color.Yellow else Color.White
-                withStyle(SpanStyle(color = firstPlayerColor)) {
-                    append(firstPlayerDisplayName)
-                }
-                append(" / ")
-                val secondPlayerColor = if (secondPlayer.isServingNow && showServingPlayer) Color.Yellow else Color.White
-                withStyle(SpanStyle(color = secondPlayerColor)) {
-                    append(secondPlayerDisplayName)
-                }
-            },
-            fontSize = 20.sp,
-            color = Color.White
-        )
+    Text(
+        text = buildAnnotatedString {
+            val firstPlayerColor =
+                if (firstPlayer.isServingNow && showServingPlayer) Color.Yellow else Color.White
+            withStyle(SpanStyle(color = firstPlayerColor)) {
+                append(firstPlayerDisplayName)
+            }
+            append(" / ")
+            val secondPlayerColor =
+                if (secondPlayer.isServingNow && showServingPlayer) Color.Yellow else Color.White
+            withStyle(SpanStyle(color = secondPlayerColor)) {
+                append(secondPlayerDisplayName)
+            }
+        },
+        fontSize = 20.sp,
+        color = Color.White
+    )
 }
 
 @Composable
@@ -80,13 +78,7 @@ fun ParticipantOnScoreboardRow(
     participant: TennisParticipantInMatch,
     matchStatus: MatchStatus
 ) {
-    val hasParticipantWonMatch = participant.isWinner
-
-    Row(
-        modifier = Modifier.then(modifier),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(4.dp)
-    ) {
+    Box(modifier = Modifier.then(modifier)){
         when (participant) {
             is ParticipantInSinglesMatch -> {
                 Text(
@@ -106,18 +98,5 @@ fun ParticipantOnScoreboardRow(
                 )
             }
         }
-
-        if (hasParticipantWonMatch) {
-            WinnerIcon(contentDescription = "Player won")
-        }
     }
-}
-
-@Composable
-fun WinnerIcon(contentDescription: String? = null) {
-    Icon(
-        imageVector = Icons.Default.Check,
-        tint = Color.White,
-        contentDescription = contentDescription
-    )
 }

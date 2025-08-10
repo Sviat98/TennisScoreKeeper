@@ -62,7 +62,7 @@ class AddMatchViewModel(
                 participantNumber = uiEvent.participantNumber,
                 participant = uiEvent.participant
             )
-
+            is AddMatchUiEvent.ChangeDisplayName->changeDisplayName(participantNumber = uiEvent.participantNumber, displayName = uiEvent.displayName)
             is AddMatchUiEvent.SelectPrimaryColor -> selectPrimaryColor(
                 participantNumber = uiEvent.participantNumber,
                 color = uiEvent.color
@@ -122,6 +122,64 @@ class AddMatchViewModel(
 
             is AddMatchUiEvent.AddMatch -> buildAndEmitMatchBody()
         }
+    }
+
+    private fun changeDisplayName(participantNumber: Int, displayName: String) {
+        val state = state.value
+
+        when (participantNumber) {
+            1 -> {
+                val firstParticipant = state.firstParticipant
+                when (firstParticipant) {
+                    is ParticipantInSinglesMatch -> {
+                        reduceState { oldState ->
+                            oldState.copy(
+                                firstParticipant = firstParticipant.copy(
+                                    displayName = displayName
+                                )
+                            )
+                        }
+                    }
+
+                    is ParticipantInDoublesMatch -> {
+                        reduceState { oldState ->
+                            oldState.copy(
+                                firstParticipant = firstParticipant.copy(
+                                    displayName = displayName
+                                )
+                            )
+                        }
+                    }
+                }
+            }
+
+            2 -> {
+                val secondParticipant = state.secondParticipant
+                when (secondParticipant) {
+                    is ParticipantInSinglesMatch -> {
+                        reduceState { oldState ->
+                            oldState.copy(
+                                secondParticipant = secondParticipant.copy(
+                                    displayName = displayName
+                                )
+                            )
+                        }
+                    }
+
+                    is ParticipantInDoublesMatch -> {
+                        reduceState { oldState ->
+                            oldState.copy(
+                                secondParticipant = secondParticipant.copy(
+                                    displayName = displayName
+                                )
+                            )
+                        }
+                    }
+                }
+            }
+        }
+
+        reduceState { oldState -> oldState.copy(dialogState = OpenColorPickerDialogState.None) }
     }
 
     private fun selectPrimaryColor(
@@ -362,7 +420,6 @@ class AddMatchViewModel(
 
             is DoublesParticipant -> {
 
-
                 val participantDisplayName =
                     "${participant.firstPlayer.surname}/${participant.secondPlayer.surname}".uppercase()
 
@@ -428,7 +485,6 @@ class AddMatchViewModel(
                 }
             }
         }
-
     }
 
     private fun buildAndEmitMatchBody() {
