@@ -18,7 +18,7 @@ import com.bashkevich.tennisscorekeeper.model.match.remote.body.MatchStatus
 @Composable
 fun ServeScoreboardComponent(
     modifier: Modifier = Modifier,
-    match: Match
+    match: Match,
 ) {
     val firstParticipant = match.firstParticipant
     val secondParticipant = match.secondParticipant

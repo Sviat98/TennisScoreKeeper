@@ -39,6 +39,9 @@ fun MatchScoreboardView(
     val firstParticipant = match.firstParticipant
     val secondParticipant = match.secondParticipant
 
+    val firstParticipantId = firstParticipant.id
+    val secondParticipantId = secondParticipant.id
+
     Row(
         modifier = Modifier.then(modifier)
     ) {
@@ -66,9 +69,23 @@ fun MatchScoreboardView(
                     .padding(top = 4.dp, bottom = 4.dp, start = 4.dp, end = 8.dp),
                 match = match,
             )
+            val winnerParticipantId = when{
+                firstParticipant.isWinner -> firstParticipantId
+                secondParticipant.isWinner -> secondParticipantId
+                else -> null
+            }
+
+            val retiredParticipantId = when{
+                firstParticipant.isRetired -> firstParticipantId
+                secondParticipant.isRetired -> secondParticipantId
+                else -> null
+            }
             WinnerAndRetiredParticipantComponent(
                 modifier = Modifier.height(columnHeight),
-                match = match
+                firstParticipantId = firstParticipantId,
+                secondParticipantId = secondParticipantId,
+                winnerParticipantId = winnerParticipantId,
+                retiredParticipantId = retiredParticipantId
             )
             ServeScoreboardComponent(
                 modifier = Modifier.height(columnHeight),

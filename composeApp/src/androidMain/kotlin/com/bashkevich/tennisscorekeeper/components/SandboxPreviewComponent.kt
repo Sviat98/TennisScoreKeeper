@@ -2,10 +2,14 @@ package com.bashkevich.tennisscorekeeper.components
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredSize
+import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
@@ -14,8 +18,10 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.bashkevich.tennisscorekeeper.components.match.add_match.SetsToWinBlock
 import com.bashkevich.tennisscorekeeper.components.participant.ParticipantListComponent
+import com.bashkevich.tennisscorekeeper.components.scoreboard.ScoreboardNumber
 import com.bashkevich.tennisscorekeeper.model.participant.domain.DoublesParticipant
 import com.bashkevich.tennisscorekeeper.model.player.domain.PlayerInParticipant
 import com.bashkevich.tennisscorekeeper.screens.participantlist.ParticipantListContent
@@ -133,4 +139,27 @@ fun SetsToWinComponentPreview() {
         setsToWin = 1,
         onValueChange = {}
     )
+}
+
+@Composable
+@Preview
+fun PrevSetPreview(){
+    Column(
+        modifier = Modifier.width(32.dp).height(64.dp).background(Color.White),
+        horizontalAlignment = Alignment.CenterHorizontally, // Выравнивание по центру
+    ) {
+        ScoreboardNumber(
+            modifier = Modifier.fillMaxWidth().weight(1f)
+                .padding(end = 4.dp),
+            scoreNumber = 6.toString(),
+            textColor = Color.Black,
+            textFontSize = 16.sp
+        )
+        ScoreboardNumber(
+            modifier = Modifier.fillMaxWidth().weight(1f).padding(top = 4.dp),
+            scoreNumber = 4.toString(),
+            textColor = Color.Black,
+            textFontSize = 16.sp
+        )
+    }
 }

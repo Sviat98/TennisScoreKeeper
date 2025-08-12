@@ -14,6 +14,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.bashkevich.tennisscorekeeper.model.match.domain.TennisGame
 
 @Composable
@@ -48,12 +49,14 @@ fun CurrentGamePausedComponent(
             ScoreboardNumber(
                 modifier = Modifier.weight(1f),
                 scoreNumber = currentGame.firstParticipantPointsWon,
-                textColor = textColor
+                textColor = textColor,
+                textFontSize = 16.sp
             )
             ScoreboardNumber(
                 modifier = Modifier.weight(1f),
                 scoreNumber = currentGame.secondParticipantPointsWon,
-                textColor = textColor
+                textColor = textColor,
+                textFontSize = 16.sp
             )
         }
     }

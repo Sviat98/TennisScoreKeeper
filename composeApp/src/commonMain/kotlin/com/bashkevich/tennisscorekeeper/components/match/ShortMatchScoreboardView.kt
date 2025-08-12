@@ -25,9 +25,11 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.unit.times
 import com.bashkevich.tennisscorekeeper.components.scoreboard.CurrentGamePausedComponent
 import com.bashkevich.tennisscorekeeper.components.scoreboard.PrevSetScoreboardComponent
 import com.bashkevich.tennisscorekeeper.components.scoreboard.SeedScoreboardComponent
+import com.bashkevich.tennisscorekeeper.components.scoreboard.WinnerAndRetiredParticipantComponent
 import com.bashkevich.tennisscorekeeper.components.scoreboard_short.ParticipantOnShortScoreboardView
 import com.bashkevich.tennisscorekeeper.model.match.domain.ShortMatch
 import com.bashkevich.tennisscorekeeper.model.match.remote.body.convertToString
@@ -72,12 +74,16 @@ fun ShortMatchScoreboardView(
         ).padding(8.dp),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
+        val verticalPadding = 4.dp
+        val extraPaddingFromCenter = 4.dp // если хотим увеличить расстояние между участниками
+
+        val spaceBetweenParticipants = 2 * (verticalPadding+extraPaddingFromCenter)
         Row {
             SeedScoreboardComponent(
                 modifier = Modifier.height(columnHeight),
                 firstParticipantSeed = match.firstParticipant.seed,
                 secondParticipantSeed = match.secondParticipant.seed,
-                paddingFromCenter = 4.dp
+                paddingFromCenter = verticalPadding
             )
             ParticipantOnShortScoreboardView(
                 modifier = Modifier.widthIn(min = 80.dp)
@@ -86,8 +92,9 @@ fun ShortMatchScoreboardView(
                             layoutCoordinates.size.height.toDp()
                         }
                     }
-                    .padding(top = 4.dp, bottom = 4.dp, start = 4.dp, end = 8.dp),
-                match = match
+                    .padding(top = verticalPadding, bottom = verticalPadding, start = 4.dp, end = 8.dp),
+                match = match,
+                spaceBetweenParticipants = spaceBetweenParticipants
             )
         }
 
@@ -96,11 +103,33 @@ fun ShortMatchScoreboardView(
         val firstParticipant = match.firstParticipant
         val secondParticipant = match.secondParticipant
 
+        val firstParticipantId = firstParticipant.id
+        val secondParticipantId = secondParticipant.id
+
         val prevSets = match.previousSets
 
         val lastSetIndex = prevSets.size - 1
 
         Row {
+            val winnerParticipantId = when{
+                firstParticipant.isWinner -> firstParticipantId
+                secondParticipant.isWinner -> secondParticipantId
+                else -> null
+            }
+
+            val retiredParticipantId = when{
+                firstParticipant.isRetired -> firstParticipantId
+                secondParticipant.isRetired -> secondParticipantId
+                else -> null
+            }
+            WinnerAndRetiredParticipantComponent(
+                modifier = Modifier.height(columnHeight),
+                firstParticipantId = firstParticipantId,
+                secondParticipantId = secondParticipantId,
+                winnerParticipantId = winnerParticipantId,
+                retiredParticipantId = retiredParticipantId,
+                paddingFromCenter = extraPaddingFromCenter
+            )
             prevSets.forEachIndexed { index, prevSet ->
                 // смотрим, есть ли досрочное завершение сета
                 val retiredParticipantNumber = if (index == lastSetIndex) {
@@ -115,7 +144,8 @@ fun ShortMatchScoreboardView(
                     modifier = Modifier.height(columnHeight).padding(horizontal = 4.dp),
                     prevSet = prevSet,
                     numberFontSize = numberFontSize,
-                    retiredParticipantNumber = retiredParticipantNumber
+                    retiredParticipantNumber = retiredParticipantNumber,
+                    paddingFromCenter = extraPaddingFromCenter,
                 )
             }
 
@@ -126,6 +156,7 @@ fun ShortMatchScoreboardView(
                     prevSet = currentSet,
                     numberFontSize = numberFontSize,
                     isSetFinished = false,
+                    paddingFromCenter = extraPaddingFromCenter
                 )
             }
             match.currentGame?.let {
