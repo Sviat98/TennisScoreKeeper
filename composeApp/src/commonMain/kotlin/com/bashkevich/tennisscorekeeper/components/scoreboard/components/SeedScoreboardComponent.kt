@@ -15,6 +15,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
@@ -23,7 +24,8 @@ fun SeedScoreboardComponent(
     modifier: Modifier = Modifier,
     firstParticipantSeed: Int?,
     secondParticipantSeed: Int?,
-    paddingFromCenter: Dp = 0.dp
+    paddingFromCenter: Dp = 0.dp,
+    seedNumberFontSize: TextUnit = 12.sp
 ) {
 
     var maxSeedWidth by remember { mutableStateOf(0) }
@@ -41,7 +43,8 @@ fun SeedScoreboardComponent(
                     maxSeedWidth = currentWidth
                 }
             },
-            seedNumber = firstParticipantSeed ?: 0
+            seedNumber = firstParticipantSeed ?: 0,
+            fontSize = seedNumberFontSize
         )
         SeedNumber(
             modifier = Modifier.weight(1f).padding(top = paddingFromCenter).onGloballyPositioned { layoutCoordinates ->
@@ -52,7 +55,8 @@ fun SeedScoreboardComponent(
                     maxSeedWidth = currentWidth
                 }
             },
-            seedNumber = secondParticipantSeed ?: 0
+            seedNumber = secondParticipantSeed ?: 0,
+            fontSize = seedNumberFontSize
         )
     }
 
@@ -61,13 +65,14 @@ fun SeedScoreboardComponent(
 @Composable
 fun SeedNumber(
     modifier: Modifier = Modifier,
-    seedNumber: Int
+    seedNumber: Int,
+    fontSize: TextUnit
 ) {
     Box(modifier = Modifier.then(modifier)) {
         Text(
             modifier = Modifier.align(Alignment.Center),
             text = if (seedNumber == 0) "" else seedNumber.toString(),
-            fontSize = 12.sp,
+            fontSize = fontSize,
             color = Color.White.copy(alpha = 0.7f),
             textAlign = TextAlign.Center
         )

@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
@@ -14,6 +15,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
@@ -24,9 +26,11 @@ fun WinnerAndRetiredParticipantComponent(
     secondParticipantId: String,
     winnerParticipantId: String?,
     retiredParticipantId: String?,
-    paddingFromCenter: Dp = 0.dp
+    paddingFromCenter: Dp = 0.dp,
+    winnerIconSize: Dp = 24.dp,
+    retiredLabelFontSize: TextUnit = 20.sp
 ) {
-    val hasParticipantWon = winnerParticipantId!=null
+    val hasParticipantWon = winnerParticipantId != null
 
     if (hasParticipantWon) {
         Column(
@@ -36,9 +40,9 @@ fun WinnerAndRetiredParticipantComponent(
 
             val winnerParticipantNumber = if (winnerParticipantId == firstParticipantId) 1 else 2
 
-            val retiredParticipantNumber = when(retiredParticipantId){
-                firstParticipantId ->1
-                secondParticipantId ->2
+            val retiredParticipantNumber = when (retiredParticipantId) {
+                firstParticipantId -> 1
+                secondParticipantId -> 2
                 else -> null
             }
 
@@ -46,13 +50,17 @@ fun WinnerAndRetiredParticipantComponent(
                 modifier = Modifier.weight(1f).padding(bottom = paddingFromCenter),
                 participantNumber = 1,
                 winnerParticipantNumber = winnerParticipantNumber,
-                retiredParticipantNumber = retiredParticipantNumber
+                retiredParticipantNumber = retiredParticipantNumber,
+                winnerIconSize = winnerIconSize,
+                retiredLabelFontSize = retiredLabelFontSize
             )
             WinnerRetiredContainer(
                 modifier = Modifier.weight(1f).padding(top = paddingFromCenter),
                 participantNumber = 2,
                 winnerParticipantNumber = winnerParticipantNumber,
-                retiredParticipantNumber = retiredParticipantNumber
+                retiredParticipantNumber = retiredParticipantNumber,
+                winnerIconSize = winnerIconSize,
+                retiredLabelFontSize = retiredLabelFontSize
             )
         }
     }
@@ -63,20 +71,27 @@ fun WinnerRetiredContainer(
     modifier: Modifier = Modifier,
     participantNumber: Int,
     winnerParticipantNumber: Int,
-    retiredParticipantNumber: Int?
+    retiredParticipantNumber: Int?,
+    winnerIconSize: Dp,
+    retiredLabelFontSize: TextUnit
 ) {
     val contentDescription =
         if (winnerParticipantNumber == 1) "First participant won" else "Second participant won"
     Box(modifier = Modifier.then(modifier)) {
         if (participantNumber == winnerParticipantNumber) {
             WinnerSign(
+                modifier = Modifier.fillMaxHeight(),
+                winnerIconSize = winnerIconSize,
                 contentDescription = contentDescription
             )
-        }else{
-            if (retiredParticipantNumber == null){
+        } else {
+            if (retiredParticipantNumber == null) {
                 Spacer(modifier = Modifier.fillMaxHeight())
-            }else{
-                RetiredSign()
+            } else {
+                RetiredSign(
+                    modifier = Modifier.fillMaxHeight(),
+                    fontSize = retiredLabelFontSize
+                )
             }
         }
 
@@ -84,12 +99,15 @@ fun WinnerRetiredContainer(
 }
 
 @Composable
-fun RetiredSign(modifier: Modifier = Modifier) {
+fun RetiredSign(
+    modifier: Modifier = Modifier,
+    fontSize: TextUnit
+) {
     Box(modifier = Modifier.then(modifier)) {
         Text(
             modifier = Modifier.align(Alignment.Center),
             text = "Ret.",
-            fontSize = 20.sp,
+            fontSize = fontSize,
             color = Color.White
         )
     }
@@ -98,11 +116,12 @@ fun RetiredSign(modifier: Modifier = Modifier) {
 @Composable
 fun WinnerSign(
     modifier: Modifier = Modifier,
+    winnerIconSize: Dp,
     contentDescription: String? = null
 ) {
     Box(modifier = Modifier.then(modifier)) {
         Icon(
-            modifier = Modifier.align(Alignment.Center),
+            modifier = Modifier.size(winnerIconSize).align(Alignment.Center),
             imageVector = Icons.Default.Check,
             tint = Color.White,
             contentDescription = contentDescription

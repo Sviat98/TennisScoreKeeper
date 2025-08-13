@@ -58,7 +58,7 @@ fun ParticipantOnScoreboardDetailsRow(
         when (participant) {
             is ParticipantInSinglesMatch -> {
                 SinglesPlayerOnScoreboardDetailsView(
-                    modifier = Modifier.widthIn(max = 180.dp),
+                    modifier = Modifier.widthIn(max = 175.dp),
                     participant = participant
                 )
             }
@@ -99,7 +99,7 @@ fun SinglesPlayerOnScoreboardDetailsView(
             maxLines = 1,
             autoSize = TextAutoSize.StepBased(
                 maxFontSize = 16.sp,
-                minFontSize = 12.sp,
+                minFontSize = 11.sp,
                 stepSize = 1.sp
             )
         )

@@ -97,7 +97,7 @@ fun ShortMatchScoreboardView(
             )
         }
 
-        val numberFontSize = 16.sp
+        val defaultFontSize = 16.sp
 
         val firstParticipant = match.firstParticipant
         val secondParticipant = match.secondParticipant
@@ -127,7 +127,9 @@ fun ShortMatchScoreboardView(
                 secondParticipantId = secondParticipantId,
                 winnerParticipantId = winnerParticipantId,
                 retiredParticipantId = retiredParticipantId,
-                paddingFromCenter = extraPaddingFromCenter
+                paddingFromCenter = extraPaddingFromCenter,
+                winnerIconSize = 20.dp,
+                retiredLabelFontSize = defaultFontSize
             )
             prevSets.forEachIndexed { index, prevSet ->
                 // смотрим, есть ли досрочное завершение сета
@@ -142,7 +144,7 @@ fun ShortMatchScoreboardView(
                 PrevSetScoreboardComponent(
                     modifier = Modifier.height(columnHeight).padding(horizontal = 4.dp),
                     prevSet = prevSet,
-                    numberFontSize = numberFontSize,
+                    numberFontSize = defaultFontSize,
                     retiredParticipantNumber = retiredParticipantNumber,
                     paddingFromCenter = extraPaddingFromCenter,
                 )
@@ -153,7 +155,7 @@ fun ShortMatchScoreboardView(
                 PrevSetScoreboardComponent(
                     modifier = Modifier.height(columnHeight).padding(horizontal = 4.dp),
                     prevSet = currentSet,
-                    numberFontSize = numberFontSize,
+                    numberFontSize = defaultFontSize,
                     isSetFinished = false,
                     paddingFromCenter = extraPaddingFromCenter
                 )

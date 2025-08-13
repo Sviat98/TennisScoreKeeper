@@ -17,6 +17,7 @@ import com.bashkevich.tennisscorekeeper.components.scoreboard.overlay.MatchScore
 import com.bashkevich.tennisscorekeeper.components.scoreboard.short.ShortMatchScoreboardCard
 import com.bashkevich.tennisscorekeeper.components.scoreboard.components.CurrentGamePausedComponent
 import com.bashkevich.tennisscorekeeper.components.scoreboard.components.ParticipantColor
+import com.bashkevich.tennisscorekeeper.components.scoreboard.components.WinnerAndRetiredParticipantComponent
 import com.bashkevich.tennisscorekeeper.model.match.domain.DOUBLES_SAMPLE_MATCH
 import com.bashkevich.tennisscorekeeper.model.match.domain.SAMPLE_DOUBLES_SHORT_MATCH
 import com.bashkevich.tennisscorekeeper.model.match.domain.SAMPLE_MATCH
@@ -104,4 +105,17 @@ fun AddMatchComponentPreviewPhone() {
         modifier = Modifier.background(Color.White).width(1000.dp).height(700.dp),
         state = AddMatchState.initial(),
         onEvent = {}) { }
+}
+
+@Composable
+@Preview
+fun WinnerAndRetiredParticipantComponentPhone() {
+    WinnerAndRetiredParticipantComponent(
+        modifier = Modifier.background(Color.Blue).width(32.dp).height(64.dp),
+        firstParticipantId = "1",
+        secondParticipantId = "2",
+        winnerParticipantId = "1",
+        retiredParticipantId = "2",
+        paddingFromCenter = 4.dp,
+    )
 }

@@ -11,6 +11,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.bashkevich.tennisscorekeeper.model.match.domain.Match
 import com.bashkevich.tennisscorekeeper.model.match.remote.body.MatchStatus
@@ -19,7 +20,8 @@ import com.bashkevich.tennisscorekeeper.model.match.remote.body.MatchStatus
 fun ServeScoreboardComponent(
     modifier: Modifier = Modifier,
     match: Match,
-) {
+    paddingFromCenter: Dp = 0.dp,
+    ) {
     val firstParticipant = match.firstParticipant
     val secondParticipant = match.secondParticipant
 
@@ -31,8 +33,8 @@ fun ServeScoreboardComponent(
             modifier = Modifier.then(modifier)
                 .padding(end=4.dp)
         ) {
-            ServingBox(modifier = Modifier.weight(1f), showServe = firstParticipant.isServing)
-            ServingBox(modifier = Modifier.weight(1f), showServe = secondParticipant.isServing)
+            ServingBox(modifier = Modifier.weight(1f).padding(bottom = paddingFromCenter), showServe = firstParticipant.isServing)
+            ServingBox(modifier = Modifier.weight(1f).padding(top = paddingFromCenter), showServe = secondParticipant.isServing)
         }
     }
 

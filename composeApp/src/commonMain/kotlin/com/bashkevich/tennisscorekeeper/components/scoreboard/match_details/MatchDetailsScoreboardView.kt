@@ -61,6 +61,7 @@ fun MatchDetailsScoreboardView(
                 modifier = Modifier.height(columnHeight),
                 firstParticipantSeed = match.firstParticipant.seed,
                 secondParticipantSeed = match.secondParticipant.seed,
+                seedNumberFontSize = 11.sp
             )
             ParticipantOnScoreboardDetailsView(
                 modifier = Modifier.widthIn(min = 80.dp)
@@ -84,12 +85,16 @@ fun MatchDetailsScoreboardView(
                 secondParticipant.isRetired -> secondParticipantId
                 else -> null
             }
+
+            val defaultFontSize = 16.sp
             WinnerAndRetiredParticipantComponent(
                 modifier = Modifier.height(columnHeight),
                 firstParticipantId = firstParticipantId,
                 secondParticipantId = secondParticipantId,
                 winnerParticipantId = winnerParticipantId,
-                retiredParticipantId = retiredParticipantId
+                retiredParticipantId = retiredParticipantId,
+                winnerIconSize = 20.dp,
+                retiredLabelFontSize = defaultFontSize
             )
             ServeScoreboardComponent(
                 modifier = Modifier.height(columnHeight),
@@ -116,7 +121,7 @@ fun MatchDetailsScoreboardView(
                     modifier = Modifier.height(columnHeight).padding(horizontal = 4.dp),
                     prevSet = prevSet,
                     retiredParticipantNumber = retiredParticipantNumber,
-                    numberFontSize = 16.sp
+                    numberFontSize = defaultFontSize
                 )
             }
             val currentSet = match.currentSet
@@ -125,13 +130,14 @@ fun MatchDetailsScoreboardView(
                     modifier = Modifier.height(columnHeight).width(columnHeight / 2)
                         .padding(horizontal = 1.dp),
                     currentSet = currentSet,
-                    numberFontSize = 16.sp
+                    numberFontSize = defaultFontSize
                 )
             }
             match.currentGame?.let {
                 CurrentGameInProgressComponent(
                     modifier = Modifier.height(columnHeight).width(columnHeight / 2),
-                    currentGame = match.currentGame
+                    currentGame = match.currentGame,
+                    fontSize = defaultFontSize
                 )
             }
         }

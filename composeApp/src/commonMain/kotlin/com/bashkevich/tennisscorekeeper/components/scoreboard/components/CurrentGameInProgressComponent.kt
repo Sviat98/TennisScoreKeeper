@@ -9,12 +9,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.TextUnit
+import androidx.compose.ui.unit.sp
 import com.bashkevich.tennisscorekeeper.model.match.domain.TennisGame
 
 @Composable
 fun CurrentGameInProgressComponent(
     modifier: Modifier = Modifier,
-    currentGame: TennisGame
+    currentGame: TennisGame,
+    fontSize: TextUnit = 20.sp
 ) {
     Box(modifier = Modifier.then(modifier)){
         Column(
@@ -27,12 +30,14 @@ fun CurrentGameInProgressComponent(
             ScoreboardNumber(
                 modifier = Modifier.weight(1f),
                 scoreNumber = currentGame.firstParticipantPointsWon,
-                textColor = textColor
+                textColor = textColor,
+                textFontSize = fontSize
             )
             ScoreboardNumber(
                 modifier = Modifier.weight(1f),
                 scoreNumber = currentGame.secondParticipantPointsWon,
-                textColor = textColor
+                textColor = textColor,
+                textFontSize = fontSize
             )
         }
         Divider(modifier = Modifier.fillMaxWidth().align(Alignment.TopStart), color = Color(0xFF142c6c))
