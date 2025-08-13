@@ -21,7 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.bashkevich.tennisscorekeeper.LocalNavHostController
 import com.bashkevich.tennisscorekeeper.components.hoverScaleEffect
-import com.bashkevich.tennisscorekeeper.components.match.ShortMatchScoreboardCard
+import com.bashkevich.tennisscorekeeper.components.scoreboard.short.ShortMatchScoreboardCard
 import com.bashkevich.tennisscorekeeper.model.match.domain.ShortMatch
 import com.bashkevich.tennisscorekeeper.model.tournament.remote.TournamentStatus
 import com.bashkevich.tennisscorekeeper.navigation.AddMatchRoute

@@ -19,9 +19,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.bashkevich.tennisscorekeeper.components.match.add_match.SetsToWinBlock
+import com.bashkevich.tennisscorekeeper.components.add_match.SetsToWinBlock
 import com.bashkevich.tennisscorekeeper.components.participant.ParticipantListComponent
-import com.bashkevich.tennisscorekeeper.components.scoreboard.ScoreboardNumber
+import com.bashkevich.tennisscorekeeper.components.scoreboard.components.ScoreboardNumber
 import com.bashkevich.tennisscorekeeper.model.participant.domain.DoublesParticipant
 import com.bashkevich.tennisscorekeeper.model.player.domain.PlayerInParticipant
 import com.bashkevich.tennisscorekeeper.screens.participantlist.ParticipantListContent

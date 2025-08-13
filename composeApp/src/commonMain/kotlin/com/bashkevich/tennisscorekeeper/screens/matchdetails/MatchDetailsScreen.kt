@@ -22,11 +22,11 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.bashkevich.tennisscorekeeper.LocalNavHostController
 import com.bashkevich.tennisscorekeeper.components.MatchDetailsAppBar
-import com.bashkevich.tennisscorekeeper.components.match.match_details.ChooseServePanel
-import com.bashkevich.tennisscorekeeper.components.match.match_details.MatchStatusButton
-import com.bashkevich.tennisscorekeeper.components.match.match_details.ParticipantsPointsControlPanel
-import com.bashkevich.tennisscorekeeper.components.match.match_details.RetireParticipantPanel
-import com.bashkevich.tennisscorekeeper.components.match.MatchScoreboardView
+import com.bashkevich.tennisscorekeeper.components.match_details.ChooseServePanel
+import com.bashkevich.tennisscorekeeper.components.match_details.MatchStatusButton
+import com.bashkevich.tennisscorekeeper.components.match_details.ParticipantsPointsControlPanel
+import com.bashkevich.tennisscorekeeper.components.match_details.RetireParticipantPanel
+import com.bashkevich.tennisscorekeeper.components.scoreboard.match_details.MatchDetailsScoreboardView
 import com.bashkevich.tennisscorekeeper.components.setText
 import com.bashkevich.tennisscorekeeper.model.match.remote.body.MatchStatus
 import com.bashkevich.tennisscorekeeper.model.match.remote.body.convertToString
@@ -85,7 +85,7 @@ fun MatchDetailsContent(
                 verticalArrangement = Arrangement.SpaceAround,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                MatchScoreboardView(
+                MatchDetailsScoreboardView(
                     match = match
                 )
 

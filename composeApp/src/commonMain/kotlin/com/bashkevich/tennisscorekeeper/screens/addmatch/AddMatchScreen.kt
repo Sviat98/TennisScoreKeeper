@@ -14,7 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.bashkevich.tennisscorekeeper.LocalNavHostController
 import com.bashkevich.tennisscorekeeper.components.AddMatchAppBar
-import com.bashkevich.tennisscorekeeper.components.match.AddMatchComponent
+import com.bashkevich.tennisscorekeeper.components.add_match.AddMatchComponent
 
 @Composable
 fun AddMatchScreen(

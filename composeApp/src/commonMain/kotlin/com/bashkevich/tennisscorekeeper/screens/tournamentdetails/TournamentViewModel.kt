@@ -62,6 +62,8 @@ class TournamentViewModel(
                         old === new
                     }.collect { matchBody ->
 
+                        println("matchBody = $matchBody")
+
                         val loadResult = matchRepository.addNewMatch(tournamentId, matchBody)
 
                         if (loadResult is LoadResult.Success) {
