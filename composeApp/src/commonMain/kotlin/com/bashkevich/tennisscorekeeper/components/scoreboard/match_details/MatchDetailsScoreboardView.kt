@@ -127,7 +127,7 @@ fun MatchDetailsScoreboardView(
             val currentSet = match.currentSet
             currentSet?.let {
                 CurrentSetComponent(
-                    modifier = Modifier.height(columnHeight).width(columnHeight / 2)
+                    modifier = Modifier.height(columnHeight).width(columnHeight/2)
                         .padding(horizontal = 1.dp),
                     currentSet = currentSet,
                     numberFontSize = defaultFontSize
@@ -135,7 +135,7 @@ fun MatchDetailsScoreboardView(
             }
             match.currentGame?.let {
                 CurrentGameInProgressComponent(
-                    modifier = Modifier.height(columnHeight).width(columnHeight / 2),
+                    modifier = Modifier.height(columnHeight).width(columnHeight/2).padding(end = 1.dp),
                     currentGame = match.currentGame,
                     fontSize = defaultFontSize
                 )
