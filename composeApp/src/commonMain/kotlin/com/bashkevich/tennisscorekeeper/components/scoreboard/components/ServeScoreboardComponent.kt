@@ -14,7 +14,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.bashkevich.tennisscorekeeper.model.match.domain.Match
-import com.bashkevich.tennisscorekeeper.model.match.remote.body.MatchStatus
 
 @Composable
 fun ServeScoreboardComponent(
@@ -26,9 +25,8 @@ fun ServeScoreboardComponent(
     val secondParticipant = match.secondParticipant
 
     val isWinnerInMatch = firstParticipant.isWinner || secondParticipant.isWinner
-    val isMatchPaused = match.status == MatchStatus.PAUSED
 
-    if (!isWinnerInMatch && !isMatchPaused) {
+    if (!isWinnerInMatch) {
         Column(
             modifier = Modifier.then(modifier)
                 .padding(end=4.dp)

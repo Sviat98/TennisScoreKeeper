@@ -58,7 +58,7 @@ fun ParticipantOnScoreboardDetailsRow(
         when (participant) {
             is ParticipantInSinglesMatch -> {
                 SinglesPlayerOnScoreboardDetailsView(
-                    modifier = Modifier.widthIn(max = 175.dp),
+                    modifier = Modifier.widthIn(max = 150.dp),
                     participant = participant
                 )
             }
