@@ -1,8 +1,7 @@
-package com.bashkevich.tennisscorekeeper.components.scoreboard.components
+package com.bashkevich.tennisscorekeeper.components.scoreboard.match_details
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.Divider
@@ -12,10 +11,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.sp
+import com.bashkevich.tennisscorekeeper.components.scoreboard.components.CurrentSetNumbersContainer
 import com.bashkevich.tennisscorekeeper.model.match.domain.TennisSet
 
 @Composable
-fun CurrentSetComponent(
+fun MatchDetailsCurrentSetComponent(
     modifier: Modifier = Modifier,
     currentSet: TennisSet,
     numberFontSize: TextUnit = 20.sp,
@@ -25,8 +25,8 @@ fun CurrentSetComponent(
         CurrentSetNumbersContainer(
             modifier = Modifier
                 .fillMaxSize()
-                .background(color = Color.Yellow)
-            ,
+                .background(color = Color.Yellow),
+                //.padding(horizontal = 4.dp),
             currentSet = currentSet,
             numberFontSize = numberFontSize
         )
@@ -41,33 +41,6 @@ fun CurrentSetComponent(
         Divider(
             modifier = Modifier.fillMaxWidth().align(Alignment.BottomCenter),
             color = mainBackgroundColor
-        )
-    }
-
-}
-
-@Composable
-fun CurrentSetNumbersContainer(
-    modifier: Modifier = Modifier,
-    currentSet: TennisSet,
-    numberFontSize: TextUnit
-) {
-    Column(
-        modifier = Modifier.then(modifier),
-        horizontalAlignment = Alignment.CenterHorizontally, // Выравнивание по центру
-    ) {
-        val textColor = Color.Black
-        ScoreboardNumber(
-            modifier = Modifier.weight(1f),
-            scoreNumber = currentSet.firstParticipantGamesWon.toString(),
-            textColor = textColor,
-            textFontSize = numberFontSize
-        )
-        ScoreboardNumber(
-            modifier = Modifier.weight(1f),
-            scoreNumber = currentSet.secondParticipantGamesWon.toString(),
-            textColor = textColor,
-            textFontSize = numberFontSize
         )
     }
 }

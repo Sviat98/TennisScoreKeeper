@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -17,9 +18,9 @@ import com.bashkevich.tennisscorekeeper.components.add_match.AddMatchComponent
 import com.bashkevich.tennisscorekeeper.components.scoreboard.components.ColorScoreboardComponent
 import com.bashkevich.tennisscorekeeper.components.scoreboard.overlay.MatchScoreboardView
 import com.bashkevich.tennisscorekeeper.components.scoreboard.short.ShortMatchScoreboardCard
-import com.bashkevich.tennisscorekeeper.components.scoreboard.components.CurrentSetComponent
 import com.bashkevich.tennisscorekeeper.components.scoreboard.components.ParticipantColor
 import com.bashkevich.tennisscorekeeper.components.scoreboard.components.WinnerAndRetiredParticipantComponent
+import com.bashkevich.tennisscorekeeper.components.scoreboard.match_details.MatchDetailsCurrentSetComponent
 import com.bashkevich.tennisscorekeeper.model.match.domain.DOUBLES_SAMPLE_MATCH
 import com.bashkevich.tennisscorekeeper.model.match.domain.SAMPLE_DOUBLES_SHORT_MATCH
 import com.bashkevich.tennisscorekeeper.model.match.domain.SAMPLE_MATCH
@@ -85,8 +86,8 @@ fun ShortDoublesMatchScoreboardCardPreview() {
 @Composable
 @Preview
 fun CurrentGamePausedComponentPreview() {
-    CurrentSetComponent(
-        modifier = Modifier.height(64.dp).background(color = Color.Yellow).padding(horizontal = 4.dp)
+    MatchDetailsCurrentSetComponent(
+        modifier = Modifier.height(64.dp).wrapContentWidth()
             .padding(horizontal = 1.dp),
         currentSet = TennisSet(5,1),
         numberFontSize = 16.sp

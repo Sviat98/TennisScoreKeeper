@@ -18,6 +18,7 @@ import androidx.compose.ui.Alignment
 
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.bashkevich.tennisscorekeeper.components.DefaultLoadingComponent
 import com.bashkevich.tennisscorekeeper.components.UploadFileComponent
 import com.bashkevich.tennisscorekeeper.components.participant.ParticipantListComponent
 import com.bashkevich.tennisscorekeeper.model.file.domain.ExcelFile
@@ -38,12 +39,17 @@ fun ParticipantListScreen(
     state: TournamentState,
     onEvent: (TournamentUiEvent) -> Unit
 ) {
-
-    ParticipantListContent(
-        modifier = Modifier.then(modifier),
-        state = state,
-        onEvent = onEvent
-    )
+    if (state.participantListState.isUploadInProgress) {
+        DefaultLoadingComponent(
+            modifier = Modifier.then(modifier),
+        )
+    } else {
+        ParticipantListContent(
+            modifier = Modifier.then(modifier),
+            state = state,
+            onEvent = onEvent
+        )
+    }
 }
 
 @Composable
@@ -64,6 +70,7 @@ fun ParticipantListContent(
         Box(
             modifier = Modifier.fillMaxSize()
         ) {
+
             val scope = rememberCoroutineScope()
             val context = LocalPlatformContext.current
 

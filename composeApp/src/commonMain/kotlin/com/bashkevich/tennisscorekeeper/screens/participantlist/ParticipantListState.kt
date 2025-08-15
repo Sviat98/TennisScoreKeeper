@@ -9,11 +9,13 @@ import com.bashkevich.tennisscorekeeper.mvi.UiState
 
 @Immutable
 data class ParticipantListState(
+    val isUploadInProgress: Boolean,
     val participants: List<TennisParticipant>,
     val participantsFile: ExcelFile
 ) : UiState {
     companion object {
         fun initial() = ParticipantListState(
+            isUploadInProgress = false,
             participants = emptyList(),
             participantsFile = EMPTY_EXCEL_FILE
         )

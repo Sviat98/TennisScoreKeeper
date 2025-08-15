@@ -163,6 +163,10 @@ class TournamentViewModel(
         viewModelScope.launch {
             val state = state.value
 
+            reduceState { oldState ->
+                oldState.copy(participantListState = oldState.participantListState.copy(isUploadInProgress = true))
+            }
+
             val excelFile = state.participantListState.participantsFile
 
             val tournamentId = state.tournament.id
@@ -178,6 +182,7 @@ class TournamentViewModel(
                 reduceState { oldState ->
                     oldState.copy(
                         participantListState = oldState.participantListState.copy(
+                            isUploadInProgress = false,
                             participants = loadResult.result,
                             participantsFile = EMPTY_EXCEL_FILE
                         )
