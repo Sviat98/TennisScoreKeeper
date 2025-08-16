@@ -1,4 +1,4 @@
-package com.bashkevich.tennisscorekeeper.components.participant
+package com.bashkevich.tennisscorekeeper.components.match_details.serve
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -20,17 +20,15 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import com.bashkevich.tennisscorekeeper.components.updateTextField
-import com.bashkevich.tennisscorekeeper.model.participant.domain.TennisParticipant
 import com.bashkevich.tennisscorekeeper.model.participant.domain.TennisParticipantInMatch
 import com.bashkevich.tennisscorekeeper.model.participant.domain.toDisplayFormat
 
 @Composable
-fun ParticipantCombobox(
+fun FirstServeParticipantCombobox(
     modifier: Modifier = Modifier,
-    participantOptions: List<TennisParticipant>,
+    participantOptions: List<TennisParticipantInMatch>,
     currentParticipant: TennisParticipantInMatch,
-    onParticipantsFetch: ()-> Unit,
-    onParticipantChange: (TennisParticipant) -> Unit
+    onParticipantChange: (TennisParticipantInMatch) -> Unit
 ) {
     var expanded by remember { mutableStateOf(false) }
 
@@ -39,7 +37,6 @@ fun ParticipantCombobox(
     val participantState = rememberTextFieldState(participantText)
 
     LaunchedEffect(participantText){
-        println(participantText)
         participantState.updateTextField(participantText)
     }
 
@@ -56,7 +53,6 @@ fun ParticipantCombobox(
                     contentDescription = "Open dropdown",
                     modifier = Modifier.clickable {
                         expanded = true
-                        onParticipantsFetch()
                     }
                 )
             },

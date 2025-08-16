@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 
@@ -24,7 +25,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.bashkevich.tennisscorekeeper.LocalNavHostController
 import com.bashkevich.tennisscorekeeper.components.MatchDetailsAppBar
-import com.bashkevich.tennisscorekeeper.components.match_details.ChooseServePanel
+import com.bashkevich.tennisscorekeeper.components.match_details.serve.ChooseServePanel
 import com.bashkevich.tennisscorekeeper.components.match_details.MatchStatusButton
 import com.bashkevich.tennisscorekeeper.components.match_details.ParticipantsPointsControlPanel
 import com.bashkevich.tennisscorekeeper.components.match_details.RetireParticipantPanel
@@ -80,7 +81,7 @@ fun MatchDetailsContent(
         }
     ) { paddingValues ->
         Box(
-            modifier = Modifier.fillMaxWidth().padding(all = 16.dp)
+            modifier = Modifier.fillMaxWidth().padding(all = 16.dp).verticalScroll(state = rememberScrollState())
         ){
             Column(
                 modifier = Modifier.widthIn(max = 600.dp).fillMaxWidth().align(Alignment.Center),

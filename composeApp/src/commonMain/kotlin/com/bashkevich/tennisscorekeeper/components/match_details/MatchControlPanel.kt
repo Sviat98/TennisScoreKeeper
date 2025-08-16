@@ -12,7 +12,9 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import com.bashkevich.tennisscorekeeper.model.match.domain.Match
 import com.bashkevich.tennisscorekeeper.model.match.remote.SpecialSetMode
 import com.bashkevich.tennisscorekeeper.model.match.remote.body.ScoreType
@@ -85,7 +87,7 @@ fun ParticipantsPointsControlPanel(
         }
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
+            horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.Start)
         ) {
             IconButton(
                 onClick = onUndoPoint,

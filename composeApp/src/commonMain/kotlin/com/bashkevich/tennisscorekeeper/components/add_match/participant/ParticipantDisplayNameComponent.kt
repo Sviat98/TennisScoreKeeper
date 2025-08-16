@@ -1,4 +1,4 @@
-package com.bashkevich.tennisscorekeeper.components.participant
+package com.bashkevich.tennisscorekeeper.components.add_match.participant
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box

@@ -1,4 +1,4 @@
-package com.bashkevich.tennisscorekeeper.components.add_match
+package com.bashkevich.tennisscorekeeper.components.add_match.participant
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -13,7 +13,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.window.core.layout.WindowSizeClass
-import com.bashkevich.tennisscorekeeper.components.participant.AddMatchParticipantComponent
 import com.bashkevich.tennisscorekeeper.model.participant.domain.TennisParticipant
 import com.bashkevich.tennisscorekeeper.model.participant.domain.TennisParticipantInMatch
 
