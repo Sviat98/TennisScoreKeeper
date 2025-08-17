@@ -10,8 +10,6 @@ import androidx.compose.ui.unit.dp
 import com.bashkevich.tennisscorekeeper.model.match.domain.Match
 import com.bashkevich.tennisscorekeeper.model.participant.domain.PARTICIPANT_IN_SINGLES_MATCH_DEFAULT
 import com.bashkevich.tennisscorekeeper.model.participant.domain.ParticipantInDoublesMatch
-import com.bashkevich.tennisscorekeeper.model.player.domain.PLAYER_IN_DOUBLES_MATCH_DEFAULT
-import com.bashkevich.tennisscorekeeper.model.player.domain.PlayerInDoublesMatch
 
 @Composable
 fun ChooseServePanel(
@@ -44,56 +42,10 @@ fun ChooseServePanel(
                 onParticipantChange = { participantId -> onFirstParticipantToServeChoose(participantId) }
             )
             if (isDoublesMatch) {
-                var nextParticipantToServeInDoublesMatch: ParticipantInDoublesMatch?
-                var firstServePlayerOptions = emptyList<PlayerInDoublesMatch>()
-                var nextServePlayerOptions = emptyList<PlayerInDoublesMatch>()
-                var enablePlayerCombobox = false
-
-
-                val firstParticipantToServeInDoublesMatch =
-                    firstParticipantToServe as? ParticipantInDoublesMatch
-                firstParticipantToServeInDoublesMatch?.let {
-                    val nextParticipantToServe = participantOptions.first { !it.isServing }
-                    nextParticipantToServeInDoublesMatch =
-                        nextParticipantToServe as ParticipantInDoublesMatch
-
-                    val firstParticipantToServeFirstPlayer =
-                        firstParticipantToServeInDoublesMatch.firstPlayer as PlayerInDoublesMatch
-                    val firstParticipantToServeSecondPlayer =
-                        firstParticipantToServeInDoublesMatch.secondPlayer as PlayerInDoublesMatch
-
-                    val nextParticipantToServeFirstPlayer =
-                        nextParticipantToServeInDoublesMatch.firstPlayer as PlayerInDoublesMatch
-                    val nextParticipantToServeSecondPlayer =
-                        nextParticipantToServeInDoublesMatch.secondPlayer as PlayerInDoublesMatch
-
-                    firstServePlayerOptions =
-                        listOf(firstParticipantToServeFirstPlayer, firstParticipantToServeSecondPlayer)
-                    nextServePlayerOptions =
-                        listOf(nextParticipantToServeFirstPlayer, nextParticipantToServeSecondPlayer)
-
-                    enablePlayerCombobox = true
-                }
-
-                val firstServePlayer = firstServePlayerOptions.firstOrNull { it.isServingNow }
-                    ?: PLAYER_IN_DOUBLES_MATCH_DEFAULT
-                val nextServePlayer = nextServePlayerOptions.firstOrNull { it.isServingNext }
-                    ?: PLAYER_IN_DOUBLES_MATCH_DEFAULT
-
-                FirstServePlayerInPairComponent(
-                    label = "First player to serve",
-                    playerOptions = firstServePlayerOptions,
-                    currentPlayer = firstServePlayer,
-                    onPlayerChange = { player -> onFirstPlayerInPairToServeChoose(player.id) },
-                    enabled = enablePlayerCombobox
-                )
-
-                FirstServePlayerInPairComponent(
-                    label = "Next player to serve",
-                    playerOptions = nextServePlayerOptions,
-                    currentPlayer = nextServePlayer,
-                    onPlayerChange = { player -> onFirstPlayerInPairToServeChoose(player.id) },
-                    enabled = enablePlayerCombobox
+                FirstServePlayerInPairBlock(
+                    participantOptions = participantOptions,
+                    firstParticipantToServe = firstParticipantToServe,
+                    onFirstPlayerInPairToServeChoose = onFirstPlayerInPairToServeChoose
                 )
             }
         }
