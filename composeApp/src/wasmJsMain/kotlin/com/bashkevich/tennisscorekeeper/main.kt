@@ -5,10 +5,9 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.window.ComposeViewport
 import androidx.navigation.ExperimentalBrowserHistoryApi
 import androidx.navigation.NavHostController
-import androidx.navigation.bindToNavigation
+import androidx.navigation.bindToBrowserNavigation
 import androidx.navigation.compose.rememberNavController
 import kotlinx.browser.document
-import kotlinx.browser.window
 
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalBrowserHistoryApi::class)
 fun main() {
@@ -36,7 +35,7 @@ fun main() {
 //                }
 //
 //            }
-            window.bindToNavigation(navController)
+            navController.bindToBrowserNavigation()
         }
 
     }
