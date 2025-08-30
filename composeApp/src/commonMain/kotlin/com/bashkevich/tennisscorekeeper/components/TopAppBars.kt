@@ -92,7 +92,7 @@ fun MatchDetailsAppBar(
 ) {
     var expanded by remember { mutableStateOf(false) }
 
-    val appConfig = AppConfig.getCurrentConfig(AppConfig.getBuildMode())
+    val appConfig = AppConfig.current
 
     val baseUrlFrontend = appConfig.baseUrlFrontend
     TopAppBar(

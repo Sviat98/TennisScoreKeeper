@@ -53,7 +53,7 @@ val coreModule = module {
     single {
         val keyValueStorage = get<KeyValueStorage>()
 
-        val appConfig = AppConfig.getCurrentConfig(AppConfig.getBuildMode())
+        val appConfig = AppConfig.current
 
         val client = httpClient {
             defaultRequest {

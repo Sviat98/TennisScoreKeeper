@@ -10,22 +10,21 @@ data class AppConfig(
     val baseUrlBackend: String
 ){
     companion object{
-        fun getBuildMode() = BuildMode.DEBUG
-
-        fun getCurrentConfig(buildMode: BuildMode)= when(buildMode){
-            BuildMode.DEBUG->{
-                AppConfig(
-                    baseUrlFrontend = BASE_URL_FRONTEND_DEBUG,
-                    baseUrlBackend = BASE_URL_BACKEND_DEBUG
-                )
-            }
-            BuildMode.RELEASE -> {
-                AppConfig(
-                    baseUrlFrontend = BASE_URL_FRONTEND_RELEASE,
-                    baseUrlBackend = BASE_URL_BACKEND_RELEASE
-                )
-            }
+        private val debugConfig: AppConfig by lazy {
+            AppConfig(BASE_URL_FRONTEND_DEBUG, BASE_URL_BACKEND_DEBUG)
         }
+
+        private val releaseConfig: AppConfig by lazy {
+            AppConfig(BASE_URL_FRONTEND_RELEASE, BASE_URL_BACKEND_RELEASE)
+        }
+
+        private fun getBuildMode(): BuildMode = BuildMode.DEBUG
+
+        val current: AppConfig
+            get() = when (getBuildMode()) {
+                BuildMode.DEBUG -> debugConfig
+                BuildMode.RELEASE -> releaseConfig
+            }
     }
 }
 

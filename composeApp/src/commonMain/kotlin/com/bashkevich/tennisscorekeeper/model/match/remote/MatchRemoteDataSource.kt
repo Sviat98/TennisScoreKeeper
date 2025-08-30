@@ -163,7 +163,7 @@ class MatchRemoteDataSource(
     fun connectToMatchUpdates(matchId: String) {
         var reconnectionTime = 5000L
 
-        val appConfig = AppConfig.getCurrentConfig(AppConfig.getBuildMode())
+        val appConfig = AppConfig.current
         scope.launch {
             while (true) {
                 try {
