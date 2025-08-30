@@ -35,10 +35,10 @@ class TournamentListViewModel(
 
         viewModelScope.launch {
             tournamentRepository.observeNewTournament()
-                .distinctUntilChanged { old, new -> old === new }.collect{tournamentBody ->
+                .distinctUntilChanged { old, new -> old === new }.collect { tournamentBody ->
                     val loadResult = tournamentRepository.addTournament(tournamentBody)
 
-                    if (loadResult is LoadResult.Success){
+                    if (loadResult is LoadResult.Success) {
                         val newTournament = loadResult.result
                         val tournaments = state.value.tournaments.toMutableList()
 

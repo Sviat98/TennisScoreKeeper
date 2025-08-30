@@ -25,6 +25,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalClipboard
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.bashkevich.tennisscorekeeper.LocalAuthorization
 import com.bashkevich.tennisscorekeeper.LocalNavHostController
 import com.bashkevich.tennisscorekeeper.components.MatchDetailsAppBar
 import com.bashkevich.tennisscorekeeper.components.match_details.serve.ChooseServePanel
@@ -35,6 +36,8 @@ import com.bashkevich.tennisscorekeeper.components.scoreboard.match_details.Matc
 import com.bashkevich.tennisscorekeeper.components.setText
 import com.bashkevich.tennisscorekeeper.model.match.remote.body.MatchStatus
 import com.bashkevich.tennisscorekeeper.model.match.remote.body.convertToString
+import com.bashkevich.tennisscorekeeper.navigation.LoginRoute
+import com.bashkevich.tennisscorekeeper.navigation.ProfileRoute
 import kotlinx.coroutines.launch
 
 @Composable
@@ -67,6 +70,8 @@ fun MatchDetailsContent(
 
     val clipboard = LocalClipboard.current
 
+    val isAuthorized = LocalAuthorization.current
+
     val scope = rememberCoroutineScope()
     Scaffold(
         modifier = Modifier.then(modifier),
@@ -79,6 +84,14 @@ fun MatchDetailsContent(
                         clipboard.setText(link)
                     }
                 },
+                isAuthorized = isAuthorized,
+                onNavigateToLoginOrProfile = {
+                    if (isAuthorized){
+                        navController.navigate(ProfileRoute)
+                    }else{
+                        navController.navigate(LoginRoute)
+                    }
+                }
             )
         }
     ) { paddingValues ->

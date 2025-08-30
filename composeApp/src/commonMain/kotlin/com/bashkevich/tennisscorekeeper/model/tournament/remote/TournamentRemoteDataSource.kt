@@ -16,7 +16,6 @@ class TournamentRemoteDataSource(
     suspend fun getTournaments(): LoadResult<List<TournamentDto>, Throwable> {
         return runOperationCatching {
             val tournaments = httpClient.get("/tournaments").body<List<TournamentDto>>()
-
             tournaments
         }
     }

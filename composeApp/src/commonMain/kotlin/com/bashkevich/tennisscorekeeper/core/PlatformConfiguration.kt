@@ -1,0 +1,3 @@
+package com.bashkevich.tennisscorekeeper.core
+
+expect class PlatformConfiguration

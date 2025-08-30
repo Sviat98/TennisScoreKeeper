@@ -50,6 +50,9 @@ kotlin {
             implementation(libs.androidx.activity.compose)
 
             implementation(libs.ktor.client.okhttp)
+            implementation(libs.slf4j.android)
+            implementation(libs.multiplatform.settings.datastore)
+            implementation(libs.androidx.datastore.preferences)
         }
         commonMain.dependencies {
             implementation(compose.runtime)
@@ -77,7 +80,11 @@ kotlin {
             implementation(libs.ktor.client.logging)
             implementation(libs.ktor.client.content.negotiation)
             implementation(libs.ktor.serialization.kotlinx.json)
+            implementation(libs.ktor.client.auth)
             implementation(libs.ktor.client.websockets)
+
+            implementation(libs.multiplatform.settings)
+            implementation(libs.multiplatform.settings.coroutines)
 
             implementation(libs.calf.file.picker)
             implementation(libs.compose.colorpicker)
@@ -89,10 +96,16 @@ kotlin {
             implementation(compose.desktop.currentOs)
             implementation(libs.kotlinx.coroutines.swing)
             implementation(libs.ktor.client.okhttp)
+            implementation(libs.logback.classic)
+            implementation(libs.multiplatform.settings.datastore)
+
         }
 
         wasmJsMain.dependencies {
             implementation(libs.ktor.client.js)
+
+            implementation(libs.multiplatform.settings.coroutines)
+            implementation(libs.multiplatform.settings.make.observable)
         }
     }
 }

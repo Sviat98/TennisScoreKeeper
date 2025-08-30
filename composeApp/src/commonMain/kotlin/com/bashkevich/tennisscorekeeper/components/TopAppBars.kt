@@ -9,6 +9,7 @@ import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -63,10 +64,31 @@ fun AddMatchAppBar(
 }
 
 @Composable
+fun LoginAppBar(
+    onBack: () -> Unit
+) {
+    TopAppBar(
+        title = { Text("Login") },
+        navigationIcon = {
+            IconButton(
+                onClick = onBack
+            ) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                    contentDescription = "Navigate back"
+                )
+            }
+        }
+    )
+}
+
+@Composable
 fun MatchDetailsAppBar(
     matchId: String,
     onBack: () -> Unit,
-    onCopyLink: (String) -> Unit
+    onCopyLink: (String) -> Unit,
+    isAuthorized: Boolean,
+    onNavigateToLoginOrProfile: () -> Unit
 ) {
     var expanded by remember { mutableStateOf(false) }
     TopAppBar(
@@ -101,9 +123,15 @@ fun MatchDetailsAppBar(
                     }
                 }
             }
-            LoginButton(
-                onNavigateToLogin = {}
-            )
+            if (isAuthorized){
+                IconButton(onClick = onNavigateToLoginOrProfile){
+                    Icon(Icons.Filled.Person, contentDescription = "Navigate to profile")
+                }
+            }else{
+                LoginButton(
+                    onNavigateToLogin = onNavigateToLoginOrProfile
+                )
+            }
         }
     )
 }

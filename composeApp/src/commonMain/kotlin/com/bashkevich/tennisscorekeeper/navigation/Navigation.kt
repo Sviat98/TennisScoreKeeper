@@ -22,6 +22,13 @@ data object AddTournamentRoute
 data class MatchDetailsRoute(val id: String)
 
 @Serializable
+@SerialName("login")
+data object LoginRoute
+
+@Serializable
+@SerialName("profile")
+data object ProfileRoute
+@Serializable
 @SerialName("addMatch")
 //@SerialName("matches/add") распознает как MatchDetailsRoute(id=add) на НЕ-Андроид
 data class AddMatchRoute(val tournamentId: String = "")
