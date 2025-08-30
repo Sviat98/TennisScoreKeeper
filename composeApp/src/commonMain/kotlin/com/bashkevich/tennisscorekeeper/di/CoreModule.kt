@@ -1,7 +1,7 @@
 package com.bashkevich.tennisscorekeeper.di
 
+import com.bashkevich.tennisscorekeeper.AppConfig
 import com.bashkevich.tennisscorekeeper.AppViewModel
-import com.bashkevich.tennisscorekeeper.core.BASE_URL_BACKEND
 import com.bashkevich.tennisscorekeeper.core.FlowSettingsFactory
 import com.bashkevich.tennisscorekeeper.core.KeyValueStorage
 import com.bashkevich.tennisscorekeeper.core.PlatformConfiguration
@@ -53,11 +53,13 @@ val coreModule = module {
     single {
         val keyValueStorage = get<KeyValueStorage>()
 
+        val appConfig = AppConfig.getCurrentConfig(AppConfig.getBuildMode())
+
         val client = httpClient {
             defaultRequest {
                 url {
                     protocol = URLProtocol.HTTPS
-                    host = BASE_URL_BACKEND
+                    host = appConfig.baseUrlBackend
                 }
                 contentType(ContentType.Application.Json)
             }

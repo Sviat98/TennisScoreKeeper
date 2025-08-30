@@ -16,7 +16,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import com.bashkevich.tennisscorekeeper.core.BASE_URL_FRONTEND
+import com.bashkevich.tennisscorekeeper.AppConfig
 
 @Composable
 fun TournamentListAppBar() {
@@ -91,6 +91,10 @@ fun MatchDetailsAppBar(
     onNavigateToLoginOrProfile: () -> Unit
 ) {
     var expanded by remember { mutableStateOf(false) }
+
+    val appConfig = AppConfig.getCurrentConfig(AppConfig.getBuildMode())
+
+    val baseUrlFrontend = appConfig.baseUrlFrontend
     TopAppBar(
         title = { Text("Match") },
         navigationIcon = {
@@ -110,13 +114,13 @@ fun MatchDetailsAppBar(
                 }
                 DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
                     DropdownMenuItem(onClick = {
-                        onCopyLink("$BASE_URL_FRONTEND/#scoreboard?matchId=${matchId}")
+                        onCopyLink("$baseUrlFrontend/#scoreboard?matchId=${matchId}")
                         expanded = false
                     }) {
                         Text("Copy link to scoreboard")
                     }
                     DropdownMenuItem(onClick = {
-                        onCopyLink("$BASE_URL_FRONTEND/#matches/${matchId}")
+                        onCopyLink("$baseUrlFrontend/#matches/${matchId}")
                         expanded = false
                     }) {
                         Text("Copy link to panel")

@@ -1,6 +1,6 @@
 package com.bashkevich.tennisscorekeeper.model.match.remote
 
-import com.bashkevich.tennisscorekeeper.core.BASE_URL_BACKEND
+import com.bashkevich.tennisscorekeeper.AppConfig
 import com.bashkevich.tennisscorekeeper.core.LoadResult
 import com.bashkevich.tennisscorekeeper.core.ResponseMessage
 import com.bashkevich.tennisscorekeeper.core.runOperationCatching
@@ -162,6 +162,8 @@ class MatchRemoteDataSource(
 
     fun connectToMatchUpdates(matchId: String) {
         var reconnectionTime = 5000L
+
+        val appConfig = AppConfig.getCurrentConfig(AppConfig.getBuildMode())
         scope.launch {
             while (true) {
                 try {
@@ -170,7 +172,7 @@ class MatchRemoteDataSource(
                         httpClient.webSocketSession {
                             url {
                                 protocol = URLProtocol.WSS
-                                host = BASE_URL_BACKEND
+                                host = appConfig.baseUrlBackend
                                 port = 443
                                 path("/matches/$matchId")
                             }
