@@ -9,15 +9,19 @@ import com.bashkevich.tennisscorekeeper.mvi.UiState
 @Immutable
 sealed class LoginUiEvent : UiEvent {
     data object Login: LoginUiEvent()
+    data class ChangeLogin(val login: String) : LoginUiEvent()
+    data class ChangePassword(val password: String) : LoginUiEvent()
 }
 
 @Immutable
 data class LoginState(
-    val playerId: String
+    val login: String,
+    val password: String
 ) : UiState {
     companion object {
         fun initial() = LoginState(
-            playerId = ""
+            login = "",
+            password = ""
         )
     }
 }

@@ -3,7 +3,7 @@ package com.bashkevich.tennisscorekeeper
 import androidx.compose.runtime.Immutable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.bashkevich.tennisscorekeeper.model.auth.AuthRepository
+import com.bashkevich.tennisscorekeeper.model.auth.repository.AuthRepository
 import com.bashkevich.tennisscorekeeper.mvi.UiState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

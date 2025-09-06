@@ -1,7 +1,7 @@
 package com.bashkevich.tennisscorekeeper.screens.profile
 
 import androidx.lifecycle.viewModelScope
-import com.bashkevich.tennisscorekeeper.model.auth.AuthRepository
+import com.bashkevich.tennisscorekeeper.model.auth.repository.AuthRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow

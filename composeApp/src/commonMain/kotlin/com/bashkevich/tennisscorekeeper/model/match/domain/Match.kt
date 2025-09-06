@@ -16,6 +16,7 @@ import com.bashkevich.tennisscorekeeper.model.player.domain.PlayerInSinglesMatch
 data class Match(
     val id: String,
     val pointShift: Int,
+    val videoLink: String?,
     val firstParticipant: TennisParticipantInMatch,
     val secondParticipant: TennisParticipantInMatch,
     val status: MatchStatus,
@@ -43,6 +44,7 @@ val EMPTY_TENNIS_SET = TennisSet(firstParticipantGamesWon = 0, secondParticipant
 fun MatchDto.toDomain() = Match(
     id = this.id,
     pointShift = this.pointShift,
+    videoLink = this.videoLink,
     firstParticipant = this.firstParticipant.toDomain(),
     secondParticipant = this.secondParticipant.toDomain(),
     status = this.status,
@@ -67,6 +69,7 @@ fun TennisGameDto.toDomain() = TennisGame(
 val SAMPLE_MATCH = Match(
     id = "1",
     pointShift = 0,
+    videoLink = null,
     firstParticipant = ParticipantInSinglesMatch(
         id = "1",
         seed = 1,
@@ -104,6 +107,7 @@ val SAMPLE_MATCH = Match(
 val DOUBLES_SAMPLE_MATCH = Match(
     id = "2",
     pointShift = 0,
+    videoLink = null,
     firstParticipant = ParticipantInDoublesMatch(
         id = "5",
         seed = 1,

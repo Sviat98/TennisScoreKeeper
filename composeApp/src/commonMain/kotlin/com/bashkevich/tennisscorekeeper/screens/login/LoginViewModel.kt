@@ -1,7 +1,8 @@
 package com.bashkevich.tennisscorekeeper.screens.login
 
 import androidx.lifecycle.viewModelScope
-import com.bashkevich.tennisscorekeeper.model.auth.AuthRepository
+import com.bashkevich.tennisscorekeeper.model.auth.remote.LoginBody
+import com.bashkevich.tennisscorekeeper.model.auth.repository.AuthRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -23,16 +24,33 @@ class LoginViewModel(
         get() = super.action
 
     fun onEvent(uiEvent: LoginUiEvent) {
-        when(uiEvent){
+        when (uiEvent) {
+            is LoginUiEvent.ChangeLogin -> changeLogin(uiEvent.login)
+            is LoginUiEvent.ChangePassword -> changePassword(uiEvent.password)
             LoginUiEvent.Login -> login()
         }
         // some feature-specific logic
     }
 
-    private fun login(){
+    private fun changeLogin(login: String) {
+        reduceState { oldState ->
+            oldState.copy(login = login)
+        }
+    }
+
+    private fun changePassword(password: String) {
+        reduceState { oldState ->
+            oldState.copy(password = password)
+        }
+    }
+
+    private fun login() {
         viewModelScope.launch {
-            authRepository.savePlayerId("1")
-            authRepository.saveTokens(accessToken = "abc123", refreshToken = "def456")
+            val login = state.value.login
+            val password = state.value.password
+
+            val loginBody = LoginBody(login = login, password = password)
+            authRepository.login(loginBody)
         }
     }
 
