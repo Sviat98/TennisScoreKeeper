@@ -110,6 +110,7 @@ val coreModule = module {
                         bearerTokens
                     }
                     refreshTokens {
+                        println("refreshTokens TRIGGER")
                         val refreshToken = oldTokens?.refreshToken
 
                         var bearerTokens: BearerTokens? = null
