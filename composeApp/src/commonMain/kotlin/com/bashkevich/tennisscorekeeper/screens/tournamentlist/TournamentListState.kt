@@ -9,18 +9,26 @@ import com.bashkevich.tennisscorekeeper.mvi.UiState
 
 @Immutable
 sealed class TournamentListUiEvent : UiEvent {
-    class ShowTournaments(val tournaments: List<Tournament>): TournamentListUiEvent()
+    object LoadTournaments: TournamentListUiEvent()
 }
 
 @Immutable
 data class TournamentListState(
+    val loadingState: TournamentListLoadingState,
     val tournaments: List<Tournament>
 ) : UiState {
     companion object {
         fun initial() = TournamentListState(
+            loadingState = TournamentListLoadingState.Loading,
             tournaments = emptyList()
         )
     }
+}
+
+sealed interface TournamentListLoadingState{
+    object Loading: TournamentListLoadingState
+    object Success: TournamentListLoadingState
+    object Error: TournamentListLoadingState
 }
 
 @Immutable

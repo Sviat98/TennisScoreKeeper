@@ -41,8 +41,7 @@ class ProfileViewModel(
 
     private fun logout(){
         viewModelScope.launch {
-            authRepository.saveTokens(accessToken = "", refreshToken = "")
-            authRepository.savePlayerId(playerId = "")
+            authRepository.logout()
         }
     }
 

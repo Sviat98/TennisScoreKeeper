@@ -2,15 +2,19 @@ package com.bashkevich.tennisscorekeeper.screens.tournamentlist
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.Button
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.Icon
 import androidx.compose.material.Scaffold
+import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.runtime.Composable
@@ -21,12 +25,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.bashkevich.tennisscorekeeper.LocalAuthorization
 import com.bashkevich.tennisscorekeeper.LocalNavHostController
 import com.bashkevich.tennisscorekeeper.components.TournamentListAppBar
+import com.bashkevich.tennisscorekeeper.components.TournamentListAppBarWithButton
 import com.bashkevich.tennisscorekeeper.components.hoverScaleEffect
 import com.bashkevich.tennisscorekeeper.components.tournament.TournamentListItem
-import com.bashkevich.tennisscorekeeper.model.tournament.domain.Tournament
 import com.bashkevich.tennisscorekeeper.navigation.AddTournamentRoute
+import com.bashkevich.tennisscorekeeper.navigation.LoginRoute
+import com.bashkevich.tennisscorekeeper.navigation.ProfileRoute
 import com.bashkevich.tennisscorekeeper.navigation.TournamentRoute
 
 @Composable
@@ -41,28 +48,54 @@ fun TournamentListScreen(
         }
     }
 
-    val navController = LocalNavHostController.current
+    when (state.loadingState) {
+        TournamentListLoadingState.Loading -> {
+            TournamentListLoading(
+                modifier = Modifier.then(modifier),
+            )
+        }
 
-    TournamentListContent(
-        modifier = Modifier.then(modifier),
-        state = state,
-        onTournamentAdd = { navController.navigate(AddTournamentRoute) },
-        onTournamentClick = { tournament -> navController.navigate(TournamentRoute(tournament.id)) }
-    )
+        TournamentListLoadingState.Error -> {
+            TournamentListError(
+                modifier = Modifier.then(modifier),
+                onEvent = { event -> viewModel.onEvent(event) }
+            )
+        }
+
+        TournamentListLoadingState.Success -> {
+            TournamentListContent(
+                modifier = Modifier.then(modifier),
+                state = state
+            )
+        }
+    }
+
 }
 
 @Composable
 fun TournamentListContent(
     modifier: Modifier = Modifier,
     state: TournamentListState,
-    onTournamentAdd: () -> Unit,
-    onTournamentClick: (Tournament) -> Unit
 ) {
+    val navController = LocalNavHostController.current
+
+    val isAuthorized = LocalAuthorization.current
     Scaffold(
         modifier = Modifier.then(modifier),
-        topBar = { TournamentListAppBar() },
+        topBar = {
+            TournamentListAppBarWithButton(
+                isAuthorized = isAuthorized,
+                onNavigateToLoginOrProfile = {
+                    if (isAuthorized) {
+                        navController.navigate(ProfileRoute)
+                    } else {
+                        navController.navigate(LoginRoute)
+                    }
+                }
+            )
+        },
         floatingActionButton = {
-            FloatingActionButton(onClick = onTournamentAdd) {
+            FloatingActionButton(onClick = { navController.navigate(AddTournamentRoute) }) {
                 Icon(Icons.Filled.Add, contentDescription = "Add Tournament")
             }
         }
@@ -83,10 +116,51 @@ fun TournamentListContent(
                             .fillMaxWidth()
                             .hoverScaleEffect(),
                         tournament = tournament,
-                        onTournamentClick = onTournamentClick
+                        onTournamentClick = { navController.navigate(TournamentRoute(tournament.id)) }
                     )
                 }
 
+            }
+        }
+    }
+}
+
+@Composable
+fun TournamentListLoading(
+    modifier: Modifier = Modifier
+) {
+    Scaffold(
+        modifier = Modifier.then(modifier),
+        topBar = { TournamentListAppBar() }
+    ) {
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            CircularProgressIndicator()
+        }
+    }
+}
+
+
+@Composable
+fun TournamentListError(
+    modifier: Modifier = Modifier,
+    onEvent: (TournamentListUiEvent) -> Unit
+) {
+    Scaffold(
+        modifier = Modifier.then(modifier),
+        topBar = { TournamentListAppBar() }
+    ) {
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterVertically)
+        ) {
+            Text("Error happened!")
+            Button(onClick = { onEvent(TournamentListUiEvent.LoadTournaments) }) {
+                Text("Try Again")
             }
         }
     }

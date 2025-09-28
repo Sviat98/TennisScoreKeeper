@@ -28,12 +28,15 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.bashkevich.tennisscorekeeper.LocalAuthorization
 import com.bashkevich.tennisscorekeeper.LocalNavHostController
 import com.bashkevich.tennisscorekeeper.components.DefaultLoadingComponent
 import com.bashkevich.tennisscorekeeper.components.TournamentDetailsAppBar
 import com.bashkevich.tennisscorekeeper.components.tournament.ChangeTournamentStatusButton
 import com.bashkevich.tennisscorekeeper.model.match.remote.body.MatchStatus
 import com.bashkevich.tennisscorekeeper.model.match.remote.body.convertToString
+import com.bashkevich.tennisscorekeeper.navigation.LoginRoute
+import com.bashkevich.tennisscorekeeper.navigation.ProfileRoute
 import com.bashkevich.tennisscorekeeper.navigation.TournamentTab
 import com.bashkevich.tennisscorekeeper.navigation.toDisplayString
 import com.bashkevich.tennisscorekeeper.screens.matchlist.MatchListScreen
@@ -76,6 +79,9 @@ fun TournamentContent(
     val tournament = state.tournament
 
     val navController = LocalNavHostController.current
+
+    val isAuthorized = LocalAuthorization.current
+
     val matchListState = state.matchListState
 
     val uncompletedMatches =
@@ -91,7 +97,18 @@ fun TournamentContent(
 
     Scaffold(
         modifier = Modifier.then(modifier),
-        topBar = { TournamentDetailsAppBar(onBack = { navController.navigateUp() }) }
+        topBar = {
+            TournamentDetailsAppBar(
+                onBack = { navController.navigateUp() },
+                isAuthorized = isAuthorized,
+                onNavigateToLoginOrProfile = {
+                    if (isAuthorized) {
+                        navController.navigate(ProfileRoute)
+                    } else {
+                        navController.navigate(LoginRoute)
+                    }
+                })
+        }
     ) {
         Column(
             modifier = Modifier.padding(it).padding(horizontal = 16.dp),
@@ -126,7 +143,10 @@ fun TournamentContent(
             ) {
                 Row(
                     modifier = Modifier.widthIn(max = 480.dp).fillMaxWidth()
-                        .background(color = Color.Gray.copy(alpha = 0.3f), shape = RoundedCornerShape(4.dp))
+                        .background(
+                            color = Color.Gray.copy(alpha = 0.3f),
+                            shape = RoundedCornerShape(4.dp)
+                        )
                         .padding(8.dp).align(Alignment.Center),
                     horizontalArrangement = Arrangement.SpaceEvenly
                 ) {
@@ -159,6 +179,7 @@ fun TournamentContent(
                         state = state,
                         onEvent = onEvent
                     )
+
                     TournamentTab.PARTICIPANTS.ordinal -> ParticipantListScreen(
                         modifier = Modifier.fillMaxSize(),
                         state = state,

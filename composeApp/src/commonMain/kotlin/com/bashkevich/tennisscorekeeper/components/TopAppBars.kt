@@ -21,13 +21,35 @@ import com.bashkevich.tennisscorekeeper.AppConfig
 @Composable
 fun TournamentListAppBar() {
     TopAppBar(
-        title = { Text("Tournaments") }
+        title = { Text("Tournaments") },
+    )
+}
+@Composable
+fun TournamentListAppBarWithButton(
+    isAuthorized: Boolean,
+    onNavigateToLoginOrProfile: () -> Unit
+) {
+    TopAppBar(
+        title = { Text("Tournaments") },
+        actions = {
+            if (isAuthorized){
+                IconButton(onClick = onNavigateToLoginOrProfile){
+                    Icon(Icons.Filled.Person, contentDescription = "Navigate to profile")
+                }
+            }else{
+                LoginButton(
+                    onNavigateToLogin = onNavigateToLoginOrProfile
+                )
+            }
+        }
     )
 }
 
 @Composable
 fun TournamentDetailsAppBar(
-    onBack: () -> Unit
+    onBack: () -> Unit,
+    isAuthorized: Boolean,
+    onNavigateToLoginOrProfile: () -> Unit
 ) {
     TopAppBar(
         title = { Text("Tournament") },
@@ -40,13 +62,26 @@ fun TournamentDetailsAppBar(
                     contentDescription = "Navigate back"
                 )
             }
+        },
+        actions = {
+            if (isAuthorized){
+                IconButton(onClick = onNavigateToLoginOrProfile){
+                    Icon(Icons.Filled.Person, contentDescription = "Navigate to profile")
+                }
+            }else{
+                LoginButton(
+                    onNavigateToLogin = onNavigateToLoginOrProfile
+                )
+            }
         }
     )
 }
 
 @Composable
 fun AddMatchAppBar(
-    onBack: () -> Unit
+    onBack: () -> Unit,
+    isAuthorized: Boolean,
+    onNavigateToLoginOrProfile: () -> Unit
 ) {
     TopAppBar(
         title = { Text("Add Match") },
@@ -57,6 +92,17 @@ fun AddMatchAppBar(
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                     contentDescription = "Navigate back"
+                )
+            }
+        },
+        actions = {
+            if (isAuthorized){
+                IconButton(onClick = onNavigateToLoginOrProfile){
+                    Icon(Icons.Filled.Person, contentDescription = "Navigate to profile")
+                }
+            }else{
+                LoginButton(
+                    onNavigateToLogin = onNavigateToLoginOrProfile
                 )
             }
         }

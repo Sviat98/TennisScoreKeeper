@@ -38,4 +38,7 @@ class KeyValueStorage @OptIn(ExperimentalSettingsApi::class) constructor(
 
     @OptIn(ExperimentalSettingsApi::class)
     fun observePlayerId() = flowSettings.getStringFlow(PLAYER_ID_KEY, STRING_DEFAULT)
+
+    @OptIn(ExperimentalSettingsApi::class)
+    fun observeRefreshToken() = flowSettings.getStringFlow(REFRESH_TOKEN_KEY, STRING_DEFAULT)
 }
