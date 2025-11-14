@@ -24,6 +24,8 @@ val normalizedBuildMode = when (rawBuildMode.lowercase()) {
     else -> error("Unknown BUILD_MODE: $rawBuildMode (expected: debug or release)")
 }
 
+println("normalizedBuildMode = $normalizedBuildMode")
+
 tasks.register("generateBuildConfig") {
     val outputDir = layout.buildDirectory.dir("generated/source/buildConfig/commonMain/kotlin")
     outputs.dir(outputDir)

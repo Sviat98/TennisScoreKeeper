@@ -1,6 +1,7 @@
 package com.bashkevich.tennisscorekeeper.screens.tournamentlist
 
 import androidx.lifecycle.viewModelScope
+import com.bashkevich.tennisscorekeeper.AppConfig
 import com.bashkevich.tennisscorekeeper.core.LoadResult
 import com.bashkevich.tennisscorekeeper.core.UnauthorizedException
 import com.bashkevich.tennisscorekeeper.core.doOnSuccess
@@ -61,6 +62,8 @@ class TournamentListViewModel(
 
             val tournamentsResultAsync = async {
                 println("START THE tournamentsResultAsync")
+                val appConfig = AppConfig.current
+                println("appConfig = $appConfig")
                 tournamentRepository.getTournaments()
             }
 
