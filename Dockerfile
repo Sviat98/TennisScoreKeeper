@@ -1,5 +1,8 @@
 # Используем образ с Java и Gradle для сборки
-FROM gradle:latest AS build
+FROM gradle:9.0.0-jdk21 AS build
+
+ARG BUILD_MODE=debug
+ENV BUILD_MODE=$BUILD_MODE
 
 # Копируем исходный код в контейнер
 WORKDIR /app
