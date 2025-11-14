@@ -18,7 +18,7 @@ data class AppConfig(
             AppConfig(BASE_URL_FRONTEND_RELEASE, BASE_URL_BACKEND_RELEASE)
         }
 
-        private fun getBuildMode(): BuildMode = BuildMode.DEBUG
+        private fun getBuildMode(): BuildMode = BuildConfig.buildMode
 
         val current: AppConfig
             get() = when (getBuildMode()) {

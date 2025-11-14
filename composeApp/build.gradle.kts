@@ -12,6 +12,35 @@ plugins {
     alias(libs.plugins.ksp)
     alias(libs.plugins.kotlinx.serialization)
 }
+val rawBuildMode: String = providers
+    .environmentVariable("BUILD_MODE")
+    .orElse(providers.gradleProperty("BUILD_MODE"))
+    .orElse("debug")
+    .get()
+
+val normalizedBuildMode = when (rawBuildMode.lowercase()) {
+    "release" -> "RELEASE"
+    "debug" -> "DEBUG"
+    else -> error("Unknown BUILD_MODE: $rawBuildMode (expected: debug or release)")
+}
+
+tasks.register("generateBuildConfig") {
+    val outputDir = layout.buildDirectory.dir("generated/source/buildConfig/commonMain/kotlin")
+    outputs.dir(outputDir)
+
+    doLast {
+        val pkg = "com.bashkevich.tennisscorekeeper"
+        val file = outputDir.get().file("BuildConfig.kt").asFile
+        file.parentFile.mkdirs()
+        file.writeText("""
+            package $pkg
+
+            object BuildConfig {
+                val buildMode: BuildMode = BuildMode.$normalizedBuildMode
+            }
+        """.trimIndent())
+    }
+}
 
 kotlin {
     androidTarget {
@@ -53,6 +82,9 @@ kotlin {
             implementation(libs.slf4j.android)
             implementation(libs.multiplatform.settings.datastore)
             implementation(libs.androidx.datastore.preferences)
+        }
+        val commonMain by getting{
+            kotlin.srcDir(tasks.named("generateBuildConfig").map { it.outputs.files.singleFile })
         }
         commonMain.dependencies {
             implementation(compose.runtime)
@@ -108,6 +140,10 @@ kotlin {
             implementation(libs.multiplatform.settings.make.observable)
         }
     }
+}
+
+tasks.named("compileKotlinMetadata") {
+    dependsOn("generateBuildConfig")
 }
 
 android {
