@@ -8,43 +8,39 @@ ENV BUILD_MODE=$BUILD_MODE
 WORKDIR /app
 COPY . .
 
-####### ОТЛАДКА!!!!!
-
 # Устанавливаем tree для визуализации структуры файлов
 RUN apt-get update && apt-get install -y tree
-
-####### КОНЕЦ ОТЛАДКИ!!!!!
 
 WORKDIR /app/composeApp
 
 ## перед сборкой удаляем ненужные исполняемые файлы из bild-директорий
-RUN rm -rf /app/composeApp/build/dist/wasmJs/developmentExecutable/* && \
+RUN rm -rf /app/composeApp/build/dist/wasmJs/* && \
     rm -rf /usr/share/nginx/html/*
 
-# Собираем проект
-# для релиза
-# RUN gradle wasmJsBrowserDistribution
-# для дебага
-RUN gradle wasmJsBrowserDevelopmentExecutableDistribution
+# Собираем проект в заивсимости от BUILD_MODE
+RUN if [ "$BUILD_MODE" = "release" ]; then \
+        GRADLE_TASK=wasmJsBrowserDistribution && \
+        DIST_DIR=productionExecutable; \
+    else \
+        GRADLE_TASK=wasmJsBrowserDevelopmentExecutableDistribution && \
+        DIST_DIR=developmentExecutable; \
+    fi && \
+    echo ">>> BUILD_MODE=$BUILD_MODE" && \
+    echo ">>> GRADLE_TASK=$GRADLE_TASK" && \
+    echo ">>> DIST_DIR=$DIST_DIR" && \
+    gradle $GRADLE_TASK && \
+    cp -r build/dist/wasmJs/$DIST_DIR /output
 
 ####### ОТЛАДКА!!!!!
-
-# # Выводим дерево файлов после сборки
-# RUN echo "File structure after build:" && tree /app -L 5
-
-# Выводим структуру файлов для отладки
-RUN ls -lR /app/composeApp/build/dist/wasmJs/developmentExecutable
-
+RUN ls -lR /output
 ####### КОНЕЦ ОТЛАДКИ!!!!!
 
+# ---------- RUNTIME STAGE ----------
 # Этап запуска (Nginx для статики)
 FROM nginx:alpine
 
-# Копируем собранные файлы из productionExecutable
-# релиз
-# COPY --from=build /app/composeApp/build/dist/wasmJs/productionExecutable /usr/share/nginx/html
-# дебаг
-COPY --from=build /app/composeApp/build/dist/wasmJs/developmentExecutable /usr/share/nginx/html
+# Копируем собранные файлы из output
+COPY --from=build /output /usr/share/nginx/html
 
 # Выводим структуру файлов для отладки
 RUN ls -lR /usr/share/nginx/html
