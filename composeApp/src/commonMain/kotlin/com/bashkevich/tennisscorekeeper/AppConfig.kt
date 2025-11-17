@@ -18,13 +18,19 @@ data class AppConfig(
             AppConfig(BASE_URL_FRONTEND_RELEASE, BASE_URL_BACKEND_RELEASE)
         }
 
+        fun logBuildMode() {
+            val buildMode = getBuildMode()
+            println("Current build mode: $buildMode")
+        }
+
         private fun getBuildMode(): BuildMode = BuildConfig.buildMode
 
         val current: AppConfig
-            get() = when (getBuildMode()) {
-                BuildMode.DEBUG -> debugConfig
-                BuildMode.RELEASE -> releaseConfig
-            }
+            get() =
+                when (getBuildMode()) {
+                    BuildMode.DEBUG -> debugConfig
+                    BuildMode.RELEASE -> releaseConfig
+                }
     }
 }
 

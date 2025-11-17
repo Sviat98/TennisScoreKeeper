@@ -63,6 +63,7 @@ class TournamentListViewModel(
             val tournamentsResultAsync = async {
                 println("START THE tournamentsResultAsync")
                 val appConfig = AppConfig.current
+                AppConfig.logBuildMode()
                 println("appConfig = $appConfig")
                 tournamentRepository.getTournaments()
             }
