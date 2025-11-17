@@ -30,6 +30,9 @@ tasks.register("generateBuildConfig") {
     val outputDir = layout.buildDirectory.dir("generated/source/buildConfig/commonMain/kotlin")
     outputs.dir(outputDir)
 
+    // Отключаем проверку актуальности таска
+    outputs.upToDateWhen { false }
+
     doLast {
         val pkg = "com.bashkevich.tennisscorekeeper"
         val file = outputDir.get().file("BuildConfig.kt").asFile
