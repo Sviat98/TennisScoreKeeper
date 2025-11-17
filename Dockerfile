@@ -17,6 +17,8 @@ WORKDIR /app/composeApp
 RUN rm -rf /app/composeApp/build/dist/wasmJs/* && \
     rm -rf /usr/share/nginx/html/*
 
+RUN cat /app/composeApp/build/generated/source/buildConfig/commonMain/kotlin/BuildConfig.kt
+
 # Собираем проект в заивсимости от BUILD_MODE
 RUN if [ "$BUILD_MODE" = "release" ]; then \
         GRADLE_TASK=wasmJsBrowserDistribution && \
