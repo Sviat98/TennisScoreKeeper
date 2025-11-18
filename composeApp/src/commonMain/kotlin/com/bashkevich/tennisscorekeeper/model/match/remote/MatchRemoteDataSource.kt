@@ -172,7 +172,7 @@ class MatchRemoteDataSource(
                         httpClient.webSocketSession {
                             url {
                                 protocol = URLProtocol.WSS
-                                host = appConfig.baseUrlBackend
+                                host = appConfig.baseHostBackend
                                 port = 443
                                 path("/matches/$matchId")
                             }

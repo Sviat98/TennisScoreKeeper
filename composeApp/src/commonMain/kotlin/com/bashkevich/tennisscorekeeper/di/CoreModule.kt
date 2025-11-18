@@ -84,7 +84,7 @@ val coreModule = module {
             defaultRequest {
                 url {
                     protocol = URLProtocol.HTTPS
-                    host = appConfig.baseUrlBackend
+                    host = appConfig.baseHostBackend
                 }
                 contentType(ContentType.Application.Json)
             }
