@@ -16,6 +16,7 @@ import kotlinx.coroutines.flow.Flow
 import com.bashkevich.tennisscorekeeper.mvi.BaseViewModel
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 
 class TournamentListViewModel(
@@ -36,7 +37,17 @@ class TournamentListViewModel(
 
         viewModelScope.launch {
             tournamentRepository.observeNewTournament()
-                .distinctUntilChanged { old, new -> old === new }.collect { tournamentBody ->
+                .onEach { println("BEFORE DISTINCT: $it, hash: ${it.hashCode()}") }
+                .distinctUntilChanged { old, new ->
+                    val areSame = old === new
+                    println("COMPARE: ${old.hashCode()} === ${new.hashCode()} -> $areSame")
+                    areSame
+                }
+                .onEach { println("AFTER DISTINCT: $it") }
+                //.distinctUntilChanged { old, new -> old === new }
+                .collect { tournamentBody ->
+                    println("COLLECT: $tournamentBody")
+
                     val loadResult = tournamentRepository.addTournament(tournamentBody)
 
                     if (loadResult is LoadResult.Success) {
