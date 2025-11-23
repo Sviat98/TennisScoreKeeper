@@ -16,7 +16,6 @@ import kotlinx.coroutines.flow.Flow
 import com.bashkevich.tennisscorekeeper.mvi.BaseViewModel
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 
 class TournamentListViewModel(
@@ -36,35 +35,19 @@ class TournamentListViewModel(
         showTournaments()
 
         viewModelScope.launch {
-            tournamentRepository.observeNewTournament()
-                .onEach { println("BEFORE DISTINCT: $it, hash: ${it.hashCode()}") }
-                .distinctUntilChanged { old, new ->
-                    val areSame = old === new
-                    println("COMPARE: ${old.hashCode()} === ${new.hashCode()} -> $areSame")
-                    areSame
-                }
-                .onEach { println("AFTER DISTINCT: $it") }
-                //.distinctUntilChanged { old, new -> old === new }
-                .collect { tournamentBody ->
-                    println("COLLECT: $tournamentBody")
+            tournamentRepository.observeNewTournament().distinctUntilChanged()
+                .collect { newTournament ->
+                    val tournaments = state.value.tournaments.toMutableList()
 
-                    val loadResult = tournamentRepository.addTournament(tournamentBody)
-
-                    if (loadResult is LoadResult.Success) {
-                        val newTournament = loadResult.result
-                        val tournaments = state.value.tournaments.toMutableList()
-
-                        tournaments.add(newTournament)
-                        reduceState { oldState ->
-                            oldState.copy(
-                                loadingState = TournamentListLoadingState.Success,
-                                tournaments = tournaments.toList()
-                            )
-                        }
+                    tournaments.add(newTournament)
+                    reduceState { oldState ->
+                        oldState.copy(
+                            loadingState = TournamentListLoadingState.Success,
+                            tournaments = tournaments.toList()
+                        )
                     }
                 }
         }
-
     }
 
     private fun showTournaments() {

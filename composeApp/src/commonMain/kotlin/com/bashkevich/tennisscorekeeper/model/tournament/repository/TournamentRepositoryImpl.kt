@@ -16,7 +16,7 @@ import kotlinx.coroutines.flow.asSharedFlow
 class TournamentRepositoryImpl(
     private val tournamentRemoteDataSource: TournamentRemoteDataSource
 ) : TournamentRepository {
-    private val _newTournament = MutableSharedFlow<AddTournamentBody>(replay = 1)
+    private val _newTournament = MutableSharedFlow<Tournament>(replay = 1)
 
 
     override suspend fun getTournaments(): LoadResult<List<Tournament>, Throwable> {
@@ -50,10 +50,10 @@ class TournamentRepositoryImpl(
         )
     }
 
-    override fun emitNewTournament(addTournamentBody: AddTournamentBody) {
-        _newTournament.tryEmit(addTournamentBody)
+    override fun emitNewTournament(newTournament: Tournament) {
+        _newTournament.tryEmit(newTournament)
     }
 
-    override fun observeNewTournament(): SharedFlow<AddTournamentBody> =
+    override fun observeNewTournament(): SharedFlow<Tournament> =
         _newTournament.asSharedFlow()
 }

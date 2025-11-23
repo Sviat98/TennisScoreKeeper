@@ -6,8 +6,10 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.material.Button
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.DropdownMenu
 import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.Icon
@@ -63,6 +65,12 @@ fun AddTournamentContent(
     onEvent: (AddTournamentUiEvent) -> Unit,
     onDismissRequest: () -> Unit = {},
 ) {
+    val addTournamentSubstate = state.addTournamentSubstate
+
+    if (addTournamentSubstate is AddTournamentSubstate.Success){
+        onDismissRequest()
+    }
+
     Column(
         modifier = Modifier.then(modifier).background(MaterialTheme.colors.background)
             .padding(16.dp),
@@ -83,15 +91,23 @@ fun AddTournamentContent(
             }
         )
 
-        val isButtonEnabled = state.tournamentType !=null && tournamentName.text.isNotBlank()
+        val isButtonEnabled = (state.tournamentType !=null && tournamentName.text.isNotBlank()) && addTournamentSubstate !is AddTournamentSubstate.Loading
         Button(
             onClick = {
                 onEvent(AddTournamentUiEvent.AddTournament(tournamentName.text.toString(), tournamentType!!))
-                onDismissRequest()
             },
             enabled = isButtonEnabled
         ) {
-            Text("Add")
+            if (addTournamentSubstate is AddTournamentSubstate.Loading){
+                CircularProgressIndicator(
+                    modifier = Modifier.size(24.dp)
+                )
+            }else{
+                Text("Add")
+            }
+        }
+        if (addTournamentSubstate is AddTournamentSubstate.Error){
+            Text(text = addTournamentSubstate.message, color = Color.Red)
         }
     }
 }

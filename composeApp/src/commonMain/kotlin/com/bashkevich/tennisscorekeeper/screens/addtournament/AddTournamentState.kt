@@ -17,15 +17,25 @@ sealed class AddTournamentUiEvent : UiEvent {
 
 @Immutable
 data class AddTournamentState(
+    val addTournamentSubstate: AddTournamentSubstate,
     val tournamentName: TextFieldState,
     val tournamentType: TournamentType?
 ) : UiState {
     companion object {
         fun initial() = AddTournamentState(
+            addTournamentSubstate = AddTournamentSubstate.Idle,
             tournamentName = TextFieldState(initialText = ""),
             tournamentType = null
         )
     }
+}
+
+@Immutable
+sealed class AddTournamentSubstate {
+    data object Idle : AddTournamentSubstate()
+    data object Loading : AddTournamentSubstate()
+    data object Success : AddTournamentSubstate()
+    data class Error(val message: String) : AddTournamentSubstate()
 }
 
 @Immutable
