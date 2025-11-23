@@ -42,7 +42,7 @@ class AddTournamentViewModel(
 
     private fun addTournament(tournamentName: String, tournamentType: TournamentType) {
         viewModelScope.launch {
-            reduceState { oldState -> oldState.copy(addTournamentSubstate = AddTournamentSubstate.Loading) }
+            reduceState { oldState -> oldState.copy(tournamentAddingSubstate = TournamentAddingSubstate.Loading) }
             val addTournamentBody = AddTournamentBody(tournamentName, tournamentType)
             val addTournamentResult = tournamentRepository.addTournament(addTournamentBody)
 
@@ -52,15 +52,15 @@ class AddTournamentViewModel(
 
                     tournamentRepository.emitNewTournament(newCounter)
 
-                    reduceState { oldState -> oldState.copy(addTournamentSubstate = AddTournamentSubstate.Success) }
+                    reduceState { oldState -> oldState.copy(tournamentAddingSubstate = TournamentAddingSubstate.Success) }
                 }
 
                 is LoadResult.Error -> {
-                    val message = addTournamentResult.result.message ?: ""
+                    val errorMessage = addTournamentResult.result.message ?: ""
                     reduceState { oldState ->
                         oldState.copy(
-                            addTournamentSubstate = AddTournamentSubstate.Error(
-                                message = message
+                            tournamentAddingSubstate = TournamentAddingSubstate.Error(
+                                message = errorMessage
                             )
                         )
                     }

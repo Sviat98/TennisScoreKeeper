@@ -58,27 +58,19 @@ class TournamentViewModel(
                 }
 
                 launch {
-                    matchRepository.observeNewMatch().distinctUntilChanged { old, new ->
-                        old === new
-                    }.collect { matchBody ->
+                    matchRepository.observeNewMatch().distinctUntilChanged().collect { newMatch ->
 
-                        println("matchBody = $matchBody")
+                        println("matchBody = $newMatch")
 
-                        val loadResult = matchRepository.addNewMatch(tournamentId, matchBody)
+                        val matches = state.value.matchListState.matches.toMutableList()
 
-                        if (loadResult is LoadResult.Success) {
-                            val newMatch = loadResult.result
-                            val matches = state.value.matchListState.matches.toMutableList()
-
-
-                            matches.add(newMatch)
-                            reduceState { oldState ->
-                                oldState.copy(
-                                    matchListState = oldState.matchListState.copy(
-                                        matches = matches.toList()
-                                    )
+                        matches.add(newMatch)
+                        reduceState { oldState ->
+                            oldState.copy(
+                                matchListState = oldState.matchListState.copy(
+                                    matches = matches.toList()
                                 )
-                            }
+                            )
                         }
                     }
                 }
@@ -164,7 +156,11 @@ class TournamentViewModel(
             val state = state.value
 
             reduceState { oldState ->
-                oldState.copy(participantListState = oldState.participantListState.copy(isUploadInProgress = true))
+                oldState.copy(
+                    participantListState = oldState.participantListState.copy(
+                        isUploadInProgress = true
+                    )
+                )
             }
 
             val excelFile = state.participantListState.participantsFile

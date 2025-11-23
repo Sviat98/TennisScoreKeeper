@@ -4,19 +4,23 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Button
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.bashkevich.tennisscorekeeper.components.ColorPickerDialog
 import com.bashkevich.tennisscorekeeper.components.add_match.participant.AddMatchParticipantsBlock
 import com.bashkevich.tennisscorekeeper.model.set_template.domain.SetTemplateTypeFilter
 import com.bashkevich.tennisscorekeeper.screens.addmatch.AddMatchState
 import com.bashkevich.tennisscorekeeper.screens.addmatch.AddMatchUiEvent
+import com.bashkevich.tennisscorekeeper.screens.addmatch.MatchAddingSubstate
 import com.bashkevich.tennisscorekeeper.screens.addmatch.OpenColorPickerDialogState
 
 @Composable
@@ -24,7 +28,6 @@ fun AddMatchComponent(
     modifier: Modifier = Modifier,
     state: AddMatchState,
     onEvent: (AddMatchUiEvent) -> Unit,
-    onNavigateAfterMatchAdd: () -> Unit
 ) {
     val participantOptions = state.participantOptions
     val firstParticipant = state.firstParticipant
@@ -112,14 +115,25 @@ fun AddMatchComponent(
                 )
             }
         )
+        val matchAddingSubstate = state.matchAddingSubstate
+
+        val isButtonEnabled = matchAddingSubstate !is MatchAddingSubstate.Loading
 
         Button(
             onClick = {
                 onEvent(AddMatchUiEvent.AddMatch)
-                onNavigateAfterMatchAdd()
-            }
+            },
+            enabled = isButtonEnabled
         ) {
-            Text("Add Match")
+            if (matchAddingSubstate is MatchAddingSubstate.Loading){
+                CircularProgressIndicator(modifier = Modifier.size(24.dp))
+            }else{
+                Text("Add Match")
+            }
+        }
+
+        if (matchAddingSubstate is MatchAddingSubstate.Error){
+            Text(text = matchAddingSubstate.message, color = Color.Red)
         }
 
         val dialogState = state.dialogState

@@ -65,9 +65,9 @@ fun AddTournamentContent(
     onEvent: (AddTournamentUiEvent) -> Unit,
     onDismissRequest: () -> Unit = {},
 ) {
-    val addTournamentSubstate = state.addTournamentSubstate
+    val tournamentAddingSubstate = state.tournamentAddingSubstate
 
-    if (addTournamentSubstate is AddTournamentSubstate.Success){
+    if (tournamentAddingSubstate is TournamentAddingSubstate.Success){
         onDismissRequest()
     }
 
@@ -91,14 +91,14 @@ fun AddTournamentContent(
             }
         )
 
-        val isButtonEnabled = (state.tournamentType !=null && tournamentName.text.isNotBlank()) && addTournamentSubstate !is AddTournamentSubstate.Loading
+        val isButtonEnabled = (state.tournamentType !=null && tournamentName.text.isNotBlank()) && tournamentAddingSubstate !is TournamentAddingSubstate.Loading
         Button(
             onClick = {
                 onEvent(AddTournamentUiEvent.AddTournament(tournamentName.text.toString(), tournamentType!!))
             },
             enabled = isButtonEnabled
         ) {
-            if (addTournamentSubstate is AddTournamentSubstate.Loading){
+            if (tournamentAddingSubstate is TournamentAddingSubstate.Loading){
                 CircularProgressIndicator(
                     modifier = Modifier.size(24.dp)
                 )
@@ -106,8 +106,8 @@ fun AddTournamentContent(
                 Text("Add")
             }
         }
-        if (addTournamentSubstate is AddTournamentSubstate.Error){
-            Text(text = addTournamentSubstate.message, color = Color.Red)
+        if (tournamentAddingSubstate is TournamentAddingSubstate.Error){
+            Text(text = tournamentAddingSubstate.message, color = Color.Red)
         }
     }
 }

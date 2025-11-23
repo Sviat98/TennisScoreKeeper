@@ -488,35 +488,54 @@ class AddMatchViewModel(
     }
 
     private fun buildAndEmitMatchBody() {
-        val state = state.value
-        
-        val firstParticipantInMatchBody = ParticipantInMatchBody(
-            id = state.firstParticipant.id,
-            displayName = state.firstParticipant.displayName,
-            primaryColor = state.firstParticipant.primaryColor.convertToRgbString(),
-            secondaryColor = state.firstParticipant.secondaryColor?.convertToRgbString()
-        )
-        val secondParticipantInMatchBody = ParticipantInMatchBody(
-            id = state.secondParticipant.id,
-            displayName = state.secondParticipant.displayName,
-            primaryColor = state.secondParticipant.primaryColor.convertToRgbString(),
-            secondaryColor = state.secondParticipant.secondaryColor?.convertToRgbString()
-        )
+        viewModelScope.launch {
+            reduceState { oldState -> oldState.copy(matchAddingSubstate = MatchAddingSubstate.Loading) }
+            val state = state.value
 
-        val regularSetTemplate = state.regularSetTemplate
+            val tournamentId = state.tournament.id
 
-        val regularSetTemplateId =
-            if (regularSetTemplate == EMPTY_REGULAR_SET_TEMPLATE) null else regularSetTemplate.id
+            val firstParticipantInMatchBody = ParticipantInMatchBody(
+                id = state.firstParticipant.id,
+                displayName = state.firstParticipant.displayName,
+                primaryColor = state.firstParticipant.primaryColor.convertToRgbString(),
+                secondaryColor = state.firstParticipant.secondaryColor?.convertToRgbString()
+            )
+            val secondParticipantInMatchBody = ParticipantInMatchBody(
+                id = state.secondParticipant.id,
+                displayName = state.secondParticipant.displayName,
+                primaryColor = state.secondParticipant.primaryColor.convertToRgbString(),
+                secondaryColor = state.secondParticipant.secondaryColor?.convertToRgbString()
+            )
 
-        val matchBody = MatchBody(
-            firstParticipant = firstParticipantInMatchBody,
-            secondParticipant = secondParticipantInMatchBody,
-            setsToWin = state.setsToWin,
-            regularSet = regularSetTemplateId,
-            decidingSet = state.decidingSetTemplate.id
-        )
+            val regularSetTemplate = state.regularSetTemplate
 
-        matchRepository.emitNewMatch(matchBody)
+            val regularSetTemplateId =
+                if (regularSetTemplate == EMPTY_REGULAR_SET_TEMPLATE) null else regularSetTemplate.id
+
+            val matchBody = MatchBody(
+                firstParticipant = firstParticipantInMatchBody,
+                secondParticipant = secondParticipantInMatchBody,
+                setsToWin = state.setsToWin,
+                regularSet = regularSetTemplateId,
+                decidingSet = state.decidingSetTemplate.id
+            )
+
+            val addMatchResult = matchRepository.addNewMatch(tournamentId = tournamentId, matchBody = matchBody)
+
+            when(addMatchResult){
+                is LoadResult.Success ->{
+                    val newMatch = addMatchResult.result
+
+                    matchRepository.emitNewMatch(newMatch)
+                    reduceState { oldState -> oldState.copy(matchAddingSubstate = MatchAddingSubstate.Success) }
+                }
+                is LoadResult.Error ->{
+                    val errorMessage = addMatchResult.result.message ?: ""
+
+                    reduceState { oldState -> oldState.copy(matchAddingSubstate = MatchAddingSubstate.Error(message = errorMessage)) }
+                }
+            }
+        }
     }
 
     private fun reduceState(reducer: (AddMatchState) -> AddMatchState) {

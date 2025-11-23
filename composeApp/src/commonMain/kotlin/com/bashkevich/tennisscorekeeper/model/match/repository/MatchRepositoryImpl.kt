@@ -23,10 +23,10 @@ class MatchRepositoryImpl(
     private val matchRemoteDataSource: MatchRemoteDataSource
 ) : MatchRepository {
 
-    private val _newMatch = MutableSharedFlow<MatchBody>(replay = 1)
+    private val _newMatch = MutableSharedFlow<ShortMatch>(replay = 1)
 
-    override fun emitNewMatch(matchBody: MatchBody) {
-        _newMatch.tryEmit(matchBody)
+    override fun emitNewMatch(newMatch: ShortMatch) {
+        _newMatch.tryEmit(newMatch)
     }
 
     override suspend fun addNewMatch(
@@ -37,7 +37,7 @@ class MatchRepositoryImpl(
             .mapSuccess { shortMatchDto -> shortMatchDto.toDomain() }
     }
 
-    override fun observeNewMatch(): Flow<MatchBody> = _newMatch.asSharedFlow()
+    override fun observeNewMatch() = _newMatch.asSharedFlow()
 
     override suspend fun getMatchesForTournament(tournamentId: String): LoadResult<List<ShortMatch>, Throwable> {
         return matchRemoteDataSource.getMatchesByTournament(tournamentId)

@@ -20,11 +20,11 @@ interface MatchRepository {
     suspend fun setFirstPlayerInPairToServe(matchId: String,playerId: String)
     suspend fun setParticipantRetired(matchId: String, participantId: String)
     suspend fun setMatchStatus(matchId: String,status: MatchStatus)
-    fun emitNewMatch(matchBody: MatchBody)
+    fun emitNewMatch(newMatch: ShortMatch)
     suspend fun addNewMatch(
         tournamentId: String,
         matchBody: MatchBody
     ): LoadResult<ShortMatch, Throwable>
 
-    fun observeNewMatch(): Flow<MatchBody>
+    fun observeNewMatch(): Flow<ShortMatch>
 }

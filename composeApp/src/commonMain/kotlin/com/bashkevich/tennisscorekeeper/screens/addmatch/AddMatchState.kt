@@ -58,6 +58,7 @@ data class AddMatchState(
     val firstParticipant: TennisParticipantInMatch,
     val secondParticipant: TennisParticipantInMatch,
     val dialogState: OpenColorPickerDialogState,
+    val matchAddingSubstate: MatchAddingSubstate,
     val setsToWin: Int,
     val setTemplateOptions: List<SetTemplate>,
     val regularSetTemplate: SetTemplate,
@@ -71,12 +72,21 @@ data class AddMatchState(
             firstParticipant = PARTICIPANT_IN_SINGLES_MATCH_DEFAULT,
             secondParticipant = PARTICIPANT_IN_SINGLES_MATCH_DEFAULT,
             dialogState = OpenColorPickerDialogState.None,
+            matchAddingSubstate = MatchAddingSubstate.Idle,
             setsToWin = 1,
             setTemplateOptions = emptyList(),
             regularSetTemplate = EMPTY_REGULAR_SET_TEMPLATE,
             decidingSetTemplate = EMPTY_DECIDING_SET_TEMPLATE
         )
     }
+}
+
+@Immutable
+sealed class MatchAddingSubstate {
+    data object Idle : MatchAddingSubstate()
+    data object Loading : MatchAddingSubstate()
+    data object Success : MatchAddingSubstate()
+    data class Error(val message: String) : MatchAddingSubstate()
 }
 
 @Immutable

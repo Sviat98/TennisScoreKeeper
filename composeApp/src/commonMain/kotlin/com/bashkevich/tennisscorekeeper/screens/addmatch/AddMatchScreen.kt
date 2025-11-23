@@ -53,6 +53,11 @@ fun AddMatchContent(
 
     val isAuthorized = LocalAuthorization.current
 
+    val matchAddingSubstate = state.matchAddingSubstate
+    if (matchAddingSubstate is MatchAddingSubstate.Success){
+        onNavigateAfterMatchAdd()
+    }
+
     Scaffold(
         modifier = Modifier.then(modifier),
         topBar = {
@@ -79,7 +84,6 @@ fun AddMatchContent(
                 AddMatchComponent(
                     state = state,
                     onEvent = onEvent,
-                    onNavigateAfterMatchAdd = onNavigateAfterMatchAdd
                 )
             }
         }
