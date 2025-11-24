@@ -28,6 +28,7 @@ import io.ktor.client.plugins.logging.Logging
 import io.ktor.client.plugins.plugin
 import io.ktor.client.plugins.websocket.WebSockets
 import io.ktor.client.request.forms.submitForm
+import io.ktor.client.request.header
 import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
@@ -87,6 +88,7 @@ val coreModule = module {
                     host = appConfig.baseHostBackend
                 }
                 contentType(ContentType.Application.Json)
+                header(HttpHeaders.Origin, appConfig.baseUrlFrontend)
             }
             install(Logging) {
                 level = LogLevel.ALL
