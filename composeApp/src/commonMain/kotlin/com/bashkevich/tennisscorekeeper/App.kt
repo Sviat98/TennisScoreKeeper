@@ -5,6 +5,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -56,7 +57,9 @@ val LocalAuthorization = staticCompositionLocalOf {
 @OptIn(KoinExperimentalAPI::class)
 @Composable
 @Preview
-fun App(navController: NavHostController = rememberNavController()) {
+fun App(
+    onNavHostReady: suspend (NavController) -> Unit = {}
+) {
     KoinMultiplatformApplication(config = KoinConfiguration {
         modules(
             coreModule,
@@ -72,6 +75,8 @@ fun App(navController: NavHostController = rememberNavController()) {
         val appViewModel = koinViewModel<AppViewModel>()
 
         val appState = appViewModel.state.collectAsStateWithLifecycle()
+
+        val navController = rememberNavController()
 
         val isAuthorized = appState.value.isAuthorized
         CompositionLocalProvider(
@@ -127,6 +132,9 @@ fun App(navController: NavHostController = rememberNavController()) {
                         )
                     }
                     platformSpecificRoutes()
+                }
+                LaunchedEffect(navController) {
+                    onNavHostReady(navController)
                 }
             }
         }

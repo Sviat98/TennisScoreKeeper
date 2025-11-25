@@ -160,7 +160,7 @@ fun MatchDetailsAppBar(
                 }
                 DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
                     DropdownMenuItem(onClick = {
-                        onCopyLink("$baseUrlFrontend/#scoreboard?matchId=${matchId}")
+                        onCopyLink("$baseUrlFrontend/#matches/${matchId}/scoreboard")
                         expanded = false
                     }) {
                         Text("Copy link to scoreboard")
