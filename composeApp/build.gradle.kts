@@ -153,8 +153,21 @@ android {
         }
     }
     buildTypes {
+        getByName("debug") {
+            isMinifyEnabled = false
+            isDebuggable = true
+            // Дополнительные настройки для debug
+            applicationIdSuffix = ".debug"
+            versionNameSuffix = "-DEBUG"
+        }
         getByName("release") {
             isMinifyEnabled = false
+            isDebuggable = false
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
+            signingConfig = signingConfigs.getByName("debug")
         }
     }
     compileOptions {
