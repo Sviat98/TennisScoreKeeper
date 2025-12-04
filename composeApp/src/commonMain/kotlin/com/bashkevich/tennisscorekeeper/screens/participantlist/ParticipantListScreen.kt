@@ -9,8 +9,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.Icon
 import androidx.compose.material.Scaffold
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
@@ -20,6 +18,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.bashkevich.tennisscorekeeper.components.DefaultLoadingComponent
 import com.bashkevich.tennisscorekeeper.components.UploadFileComponent
+import com.bashkevich.tennisscorekeeper.components.icons.IconGroup
+import com.bashkevich.tennisscorekeeper.components.icons.default_icons.Add
 import com.bashkevich.tennisscorekeeper.components.participant.ParticipantListComponent
 import com.bashkevich.tennisscorekeeper.model.file.domain.ExcelFile
 import com.bashkevich.tennisscorekeeper.model.tournament.remote.TournamentStatus
@@ -63,7 +63,7 @@ fun ParticipantListContent(
         modifier = Modifier.then(modifier),
         floatingActionButton = {
             FloatingActionButton(onClick = {}) {
-                Icon(Icons.Filled.Add, contentDescription = "Add Participant")
+                Icon(IconGroup.Default.Add, contentDescription = "Add Participant")
             }
         }
     ) {

@@ -11,16 +11,14 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.Icon
 import androidx.compose.material.Scaffold
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
-
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.bashkevich.tennisscorekeeper.LocalNavHostController
 import com.bashkevich.tennisscorekeeper.components.hoverScaleEffect
+import com.bashkevich.tennisscorekeeper.components.icons.IconGroup
+import com.bashkevich.tennisscorekeeper.components.icons.default_icons.Add
 import com.bashkevich.tennisscorekeeper.components.scoreboard.short.ShortMatchScoreboardCard
 import com.bashkevich.tennisscorekeeper.model.match.domain.ShortMatch
 import com.bashkevich.tennisscorekeeper.model.tournament.remote.TournamentStatus
@@ -63,7 +61,7 @@ fun MatchListContent(
         floatingActionButton = {
             if (tournament.status == TournamentStatus.IN_PROGRESS){
                 FloatingActionButton(onClick = {onMatchAdd(tournament.id)}) {
-                    Icon(Icons.Filled.Add, contentDescription = "Add Match")
+                    Icon(IconGroup.Default.Add, contentDescription = "Add Match")
                 }
             }
         }

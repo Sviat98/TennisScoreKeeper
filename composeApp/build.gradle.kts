@@ -36,13 +36,15 @@ tasks.register("generateBuildConfig") {
         val pkg = "com.bashkevich.tennisscorekeeper"
         val file = outputDir.get().file("BuildConfig.kt").asFile
         file.parentFile.mkdirs()
-        file.writeText("""
+        file.writeText(
+            """
             package $pkg
 
             object BuildConfig {
                 val buildMode: BuildMode = BuildMode.$normalizedBuildMode
             }
-        """.trimIndent())
+        """.trimIndent()
+        )
     }
 }
 
@@ -61,9 +63,9 @@ kotlin {
         browser()
         binaries.executable()
     }
-    
+
     sourceSets {
-        
+
         androidMain.dependencies {
             implementation(compose.preview)
             implementation(libs.androidx.activity.compose)
@@ -73,7 +75,7 @@ kotlin {
             implementation(libs.multiplatform.settings.datastore)
             implementation(libs.androidx.datastore.preferences)
         }
-        val commonMain by getting{
+        val commonMain by getting {
             kotlin.srcDir(tasks.named("generateBuildConfig").map { it.outputs.files.singleFile })
         }
         commonMain.dependencies {
@@ -84,7 +86,6 @@ kotlin {
             implementation(compose.components.resources)
             implementation(libs.compose.material3.adaptive)
             implementation(compose.components.uiToolingPreview)
-            implementation(libs.compose.material.icons.core)
             implementation(libs.androidx.lifecycle.viewmodel)
             implementation(libs.androidx.lifecycle.runtime.compose)
             implementation(libs.androidx.navigation)
@@ -177,7 +178,7 @@ android {
         targetCompatibility = JavaVersion.VERSION_11
     }
 
-    dependencies{
+    dependencies {
         coreLibraryDesugaring(libs.android.core.desugaring)
     }
 }

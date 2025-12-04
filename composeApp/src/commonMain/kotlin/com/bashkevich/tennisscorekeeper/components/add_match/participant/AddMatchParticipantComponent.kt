@@ -18,15 +18,15 @@ import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import com.bashkevich.tennisscorekeeper.components.icons.IconGroup
+import com.bashkevich.tennisscorekeeper.components.icons.default_icons.Add
+import com.bashkevich.tennisscorekeeper.components.icons.default_icons.Close
 import com.bashkevich.tennisscorekeeper.model.participant.domain.TennisParticipant
 import com.bashkevich.tennisscorekeeper.model.participant.domain.TennisParticipantInMatch
 
@@ -130,7 +130,7 @@ fun SecondaryColorPicker(
                         .clickable {
                             onToggleSecondaryColor(null)
                         },
-                    imageVector = Icons.Default.Close,
+                    imageVector = IconGroup.Default.Close,
                     contentDescription = "Close",
                     tint = Color.White
                 )
@@ -163,7 +163,7 @@ fun AddSecondaryColorButton(
             modifier = Modifier.align(Alignment.Center).clickable {
                 onAddSecondaryColor(Color.White)
             },
-            imageVector = Icons.Default.Add,
+            imageVector = IconGroup.Default.Add,
             contentDescription = "Add secondary color",
             tint = Color.Black
         )

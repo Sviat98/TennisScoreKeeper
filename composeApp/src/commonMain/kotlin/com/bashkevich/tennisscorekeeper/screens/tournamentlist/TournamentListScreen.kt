@@ -15,8 +15,6 @@ import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.Icon
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -30,6 +28,8 @@ import com.bashkevich.tennisscorekeeper.LocalNavHostController
 import com.bashkevich.tennisscorekeeper.components.TournamentListAppBar
 import com.bashkevich.tennisscorekeeper.components.TournamentListAppBarWithButton
 import com.bashkevich.tennisscorekeeper.components.hoverScaleEffect
+import com.bashkevich.tennisscorekeeper.components.icons.IconGroup
+import com.bashkevich.tennisscorekeeper.components.icons.default_icons.Add
 import com.bashkevich.tennisscorekeeper.components.tournament.TournamentListItem
 import com.bashkevich.tennisscorekeeper.navigation.AddTournamentRoute
 import com.bashkevich.tennisscorekeeper.navigation.LoginRoute
@@ -96,7 +96,7 @@ fun TournamentListContent(
         },
         floatingActionButton = {
             FloatingActionButton(onClick = { navController.navigate(AddTournamentRoute) }) {
-                Icon(Icons.Filled.Add, contentDescription = "Add Tournament")
+                Icon(IconGroup.Default.Add, contentDescription = "Add Tournament")
             }
         }
     ) {

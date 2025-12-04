@@ -8,8 +8,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Check
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -18,6 +16,8 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.bashkevich.tennisscorekeeper.components.icons.IconGroup
+import com.bashkevich.tennisscorekeeper.components.icons.default_icons.Check
 
 @Composable
 fun WinnerAndRetiredParticipantComponent(
@@ -122,7 +122,7 @@ fun WinnerSign(
     Box(modifier = Modifier.then(modifier)) {
         Icon(
             modifier = Modifier.size(winnerIconSize).align(Alignment.Center),
-            imageVector = Icons.Default.Check,
+            imageVector = IconGroup.Default.Check,
             tint = Color.White,
             contentDescription = contentDescription
         )

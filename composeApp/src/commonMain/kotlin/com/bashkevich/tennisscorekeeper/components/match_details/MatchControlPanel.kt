@@ -8,13 +8,13 @@ import androidx.compose.material.Button
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.Text
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.bashkevich.tennisscorekeeper.components.icons.IconGroup
+import com.bashkevich.tennisscorekeeper.components.icons.default_icons.ArrowBack
+import com.bashkevich.tennisscorekeeper.components.icons.default_icons.ArrowForward
 import com.bashkevich.tennisscorekeeper.model.match.domain.Match
 import com.bashkevich.tennisscorekeeper.model.match.remote.SpecialSetMode
 import com.bashkevich.tennisscorekeeper.model.match.remote.body.ScoreType
@@ -94,7 +94,7 @@ fun ParticipantsPointsControlPanel(
                 enabled = hasFirstPointPlayed
             ) {
                 Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                    imageVector = IconGroup.Default.ArrowBack,
                     contentDescription = "Undo point"
                 )
             }
@@ -103,7 +103,7 @@ fun ParticipantsPointsControlPanel(
                 enabled = isPointShift
             ) {
                 Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ArrowForward,
+                    imageVector = IconGroup.Default.ArrowForward,
                     contentDescription = "Redo point"
                 )
             }

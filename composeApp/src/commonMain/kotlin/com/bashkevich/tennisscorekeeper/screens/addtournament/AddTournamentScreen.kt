@@ -17,8 +17,6 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowDropDown
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -33,6 +31,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.bashkevich.tennisscorekeeper.LocalNavHostController
+import com.bashkevich.tennisscorekeeper.components.icons.default_icons.ArrowDropDown
+import com.bashkevich.tennisscorekeeper.components.icons.IconGroup
 import com.bashkevich.tennisscorekeeper.model.tournament.remote.TournamentType
 import com.bashkevich.tennisscorekeeper.model.tournament.remote.mapToDisplayedString
 
@@ -132,7 +132,7 @@ fun TournamentTypeCombobox(
             readOnly = true,
             trailingIcon = {
                 Icon(
-                    imageVector = Icons.Default.ArrowDropDown,
+                    imageVector = IconGroup.Default.ArrowDropDown,
                     contentDescription = "Open dropdown",
                     modifier = Modifier.clickable { expanded = true }
                 )

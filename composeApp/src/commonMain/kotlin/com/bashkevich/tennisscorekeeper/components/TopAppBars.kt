@@ -7,16 +7,17 @@ import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.Share
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import com.bashkevich.tennisscorekeeper.AppConfig
+import com.bashkevich.tennisscorekeeper.components.icons.default_icons.ArrowBack
+import com.bashkevich.tennisscorekeeper.components.icons.IconGroup
+import com.bashkevich.tennisscorekeeper.components.icons.default_icons.Person
+import com.bashkevich.tennisscorekeeper.components.icons.default_icons.Share
+import com.bashkevich.tennisscorekeeper.components.icons.filled_icons.Person
 
 @Composable
 fun TournamentListAppBar() {
@@ -34,7 +35,7 @@ fun TournamentListAppBarWithButton(
         actions = {
             if (isAuthorized){
                 IconButton(onClick = onNavigateToLoginOrProfile){
-                    Icon(Icons.Filled.Person, contentDescription = "Navigate to profile")
+                    Icon(IconGroup.Default.Person, contentDescription = "Navigate to profile")
                 }
             }else{
                 LoginButton(
@@ -58,7 +59,7 @@ fun TournamentDetailsAppBar(
                 onClick = onBack
             ) {
                 Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                    imageVector = IconGroup.Default.ArrowBack,
                     contentDescription = "Navigate back"
                 )
             }
@@ -66,7 +67,7 @@ fun TournamentDetailsAppBar(
         actions = {
             if (isAuthorized){
                 IconButton(onClick = onNavigateToLoginOrProfile){
-                    Icon(Icons.Filled.Person, contentDescription = "Navigate to profile")
+                    Icon(IconGroup.Filled.Person, contentDescription = "Navigate to profile")
                 }
             }else{
                 LoginButton(
@@ -90,7 +91,7 @@ fun AddMatchAppBar(
                 onClick = onBack
             ) {
                 Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                    imageVector = IconGroup.Default.ArrowBack,
                     contentDescription = "Navigate back"
                 )
             }
@@ -98,7 +99,7 @@ fun AddMatchAppBar(
         actions = {
             if (isAuthorized){
                 IconButton(onClick = onNavigateToLoginOrProfile){
-                    Icon(Icons.Filled.Person, contentDescription = "Navigate to profile")
+                    Icon(IconGroup.Filled.Person, contentDescription = "Navigate to profile")
                 }
             }else{
                 LoginButton(
@@ -120,7 +121,7 @@ fun LoginAppBar(
                 onClick = onBack
             ) {
                 Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                    imageVector = IconGroup.Default.ArrowBack,
                     contentDescription = "Navigate back"
                 )
             }
@@ -148,7 +149,7 @@ fun MatchDetailsAppBar(
                 onClick = onBack
             ) {
                 Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                    imageVector = IconGroup.Default.ArrowBack,
                     contentDescription = "Navigate back"
                 )
             }
@@ -156,7 +157,7 @@ fun MatchDetailsAppBar(
         actions = {
             Box {
                 IconButton(onClick = { expanded = true }) {
-                    Icon(Icons.Default.Share, contentDescription = "Copy link")
+                    Icon(IconGroup.Default.Share, contentDescription = "Copy link")
                 }
                 DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
                     DropdownMenuItem(onClick = {
@@ -175,7 +176,7 @@ fun MatchDetailsAppBar(
             }
             if (isAuthorized){
                 IconButton(onClick = onNavigateToLoginOrProfile){
-                    Icon(Icons.Filled.Person, contentDescription = "Navigate to profile")
+                    Icon(IconGroup.Filled.Person, contentDescription = "Navigate to profile")
                 }
             }else{
                 LoginButton(

@@ -9,8 +9,6 @@ import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -19,6 +17,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import com.bashkevich.tennisscorekeeper.components.icons.default_icons.ArrowDropDown
+import com.bashkevich.tennisscorekeeper.components.icons.IconGroup
 import com.bashkevich.tennisscorekeeper.components.updateTextField
 import com.bashkevich.tennisscorekeeper.model.player.domain.TennisPlayerInMatch
 import com.bashkevich.tennisscorekeeper.model.player.domain.toDisplayFormat
@@ -51,7 +51,7 @@ fun FirstServePlayerInPairCombobox(
             enabled = enabled,
             trailingIcon = {
                 Icon(
-                    imageVector = Icons.Default.ArrowDropDown,
+                    imageVector = IconGroup.Default.ArrowDropDown,
                     contentDescription = "Open dropdown",
                     modifier = Modifier.clickable {
                         expanded = true
