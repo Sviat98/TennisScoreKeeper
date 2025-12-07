@@ -1,4 +1,4 @@
-package com.bashkevich.tennisscorekeeper.components
+package com.bashkevich.tennisscorekeeper.components.expect
 
 import androidx.compose.ui.platform.Clipboard
 

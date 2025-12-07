@@ -28,12 +28,12 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.bashkevich.tennisscorekeeper.LocalAuthorization
 import com.bashkevich.tennisscorekeeper.LocalNavHostController
 import com.bashkevich.tennisscorekeeper.components.MatchDetailsAppBar
+import com.bashkevich.tennisscorekeeper.components.expect.MatchDetailsScoreboardWrapper
 import com.bashkevich.tennisscorekeeper.components.match_details.serve.ChooseServePanel
 import com.bashkevich.tennisscorekeeper.components.match_details.MatchStatusButton
 import com.bashkevich.tennisscorekeeper.components.match_details.ParticipantsPointsControlPanel
 import com.bashkevich.tennisscorekeeper.components.match_details.RetireParticipantPanel
-import com.bashkevich.tennisscorekeeper.components.scoreboard.match_details.MatchDetailsScoreboardView
-import com.bashkevich.tennisscorekeeper.components.setText
+import com.bashkevich.tennisscorekeeper.components.expect.setText
 import com.bashkevich.tennisscorekeeper.model.match.remote.body.MatchStatus
 import com.bashkevich.tennisscorekeeper.model.match.remote.body.convertToString
 import com.bashkevich.tennisscorekeeper.navigation.LoginRoute
@@ -103,9 +103,10 @@ fun MatchDetailsContent(
                 verticalArrangement = Arrangement.SpaceAround,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                MatchDetailsScoreboardView(
+                MatchDetailsScoreboardWrapper(
+                    modifier = Modifier.horizontalScroll(state = rememberScrollState()),
                     match = match,
-                    modifier = Modifier.horizontalScroll(state = rememberScrollState())
+                    onEvent = onEvent
                 )
 
                 Text("Status: ${match.status.convertToString()}")
