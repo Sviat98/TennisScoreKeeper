@@ -74,6 +74,9 @@ kotlin {
             implementation(libs.slf4j.android)
             implementation(libs.multiplatform.settings.datastore)
             implementation(libs.androidx.datastore.preferences)
+
+            implementation(libs.media.player)
+            implementation(libs.sdp.ssp)
         }
         val commonMain by getting {
             kotlin.srcDir(tasks.named("generateBuildConfig").map { it.outputs.files.singleFile })
@@ -81,7 +84,7 @@ kotlin {
         commonMain.dependencies {
             implementation(compose.runtime)
             implementation(compose.foundation)
-            implementation(compose.material)
+            implementation(compose.material3)
             implementation(compose.ui)
             implementation(compose.components.resources)
             implementation(libs.compose.material3.adaptive)

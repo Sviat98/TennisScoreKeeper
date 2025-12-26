@@ -3,7 +3,8 @@ package com.bashkevich.tennisscorekeeper.screens.login
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material.Scaffold
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Scaffold
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -54,9 +55,9 @@ fun LoginScreenContent(
     Scaffold(
         modifier = Modifier.then(modifier),
         topBar = { LoginAppBar(onBack = { navController.navigateUp() }) }
-    ) {
+    ) { paddingValues ->
         Column(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier.fillMaxSize().padding(paddingValues),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {

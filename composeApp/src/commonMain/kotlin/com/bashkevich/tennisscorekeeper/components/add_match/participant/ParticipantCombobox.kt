@@ -3,12 +3,12 @@ package com.bashkevich.tennisscorekeeper.components.add_match.participant
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.text.input.rememberTextFieldState
-import androidx.compose.material.DropdownMenu
-import androidx.compose.material.DropdownMenuItem
-import androidx.compose.material.Icon
-import androidx.compose.material.Text
-import androidx.compose.material.TextField
-import androidx.compose.material.TextFieldDefaults
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -60,7 +60,7 @@ fun ParticipantCombobox(
                     }
                 )
             },
-            colors = TextFieldDefaults.textFieldColors(
+            colors = TextFieldDefaults.colors(
                 disabledIndicatorColor = Color.Transparent,
                 disabledTextColor = Color.Black,
                 disabledLabelColor = Color.Gray,
@@ -75,13 +75,12 @@ fun ParticipantCombobox(
         ) {
             participantOptions.forEach { option ->
                 DropdownMenuItem(
+                    text = { Text(text = option.toDisplayFormat()) },
                     onClick = {
                         onParticipantChange(option)
                         expanded = false
                     }
-                ) {
-                    Text(text = option.toDisplayFormat())
-                }
+                )
             }
         }
     }

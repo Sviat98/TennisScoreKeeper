@@ -4,7 +4,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.material.Divider
+import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -30,15 +31,15 @@ fun MatchDetailsCurrentSetComponent(
             currentSet = currentSet,
             numberFontSize = numberFontSize
         )
-        Divider(
+        HorizontalDivider(
             modifier = Modifier.fillMaxWidth().align(Alignment.TopStart),
             color = mainBackgroundColor
         )
-        Divider(
+        HorizontalDivider(
             modifier = Modifier.fillMaxWidth().align(Alignment.Center),
             color = mainBackgroundColor
         )
-        Divider(
+        HorizontalDivider(
             modifier = Modifier.fillMaxWidth().align(Alignment.BottomCenter),
             color = mainBackgroundColor
         )
