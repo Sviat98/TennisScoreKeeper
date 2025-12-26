@@ -8,15 +8,15 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.input.TextFieldState
-import androidx.compose.material.Button
-import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.DropdownMenu
-import androidx.compose.material.DropdownMenuItem
-import androidx.compose.material.Icon
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
-import androidx.compose.material.TextField
-import androidx.compose.material.TextFieldDefaults
+import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -67,12 +67,12 @@ fun AddTournamentContent(
 ) {
     val tournamentAddingSubstate = state.tournamentAddingSubstate
 
-    if (tournamentAddingSubstate is TournamentAddingSubstate.Success){
+    if (tournamentAddingSubstate is TournamentAddingSubstate.Success) {
         onDismissRequest()
     }
 
     Column(
-        modifier = Modifier.then(modifier).background(MaterialTheme.colors.background)
+        modifier = Modifier.then(modifier).background(MaterialTheme.colorScheme.background)
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterVertically),
         horizontalAlignment = Alignment.CenterHorizontally
@@ -91,22 +91,28 @@ fun AddTournamentContent(
             }
         )
 
-        val isButtonEnabled = (state.tournamentType !=null && tournamentName.text.isNotBlank()) && tournamentAddingSubstate !is TournamentAddingSubstate.Loading
+        val isButtonEnabled =
+            (state.tournamentType != null && tournamentName.text.isNotBlank()) && tournamentAddingSubstate !is TournamentAddingSubstate.Loading
         Button(
             onClick = {
-                onEvent(AddTournamentUiEvent.AddTournament(tournamentName.text.toString(), tournamentType!!))
+                onEvent(
+                    AddTournamentUiEvent.AddTournament(
+                        tournamentName.text.toString(),
+                        tournamentType!!
+                    )
+                )
             },
             enabled = isButtonEnabled
         ) {
-            if (tournamentAddingSubstate is TournamentAddingSubstate.Loading){
+            if (tournamentAddingSubstate is TournamentAddingSubstate.Loading) {
                 CircularProgressIndicator(
                     modifier = Modifier.size(24.dp)
                 )
-            }else{
+            } else {
                 Text("Add")
             }
         }
-        if (tournamentAddingSubstate is TournamentAddingSubstate.Error){
+        if (tournamentAddingSubstate is TournamentAddingSubstate.Error) {
             Text(text = tournamentAddingSubstate.message, color = Color.Red)
         }
     }
@@ -137,7 +143,7 @@ fun TournamentTypeCombobox(
                     modifier = Modifier.clickable { expanded = true }
                 )
             },
-            colors = TextFieldDefaults.textFieldColors(
+            colors = TextFieldDefaults.colors(
                 disabledIndicatorColor = Color.Transparent,
                 disabledTextColor = Color.Black,
                 disabledLabelColor = Color.Gray,
@@ -152,13 +158,12 @@ fun TournamentTypeCombobox(
         ) {
             options.forEach { option ->
                 DropdownMenuItem(
+                    text = { Text(text = option.mapToDisplayedString()) },
                     onClick = {
                         onTournamentTypeChange(option)
                         expanded = false
                     }
-                ) {
-                    Text(text = option.mapToDisplayedString())
-                }
+                )
             }
         }
     }

@@ -4,7 +4,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.material.Divider
+import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -40,9 +41,9 @@ fun CurrentGameInProgressComponent(
                 textFontSize = fontSize
             )
         }
-        Divider(modifier = Modifier.fillMaxWidth().align(Alignment.TopStart), color = Color(0xFF142c6c))
-        Divider(modifier = Modifier.fillMaxWidth().align(Alignment.Center), color = Color(0xFF142c6c))
-        Divider(modifier = Modifier.fillMaxWidth().align(Alignment.BottomCenter), color = Color(0xFF142c6c))
+        HorizontalDivider(modifier = Modifier.fillMaxWidth().align(Alignment.TopStart), color = Color(0xFF142c6c))
+        HorizontalDivider(modifier = Modifier.fillMaxWidth().align(Alignment.Center), color = Color(0xFF142c6c))
+        HorizontalDivider(modifier = Modifier.fillMaxWidth().align(Alignment.BottomCenter), color = Color(0xFF142c6c))
     }
 
 }

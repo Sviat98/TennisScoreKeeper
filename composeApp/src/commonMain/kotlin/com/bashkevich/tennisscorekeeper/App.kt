@@ -1,7 +1,7 @@
 package com.bashkevich.tennisscorekeeper
 
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material.MaterialTheme
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -84,7 +84,11 @@ fun App(
             LocalAuthorization provides isAuthorized
         ) {
             MaterialTheme {
-                NavHost(navController = navController, startDestination = TournamentsRoute) {
+                NavHost(
+                    modifier = Modifier
+                    .fillMaxSize(),
+                    navController = navController,
+                    startDestination = TournamentsRoute) {
                     composable<TournamentsRoute> {
                         val tournamentListViewModel = koinViewModel<TournamentListViewModel>()
 

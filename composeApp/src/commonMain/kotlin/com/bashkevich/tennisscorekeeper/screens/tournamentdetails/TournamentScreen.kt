@@ -13,9 +13,11 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Scaffold
-import androidx.compose.material.Text
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -32,9 +34,13 @@ import com.bashkevich.tennisscorekeeper.LocalAuthorization
 import com.bashkevich.tennisscorekeeper.LocalNavHostController
 import com.bashkevich.tennisscorekeeper.components.DefaultLoadingComponent
 import com.bashkevich.tennisscorekeeper.components.TournamentDetailsAppBar
+import com.bashkevich.tennisscorekeeper.components.icons.IconGroup
+import com.bashkevich.tennisscorekeeper.components.icons.default_icons.Add
 import com.bashkevich.tennisscorekeeper.components.tournament.ChangeTournamentStatusButton
 import com.bashkevich.tennisscorekeeper.model.match.remote.body.MatchStatus
 import com.bashkevich.tennisscorekeeper.model.match.remote.body.convertToString
+import com.bashkevich.tennisscorekeeper.model.tournament.remote.TournamentStatus
+import com.bashkevich.tennisscorekeeper.navigation.AddMatchRoute
 import com.bashkevich.tennisscorekeeper.navigation.LoginRoute
 import com.bashkevich.tennisscorekeeper.navigation.ProfileRoute
 import com.bashkevich.tennisscorekeeper.navigation.TournamentTab
@@ -108,10 +114,24 @@ fun TournamentContent(
                         navController.navigate(LoginRoute)
                     }
                 })
+        },
+        floatingActionButton = {
+            if (tournament.status== TournamentStatus.IN_PROGRESS){
+                val onClick :()-> Unit = {
+                    if (pagerState.currentPage == TournamentTab.MATCHES.ordinal) {
+                        navController.navigate(AddMatchRoute(tournament.id))
+                    }
+                }
+
+                val contantDescription = if (pagerState.currentPage == TournamentTab.MATCHES.ordinal) "Add match" else "Add participant"
+                FloatingActionButton(onClick = onClick) {
+                    Icon(IconGroup.Default.Add, contentDescription = contantDescription)
+                }
+            }
         }
-    ) {
+    ) { paddingValues ->
         Column(
-            modifier = Modifier.padding(it).padding(horizontal = 16.dp),
+            modifier = Modifier.padding(paddingValues).padding(horizontal = 16.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterVertically)
         ) {
             Row(
@@ -157,7 +177,7 @@ fun TournamentContent(
                                 pagerState.animateScrollToPage(TournamentTab.MATCHES.ordinal)
                             }
                         },
-                        color = if (pagerState.currentPage == TournamentTab.MATCHES.ordinal) MaterialTheme.colors.primary else Color.DarkGray
+                        color = if (pagerState.currentPage == TournamentTab.MATCHES.ordinal) MaterialTheme.colorScheme.primary else Color.DarkGray
                     )
                     Text(
                         text = TournamentTab.PARTICIPANTS.toDisplayString(),
@@ -166,7 +186,7 @@ fun TournamentContent(
                                 pagerState.animateScrollToPage(TournamentTab.PARTICIPANTS.ordinal)
                             }
                         },
-                        color = if (pagerState.currentPage == TournamentTab.PARTICIPANTS.ordinal) MaterialTheme.colors.primary else Color.DarkGray
+                        color = if (pagerState.currentPage == TournamentTab.PARTICIPANTS.ordinal) MaterialTheme.colorScheme.primary else Color.DarkGray
                     )
                 }
 

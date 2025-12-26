@@ -4,13 +4,13 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.text.input.TextFieldLineLimits
 import androidx.compose.foundation.text.input.TextFieldState
-import androidx.compose.material.DropdownMenu
-import androidx.compose.material.DropdownMenuItem
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.Text
-import androidx.compose.material.TextField
-import androidx.compose.material.TextFieldDefaults
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -62,7 +62,7 @@ fun SetTemplateCombobox(
                 }
             },
             lineLimits = TextFieldLineLimits.MultiLine(minHeightInLines = 2, maxHeightInLines = 3),
-            colors = TextFieldDefaults.textFieldColors(
+            colors = TextFieldDefaults.colors(
                 disabledIndicatorColor = Color.Transparent,
                 disabledTextColor = Color.Black,
                 disabledLabelColor = Color.Gray,
@@ -77,13 +77,12 @@ fun SetTemplateCombobox(
         ) {
             setTemplateOptions.forEach { option ->
                 DropdownMenuItem(
+                    text = { Text(text = option.name) },
                     onClick = {
                         onSetTemplateChange(option)
                         expanded = false
                     }
-                ) {
-                    Text(text = option.name)
-                }
+                )
             }
         }
     }

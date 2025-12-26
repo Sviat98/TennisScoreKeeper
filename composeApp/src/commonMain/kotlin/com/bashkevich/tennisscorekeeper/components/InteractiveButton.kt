@@ -8,16 +8,14 @@ import androidx.compose.foundation.interaction.collectIsHoveredAsState
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.RowScope
-import androidx.compose.material.Button
-import androidx.compose.material.ButtonColors
-import androidx.compose.material.ButtonDefaults
-import androidx.compose.material.ButtonElevation
-import androidx.compose.material.MaterialTheme
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ButtonElevation
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
@@ -35,9 +33,9 @@ fun InteractiveButton(
     contentPadding: PaddingValues = ButtonDefaults.ContentPadding,
     content: @Composable RowScope.() -> Unit
 ) {
-    val defaultBackgroundColor by colors.backgroundColor(enabled)
+    val defaultBackgroundColor  = if (enabled) colors.containerColor else colors.disabledContainerColor
 
-    val defaultContentColor by colors.contentColor(enabled)
+    val defaultContentColor =  if (enabled) colors.contentColor else colors.disabledContentColor
 
     val interactionSource = remember { MutableInteractionSource() }
 
@@ -63,7 +61,7 @@ fun InteractiveButton(
         shape = shape,
         border = border,
         colors = ButtonDefaults.buttonColors(
-            backgroundColor = backgroundColor,
+            containerColor = backgroundColor,
             contentColor = contentColor
         ),
         contentPadding = contentPadding,
