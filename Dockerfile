@@ -31,8 +31,6 @@ RUN if [ "$BUILD_MODE" = "RELEASE" ]; then \
     gradle $GRADLE_TASK && \
     cp -r build/dist/wasmJs/$DIST_DIR /output
 
-RUN cat /app/composeApp/build/generated/source/buildConfig/commonMain/kotlin/BuildConfig.kt
-
 ####### ОТЛАДКА!!!!!
 RUN ls -lR /output
 ####### КОНЕЦ ОТЛАДКИ!!!!!
