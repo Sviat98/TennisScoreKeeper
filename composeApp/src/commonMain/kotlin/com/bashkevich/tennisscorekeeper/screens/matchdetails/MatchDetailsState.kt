@@ -16,17 +16,23 @@ sealed class MatchDetailsUiEvent : UiEvent {
     class ShowMatch(val match: Match) : MatchDetailsUiEvent()
     class SetFirstParticipantToServe(val participantId: String) :
         MatchDetailsUiEvent()
+
     class SetFirstPlayerInPairToServe(val playerId: String) :
         MatchDetailsUiEvent()
 
     class SetParticipantRetired(val participantId: String) :
         MatchDetailsUiEvent()
+
     class ChangeMatchStatus(val status: MatchStatus) :
         MatchDetailsUiEvent()
+
     class UpdateScore(val participantId: String, val scoreType: ScoreType) :
         MatchDetailsUiEvent()
+
     data object UndoPoint : MatchDetailsUiEvent()
     data object RedoPoint : MatchDetailsUiEvent()
+
+    class AttachVideoLink(val videoLink: String) : MatchDetailsUiEvent()
 }
 
 @Immutable

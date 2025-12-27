@@ -16,6 +16,7 @@ interface MatchRepository {
     suspend fun updateMatchScore(matchId: String, participantId: String, scoreType: ScoreType)
     suspend fun undoPoint(matchId: String)
     suspend fun redoPoint(matchId: String)
+    suspend fun attachVideoLink(matchId: String, videoLink: String)
     suspend fun setFirstParticipantToServe(matchId: String,participantId: String)
     suspend fun setFirstPlayerInPairToServe(matchId: String,playerId: String)
     suspend fun setParticipantRetired(matchId: String, participantId: String)

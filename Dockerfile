@@ -1,7 +1,7 @@
 # Используем образ с Java и Gradle для сборки
-FROM gradle:9.0.0-jdk21 AS build
+FROM gradle:9.2.1-jdk21 AS build
 
-ARG BUILD_MODE=debug
+ARG BUILD_MODE=DEBUG
 ENV BUILD_MODE=$BUILD_MODE
 
 # Копируем исходный код в контейнер
@@ -18,7 +18,7 @@ RUN rm -rf /app/composeApp/build/dist/wasmJs/* && \
     rm -rf /usr/share/nginx/html/*
 
 # Собираем проект в заивсимости от BUILD_MODE
-RUN if [ "$BUILD_MODE" = "release" ]; then \
+RUN if [ "$BUILD_MODE" = "RELEASE" ]; then \
         GRADLE_TASK=wasmJsBrowserDistribution && \
         DIST_DIR=productionExecutable; \
     else \

@@ -14,6 +14,7 @@ import com.bashkevich.tennisscorekeeper.model.match.remote.body.RetiredParticipa
 import com.bashkevich.tennisscorekeeper.model.match.remote.body.ScoreType
 import com.bashkevich.tennisscorekeeper.model.match.remote.body.ServeBody
 import com.bashkevich.tennisscorekeeper.model.match.remote.body.ServeInPairBody
+import com.bashkevich.tennisscorekeeper.model.match.remote.body.VideoLinkBody
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -68,6 +69,11 @@ class MatchRepositoryImpl(
 
     override suspend fun redoPoint(matchId: String) {
         matchRemoteDataSource.redoPoint(matchId = matchId)
+    }
+
+    override suspend fun attachVideoLink(matchId: String, videoLink: String) {
+        val videoLinkBody = VideoLinkBody(videoLink)
+        matchRemoteDataSource.attachVideoLink(matchId = matchId, videoLinkBody = videoLinkBody)
     }
 
     override suspend fun setFirstParticipantToServe(matchId: String, participantId: String) {

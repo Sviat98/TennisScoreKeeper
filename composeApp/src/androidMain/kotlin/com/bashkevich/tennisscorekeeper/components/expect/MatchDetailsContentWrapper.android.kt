@@ -1,24 +1,32 @@
 package com.bashkevich.tennisscorekeeper.components.expect
 
+import android.os.Build
+import android.view.View
+import android.view.WindowInsetsController
 import androidx.activity.OnBackPressedCallback
+import androidx.activity.compose.LocalActivity
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.ScaffoldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -34,6 +42,7 @@ import chaintech.videoplayer.host.MediaPlayerHost
 import com.bashkevich.tennisscorekeeper.LocalAuthorization
 import com.bashkevich.tennisscorekeeper.LocalNavHostController
 import com.bashkevich.tennisscorekeeper.components.MatchDetailsAppBar
+import com.bashkevich.tennisscorekeeper.components.ScoreboardWithMediaPlayerView
 import com.bashkevich.tennisscorekeeper.components.match_details.MatchStatusButton
 import com.bashkevich.tennisscorekeeper.components.match_details.ParticipantsPointsControlPanel
 import com.bashkevich.tennisscorekeeper.components.match_details.RetireParticipantPanel
@@ -51,13 +60,10 @@ class FullScreenState(
     val isFullScreen: Boolean,
     val setFullScreenValue: (Boolean) -> Unit
 )
+
 //
 val LocalFullScreenState = compositionLocalOf<FullScreenState> {
     error("FullScreenState не предоставлен")
-}
-
-val LocalMediaPlayerHost = compositionLocalOf<MediaPlayerHost> {
-    error("MediaPlayerHost не предоставлен")
 }
 
 @Composable
@@ -82,20 +88,47 @@ actual fun MatchDetailsContentWrapper(
     val fullScreenState = remember(isFullScreen) {
         FullScreenState(
             isFullScreen = isFullScreen,
-            setFullScreenValue = { newValue->
+            setFullScreenValue = { newValue ->
                 isFullScreen = newValue
             }
         )
     }
 
+    val window = LocalActivity.current?.window
+
+    LaunchedEffect(isFullScreen) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            val insetsController = window?.insetsController
+
+            if (isFullScreen) {
+                insetsController?.hide(android.view.WindowInsets.Type.systemBars()) // Hide systemBars
+                insetsController?.systemBarsBehavior =
+                    WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+            } else {
+                insetsController?.show(android.view.WindowInsets.Type.systemBars()) // Hide systemBars
+            }
+        } else {
+            if (isFullScreen) {
+                window?.decorView?.systemUiVisibility = (
+                        View.SYSTEM_UI_FLAG_FULLSCREEN
+                                or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                                or View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+                        )
+            } else {
+                window?.decorView?.systemUiVisibility = View.SYSTEM_UI_FLAG_VISIBLE
+            }
+        }
+    }
+
     val videoLink = match.videoLink ?: "https://www.youtube.com/watch?v=q0jH2gyFqAQ"
     val mediaPlayerHost = remember { MediaPlayerHost(mediaUrl = videoLink) }
 
-    mediaPlayerHost.onEvent = { event->
-        when(event){
-            is MediaPlayerEvent.FullScreenChange->{
+    mediaPlayerHost.onEvent = { event ->
+        when (event) {
+            is MediaPlayerEvent.FullScreenChange -> {
                 fullScreenState.setFullScreenValue(!isFullScreen)
             }
+
             else -> {}
         }
     }
@@ -107,7 +140,7 @@ actual fun MatchDetailsContentWrapper(
                 if (isFullScreen) {
                     mediaPlayerHost.setFullScreen(false)
                     fullScreenState.setFullScreenValue(false)
-                }else{
+                } else {
                     navController.navigateUp()
                 }
             }
@@ -121,8 +154,7 @@ actual fun MatchDetailsContentWrapper(
 
     val scope = rememberCoroutineScope()
     CompositionLocalProvider(
-        LocalFullScreenState provides fullScreenState,
-        LocalMediaPlayerHost provides mediaPlayerHost
+        LocalFullScreenState provides fullScreenState
     ) {
         Scaffold(
             modifier = Modifier.then(modifier),
@@ -146,10 +178,13 @@ actual fun MatchDetailsContentWrapper(
                         }
                     )
                 }
-            }
+            },
+            contentWindowInsets = if (isFullScreen) WindowInsets.statusBars else ScaffoldDefaults.contentWindowInsets
         ) { paddingValues ->
             val boxModifier =
-                if (isFullScreen) Modifier.fillMaxSize().padding(paddingValues) else Modifier
+                if (isFullScreen) Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues) else Modifier
                     .fillMaxWidth()
                     .padding(paddingValues)
                     .padding(all = 16.dp)
@@ -166,9 +201,10 @@ actual fun MatchDetailsContentWrapper(
                     verticalArrangement = Arrangement.SpaceAround,
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    MatchDetailsScoreboardWrapper(
+                    ScoreboardWithMediaPlayerView(
                         modifier = Modifier.horizontalScroll(state = rememberScrollState()),
                         match = match,
+                        mediaPlayerHost = mediaPlayerHost,
                         onEvent = onEvent
                     )
                     if (!isFullScreen) { // показываем, ТОЛЬКО если видео не на полный экран

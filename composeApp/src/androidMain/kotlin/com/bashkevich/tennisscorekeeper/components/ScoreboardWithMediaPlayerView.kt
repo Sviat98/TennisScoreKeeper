@@ -1,4 +1,4 @@
-package com.bashkevich.tennisscorekeeper.components.expect
+package com.bashkevich.tennisscorekeeper.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -13,15 +13,17 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.bashkevich.tennisscorekeeper.components.MediaPlayerComponent
+import chaintech.videoplayer.host.MediaPlayerHost
+import com.bashkevich.tennisscorekeeper.components.expect.LocalFullScreenState
 import com.bashkevich.tennisscorekeeper.components.scoreboard.match_details.MatchDetailsScoreboardView
 import com.bashkevich.tennisscorekeeper.model.match.domain.Match
 import com.bashkevich.tennisscorekeeper.screens.matchdetails.MatchDetailsUiEvent
 
 @Composable
-actual fun MatchDetailsScoreboardWrapper(
+fun ScoreboardWithMediaPlayerView(
     modifier: Modifier,
     match: Match,
+    mediaPlayerHost: MediaPlayerHost,
     onEvent: (MatchDetailsUiEvent)->Unit
 ){
     var isMediaPlayerEnabled  by remember { mutableStateOf(match.videoLink != null)  }
@@ -49,7 +51,9 @@ actual fun MatchDetailsScoreboardWrapper(
     }
    if (isMediaPlayerEnabled){
        MediaPlayerComponent(
-           match = match
+           match = match,
+           mediaPlayerHost = mediaPlayerHost,
+           onLoadVideoLink = {videoLink  -> onEvent(MatchDetailsUiEvent.AttachVideoLink(videoLink))}
        )
    }
    else{

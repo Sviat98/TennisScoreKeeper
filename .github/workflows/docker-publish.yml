@@ -17,8 +17,8 @@ env:
   REGISTRY: ghcr.io
   # github.repository as <account>/<repo>
   IMAGE_NAME: ${{ github.repository }}
-  # build mode: debug or release
-  BUILD_MODE: release
+  # build mode: DEBUG or RELEASE
+  BUILD_MODE: RELEASE
 
 
 jobs:

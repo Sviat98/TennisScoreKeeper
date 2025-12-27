@@ -8,16 +8,14 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.graphics.Color
 import com.bashkevich.tennisscorekeeper.AppConfig
-import com.bashkevich.tennisscorekeeper.components.icons.default_icons.ArrowBack
 import com.bashkevich.tennisscorekeeper.components.icons.IconGroup
+import com.bashkevich.tennisscorekeeper.components.icons.default_icons.ArrowBack
 import com.bashkevich.tennisscorekeeper.components.icons.default_icons.Person
 import com.bashkevich.tennisscorekeeper.components.icons.default_icons.Share
 import com.bashkevich.tennisscorekeeper.components.icons.filled_icons.Person
@@ -153,7 +151,6 @@ fun MatchDetailsAppBar(
     val baseUrlFrontend = appConfig.baseUrlFrontend
     TopAppBar(
         title = { Text("Match") },
-        colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Red),
         navigationIcon = {
             IconButton(
                 onClick = onBack

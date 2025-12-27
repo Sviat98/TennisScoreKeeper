@@ -1,3 +1,4 @@
+import com.codingfeline.buildkonfig.compiler.FieldSpec
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
@@ -10,46 +11,11 @@ plugins {
     alias(libs.plugins.composeCompiler)
     alias(libs.plugins.ksp)
     alias(libs.plugins.kotlinx.serialization)
-}
-val rawBuildMode: String = providers
-    .environmentVariable("BUILD_MODE")
-    .orElse(providers.gradleProperty("BUILD_MODE"))
-    .orElse("debug")
-    .get()
-
-val normalizedBuildMode = when (rawBuildMode.lowercase()) {
-    "release" -> "RELEASE"
-    "debug" -> "DEBUG"
-    else -> error("Unknown BUILD_MODE: $rawBuildMode (expected: debug or release)")
-}
-
-println("normalizedBuildMode = $normalizedBuildMode")
-
-tasks.register("generateBuildConfig") {
-    val outputDir = layout.buildDirectory.dir("generated/source/buildConfig/commonMain/kotlin")
-    outputs.dir(outputDir)
-
-    // Отключаем проверку актуальности таска
-    outputs.upToDateWhen { false }
-
-    doLast {
-        val pkg = "com.bashkevich.tennisscorekeeper"
-        val file = outputDir.get().file("BuildConfig.kt").asFile
-        file.parentFile.mkdirs()
-        file.writeText(
-            """
-            package $pkg
-
-            object BuildConfig {
-                val buildMode: BuildMode = BuildMode.$normalizedBuildMode
-            }
-        """.trimIndent()
-        )
-    }
+    alias(libs.plugins.build.konfig)
 }
 
 kotlin {
-    androidTarget {
+    androidTarget{
         @OptIn(ExperimentalKotlinGradlePluginApi::class)
         compilerOptions {
             jvmTarget.set(JvmTarget.JVM_11)
@@ -77,9 +43,6 @@ kotlin {
 
             implementation(libs.media.player)
             implementation(libs.sdp.ssp)
-        }
-        val commonMain by getting {
-            kotlin.srcDir(tasks.named("generateBuildConfig").map { it.outputs.files.singleFile })
         }
         commonMain.dependencies {
             implementation(compose.runtime)
@@ -136,9 +99,21 @@ kotlin {
     }
 }
 
-tasks.named("compileKotlinMetadata") {
-    dependsOn("generateBuildConfig")
+val buildMode  = providers.environmentVariable("BUILD_MODE")
+    .orElse(providers.gradleProperty("BUILD_MODE"))
+    .orElse("DEBUG")
+    .get()
+
+buildkonfig {
+    packageName = "com.bashkevich.tennisscorekeeper"
+    objectName = "BuildConfig"
+
+    defaultConfigs {
+        buildConfigField(FieldSpec.Type.STRING, "buildMode",buildMode)
+    }
 }
+
+println("buildMode = $buildMode")
 
 android {
     namespace = "com.bashkevich.tennisscorekeeper"

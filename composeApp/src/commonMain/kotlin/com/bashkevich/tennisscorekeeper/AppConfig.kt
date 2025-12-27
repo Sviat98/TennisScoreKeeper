@@ -23,7 +23,7 @@ data class AppConfig(
             println("Current build mode: $buildMode")
         }
 
-        private fun getBuildMode(): BuildMode = BuildConfig.buildMode
+        private fun getBuildMode(): BuildMode = BuildMode.valueOf(BuildConfig.buildMode)
 
         val current: AppConfig
             get() =

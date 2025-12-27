@@ -78,6 +78,7 @@ class MatchDetailsViewModel(
             is MatchDetailsUiEvent.UndoPoint -> undoPoint()
 
             is MatchDetailsUiEvent.RedoPoint -> redoPoint()
+            is MatchDetailsUiEvent.AttachVideoLink -> attachVideoLink(videoLink = uiEvent.videoLink)
         }
     }
 
@@ -159,6 +160,17 @@ class MatchDetailsViewModel(
             val matchId = state.match.id
             matchRepository.redoPoint(
                 matchId = matchId,
+            )
+        }
+    }
+    private fun attachVideoLink(videoLink: String) {
+        viewModelScope.launch {
+            val state = state.value
+
+            val matchId = state.match.id
+            matchRepository.attachVideoLink(
+                matchId = matchId,
+                videoLink = videoLink
             )
         }
     }
