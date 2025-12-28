@@ -120,7 +120,7 @@ actual fun MatchDetailsContentWrapper(
         }
     }
 
-    val videoLink = match.videoLink ?: "https://www.youtube.com/watch?v=q0jH2gyFqAQ"
+    val videoLink = match.videoLink ?: ""
     val mediaPlayerHost = remember { MediaPlayerHost(mediaUrl = videoLink) }
 
     mediaPlayerHost.onEvent = { event ->
