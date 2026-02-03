@@ -1,12 +1,10 @@
 import com.codingfeline.buildkonfig.compiler.FieldSpec
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
-import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
-    alias(libs.plugins.androidApplication)
+    alias(libs.plugins.androidKmpLibrary)
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
     alias(libs.plugins.ksp)
@@ -15,11 +13,12 @@ plugins {
 }
 
 kotlin {
-    androidTarget{
-        @OptIn(ExperimentalKotlinGradlePluginApi::class)
-        compilerOptions {
-            jvmTarget.set(JvmTarget.JVM_11)
-        }
+
+    androidLibrary{
+        minSdk = libs.versions.android.minSdk.get().toInt()
+        compileSdk = libs.versions.android.targetSdk.get().toInt()
+        namespace = "com.bashkevich.tennisscorekeeper.composeApp"
+        experimentalProperties["android.experimental.kmp.enableAndroidResources"] = true
     }
 
     jvm("desktop")
@@ -59,7 +58,7 @@ kotlin {
             implementation(libs.kotlinx.datetime)
 
             implementation(project.dependencies.platform(libs.koin.bom))
-            api(libs.koin.core)
+            implementation(libs.koin.core)
             implementation(libs.koin.compose)
             implementation(libs.koin.compose.viewmodel)
 
@@ -115,51 +114,7 @@ buildkonfig {
 
 println("buildMode = $buildMode")
 
-android {
-    namespace = "com.bashkevich.tennisscorekeeper"
-    compileSdk = libs.versions.android.compileSdk.get().toInt()
 
-    defaultConfig {
-        applicationId = "com.bashkevich.tennisscorekeeper"
-        minSdk = libs.versions.android.minSdk.get().toInt()
-        targetSdk = libs.versions.android.targetSdk.get().toInt()
-        versionCode = 1
-        versionName = "1.0"
-    }
-    packaging {
-        resources {
-            excludes += "/META-INF/{AL2.0,LGPL2.1}"
-        }
-    }
-    buildTypes {
-        getByName("debug") {
-            isMinifyEnabled = false
-            isDebuggable = true
-            // Дополнительные настройки для debug
-            applicationIdSuffix = ".debug"
-            versionNameSuffix = "-DEBUG"
-        }
-        getByName("release") {
-            isMinifyEnabled = false
-            isDebuggable = false
-            proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
-            )
-            signingConfig = signingConfigs.getByName("debug")
-        }
-    }
-    compileOptions {
-        isCoreLibraryDesugaringEnabled = true
-
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
-    }
-
-    dependencies {
-        coreLibraryDesugaring(libs.android.core.desugaring)
-    }
-}
 
 compose.desktop {
     application {
@@ -171,9 +126,5 @@ compose.desktop {
             packageVersion = "1.0.0"
         }
     }
-}
-
-dependencies {
-    debugImplementation(compose.uiTooling)
 }
 

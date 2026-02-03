@@ -15,7 +15,9 @@ WORKDIR /app/composeApp
 
 ## перед сборкой удаляем ненужные исполняемые файлы из bild-директорий
 RUN rm -rf /app/composeApp/build/dist/wasmJs/* && \
-    rm -rf /usr/share/nginx/html/*
+    rm -rf /usr/share/nginx/html/* \
+
+RUN apt-get update && apt-get -y install libatomic1
 
 # Собираем проект в заивсимости от BUILD_MODE
 RUN if [ "$BUILD_MODE" = "RELEASE" ]; then \

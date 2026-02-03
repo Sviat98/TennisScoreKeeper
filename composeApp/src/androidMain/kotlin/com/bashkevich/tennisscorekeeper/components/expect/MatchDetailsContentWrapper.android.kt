@@ -120,8 +120,7 @@ actual fun MatchDetailsContentWrapper(
         }
     }
 
-    val videoLink = match.videoLink ?: ""
-    val mediaPlayerHost = remember { MediaPlayerHost(mediaUrl = videoLink) }
+    val mediaPlayerHost = remember { MediaPlayerHost() }
 
     mediaPlayerHost.onEvent = { event ->
         when (event) {
