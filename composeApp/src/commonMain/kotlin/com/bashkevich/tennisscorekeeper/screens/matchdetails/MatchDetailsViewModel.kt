@@ -38,7 +38,7 @@ class MatchDetailsViewModel(
 
         viewModelScope.launch {
             matchRepository.observeMatchUpdates().distinctUntilChanged().collect { result ->
-                println(result)
+                println("match result = $result")
                 when (result) {
                     is LoadResult.Success -> {
                         reduceState { oldState -> oldState.copy(match = result.result) }

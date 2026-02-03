@@ -13,6 +13,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -31,12 +32,21 @@ fun MediaPlayerComponent(
     mediaPlayerHost: MediaPlayerHost,
     onLoadVideoLink: (String)-> Unit
 ) {
-    val videoLinkState = rememberTextFieldState(match.videoLink ?: "")
     val isLiveStream = match.status !in listOf(MatchStatus.PAUSED,MatchStatus.COMPLETED)
 
     val fullScreenState = LocalFullScreenState.current
 
     val isFullScreen = fullScreenState.isFullScreen
+
+    val videoLink = match.videoLink ?: ""
+
+    val videoLinkState = rememberTextFieldState(videoLink)
+
+    LaunchedEffect(videoLink) {
+        if (videoLink.isNotBlank()){
+            mediaPlayerHost.loadUrl(videoLink)
+        }
+    }
 
     Column(
         modifier = Modifier.then(modifier),
@@ -57,7 +67,7 @@ fun MediaPlayerComponent(
             }
         }
         val videoPlayerModifier = Modifier.width(300.dp).aspectRatio(16/9f)
-        if(match.videoLink == null){
+        if(videoLink.isEmpty()){
             Box(
                modifier = Modifier.then(videoPlayerModifier).background(color = Color.Black)
             )
