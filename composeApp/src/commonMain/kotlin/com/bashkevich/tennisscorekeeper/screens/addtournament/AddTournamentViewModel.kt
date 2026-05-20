@@ -48,9 +48,9 @@ class AddTournamentViewModel(
 
             when (addTournamentResult) {
                 is LoadResult.Success -> {
-                    val newCounter = addTournamentResult.result
+                    val newTournament = addTournamentResult.result
 
-                    tournamentRepository.emitNewTournament(newCounter)
+                    tournamentRepository.emitNewTournament(newTournament)
 
                     reduceState { oldState -> oldState.copy(tournamentAddingSubstate = TournamentAddingSubstate.Success) }
                 }
