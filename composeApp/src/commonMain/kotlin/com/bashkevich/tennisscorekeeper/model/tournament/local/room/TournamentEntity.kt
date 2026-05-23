@@ -19,6 +19,12 @@ data class TournamentEntity(
     val type: String,
     @ColumnInfo(name = "status")
     val status: String,
+    @ColumnInfo(name = "regular_set_id")
+    val regularSetTemplateId: String,
+    @ColumnInfo(name = "deciding_set_id")
+    val decidingSetTemplateId: String,
+    @ColumnInfo(name = "theme_id")
+    val themeId: String,
 )
 
 fun TournamentEntity.toDomain() = Tournament(
@@ -26,6 +32,9 @@ fun TournamentEntity.toDomain() = Tournament(
     name = name,
     type = TournamentType.valueOf(type),
     status = TournamentStatus.valueOf(status),
+    regularSetTemplateId = regularSetTemplateId,
+    decidingSetTemplateId = decidingSetTemplateId,
+    themeId = themeId,
 )
 
 fun TournamentDto.toEntity() = TournamentEntity(
@@ -33,4 +42,7 @@ fun TournamentDto.toEntity() = TournamentEntity(
     name = name,
     type = type.name,
     status = status.name,
+    regularSetTemplateId = regularSetTemplateId,
+    decidingSetTemplateId = decidingSetTemplateId,
+    themeId = themeId,
 )

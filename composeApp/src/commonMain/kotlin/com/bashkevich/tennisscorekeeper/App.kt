@@ -9,7 +9,6 @@ import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.dialog
 import androidx.navigation.compose.rememberNavController
 import com.bashkevich.tennisscorekeeper.di.authModule
 import com.bashkevich.tennisscorekeeper.di.coreModule
@@ -107,10 +106,11 @@ fun App(
                             viewModel = tournamentViewModel,
                         )
                     }
-                    dialog<AddTournamentRoute> {
+                    composable<AddTournamentRoute> {
                         val addTournamentViewModel = koinViewModel<AddTournamentViewModel>()
 
                         AddTournamentScreen(
+                            modifier = Modifier.fillMaxSize(),
                             viewModel = addTournamentViewModel,
                         )
                     }

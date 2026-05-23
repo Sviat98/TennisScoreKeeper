@@ -117,6 +117,26 @@ fun AddMatchAppBar(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
+fun AddTournamentAppBar(
+    onBack: () -> Unit,
+) {
+    TopAppBar(
+        title = { Text("Add Tournament") },
+        navigationIcon = {
+            IconButton(
+                onClick = onBack
+            ) {
+                Icon(
+                    imageVector = IconGroup.Default.ArrowBack,
+                    contentDescription = "Navigate back"
+                )
+            }
+        }
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
 fun LoginAppBar(
     onBack: () -> Unit
 ) {

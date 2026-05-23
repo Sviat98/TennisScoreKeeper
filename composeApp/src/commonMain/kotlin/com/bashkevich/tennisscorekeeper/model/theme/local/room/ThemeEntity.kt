@@ -9,6 +9,8 @@ data class ThemeEntity(
     @PrimaryKey
     @ColumnInfo(name = "id")
     val id: String,
+    @ColumnInfo(name = "name")
+    val name: String,
     @ColumnInfo(name = "content")
     val content: String
 )
