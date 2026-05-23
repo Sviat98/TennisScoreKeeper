@@ -5,6 +5,7 @@ import com.bashkevich.tennisscorekeeper.core.ResponseMessage
 import com.bashkevich.tennisscorekeeper.model.tournament.domain.Tournament
 import com.bashkevich.tennisscorekeeper.model.tournament.remote.AddTournamentBody
 import com.bashkevich.tennisscorekeeper.model.tournament.remote.TournamentStatus
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharedFlow
 
 interface TournamentRepository {
@@ -14,4 +15,6 @@ interface TournamentRepository {
     fun emitNewTournament(newTournament: Tournament)
     fun observeNewTournament(): SharedFlow<Tournament>
     suspend fun getTournamentById(id: String): LoadResult<Tournament, Throwable>
+    fun observeTournaments(): Flow<List<Tournament>>
+    fun observeTournamentById(id: String): Flow<Tournament>
 }

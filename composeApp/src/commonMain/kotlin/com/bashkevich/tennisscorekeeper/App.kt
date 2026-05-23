@@ -17,6 +17,7 @@ import com.bashkevich.tennisscorekeeper.di.matchModule
 import com.bashkevich.tennisscorekeeper.di.participantModule
 import com.bashkevich.tennisscorekeeper.di.platformModule
 import com.bashkevich.tennisscorekeeper.di.setTemplateModule
+import com.bashkevich.tennisscorekeeper.di.themeModule
 import com.bashkevich.tennisscorekeeper.di.tournamentModule
 import com.bashkevich.tennisscorekeeper.navigation.AddMatchRoute
 import com.bashkevich.tennisscorekeeper.navigation.AddTournamentRoute
@@ -67,6 +68,7 @@ fun App(
             tournamentModule,
             matchModule,
             setTemplateModule,
+            themeModule,
             participantModule,
             authModule
             //fileModule

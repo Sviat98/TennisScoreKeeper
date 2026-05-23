@@ -5,6 +5,8 @@ import com.bashkevich.tennisscorekeeper.AppViewModel
 import com.bashkevich.tennisscorekeeper.core.FlowSettingsFactory
 import com.bashkevich.tennisscorekeeper.core.KeyValueStorage
 import com.bashkevich.tennisscorekeeper.core.PlatformConfiguration
+import com.bashkevich.tennisscorekeeper.core.AppDatabase
+import com.bashkevich.tennisscorekeeper.core.getDatabaseBuilder
 import com.bashkevich.tennisscorekeeper.core.ResponseMessage
 import com.bashkevich.tennisscorekeeper.core.UnauthorizedException
 import com.bashkevich.tennisscorekeeper.core.doOnError
@@ -55,6 +57,12 @@ val coreModule = module {
     }
     singleOf(::KeyValueStorage) {
         createdAtStart()
+    }
+
+    single {
+        val platformConfiguration = get<PlatformConfiguration>()
+        val builder = getDatabaseBuilder(platformConfiguration)
+        builder.build()
     }
 
     val jsonSerializer = Json {

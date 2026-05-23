@@ -10,6 +10,7 @@ plugins {
     alias(libs.plugins.ksp)
     alias(libs.plugins.kotlinx.serialization)
     alias(libs.plugins.build.konfig)
+    alias(libs.plugins.androidx.room3)
 }
 
 kotlin {
@@ -27,6 +28,7 @@ kotlin {
     wasmJs {
         browser()
         binaries.executable()
+        useEsModules()
     }
 
     sourceSets {
@@ -42,6 +44,8 @@ kotlin {
 
             implementation(libs.media.player)
             implementation(libs.sdp.ssp)
+
+            implementation(libs.androidx.sqlite.bundled)
         }
         commonMain.dependencies {
             implementation(compose.runtime)
@@ -76,6 +80,8 @@ kotlin {
 
             implementation(libs.calf.file.picker)
             implementation(libs.compose.colorpicker)
+
+            implementation(libs.androidx.room3.runtime)
         }
 
         val desktopMain by getting
@@ -87,6 +93,8 @@ kotlin {
             implementation(libs.logback.classic)
             implementation(libs.multiplatform.settings.datastore)
 
+            implementation(libs.androidx.sqlite.bundled)
+
         }
 
         wasmJsMain.dependencies {
@@ -94,8 +102,24 @@ kotlin {
 
             implementation(libs.multiplatform.settings.coroutines)
             implementation(libs.multiplatform.settings.make.observable)
+
+            implementation(libs.androidx.sqlite.web)
+            implementation(
+                npm("sqlite-wasm-worker", layout.projectDirectory.dir("sqlite-wasm-worker").asFile)
+            )
+            implementation(libs.kotlinx.browser)
         }
     }
+}
+
+room3 {
+    schemaDirectory("$projectDir/schemas")
+}
+
+dependencies {
+    add("kspAndroid", libs.androidx.room3.compiler)
+    add("kspDesktop", libs.androidx.room3.compiler)
+    add("kspWasmJs", libs.androidx.room3.compiler)
 }
 
 val buildMode  = providers.environmentVariable("BUILD_MODE")

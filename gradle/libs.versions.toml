@@ -35,6 +35,10 @@ media-player = "1.0.53"
 
 build-konfig = "0.21.2"
 
+room = "3.0.0-alpha04"
+sqlite = "2.7.0-alpha04"
+kotlinx-browser = "0.5.0"
+
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
 kotlin-test-junit = { module = "org.jetbrains.kotlin:kotlin-test-junit", version.ref = "kotlin" }
@@ -89,6 +93,12 @@ koin-compose-viewmodel-navigation = { group = "io.insert-koin", name = "koin-com
 sdp-ssp = { module = "network.chaintech:sdp-ssp-compose-multiplatform", version.ref = "sdp_ssp" }
 media-player = { module = "network.chaintech:compose-multiplatform-media-player", version.ref = "media-player" }
 
+androidx-room3-runtime = { module = "androidx.room3:room3-runtime", version.ref = "room" }
+androidx-room3-compiler = { module = "androidx.room3:room3-compiler", version.ref = "room" }
+androidx-sqlite-bundled = { module = "androidx.sqlite:sqlite-bundled", version.ref = "sqlite" }
+androidx-sqlite-web = { module = "androidx.sqlite:sqlite-web", version.ref = "sqlite" }
+kotlinx-browser = { module = "org.jetbrains.kotlinx:kotlinx-browser", version.ref = "kotlinx-browser" }
+
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
 androidLibrary = { id = "com.android.library", version.ref = "agp" }
@@ -100,3 +110,4 @@ kotlinx-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", vers
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 build-konfig = {id = "com.codingfeline.buildkonfig" , version.ref = "build-konfig" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+androidx-room3 = { id = "androidx.room3", version.ref = "room" }
