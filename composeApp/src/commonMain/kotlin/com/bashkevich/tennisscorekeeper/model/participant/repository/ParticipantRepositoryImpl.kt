@@ -1,7 +1,7 @@
 package com.bashkevich.tennisscorekeeper.model.participant.repository
 
-import com.bashkevich.tennisscorekeeper.core.LoadResult
-import com.bashkevich.tennisscorekeeper.core.mapSuccess
+import com.bashkevich.tennisscorekeeper.core.remote.LoadResult
+import com.bashkevich.tennisscorekeeper.core.remote.mapSuccess
 import com.bashkevich.tennisscorekeeper.model.file.domain.ExcelFile
 import com.bashkevich.tennisscorekeeper.model.participant.domain.TennisParticipant
 import com.bashkevich.tennisscorekeeper.model.participant.domain.toDomain

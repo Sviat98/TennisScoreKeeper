@@ -2,17 +2,16 @@ package com.bashkevich.tennisscorekeeper.di
 
 import com.bashkevich.tennisscorekeeper.AppConfig
 import com.bashkevich.tennisscorekeeper.AppViewModel
-import com.bashkevich.tennisscorekeeper.core.FlowSettingsFactory
-import com.bashkevich.tennisscorekeeper.core.KeyValueStorage
+import com.bashkevich.tennisscorekeeper.core.local.FlowSettingsFactory
+import com.bashkevich.tennisscorekeeper.core.local.KeyValueStorage
 import com.bashkevich.tennisscorekeeper.core.PlatformConfiguration
-import com.bashkevich.tennisscorekeeper.core.AppDatabase
-import com.bashkevich.tennisscorekeeper.core.getDatabaseBuilder
-import com.bashkevich.tennisscorekeeper.core.ResponseMessage
-import com.bashkevich.tennisscorekeeper.core.UnauthorizedException
-import com.bashkevich.tennisscorekeeper.core.doOnError
-import com.bashkevich.tennisscorekeeper.core.doOnSuccess
-import com.bashkevich.tennisscorekeeper.core.httpClient
-import com.bashkevich.tennisscorekeeper.core.runOperationCatching
+import com.bashkevich.tennisscorekeeper.core.local.getDatabaseBuilder
+import com.bashkevich.tennisscorekeeper.core.remote.ResponseMessage
+import com.bashkevich.tennisscorekeeper.core.remote.UnauthorizedException
+import com.bashkevich.tennisscorekeeper.core.remote.doOnError
+import com.bashkevich.tennisscorekeeper.core.remote.doOnSuccess
+import com.bashkevich.tennisscorekeeper.core.remote.httpClient
+import com.bashkevich.tennisscorekeeper.core.remote.runOperationCatching
 import com.bashkevich.tennisscorekeeper.model.auth.remote.LoginResponseDto
 import com.russhwolf.settings.ExperimentalSettingsApi
 import io.ktor.client.call.body

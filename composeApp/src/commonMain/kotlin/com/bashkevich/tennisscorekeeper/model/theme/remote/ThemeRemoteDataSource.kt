@@ -1,7 +1,7 @@
 package com.bashkevich.tennisscorekeeper.model.theme.remote
 
-import com.bashkevich.tennisscorekeeper.core.LoadResult
-import com.bashkevich.tennisscorekeeper.core.runOperationCatching
+import com.bashkevich.tennisscorekeeper.core.remote.LoadResult
+import com.bashkevich.tennisscorekeeper.core.remote.runOperationCatching
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get

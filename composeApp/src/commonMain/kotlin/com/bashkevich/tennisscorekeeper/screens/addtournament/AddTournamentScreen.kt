@@ -44,8 +44,7 @@ import com.bashkevich.tennisscorekeeper.components.AddTournamentAppBar
 import com.bashkevich.tennisscorekeeper.components.add_match.set_template.SetTemplateCombobox
 import com.bashkevich.tennisscorekeeper.components.icons.IconGroup
 import com.bashkevich.tennisscorekeeper.components.icons.default_icons.ArrowDropDown
-import com.bashkevich.tennisscorekeeper.model.set_template.domain.SetTemplate
-import com.bashkevich.tennisscorekeeper.model.theme.ScoreboardTheme
+import com.bashkevich.tennisscorekeeper.model.theme.domain.ScoreboardTheme
 import com.bashkevich.tennisscorekeeper.model.tournament.remote.TournamentType
 import com.bashkevich.tennisscorekeeper.model.tournament.remote.mapToDisplayedString
 

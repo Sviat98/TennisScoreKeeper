@@ -1,2 +1,3 @@
-package com.bashkevich.tennisscorekeeper.core.remote 
+package com.bashkevich.tennisscorekeeper.core.remote
 
+class UnauthorizedException(message: String) : Exception(message)

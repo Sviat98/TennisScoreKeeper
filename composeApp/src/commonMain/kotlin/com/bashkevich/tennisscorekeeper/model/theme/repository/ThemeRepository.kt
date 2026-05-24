@@ -1,7 +1,7 @@
 package com.bashkevich.tennisscorekeeper.model.theme.repository
 
-import com.bashkevich.tennisscorekeeper.core.LoadResult
-import com.bashkevich.tennisscorekeeper.model.theme.ScoreboardTheme
+import com.bashkevich.tennisscorekeeper.core.remote.LoadResult
+import com.bashkevich.tennisscorekeeper.model.theme.domain.ScoreboardTheme
 import kotlinx.coroutines.flow.Flow
 
 interface ThemeRepository {

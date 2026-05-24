@@ -1,8 +1,6 @@
 package com.bashkevich.tennisscorekeeper.model.theme.local
 
-import com.bashkevich.tennisscorekeeper.core.AppDatabase
-import com.bashkevich.tennisscorekeeper.model.theme.local.room.ThemeDao
-import com.bashkevich.tennisscorekeeper.model.theme.local.room.ThemeEntity as RoomThemeEntity
+import com.bashkevich.tennisscorekeeper.core.local.AppDatabase
 import kotlinx.coroutines.flow.Flow
 
 class ThemeLocalDataSource(
@@ -10,20 +8,19 @@ class ThemeLocalDataSource(
 ) {
     private val dao: ThemeDao = db.themeDao()
 
-    fun getThemes(): Flow<List<RoomThemeEntity>> {
+    fun getThemes(): Flow<List<ThemeEntity>> {
         return dao.getAllThemes()
     }
 
-    fun getThemeById(id: String): Flow<RoomThemeEntity?> {
+    fun getThemeById(id: String): Flow<ThemeEntity?> {
         return dao.getThemeById(id)
     }
 
-    suspend fun insertTheme(theme: RoomThemeEntity) {
+    suspend fun insertTheme(theme: ThemeEntity) {
         dao.insertTheme(theme)
     }
 
-    suspend fun replaceAllThemes(themes: List<RoomThemeEntity>) {
-        dao.deleteAllThemes()
-        dao.insertThemes(themes)
+    suspend fun replaceAllThemes(themes: List<ThemeEntity>) {
+        dao.replaceAllThemes(themes)
     }
 }

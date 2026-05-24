@@ -1,7 +1,9 @@
 package com.bashkevich.tennisscorekeeper.model.theme.remote
 
+import com.bashkevich.tennisscorekeeper.model.theme.local.ThemeEntity
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
 
 @Serializable
 data class ThemeDto(
@@ -25,8 +27,3 @@ data class ThemeColor(
     val alpha: Float = 1f,
 )
 
-fun ThemeDto.toEntity() = com.bashkevich.tennisscorekeeper.model.theme.local.room.ThemeEntity(
-    id = id,
-    name = name,
-    content = kotlinx.serialization.json.Json.encodeToString(ThemeContent.serializer(), content)
-)

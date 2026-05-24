@@ -1,4 +1,4 @@
-package com.bashkevich.tennisscorekeeper.core
+package com.bashkevich.tennisscorekeeper.core.remote
 
 import io.ktor.client.HttpClient
 import io.ktor.client.HttpClientConfig

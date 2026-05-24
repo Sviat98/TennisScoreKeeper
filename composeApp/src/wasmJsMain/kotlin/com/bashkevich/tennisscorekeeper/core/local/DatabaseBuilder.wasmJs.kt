@@ -1,8 +1,9 @@
-package com.bashkevich.tennisscorekeeper.core
+package com.bashkevich.tennisscorekeeper.core.local
 
 import androidx.room3.Room
 import androidx.room3.RoomDatabase
 import androidx.sqlite.driver.web.WebWorkerSQLiteDriver
+import com.bashkevich.tennisscorekeeper.core.PlatformConfiguration
 import org.w3c.dom.Worker
 
 actual fun getDatabaseBuilder(

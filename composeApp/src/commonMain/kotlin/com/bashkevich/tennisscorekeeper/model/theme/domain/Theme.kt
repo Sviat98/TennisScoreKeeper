@@ -1,4 +1,4 @@
-package com.bashkevich.tennisscorekeeper.model.theme
+package com.bashkevich.tennisscorekeeper.model.theme.domain
 
 import androidx.compose.ui.graphics.Color
 import com.bashkevich.tennisscorekeeper.model.theme.local.ThemeEntity

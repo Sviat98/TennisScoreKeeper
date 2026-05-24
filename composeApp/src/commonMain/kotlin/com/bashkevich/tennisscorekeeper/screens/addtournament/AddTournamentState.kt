@@ -5,7 +5,7 @@ import androidx.compose.runtime.Immutable
 import com.bashkevich.tennisscorekeeper.model.set_template.domain.EMPTY_DECIDING_SET_TEMPLATE
 import com.bashkevich.tennisscorekeeper.model.set_template.domain.EMPTY_REGULAR_SET_TEMPLATE
 import com.bashkevich.tennisscorekeeper.model.set_template.domain.SetTemplate
-import com.bashkevich.tennisscorekeeper.model.theme.ScoreboardTheme
+import com.bashkevich.tennisscorekeeper.model.theme.domain.ScoreboardTheme
 import com.bashkevich.tennisscorekeeper.model.tournament.remote.TournamentType
 
 import com.bashkevich.tennisscorekeeper.mvi.UiAction

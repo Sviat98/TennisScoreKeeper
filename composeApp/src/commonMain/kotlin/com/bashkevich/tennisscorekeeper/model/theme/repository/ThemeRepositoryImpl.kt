@@ -1,13 +1,13 @@
 package com.bashkevich.tennisscorekeeper.model.theme.repository
 
-import com.bashkevich.tennisscorekeeper.core.LoadResult
-import com.bashkevich.tennisscorekeeper.core.doOnSuccess
-import com.bashkevich.tennisscorekeeper.core.mapSuccess
-import com.bashkevich.tennisscorekeeper.model.theme.ScoreboardTheme
+import com.bashkevich.tennisscorekeeper.core.remote.LoadResult
+import com.bashkevich.tennisscorekeeper.core.remote.doOnSuccess
+import com.bashkevich.tennisscorekeeper.core.remote.mapSuccess
+import com.bashkevich.tennisscorekeeper.model.theme.domain.ScoreboardTheme
 import com.bashkevich.tennisscorekeeper.model.theme.local.ThemeLocalDataSource
+import com.bashkevich.tennisscorekeeper.model.theme.local.toEntity
 import com.bashkevich.tennisscorekeeper.model.theme.remote.ThemeRemoteDataSource
-import com.bashkevich.tennisscorekeeper.model.theme.remote.toEntity
-import com.bashkevich.tennisscorekeeper.model.theme.toDomain
+import com.bashkevich.tennisscorekeeper.model.theme.domain.toDomain
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
