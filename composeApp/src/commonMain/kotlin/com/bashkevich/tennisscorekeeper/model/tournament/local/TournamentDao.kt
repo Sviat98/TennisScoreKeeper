@@ -1,9 +1,10 @@
-package com.bashkevich.tennisscorekeeper.model.tournament.local.room
+package com.bashkevich.tennisscorekeeper.model.tournament.local
 
 import androidx.room3.Dao
 import androidx.room3.Insert
 import androidx.room3.OnConflictStrategy
 import androidx.room3.Query
+import androidx.room3.Transaction
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -14,9 +15,18 @@ interface TournamentDao {
     @Query("SELECT * FROM tournaments WHERE id = :id")
     fun getTournamentById(id: String): Flow<TournamentEntity?>
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Insert(onConflict = OnConflictStrategy.Companion.REPLACE)
+    suspend fun insertTournament(tournament: TournamentEntity)
+
+    @Insert(onConflict = OnConflictStrategy.Companion.REPLACE)
     suspend fun insertTournaments(tournaments: List<TournamentEntity>)
 
     @Query("DELETE FROM tournaments")
     suspend fun deleteAllTournaments()
+
+    @Transaction
+    suspend fun replaceAllTournaments(tournaments: List<TournamentEntity>) {
+        deleteAllTournaments()
+        insertTournaments(tournaments)
+    }
 }

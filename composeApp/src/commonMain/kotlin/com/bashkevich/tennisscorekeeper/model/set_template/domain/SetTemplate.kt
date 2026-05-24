@@ -1,5 +1,6 @@
 package com.bashkevich.tennisscorekeeper.model.set_template.domain
 
+import com.bashkevich.tennisscorekeeper.model.set_template.local.SetTemplateEntity
 import com.bashkevich.tennisscorekeeper.model.set_template.remote.SetTemplateDto
 
 data class SetTemplate(
@@ -44,4 +45,15 @@ fun SetTemplateDto.toDomain() = SetTemplate(
     tiebreakPointsToWin = this.tiebreakPointsToWin,
     isRegular = this.isRegular,
     isDeciding = this.isDeciding
+)
+
+fun SetTemplateEntity.toDomain() = SetTemplate(
+    id = id,
+    name = name.replace(";", "\n"),
+    gamesToWin = gamesToWin,
+    hasDecidingPoint = hasDecidingPoint,
+    tiebreakMode = TiebreakMode.valueOf(tiebreakMode),
+    tiebreakPointsToWin = tiebreakPointsToWin,
+    isRegular = isRegular,
+    isDeciding = isDeciding,
 )

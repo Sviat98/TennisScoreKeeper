@@ -4,7 +4,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
-import com.bashkevich.tennisscorekeeper.core.LoadResult
+import com.bashkevich.tennisscorekeeper.core.remote.LoadResult
 import com.bashkevich.tennisscorekeeper.model.match.remote.MatchBody
 import com.bashkevich.tennisscorekeeper.model.match.remote.ParticipantInMatchBody
 import com.bashkevich.tennisscorekeeper.model.match.remote.convertToRgbString
@@ -48,6 +48,8 @@ class AddMatchViewModel(
 
     val actions: Flow<AddMatchAction>
         get() = super.action
+
+    private var currentSetTemplateFilter: SetTemplateTypeFilter? = null
 
     init {
         fetchTournament()
@@ -308,41 +310,43 @@ class AddMatchViewModel(
         viewModelScope.launch {
             val tournamentId = savedStateHandle.toRoute<AddMatchRoute>().tournamentId
 
-            val tournamentResult = tournamentRepository.getTournamentById(tournamentId)
+            launch {
+                tournamentRepository.observeTournamentById(tournamentId).collect { tournament ->
+                    val defaultParticipant = when (tournament.type) {
+                        TournamentType.SINGLES -> PARTICIPANT_IN_SINGLES_MATCH_DEFAULT
+                        TournamentType.DOUBLES -> PARTICIPANT_IN_DOUBLES_MATCH_DEFAULT
+                    }
 
-            if (tournamentResult is LoadResult.Success) {
-
-                val tournament = tournamentResult.result
-
-                val defaultParticipant = when(tournament.type){
-                    TournamentType.SINGLES -> PARTICIPANT_IN_SINGLES_MATCH_DEFAULT
-                    TournamentType.DOUBLES -> PARTICIPANT_IN_DOUBLES_MATCH_DEFAULT
-                }
-
-                reduceState { oldState ->
-                    oldState.copy(
-                        isLoading = false,
-                        tournament = tournament,
-                        firstParticipant = defaultParticipant,
-                        secondParticipant = defaultParticipant
-                    )
+                    reduceState { oldState ->
+                        oldState.copy(
+                            isLoading = false,
+                            tournament = tournament,
+                            firstParticipant = defaultParticipant,
+                            secondParticipant = defaultParticipant
+                        )
+                    }
                 }
             }
+            tournamentRepository.fetchTournamentById(tournamentId)
         }
     }
 
     private fun fetchSetTemplates(setTemplateTypeFilter: SetTemplateTypeFilter) {
-        viewModelScope.launch {
-
-            val setTemplatesResult =
-                setTemplateRepository.getSetTemplates(setTemplateTypeFilter)
-
-            if (setTemplatesResult is LoadResult.Success) {
-                reduceState { oldState ->
-                    oldState.copy(
-                        setTemplateOptions = setTemplatesResult.result
-                    )
+        if (currentSetTemplateFilter != setTemplateTypeFilter) {
+            currentSetTemplateFilter = setTemplateTypeFilter
+            viewModelScope.launch {
+                launch {
+                    setTemplateRepository.observeSetTemplates(setTemplateTypeFilter).collect { templates ->
+                        reduceState { oldState ->
+                            oldState.copy(setTemplateOptions = templates)
+                        }
+                    }
                 }
+                setTemplateRepository.fetchSetTemplates(setTemplateTypeFilter)
+            }
+        } else {
+            viewModelScope.launch {
+                setTemplateRepository.fetchSetTemplates(setTemplateTypeFilter)
             }
         }
     }

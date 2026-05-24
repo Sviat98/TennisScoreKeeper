@@ -1,5 +1,6 @@
 package com.bashkevich.tennisscorekeeper.model.tournament.domain
 
+import com.bashkevich.tennisscorekeeper.model.tournament.local.TournamentEntity
 import com.bashkevich.tennisscorekeeper.model.tournament.remote.TournamentDto
 import com.bashkevich.tennisscorekeeper.model.tournament.remote.TournamentStatus
 import com.bashkevich.tennisscorekeeper.model.tournament.remote.TournamentType
@@ -26,3 +27,13 @@ fun TournamentDto.toDomain() =
         decidingSetTemplateId = this.decidingSetTemplateId,
         themeId = this.themeId,
     )
+
+fun TournamentEntity.toDomain() = Tournament(
+    id = id,
+    name = name,
+    type = TournamentType.valueOf(type),
+    status = TournamentStatus.valueOf(status),
+    regularSetTemplateId = regularSetTemplateId,
+    decidingSetTemplateId = decidingSetTemplateId,
+    themeId = themeId,
+)

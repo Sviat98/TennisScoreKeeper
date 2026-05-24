@@ -2,9 +2,8 @@ package com.bashkevich.tennisscorekeeper.screens.tournamentlist
 
 import androidx.lifecycle.viewModelScope
 import com.bashkevich.tennisscorekeeper.AppConfig
-import com.bashkevich.tennisscorekeeper.core.LoadResult
-import com.bashkevich.tennisscorekeeper.core.UnauthorizedException
-import com.bashkevich.tennisscorekeeper.core.doOnSuccess
+import com.bashkevich.tennisscorekeeper.core.remote.LoadResult
+import com.bashkevich.tennisscorekeeper.core.remote.UnauthorizedException
 import com.bashkevich.tennisscorekeeper.model.auth.repository.AuthRepository
 import com.bashkevich.tennisscorekeeper.model.tournament.repository.TournamentRepository
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -35,18 +34,30 @@ class TournamentListViewModel(
         showTournaments()
 
         viewModelScope.launch {
-            tournamentRepository.observeNewTournament().distinctUntilChanged()
-                .collect { newTournament ->
-                    val tournaments = state.value.tournaments.toMutableList()
-
-                    tournaments.add(newTournament)
+            launch {
+                tournamentRepository.observeTournaments().collect { tournaments ->
                     reduceState { oldState ->
                         oldState.copy(
                             loadingState = TournamentListLoadingState.Success,
-                            tournaments = tournaments.toList()
+                            tournaments = tournaments
                         )
                     }
                 }
+            }
+            launch {
+                tournamentRepository.observeNewTournament().distinctUntilChanged()
+                    .collect { newTournament ->
+                        val tournaments = state.value.tournaments.toMutableList()
+
+                        tournaments.add(newTournament)
+                        reduceState { oldState ->
+                            oldState.copy(
+                                loadingState = TournamentListLoadingState.Success,
+                                tournaments = tournaments.toList()
+                            )
+                        }
+                    }
+            }
         }
     }
 
@@ -59,7 +70,7 @@ class TournamentListViewModel(
                 val appConfig = AppConfig.current
                 AppConfig.logBuildMode()
                 println("appConfig = $appConfig")
-                tournamentRepository.getTournaments()
+                tournamentRepository.fetchTournaments()
             }
 
             val refreshTokenStatusResultAsync = async {
@@ -73,13 +84,8 @@ class TournamentListViewModel(
             if (tournamentsResult is LoadResult.Error || (refreshTokenStatusResult is LoadResult.Error && refreshTokenStatusResult.result !is UnauthorizedException)) {
                 reduceState { oldState -> oldState.copy(loadingState = TournamentListLoadingState.Error) }
             } else {
-                tournamentsResult.doOnSuccess { tournaments ->
-                    reduceState { oldState ->
-                        oldState.copy(
-                            loadingState = TournamentListLoadingState.Success,
-                            tournaments = tournaments
-                        )
-                    }
+                reduceState { oldState ->
+                    oldState.copy(loadingState = TournamentListLoadingState.Success)
                 }
             }
         }

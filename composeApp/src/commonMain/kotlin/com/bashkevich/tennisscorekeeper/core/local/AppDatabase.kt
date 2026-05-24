@@ -1,15 +1,15 @@
-package com.bashkevich.tennisscorekeeper.core
+package com.bashkevich.tennisscorekeeper.core.local
 
 import androidx.room3.ConstructedBy
 import androidx.room3.Database
 import androidx.room3.RoomDatabase
 import androidx.room3.RoomDatabaseConstructor
-import com.bashkevich.tennisscorekeeper.model.set_template.local.room.SetTemplateDao
-import com.bashkevich.tennisscorekeeper.model.set_template.local.room.SetTemplateEntity
-import com.bashkevich.tennisscorekeeper.model.theme.local.room.ThemeDao
-import com.bashkevich.tennisscorekeeper.model.theme.local.room.ThemeEntity
-import com.bashkevich.tennisscorekeeper.model.tournament.local.room.TournamentDao
-import com.bashkevich.tennisscorekeeper.model.tournament.local.room.TournamentEntity
+import com.bashkevich.tennisscorekeeper.model.set_template.local.SetTemplateDao
+import com.bashkevich.tennisscorekeeper.model.set_template.local.SetTemplateEntity
+import com.bashkevich.tennisscorekeeper.model.theme.local.ThemeDao
+import com.bashkevich.tennisscorekeeper.model.theme.local.ThemeEntity
+import com.bashkevich.tennisscorekeeper.model.tournament.local.TournamentDao
+import com.bashkevich.tennisscorekeeper.model.tournament.local.TournamentEntity
 
 @Database(
     entities = [TournamentEntity::class, SetTemplateEntity::class, ThemeEntity::class],
@@ -22,7 +22,6 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun themeDao(): ThemeDao
 }
 
-@Suppress("KotlinNoActualForExpect")
 expect object AppDatabaseConstructor : RoomDatabaseConstructor<AppDatabase> {
     override fun initialize(): AppDatabase
 }

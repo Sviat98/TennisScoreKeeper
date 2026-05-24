@@ -1,8 +1,6 @@
 package com.bashkevich.tennisscorekeeper.model.tournament.local
 
-import com.bashkevich.tennisscorekeeper.core.AppDatabase
-import com.bashkevich.tennisscorekeeper.model.tournament.local.room.TournamentDao
-import com.bashkevich.tennisscorekeeper.model.tournament.local.room.TournamentEntity
+import com.bashkevich.tennisscorekeeper.core.local.AppDatabase
 import kotlinx.coroutines.flow.Flow
 
 class TournamentLocalDataSource(
@@ -18,8 +16,11 @@ class TournamentLocalDataSource(
         return dao.getTournamentById(id)
     }
 
+    suspend fun insertTournament(tournament: TournamentEntity) {
+        dao.insertTournament(tournament)
+    }
+
     suspend fun replaceAllTournaments(tournaments: List<TournamentEntity>) {
-        dao.deleteAllTournaments()
-        dao.insertTournaments(tournaments)
+        dao.replaceAllTournaments(tournaments)
     }
 }

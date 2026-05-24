@@ -1,10 +1,8 @@
-package com.bashkevich.tennisscorekeeper.model.set_template.local.room
+package com.bashkevich.tennisscorekeeper.model.set_template.local
 
 import androidx.room3.ColumnInfo
 import androidx.room3.Entity
 import androidx.room3.PrimaryKey
-import com.bashkevich.tennisscorekeeper.model.set_template.domain.SetTemplate
-import com.bashkevich.tennisscorekeeper.model.set_template.domain.TiebreakMode
 import com.bashkevich.tennisscorekeeper.model.set_template.remote.SetTemplateDto
 
 @Entity(tableName = "set_templates")
@@ -26,17 +24,6 @@ data class SetTemplateEntity(
     val isRegular: Boolean,
     @ColumnInfo(name = "is_deciding")
     val isDeciding: Boolean,
-)
-
-fun SetTemplateEntity.toDomain() = SetTemplate(
-    id = id,
-    name = name.replace(";", "\n"),
-    gamesToWin = gamesToWin,
-    hasDecidingPoint = hasDecidingPoint,
-    tiebreakMode = TiebreakMode.valueOf(tiebreakMode),
-    tiebreakPointsToWin = tiebreakPointsToWin,
-    isRegular = isRegular,
-    isDeciding = isDeciding,
 )
 
 fun SetTemplateDto.toEntity() = SetTemplateEntity(

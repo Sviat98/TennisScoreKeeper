@@ -1,7 +1,7 @@
 package com.bashkevich.tennisscorekeeper.model.theme
 
 import androidx.compose.ui.graphics.Color
-import com.bashkevich.tennisscorekeeper.model.theme.local.room.ThemeEntity
+import com.bashkevich.tennisscorekeeper.model.theme.local.ThemeEntity
 import com.bashkevich.tennisscorekeeper.model.theme.remote.ThemeColor
 import com.bashkevich.tennisscorekeeper.model.theme.remote.ThemeContent
 import com.bashkevich.tennisscorekeeper.model.theme.remote.ThemeDto

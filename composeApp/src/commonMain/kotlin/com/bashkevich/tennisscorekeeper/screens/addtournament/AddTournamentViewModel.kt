@@ -1,7 +1,7 @@
 package com.bashkevich.tennisscorekeeper.screens.addtournament
 
 import androidx.lifecycle.viewModelScope
-import com.bashkevich.tennisscorekeeper.core.LoadResult
+import com.bashkevich.tennisscorekeeper.core.remote.LoadResult
 import com.bashkevich.tennisscorekeeper.model.set_template.domain.SetTemplateTypeFilter
 import com.bashkevich.tennisscorekeeper.model.set_template.repository.SetTemplateRepository
 import com.bashkevich.tennisscorekeeper.model.theme.repository.ThemeRepository
@@ -118,7 +118,7 @@ class AddTournamentViewModel(
                 }
             }
             // Fetch from network and cache
-            setTemplateRepository.getSetTemplates(SetTemplateTypeFilter.ALL)
+            setTemplateRepository.fetchSetTemplates(SetTemplateTypeFilter.ALL)
         }
     }
 

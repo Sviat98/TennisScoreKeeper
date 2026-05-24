@@ -1,9 +1,7 @@
 package com.bashkevich.tennisscorekeeper.model.set_template.local
 
-import com.bashkevich.tennisscorekeeper.core.AppDatabase
+import com.bashkevich.tennisscorekeeper.core.local.AppDatabase
 import com.bashkevich.tennisscorekeeper.model.set_template.domain.SetTemplateTypeFilter
-import com.bashkevich.tennisscorekeeper.model.set_template.local.room.SetTemplateDao
-import com.bashkevich.tennisscorekeeper.model.set_template.local.room.SetTemplateEntity
 import kotlinx.coroutines.flow.Flow
 
 class SetTemplateLocalDataSource(
@@ -20,7 +18,6 @@ class SetTemplateLocalDataSource(
     }
 
     suspend fun replaceAllSetTemplates(templates: List<SetTemplateEntity>) {
-        dao.deleteAllSetTemplates()
-        dao.insertSetTemplates(templates)
+        dao.replaceAllSetTemplates(templates)
     }
 }

@@ -1,15 +1,14 @@
 package com.bashkevich.tennisscorekeeper.model.tournament.repository
 
-import com.bashkevich.tennisscorekeeper.core.LoadResult
-import com.bashkevich.tennisscorekeeper.core.ResponseMessage
-import com.bashkevich.tennisscorekeeper.core.doOnSuccess
-import com.bashkevich.tennisscorekeeper.core.mapSuccess
+import com.bashkevich.tennisscorekeeper.core.remote.LoadResult
+import com.bashkevich.tennisscorekeeper.core.remote.ResponseMessage
+import com.bashkevich.tennisscorekeeper.core.remote.doOnSuccess
+import com.bashkevich.tennisscorekeeper.core.remote.mapSuccess
 import com.bashkevich.tennisscorekeeper.model.tournament.domain.Tournament
 import com.bashkevich.tennisscorekeeper.model.tournament.domain.TOURNAMENT_DEFAULT
 import com.bashkevich.tennisscorekeeper.model.tournament.domain.toDomain
 import com.bashkevich.tennisscorekeeper.model.tournament.local.TournamentLocalDataSource
-import com.bashkevich.tennisscorekeeper.model.tournament.local.room.toEntity
-import com.bashkevich.tennisscorekeeper.model.tournament.local.room.toDomain as entityToDomain
+import com.bashkevich.tennisscorekeeper.model.tournament.local.toEntity
 import com.bashkevich.tennisscorekeeper.model.tournament.remote.AddTournamentBody
 import com.bashkevich.tennisscorekeeper.model.tournament.remote.TournamentRemoteDataSource
 import com.bashkevich.tennisscorekeeper.model.tournament.remote.TournamentStatus
@@ -26,19 +25,17 @@ class TournamentRepositoryImpl(
 ) : TournamentRepository {
     private val _newTournament = MutableSharedFlow<Tournament>(replay = 1)
 
-    override suspend fun getTournaments(): LoadResult<List<Tournament>, Throwable> {
+    override suspend fun fetchTournaments(): LoadResult<Unit, Throwable> {
         return tournamentRemoteDataSource.getTournaments().doOnSuccess { tournamentDtos ->
             val entities = tournamentDtos.map { it.toEntity() }
             tournamentLocalDataSource.replaceAllTournaments(entities)
-        }.mapSuccess { tournamentDtos ->
-            tournamentDtos.map { it.toDomain() }
-        }
+        }.mapSuccess { }
     }
 
-    override suspend fun getTournamentById(id: String): LoadResult<Tournament, Throwable> {
-        return tournamentRemoteDataSource.getTournamentById(id).mapSuccess { tournamentDto ->
-            tournamentDto.toDomain()
-        }
+    override suspend fun fetchTournamentById(id: String): LoadResult<Unit, Throwable> {
+        return tournamentRemoteDataSource.getTournamentById(id).doOnSuccess { tournamentDto ->
+            tournamentLocalDataSource.insertTournament(tournamentDto.toEntity())
+        }.mapSuccess { }
     }
 
     override suspend fun addTournament(addTournamentBody: AddTournamentBody): LoadResult<Tournament, Throwable> {
@@ -68,13 +65,13 @@ class TournamentRepositoryImpl(
 
     override fun observeTournaments(): Flow<List<Tournament>> {
         return tournamentLocalDataSource.getTournaments().map { entities ->
-            entities.map { it.entityToDomain() }
+            entities.map { it.toDomain() }
         }
     }
 
     override fun observeTournamentById(id: String): Flow<Tournament> {
         return tournamentLocalDataSource.getTournamentById(id).map { entity ->
-            entity?.entityToDomain() ?: TOURNAMENT_DEFAULT
+            entity?.toDomain() ?: TOURNAMENT_DEFAULT
         }
     }
 }

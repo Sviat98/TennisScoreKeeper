@@ -1,12 +1,9 @@
-package com.bashkevich.tennisscorekeeper.model.tournament.local.room
+package com.bashkevich.tennisscorekeeper.model.tournament.local
 
 import androidx.room3.ColumnInfo
 import androidx.room3.Entity
 import androidx.room3.PrimaryKey
-import com.bashkevich.tennisscorekeeper.model.tournament.domain.Tournament
 import com.bashkevich.tennisscorekeeper.model.tournament.remote.TournamentDto
-import com.bashkevich.tennisscorekeeper.model.tournament.remote.TournamentStatus
-import com.bashkevich.tennisscorekeeper.model.tournament.remote.TournamentType
 
 @Entity(tableName = "tournaments")
 data class TournamentEntity(
@@ -25,16 +22,6 @@ data class TournamentEntity(
     val decidingSetTemplateId: String,
     @ColumnInfo(name = "theme_id")
     val themeId: String,
-)
-
-fun TournamentEntity.toDomain() = Tournament(
-    id = id,
-    name = name,
-    type = TournamentType.valueOf(type),
-    status = TournamentStatus.valueOf(status),
-    regularSetTemplateId = regularSetTemplateId,
-    decidingSetTemplateId = decidingSetTemplateId,
-    themeId = themeId,
 )
 
 fun TournamentDto.toEntity() = TournamentEntity(
