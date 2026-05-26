@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.input.TextFieldState
@@ -27,6 +28,8 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
+import androidx.window.core.layout.WindowSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -85,12 +88,20 @@ fun AddTournamentContent(
         onNavigateUp()
     }
 
+    val windowSize = currentWindowAdaptiveInfo().windowSizeClass
+    val isWideScreen = windowSize.isWidthAtLeastBreakpoint(WindowSizeClass.WIDTH_DP_MEDIUM_LOWER_BOUND)
+
     Scaffold(
         modifier = modifier,
         topBar = {
             AddTournamentAppBar(onBack = onNavigateUp)
         }
     ) { paddingValues ->
+        val tournamentName = state.tournamentName
+        val tournamentType = state.tournamentType
+        val regularTemplates = state.setTemplateOptions.filter { it.isRegular }
+        val decidingTemplates = state.setTemplateOptions.filter { it.isDeciding }
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -100,80 +111,121 @@ fun AddTournamentContent(
             verticalArrangement = Arrangement.spacedBy(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            val tournamentName = state.tournamentName
-            val tournamentType = state.tournamentType
-
-            // Tournament name
-            TextField(
-                modifier = Modifier.fillMaxWidth(),
-                state = tournamentName,
-                placeholder = { Text("Tournament name") },
-            )
-
-            // Tournament type
-            TournamentTypeCombobox(
-                modifier = Modifier.fillMaxWidth(),
-                currentTournamentType = tournamentType,
-                onTournamentTypeChange = { type ->
-                    onEvent(AddTournamentUiEvent.SelectTournamentType(type))
+            if (isWideScreen) {
+                // Row 1: Tournament name + Tournament type
+                Row(
+                    modifier = Modifier
+                        .widthIn(max = 1000.dp)
+                        .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(64.dp),
+                ) {
+                    TextField(
+                        modifier = Modifier.weight(1f),
+                        state = tournamentName,
+                        placeholder = { Text("Tournament name") },
+                    )
+                    TournamentTypeCombobox(
+                        modifier = Modifier.weight(1f),
+                        currentTournamentType = tournamentType,
+                        onTournamentTypeChange = { type ->
+                            onEvent(AddTournamentUiEvent.SelectTournamentType(type))
+                        }
+                    )
                 }
-            )
 
-            // Set templates section
-            Text(
-                text = "Set Templates",
-                style = MaterialTheme.typography.titleMedium,
-                modifier = Modifier.fillMaxWidth()
-            )
+                // Row 2: Regular set template + Deciding set template
+                Row(
+                    modifier = Modifier
+                        .widthIn(max = 1000.dp)
+                        .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(64.dp),
+                ) {
+                    SetTemplateCombobox(
+                        modifier = Modifier.weight(1f),
+                        setTemplateOptions = regularTemplates,
+                        enabled = true,
+                        currentSetTemplate = state.regularSetTemplate,
+                        onSetTemplatesFetch = { onEvent(AddTournamentUiEvent.FetchSetTemplates) },
+                        onSetTemplateChange = { template ->
+                            onEvent(AddTournamentUiEvent.SelectRegularSetTemplate(template))
+                        }
+                    )
+                    SetTemplateCombobox(
+                        modifier = Modifier.weight(1f),
+                        setTemplateOptions = decidingTemplates,
+                        enabled = true,
+                        currentSetTemplate = state.decidingSetTemplate,
+                        onSetTemplatesFetch = { onEvent(AddTournamentUiEvent.FetchSetTemplates) },
+                        onSetTemplateChange = { template ->
+                            onEvent(AddTournamentUiEvent.SelectDecidingSetTemplate(template))
+                        }
+                    )
+                }
 
-            if (state.setTemplatesLoading) {
-                CircularProgressIndicator(modifier = Modifier.size(32.dp))
+                // Row 3: Theme (under regular set template, same width)
+                Row(
+                    modifier = Modifier
+                        .widthIn(max = 1000.dp)
+                        .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(64.dp),
+                ) {
+                    ThemeDropdownMenu(
+                        modifier = Modifier.weight(1f),
+                        themes = state.themeOptions,
+                        selectedTheme = state.selectedTheme,
+                        onThemeSelected = { theme ->
+                            onEvent(AddTournamentUiEvent.SelectTheme(theme))
+                        },
+                        onThemesFetch = { onEvent(AddTournamentUiEvent.FetchThemes) }
+                    )
+                    Spacer(modifier = Modifier.weight(1f))
+                }
             } else {
-                val regularTemplates = state.setTemplateOptions.filter { it.isRegular }
-                val decidingTemplates = state.setTemplateOptions.filter { it.isDeciding }
+                // Narrow screen: vertical layout
+                TextField(
+                    modifier = Modifier.fillMaxWidth(),
+                    state = tournamentName,
+                    placeholder = { Text("Tournament name") },
+                )
 
-                // Regular set template
+                TournamentTypeCombobox(
+                    modifier = Modifier.fillMaxWidth(),
+                    currentTournamentType = tournamentType,
+                    onTournamentTypeChange = { type ->
+                        onEvent(AddTournamentUiEvent.SelectTournamentType(type))
+                    }
+                )
+
                 SetTemplateCombobox(
                     modifier = Modifier.fillMaxWidth(),
                     setTemplateOptions = regularTemplates,
                     enabled = true,
                     currentSetTemplate = state.regularSetTemplate,
-                    onSetTemplatesFetch = {},
+                    onSetTemplatesFetch = { onEvent(AddTournamentUiEvent.FetchSetTemplates) },
                     onSetTemplateChange = { template ->
                         onEvent(AddTournamentUiEvent.SelectRegularSetTemplate(template))
                     }
                 )
 
-                // Deciding set template
                 SetTemplateCombobox(
                     modifier = Modifier.fillMaxWidth(),
                     setTemplateOptions = decidingTemplates,
                     enabled = true,
                     currentSetTemplate = state.decidingSetTemplate,
-                    onSetTemplatesFetch = {},
+                    onSetTemplatesFetch = { onEvent(AddTournamentUiEvent.FetchSetTemplates) },
                     onSetTemplateChange = { template ->
                         onEvent(AddTournamentUiEvent.SelectDecidingSetTemplate(template))
                     }
                 )
-            }
 
-            // Theme section
-            Text(
-                text = "Theme",
-                style = MaterialTheme.typography.titleMedium,
-                modifier = Modifier.fillMaxWidth()
-            )
-
-            if (state.themesLoading) {
-                CircularProgressIndicator(modifier = Modifier.size(32.dp))
-            } else {
                 ThemeDropdownMenu(
                     modifier = Modifier.fillMaxWidth(),
                     themes = state.themeOptions,
                     selectedTheme = state.selectedTheme,
                     onThemeSelected = { theme ->
                         onEvent(AddTournamentUiEvent.SelectTheme(theme))
-                    }
+                    },
+                    onThemesFetch = { onEvent(AddTournamentUiEvent.FetchThemes) }
                 )
             }
 
@@ -277,7 +329,8 @@ fun ThemeDropdownMenu(
     modifier: Modifier = Modifier,
     themes: List<ScoreboardTheme>,
     selectedTheme: ScoreboardTheme?,
-    onThemeSelected: (ScoreboardTheme) -> Unit
+    onThemeSelected: (ScoreboardTheme) -> Unit,
+    onThemesFetch: () -> Unit = {},
 ) {
     var expanded by remember { mutableStateOf(false) }
 
@@ -290,7 +343,10 @@ fun ThemeDropdownMenu(
             placeholder = { Text("Select theme") },
             readOnly = true,
             trailingIcon = {
-                IconButton(onClick = { expanded = true }) {
+                IconButton(onClick = {
+                    expanded = true
+                    onThemesFetch()
+                }) {
                     Icon(
                         imageVector = IconGroup.Default.ArrowDropDown,
                         contentDescription = "Open dropdown",

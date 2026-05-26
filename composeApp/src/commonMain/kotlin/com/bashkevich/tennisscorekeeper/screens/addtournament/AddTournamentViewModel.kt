@@ -30,10 +30,8 @@ class AddTournamentViewModel(
     val actions: Flow<AddTournamentAction>
         get() = super.action
 
-    init {
-        loadSetTemplates()
-        loadThemes()
-    }
+    private var setTemplatesLoaded = false
+    private var themesLoaded = false
 
     fun onEvent(uiEvent: AddTournamentUiEvent) {
         when (uiEvent) {
@@ -52,6 +50,10 @@ class AddTournamentViewModel(
             is AddTournamentUiEvent.SelectTheme -> {
                 reduceState { oldState -> oldState.copy(selectedTheme = uiEvent.theme) }
             }
+
+            is AddTournamentUiEvent.FetchSetTemplates -> fetchSetTemplates()
+
+            is AddTournamentUiEvent.FetchThemes -> fetchThemes()
 
             is AddTournamentUiEvent.AddTournament -> addTournament(
                 tournamentName = uiEvent.tournamentName,
@@ -102,40 +104,36 @@ class AddTournamentViewModel(
         }
     }
 
-    private fun loadSetTemplates() {
+    private fun fetchSetTemplates() {
+        if (setTemplatesLoaded) return
+        setTemplatesLoaded = true
         viewModelScope.launch {
-            // Observe cached data from Room
             launch {
                 setTemplateRepository.observeSetTemplates(SetTemplateTypeFilter.ALL).collect { templates ->
                     reduceState { oldState ->
-                        val regularTemplates = templates.filter { it.isRegular }
-                        val decidingTemplates = templates.filter { it.isDeciding }
                         oldState.copy(
                             setTemplateOptions = templates,
-                            setTemplatesLoading = false,
                         )
                     }
                 }
             }
-            // Fetch from network and cache
             setTemplateRepository.fetchSetTemplates(SetTemplateTypeFilter.ALL)
         }
     }
 
-    private fun loadThemes() {
+    private fun fetchThemes() {
+        if (themesLoaded) return
+        themesLoaded = true
         viewModelScope.launch {
-            // Observe cached data from Room
             launch {
                 themeRepository.observeThemesFromDatabase().collect { themes ->
                     reduceState { oldState ->
                         oldState.copy(
                             themeOptions = themes,
-                            themesLoading = false,
                         )
                     }
                 }
             }
-            // Fetch from network and cache
             themeRepository.fetchThemes()
         }
     }
