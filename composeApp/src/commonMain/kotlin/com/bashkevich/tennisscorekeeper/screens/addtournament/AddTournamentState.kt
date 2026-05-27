@@ -20,12 +20,14 @@ sealed class AddTournamentUiEvent : UiEvent {
     class SelectTheme(val theme: ScoreboardTheme) : AddTournamentUiEvent()
     data object FetchSetTemplates : AddTournamentUiEvent()
     data object FetchThemes : AddTournamentUiEvent()
+    class ChangeSetsToWin(val delta: Int) : AddTournamentUiEvent()
     class AddTournament(
         val tournamentName: String,
         val tournamentType: TournamentType,
         val defaultSetTemplateId: String,
         val decidingSetTemplateId: String,
         val themeId: String,
+        val setsToWin: Int,
     ) : AddTournamentUiEvent()
 }
 
@@ -39,6 +41,7 @@ data class AddTournamentState(
     val decidingSetTemplate: SetTemplate,
     val themeOptions: List<ScoreboardTheme>,
     val selectedTheme: ScoreboardTheme?,
+    val setsToWin: Int,
 ) : UiState {
     companion object {
         fun initial() = AddTournamentState(
@@ -50,6 +53,7 @@ data class AddTournamentState(
             decidingSetTemplate = EMPTY_DECIDING_SET_TEMPLATE,
             themeOptions = emptyList(),
             selectedTheme = null,
+            setsToWin = 1,
         )
     }
 }

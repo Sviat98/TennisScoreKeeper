@@ -5,6 +5,7 @@ import com.bashkevich.tennisscorekeeper.core.remote.LoadResult
 import com.bashkevich.tennisscorekeeper.model.set_template.domain.SetTemplateTypeFilter
 import com.bashkevich.tennisscorekeeper.model.set_template.repository.SetTemplateRepository
 import com.bashkevich.tennisscorekeeper.model.theme.repository.ThemeRepository
+import com.bashkevich.tennisscorekeeper.model.set_template.domain.EMPTY_REGULAR_SET_TEMPLATE
 import com.bashkevich.tennisscorekeeper.model.tournament.remote.AddTournamentBody
 import com.bashkevich.tennisscorekeeper.model.tournament.remote.TournamentType
 import com.bashkevich.tennisscorekeeper.model.tournament.repository.TournamentRepository
@@ -51,6 +52,18 @@ class AddTournamentViewModel(
                 reduceState { oldState -> oldState.copy(selectedTheme = uiEvent.theme) }
             }
 
+            is AddTournamentUiEvent.ChangeSetsToWin -> {
+                val setsToWinNewValue = state.value.setsToWin + uiEvent.delta
+                val regularSetTemplate =
+                    if (setsToWinNewValue < 2) EMPTY_REGULAR_SET_TEMPLATE else state.value.regularSetTemplate
+                reduceState { oldState ->
+                    oldState.copy(
+                        setsToWin = setsToWinNewValue,
+                        regularSetTemplate = regularSetTemplate
+                    )
+                }
+            }
+
             is AddTournamentUiEvent.FetchSetTemplates -> fetchSetTemplates()
 
             is AddTournamentUiEvent.FetchThemes -> fetchThemes()
@@ -61,6 +74,7 @@ class AddTournamentViewModel(
                 defaultSetTemplateId = uiEvent.defaultSetTemplateId,
                 decidingSetTemplateId = uiEvent.decidingSetTemplateId,
                 themeId = uiEvent.themeId,
+                setsToWin = uiEvent.setsToWin,
             )
         }
     }
@@ -71,6 +85,7 @@ class AddTournamentViewModel(
         defaultSetTemplateId: String,
         decidingSetTemplateId: String,
         themeId: String,
+        setsToWin: Int,
     ) {
         viewModelScope.launch {
             reduceState { oldState -> oldState.copy(tournamentAddingSubstate = TournamentAddingSubstate.Loading) }
@@ -80,6 +95,7 @@ class AddTournamentViewModel(
                 regularSetTemplateId = defaultSetTemplateId,
                 decidingSetTemplateId = decidingSetTemplateId,
                 themeId = themeId,
+                setsToWin = setsToWin,
             )
             val addTournamentResult = tournamentRepository.addTournament(addTournamentBody)
 

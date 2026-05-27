@@ -22,6 +22,7 @@ import com.bashkevich.tennisscorekeeper.model.player.domain.PlayerInSinglesMatch
 import com.bashkevich.tennisscorekeeper.model.set_template.domain.EMPTY_REGULAR_SET_TEMPLATE
 import com.bashkevich.tennisscorekeeper.model.set_template.domain.SetTemplateTypeFilter
 import com.bashkevich.tennisscorekeeper.model.set_template.repository.SetTemplateRepository
+import com.bashkevich.tennisscorekeeper.model.theme.repository.ThemeRepository
 import com.bashkevich.tennisscorekeeper.model.tournament.remote.TournamentType
 import com.bashkevich.tennisscorekeeper.model.tournament.repository.TournamentRepository
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -39,7 +40,8 @@ class AddMatchViewModel(
     private val matchRepository: MatchRepository,
     private val tournamentRepository: TournamentRepository,
     private val participantRepository: ParticipantRepository,
-    private val setTemplateRepository: SetTemplateRepository
+    private val setTemplateRepository: SetTemplateRepository,
+    private val themeRepository: ThemeRepository,
 ) : BaseViewModel<AddMatchState, AddMatchUiEvent, AddMatchAction>() {
 
     private val _state = MutableStateFlow(AddMatchState.initial())
@@ -50,6 +52,7 @@ class AddMatchViewModel(
         get() = super.action
 
     private var currentSetTemplateFilter: SetTemplateTypeFilter? = null
+    private var themesLoaded = false
 
     init {
         fetchTournament()
@@ -101,6 +104,12 @@ class AddMatchViewModel(
                         regularSetTemplate = regularSetTemplate
                     )
                 }
+            }
+
+            is AddMatchUiEvent.FetchThemes -> fetchThemes()
+
+            is AddMatchUiEvent.SelectTheme -> {
+                reduceState { oldState -> oldState.copy(selectedTheme = uiEvent.theme) }
             }
 
             is AddMatchUiEvent.SelectSetTemplate -> {
@@ -371,6 +380,23 @@ class AddMatchViewModel(
         }
     }
 
+    private fun fetchThemes() {
+        if (themesLoaded) return
+        themesLoaded = true
+        viewModelScope.launch {
+            launch {
+                themeRepository.observeThemesFromDatabase().collect { themes ->
+                    reduceState { oldState ->
+                        oldState.copy(
+                            themeOptions = themes,
+                        )
+                    }
+                }
+            }
+            themeRepository.fetchThemes()
+        }
+    }
+
     private fun selectParticipant(participantNumber: Int, participant: TennisParticipant) {
         val state = state.value
         when (participant) {
@@ -521,7 +547,8 @@ class AddMatchViewModel(
                 secondParticipant = secondParticipantInMatchBody,
                 setsToWin = state.setsToWin,
                 regularSet = regularSetTemplateId,
-                decidingSet = state.decidingSetTemplate.id
+                decidingSet = state.decidingSetTemplate.id,
+                themeId = state.selectedTheme?.id ?: "",
             )
 
             val addMatchResult = matchRepository.addNewMatch(tournamentId = tournamentId, matchBody = matchBody)

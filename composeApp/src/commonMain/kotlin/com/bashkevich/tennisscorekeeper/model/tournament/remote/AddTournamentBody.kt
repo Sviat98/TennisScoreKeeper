@@ -15,4 +15,6 @@ data class AddTournamentBody(
     val decidingSetTemplateId: String,
     @SerialName("theme_id")
     val themeId: String,
+    @SerialName("sets_to_win")
+    val setsToWin: Int,
 )

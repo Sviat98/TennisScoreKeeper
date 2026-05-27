@@ -2,26 +2,32 @@ package com.bashkevich.tennisscorekeeper.components.add_match
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
+import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.window.core.layout.WindowSizeClass
 import com.bashkevich.tennisscorekeeper.components.ColorPickerDialog
 import com.bashkevich.tennisscorekeeper.components.add_match.participant.AddMatchParticipantsBlock
+import com.bashkevich.tennisscorekeeper.components.add_match.set_template.SetTemplateComponent
 import com.bashkevich.tennisscorekeeper.model.set_template.domain.SetTemplateTypeFilter
 import com.bashkevich.tennisscorekeeper.screens.addmatch.AddMatchState
 import com.bashkevich.tennisscorekeeper.screens.addmatch.AddMatchUiEvent
 import com.bashkevich.tennisscorekeeper.screens.addmatch.MatchAddingSubstate
 import com.bashkevich.tennisscorekeeper.screens.addmatch.OpenColorPickerDialogState
+import com.bashkevich.tennisscorekeeper.screens.addtournament.ThemeDropdownMenu
 
 @Composable
 fun AddMatchComponent(
@@ -33,6 +39,8 @@ fun AddMatchComponent(
     val firstParticipant = state.firstParticipant
     val secondParticipant = state.secondParticipant
 
+    val windowSize = currentWindowAdaptiveInfo().windowSizeClass
+    val isWideScreen = windowSize.isWidthAtLeastBreakpoint(WindowSizeClass.WIDTH_DP_MEDIUM_LOWER_BOUND)
 
     Column(
         modifier = Modifier.then(modifier).padding(16.dp)
@@ -81,40 +89,136 @@ fun AddMatchComponent(
         )
 
         val setsToWin = state.setsToWin
-
         val setTemplateOptions = state.setTemplateOptions
-
         val regularSetTemplate = state.regularSetTemplate
         val decidingSetTemplate = state.decidingSetTemplate
 
-        SetsToWinBlock(
-            modifier = Modifier.fillMaxWidth(),
-            setsToWin = setsToWin,
-            onValueChange = { delta -> onEvent(AddMatchUiEvent.ChangeSetsToWin(delta)) }
-        )
+        val regularTemplates = setTemplateOptions.filter { it.isRegular }
+        val decidingTemplates = setTemplateOptions.filter { it.isDeciding }
 
-        MatchScoringSettingsBlock(
-            modifier = Modifier.fillMaxWidth(),
-            setsToWin = setsToWin,
-            setTemplateOptions = setTemplateOptions,
-            regularSetTemplate = regularSetTemplate,
-            decidingSetTemplate = decidingSetTemplate,
-            onSetTemplatesFetch = {
-                onEvent(
-                    AddMatchUiEvent.FetchSetTemplates(
-                        SetTemplateTypeFilter.ALL
-                    )
+        // Settings section
+        if (isWideScreen) {
+            // Row 1: Theme + SetsToWin
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(64.dp),
+            ) {
+                ThemeDropdownMenu(
+                    modifier = Modifier.weight(1f),
+                    themes = state.themeOptions,
+                    selectedTheme = state.selectedTheme,
+                    onThemeSelected = { theme ->
+                        onEvent(AddMatchUiEvent.SelectTheme(theme))
+                    },
+                    onThemesFetch = { onEvent(AddMatchUiEvent.FetchThemes) }
                 )
-            },
-            onSetTemplateChange = { setTemplateType, setTemplate ->
-                onEvent(
-                    AddMatchUiEvent.SelectSetTemplate(
-                        setTemplateTypeFilter = setTemplateType,
-                        setTemplate = setTemplate
-                    )
+                SetsToWinComponent(
+                    modifier = Modifier.weight(1f),
+                    setsToWin = setsToWin,
+                    onValueChange = { delta -> onEvent(AddMatchUiEvent.ChangeSetsToWin(delta)) }
                 )
             }
-        )
+
+            // Row 2: Regular + Deciding set templates
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(64.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                SetTemplateComponent(
+                    modifier = Modifier.weight(1f),
+                    label = "Regular Set Template",
+                    setTemplateOptions = regularTemplates,
+                    enabled = setsToWin > 1,
+                    currentSetTemplate = regularSetTemplate,
+                    onSetTemplatesFetch = {
+                        onEvent(AddMatchUiEvent.FetchSetTemplates(SetTemplateTypeFilter.ALL))
+                    },
+                    onSetTemplateChange = { setTemplate ->
+                        onEvent(
+                            AddMatchUiEvent.SelectSetTemplate(
+                                setTemplateTypeFilter = SetTemplateTypeFilter.REGULAR,
+                                setTemplate = setTemplate
+                            )
+                        )
+                    }
+                )
+                SetTemplateComponent(
+                    modifier = Modifier.weight(1f),
+                    label = "Deciding Set Template",
+                    setTemplateOptions = decidingTemplates,
+                    enabled = true,
+                    currentSetTemplate = decidingSetTemplate,
+                    onSetTemplatesFetch = {
+                        onEvent(AddMatchUiEvent.FetchSetTemplates(SetTemplateTypeFilter.ALL))
+                    },
+                    onSetTemplateChange = { setTemplate ->
+                        onEvent(
+                            AddMatchUiEvent.SelectSetTemplate(
+                                setTemplateTypeFilter = SetTemplateTypeFilter.DECIDER,
+                                setTemplate = setTemplate
+                            )
+                        )
+                    }
+                )
+            }
+        } else {
+            // Narrow screen: vertical layout
+            ThemeDropdownMenu(
+                modifier = Modifier.widthIn(max = 300.dp).fillMaxWidth(),
+                themes = state.themeOptions,
+                selectedTheme = state.selectedTheme,
+                onThemeSelected = { theme ->
+                    onEvent(AddMatchUiEvent.SelectTheme(theme))
+                },
+                onThemesFetch = { onEvent(AddMatchUiEvent.FetchThemes) }
+            )
+
+            SetsToWinComponent(
+                modifier = Modifier.fillMaxWidth(),
+                setsToWin = setsToWin,
+                onValueChange = { delta -> onEvent(AddMatchUiEvent.ChangeSetsToWin(delta)) }
+            )
+
+            SetTemplateComponent(
+                modifier = Modifier.fillMaxWidth(),
+                label = "Regular Set Template",
+                setTemplateOptions = regularTemplates,
+                enabled = setsToWin > 1,
+                currentSetTemplate = regularSetTemplate,
+                onSetTemplatesFetch = {
+                    onEvent(AddMatchUiEvent.FetchSetTemplates(SetTemplateTypeFilter.ALL))
+                },
+                onSetTemplateChange = { setTemplate ->
+                    onEvent(
+                        AddMatchUiEvent.SelectSetTemplate(
+                            setTemplateTypeFilter = SetTemplateTypeFilter.REGULAR,
+                            setTemplate = setTemplate
+                        )
+                    )
+                }
+            )
+
+            SetTemplateComponent(
+                modifier = Modifier.fillMaxWidth(),
+                label = "Deciding Set Template",
+                setTemplateOptions = decidingTemplates,
+                enabled = true,
+                currentSetTemplate = decidingSetTemplate,
+                onSetTemplatesFetch = {
+                    onEvent(AddMatchUiEvent.FetchSetTemplates(SetTemplateTypeFilter.ALL))
+                },
+                onSetTemplateChange = { setTemplate ->
+                    onEvent(
+                        AddMatchUiEvent.SelectSetTemplate(
+                            setTemplateTypeFilter = SetTemplateTypeFilter.DECIDER,
+                            setTemplate = setTemplate
+                        )
+                    )
+                }
+            )
+        }
+
         val matchAddingSubstate = state.matchAddingSubstate
 
         val isButtonEnabled = matchAddingSubstate !is MatchAddingSubstate.Loading
@@ -179,4 +283,3 @@ fun AddMatchComponent(
         }
     }
 }
-

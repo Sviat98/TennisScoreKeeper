@@ -13,11 +13,12 @@ data class Tournament(
     val regularSetTemplateId: String,
     val decidingSetTemplateId: String,
     val themeId: String,
+    val setsToWin: Int,
 )
 
 val TOURNAMENT_DEFAULT = Tournament(
     id = "0", name = "", type = TournamentType.SINGLES, status = TournamentStatus.NOT_STARTED,
-    regularSetTemplateId = "", decidingSetTemplateId = "", themeId = ""
+    regularSetTemplateId = "", decidingSetTemplateId = "", themeId = "", setsToWin = 1
 )
 
 fun TournamentDto.toDomain() =
@@ -26,6 +27,7 @@ fun TournamentDto.toDomain() =
         regularSetTemplateId = this.regularSetTemplateId,
         decidingSetTemplateId = this.decidingSetTemplateId,
         themeId = this.themeId,
+        setsToWin = this.setsToWin,
     )
 
 fun TournamentEntity.toDomain() = Tournament(
@@ -36,4 +38,5 @@ fun TournamentEntity.toDomain() = Tournament(
     regularSetTemplateId = regularSetTemplateId,
     decidingSetTemplateId = decidingSetTemplateId,
     themeId = themeId,
+    setsToWin = setsToWin,
 )

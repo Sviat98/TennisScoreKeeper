@@ -44,6 +44,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.bashkevich.tennisscorekeeper.LocalNavHostController
 import com.bashkevich.tennisscorekeeper.components.AddTournamentAppBar
+import com.bashkevich.tennisscorekeeper.components.add_match.SetsToWinComponent
 import com.bashkevich.tennisscorekeeper.components.add_match.set_template.SetTemplateCombobox
 import com.bashkevich.tennisscorekeeper.components.icons.IconGroup
 import com.bashkevich.tennisscorekeeper.components.icons.default_icons.ArrowDropDown
@@ -133,7 +134,30 @@ fun AddTournamentContent(
                     )
                 }
 
-                // Row 2: Regular set template + Deciding set template
+                // Row 2: Theme + SetsToWin
+                Row(
+                    modifier = Modifier
+                        .widthIn(max = 1000.dp)
+                        .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(64.dp),
+                ) {
+                    ThemeDropdownMenu(
+                        modifier = Modifier.weight(1f),
+                        themes = state.themeOptions,
+                        selectedTheme = state.selectedTheme,
+                        onThemeSelected = { theme ->
+                            onEvent(AddTournamentUiEvent.SelectTheme(theme))
+                        },
+                        onThemesFetch = { onEvent(AddTournamentUiEvent.FetchThemes) }
+                    )
+                    SetsToWinComponent(
+                        modifier = Modifier.weight(1f),
+                        setsToWin = state.setsToWin,
+                        onValueChange = { delta -> onEvent(AddTournamentUiEvent.ChangeSetsToWin(delta)) }
+                    )
+                }
+
+                // Row 3: Regular set template + Deciding set template
                 Row(
                     modifier = Modifier
                         .widthIn(max = 1000.dp)
@@ -143,7 +167,7 @@ fun AddTournamentContent(
                     SetTemplateCombobox(
                         modifier = Modifier.weight(1f),
                         setTemplateOptions = regularTemplates,
-                        enabled = true,
+                        enabled = state.setsToWin > 1,
                         currentSetTemplate = state.regularSetTemplate,
                         onSetTemplatesFetch = { onEvent(AddTournamentUiEvent.FetchSetTemplates) },
                         onSetTemplateChange = { template ->
@@ -161,45 +185,42 @@ fun AddTournamentContent(
                         }
                     )
                 }
-
-                // Row 3: Theme (under regular set template, same width)
-                Row(
-                    modifier = Modifier
-                        .widthIn(max = 1000.dp)
-                        .fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(64.dp),
-                ) {
-                    ThemeDropdownMenu(
-                        modifier = Modifier.weight(1f),
-                        themes = state.themeOptions,
-                        selectedTheme = state.selectedTheme,
-                        onThemeSelected = { theme ->
-                            onEvent(AddTournamentUiEvent.SelectTheme(theme))
-                        },
-                        onThemesFetch = { onEvent(AddTournamentUiEvent.FetchThemes) }
-                    )
-                    Spacer(modifier = Modifier.weight(1f))
-                }
             } else {
                 // Narrow screen: vertical layout
                 TextField(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier.widthIn(max = 300.dp).fillMaxWidth(),
                     state = tournamentName,
                     placeholder = { Text("Tournament name") },
                 )
 
                 TournamentTypeCombobox(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier.widthIn(max = 300.dp).fillMaxWidth(),
                     currentTournamentType = tournamentType,
                     onTournamentTypeChange = { type ->
                         onEvent(AddTournamentUiEvent.SelectTournamentType(type))
                     }
                 )
 
+                ThemeDropdownMenu(
+                    modifier = Modifier.widthIn(max = 300.dp).fillMaxWidth(),
+                    themes = state.themeOptions,
+                    selectedTheme = state.selectedTheme,
+                    onThemeSelected = { theme ->
+                        onEvent(AddTournamentUiEvent.SelectTheme(theme))
+                    },
+                    onThemesFetch = { onEvent(AddTournamentUiEvent.FetchThemes) }
+                )
+
+                SetsToWinComponent(
+                    modifier = Modifier.widthIn(max = 300.dp).fillMaxWidth(),
+                    setsToWin = state.setsToWin,
+                    onValueChange = { delta -> onEvent(AddTournamentUiEvent.ChangeSetsToWin(delta)) }
+                )
+
                 SetTemplateCombobox(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier.widthIn(max = 300.dp).fillMaxWidth(),
                     setTemplateOptions = regularTemplates,
-                    enabled = true,
+                    enabled = state.setsToWin > 1,
                     currentSetTemplate = state.regularSetTemplate,
                     onSetTemplatesFetch = { onEvent(AddTournamentUiEvent.FetchSetTemplates) },
                     onSetTemplateChange = { template ->
@@ -208,7 +229,7 @@ fun AddTournamentContent(
                 )
 
                 SetTemplateCombobox(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier.widthIn(max = 300.dp).fillMaxWidth(),
                     setTemplateOptions = decidingTemplates,
                     enabled = true,
                     currentSetTemplate = state.decidingSetTemplate,
@@ -216,16 +237,6 @@ fun AddTournamentContent(
                     onSetTemplateChange = { template ->
                         onEvent(AddTournamentUiEvent.SelectDecidingSetTemplate(template))
                     }
-                )
-
-                ThemeDropdownMenu(
-                    modifier = Modifier.fillMaxWidth(),
-                    themes = state.themeOptions,
-                    selectedTheme = state.selectedTheme,
-                    onThemeSelected = { theme ->
-                        onEvent(AddTournamentUiEvent.SelectTheme(theme))
-                    },
-                    onThemesFetch = { onEvent(AddTournamentUiEvent.FetchThemes) }
                 )
             }
 
@@ -249,6 +260,7 @@ fun AddTournamentContent(
                             defaultSetTemplateId = state.regularSetTemplate.id,
                             decidingSetTemplateId = state.decidingSetTemplate.id,
                             themeId = state.selectedTheme!!.id,
+                            setsToWin = state.setsToWin,
                         )
                     )
                 },
@@ -378,9 +390,10 @@ fun ThemeDropdownMenu(
                             horizontalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
                             ColorCircle(color = theme.backgroundColor)
+                            ColorCircle(color = theme.textColor)
                             Text(
                                 text = theme.name,
-                                color = theme.textColor
+                                color = Color.Black
                             )
                         }
                     },

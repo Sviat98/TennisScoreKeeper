@@ -22,6 +22,8 @@ data class TournamentEntity(
     val decidingSetTemplateId: String,
     @ColumnInfo(name = "theme_id")
     val themeId: String,
+    @ColumnInfo(name = "sets_to_win")
+    val setsToWin: Int,
 )
 
 fun TournamentDto.toEntity() = TournamentEntity(
@@ -32,4 +34,5 @@ fun TournamentDto.toEntity() = TournamentEntity(
     regularSetTemplateId = regularSetTemplateId,
     decidingSetTemplateId = decidingSetTemplateId,
     themeId = themeId,
+    setsToWin = setsToWin,
 )
