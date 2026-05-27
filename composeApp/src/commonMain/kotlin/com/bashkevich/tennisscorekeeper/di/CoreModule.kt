@@ -78,9 +78,9 @@ val coreModule = module {
         val client = httpClient {
             expectSuccess = true
             HttpResponseValidator {
-                handleResponseException { exception, request ->
+                handleResponseExceptionWithRequest { exception, request ->
                     val clientException =
-                        exception as? ClientRequestException ?: return@handleResponseException
+                        exception as? ClientRequestException ?: return@handleResponseExceptionWithRequest
                     val exceptionResponse = clientException.response
                     if (exceptionResponse.status == HttpStatusCode.Unauthorized) {
                         val exceptionResponseText =
