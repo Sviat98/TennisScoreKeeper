@@ -16,10 +16,10 @@ interface ThemeDao {
     @Query("SELECT * FROM scoreboard_theme WHERE id = :id")
     fun getThemeById(id: String): Flow<ThemeEntity?>
 
-    @Insert(onConflict = OnConflictStrategy.Companion.REPLACE)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertTheme(theme: ThemeEntity)
 
-    @Insert(onConflict = OnConflictStrategy.Companion.REPLACE)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertThemes(themes: List<ThemeEntity>)
 
     @Query("DELETE FROM scoreboard_theme")

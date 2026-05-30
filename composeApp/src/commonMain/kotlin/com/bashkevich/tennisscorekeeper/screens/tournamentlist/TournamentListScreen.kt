@@ -15,10 +15,14 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 
 import androidx.compose.ui.Modifier
@@ -44,29 +48,26 @@ fun TournamentListScreen(
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 
-    LaunchedEffect(Unit) {
-        viewModel.actions.collect { action ->
-        }
-    }
-
     when (state.loadingState) {
-        TournamentListLoadingState.Loading -> {
+        TournamentListContentState.Loading -> {
             TournamentListLoading(
                 modifier = Modifier.then(modifier),
             )
         }
 
-        TournamentListLoadingState.Error -> {
-            TournamentListError(
+        TournamentListContentState.Refreshing,
+        TournamentListContentState.Idle -> {
+            TournamentListContent(
                 modifier = Modifier.then(modifier),
-                onEvent = { event -> viewModel.onEvent(event) }
+                state = state,
+                viewModel = viewModel,
             )
         }
 
-        TournamentListLoadingState.Success -> {
-            TournamentListContent(
+        is TournamentListContentState.InitialError -> {
+            TournamentListError(
                 modifier = Modifier.then(modifier),
-                state = state
+                onEvent = { event -> viewModel.onEvent(event) }
             )
         }
     }
@@ -77,10 +78,22 @@ fun TournamentListScreen(
 fun TournamentListContent(
     modifier: Modifier = Modifier,
     state: TournamentListState,
+    viewModel: TournamentListViewModel,
 ) {
     val navController = LocalNavHostController.current
-
     val isAuthorized = LocalAuthorization.current
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    LaunchedEffect(Unit) {
+        viewModel.actions.collect { action ->
+            when (action) {
+                is TournamentListAction.ShowRefreshError -> {
+                    snackbarHostState.showSnackbar(message = action.message)
+                }
+            }
+        }
+    }
+
     Scaffold(
         modifier = Modifier.then(modifier),
         topBar = {
@@ -99,11 +112,16 @@ fun TournamentListContent(
             FloatingActionButton(onClick = { navController.navigate(AddTournamentRoute) }) {
                 Icon(IconGroup.Default.Add, contentDescription = "Add Tournament")
             }
-        }
+        },
+        snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { paddingValues ->
-        Box(modifier = Modifier.fillMaxSize().padding(paddingValues)) {
+        PullToRefreshBox(
+            isRefreshing = state.loadingState is TournamentListContentState.Refreshing,
+            onRefresh = { viewModel.onEvent(TournamentListUiEvent.RefreshTournaments) },
+            modifier = Modifier.fillMaxSize().padding(paddingValues)
+        ) {
             LazyColumn(
-                modifier = Modifier.align(Alignment.Center),
+                modifier = Modifier.fillMaxSize(),
                 verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterVertically),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 contentPadding = PaddingValues(16.dp)
@@ -120,7 +138,6 @@ fun TournamentListContent(
                         onTournamentClick = { navController.navigate(TournamentRoute(tournament.id)) }
                     )
                 }
-
             }
         }
     }
@@ -166,4 +183,3 @@ fun TournamentListError(
         }
     }
 }
-

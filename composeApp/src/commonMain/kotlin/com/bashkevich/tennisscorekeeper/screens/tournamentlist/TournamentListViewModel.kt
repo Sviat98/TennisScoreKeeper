@@ -1,9 +1,7 @@
 package com.bashkevich.tennisscorekeeper.screens.tournamentlist
 
 import androidx.lifecycle.viewModelScope
-import com.bashkevich.tennisscorekeeper.AppConfig
 import com.bashkevich.tennisscorekeeper.core.remote.LoadResult
-import com.bashkevich.tennisscorekeeper.core.remote.UnauthorizedException
 import com.bashkevich.tennisscorekeeper.model.auth.repository.AuthRepository
 import com.bashkevich.tennisscorekeeper.model.tournament.repository.TournamentRepository
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -14,7 +12,6 @@ import kotlinx.coroutines.flow.Flow
 
 import com.bashkevich.tennisscorekeeper.mvi.BaseViewModel
 import kotlinx.coroutines.async
-import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 
 class TournamentListViewModel(
@@ -34,69 +31,57 @@ class TournamentListViewModel(
         showTournaments()
 
         viewModelScope.launch {
-            launch {
-                tournamentRepository.observeTournaments().collect { tournaments ->
-                    reduceState { oldState ->
-                        oldState.copy(
-                            loadingState = TournamentListLoadingState.Success,
-                            tournaments = tournaments
-                        )
+            tournamentRepository.observeTournaments().collect { tournaments ->
+                reduceState { oldState ->
+                    when (oldState.loadingState) {
+                        TournamentListContentState.Loading,
+                        TournamentListContentState.Refreshing ->
+                            oldState.copy(loadingState = TournamentListContentState.Idle, tournaments = tournaments)
+
+                        else -> oldState.copy(tournaments = tournaments)
                     }
                 }
-            }
-            launch {
-                tournamentRepository.observeNewTournament().distinctUntilChanged()
-                    .collect { newTournament ->
-                        val tournaments = state.value.tournaments.toMutableList()
-
-                        tournaments.add(newTournament)
-                        reduceState { oldState ->
-                            oldState.copy(
-                                loadingState = TournamentListLoadingState.Success,
-                                tournaments = tournaments.toList()
-                            )
-                        }
-                    }
             }
         }
     }
 
     private fun showTournaments() {
         viewModelScope.launch {
-            reduceState { oldState -> oldState.copy(loadingState = TournamentListLoadingState.Loading) }
+            reduceState { it.copy(loadingState = TournamentListContentState.Loading) }
 
-            val tournamentsResultAsync = async {
-                println("START THE tournamentsResultAsync")
-                val appConfig = AppConfig.current
-                AppConfig.logBuildMode()
-                println("appConfig = $appConfig")
-                tournamentRepository.fetchTournaments()
+            val fetchTournamentsAsync = async { tournamentRepository.fetchTournaments() }
+            val checkRefreshTokenAsync = async { authRepository.checkRefreshTokenStatus() }
+
+            val tournamentsResult = fetchTournamentsAsync.await()
+            checkRefreshTokenAsync.await() // fire-and-forget, errors ignored
+            println("fetchTournaments result 111= $tournamentsResult")
+            if (tournamentsResult is LoadResult.Error) {
+                val message = tournamentsResult.result.message ?: "Unknown error"
+                reduceState { it.copy(loadingState = TournamentListContentState.InitialError(message)) }
             }
+        }
+    }
 
-            val refreshTokenStatusResultAsync = async {
-                println("START THE refreshTokenStatusResultAsync")
-                authRepository.checkRefreshTokenStatus()
-            }
+    private fun refreshTournaments() {
+        viewModelScope.launch {
+            if (state.value.loadingState != TournamentListContentState.Idle) return@launch
 
-            val tournamentsResult = tournamentsResultAsync.await()
+            reduceState { it.copy(loadingState = TournamentListContentState.Refreshing) }
 
-            val refreshTokenStatusResult = refreshTokenStatusResultAsync.await()
-            if (tournamentsResult is LoadResult.Error || (refreshTokenStatusResult is LoadResult.Error && refreshTokenStatusResult.result !is UnauthorizedException)) {
-                reduceState { oldState -> oldState.copy(loadingState = TournamentListLoadingState.Error) }
-            } else {
-                reduceState { oldState ->
-                    oldState.copy(loadingState = TournamentListLoadingState.Success)
-                }
+            val result = tournamentRepository.fetchTournaments()
+            println("fetchTournaments result 222= $result")
+            if (result is LoadResult.Error) {
+                val message = result.result.message ?: "Unknown error"
+                reduceState { it.copy(loadingState = TournamentListContentState.Idle) }
+                sendAction(TournamentListAction.ShowRefreshError(message))
             }
         }
     }
 
     fun onEvent(uiEvent: TournamentListUiEvent) {
-        // some feature-specific logic
         when (uiEvent) {
-            is TournamentListUiEvent.LoadTournaments -> {
-                showTournaments()
-            }
+            is TournamentListUiEvent.LoadTournaments -> showTournaments()
+            is TournamentListUiEvent.RefreshTournaments -> refreshTournaments()
         }
     }
 

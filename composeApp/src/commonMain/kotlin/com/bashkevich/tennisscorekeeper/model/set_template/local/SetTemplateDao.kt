@@ -18,7 +18,7 @@ interface SetTemplateDao {
     @Query("SELECT * FROM set_templates WHERE is_deciding = 1")
     fun getDecidingSetTemplates(): Flow<List<SetTemplateEntity>>
 
-    @Insert(onConflict = OnConflictStrategy.Companion.REPLACE)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertSetTemplates(templates: List<SetTemplateEntity>)
 
     @Query("DELETE FROM set_templates")

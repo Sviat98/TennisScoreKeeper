@@ -15,10 +15,10 @@ interface TournamentDao {
     @Query("SELECT * FROM tournaments WHERE id = :id")
     fun getTournamentById(id: String): Flow<TournamentEntity?>
 
-    @Insert(onConflict = OnConflictStrategy.Companion.REPLACE)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertTournament(tournament: TournamentEntity)
 
-    @Insert(onConflict = OnConflictStrategy.Companion.REPLACE)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertTournaments(tournaments: List<TournamentEntity>)
 
     @Query("DELETE FROM tournaments")

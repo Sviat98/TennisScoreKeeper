@@ -10,28 +10,30 @@ import com.bashkevich.tennisscorekeeper.mvi.UiState
 @Immutable
 sealed class TournamentListUiEvent : UiEvent {
     object LoadTournaments: TournamentListUiEvent()
+    object RefreshTournaments: TournamentListUiEvent()
 }
 
 @Immutable
 data class TournamentListState(
-    val loadingState: TournamentListLoadingState,
+    val loadingState: TournamentListContentState,
     val tournaments: List<Tournament>
 ) : UiState {
     companion object {
         fun initial() = TournamentListState(
-            loadingState = TournamentListLoadingState.Loading,
+            loadingState = TournamentListContentState.Loading,
             tournaments = emptyList()
         )
     }
 }
 
-sealed interface TournamentListLoadingState{
-    object Loading: TournamentListLoadingState
-    object Success: TournamentListLoadingState
-    object Error: TournamentListLoadingState
+sealed interface TournamentListContentState{
+    object Loading: TournamentListContentState
+    object Refreshing: TournamentListContentState
+    object Idle: TournamentListContentState
+    data class InitialError(val message: String): TournamentListContentState
 }
 
 @Immutable
 sealed class TournamentListAction : UiAction {
-
+    data class ShowRefreshError(val message: String) : TournamentListAction()
 }
