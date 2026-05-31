@@ -1,7 +1,6 @@
 package com.bashkevich.tennisscorekeeper.screens.tournamentlist
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -24,7 +23,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
-
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -48,44 +46,46 @@ fun TournamentListScreen(
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 
-    when (state.loadingState) {
-        TournamentListContentState.Loading -> {
+    when (val currentState = state) {
+        TournamentListState.Loading -> {
             TournamentListLoading(
-                modifier = Modifier.then(modifier),
+                modifier = modifier,
             )
         }
 
-        TournamentListContentState.Refreshing,
-        TournamentListContentState.Idle -> {
+        is TournamentListState.Content -> {
             TournamentListContent(
-                modifier = Modifier.then(modifier),
-                state = state,
-                viewModel = viewModel,
+                modifier = modifier,
+                state = currentState,
+                onRefresh = { viewModel.onEvent(TournamentListUiEvent.RefreshTournaments) },
+                actionsFlow = viewModel.actions,
             )
         }
 
-        is TournamentListContentState.InitialError -> {
+        is TournamentListState.Error -> {
             TournamentListError(
-                modifier = Modifier.then(modifier),
-                onEvent = { event -> viewModel.onEvent(event) }
+                modifier = modifier,
+                state = currentState,
+                onRetry = { viewModel.onEvent(TournamentListUiEvent.Retry) },
+                actionsFlow = viewModel.actions,
             )
         }
     }
-
 }
 
 @Composable
-fun TournamentListContent(
+private fun TournamentListContent(
     modifier: Modifier = Modifier,
-    state: TournamentListState,
-    viewModel: TournamentListViewModel,
+    state: TournamentListState.Content,
+    onRefresh: () -> Unit,
+    actionsFlow: kotlinx.coroutines.flow.Flow<TournamentListAction>,
 ) {
     val navController = LocalNavHostController.current
     val isAuthorized = LocalAuthorization.current
     val snackbarHostState = remember { SnackbarHostState() }
 
     LaunchedEffect(Unit) {
-        viewModel.actions.collect { action ->
+        actionsFlow.collect { action ->
             when (action) {
                 is TournamentListAction.ShowRefreshError -> {
                     snackbarHostState.showSnackbar(message = action.message)
@@ -95,7 +95,7 @@ fun TournamentListContent(
     }
 
     Scaffold(
-        modifier = Modifier.then(modifier),
+        modifier = modifier,
         topBar = {
             TournamentListAppBarWithButton(
                 isAuthorized = isAuthorized,
@@ -116,8 +116,8 @@ fun TournamentListContent(
         snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { paddingValues ->
         PullToRefreshBox(
-            isRefreshing = state.loadingState is TournamentListContentState.Refreshing,
-            onRefresh = { viewModel.onEvent(TournamentListUiEvent.RefreshTournaments) },
+            isRefreshing = state.isRefreshing,
+            onRefresh = onRefresh,
             modifier = Modifier.fillMaxSize().padding(paddingValues)
         ) {
             LazyColumn(
@@ -144,11 +144,11 @@ fun TournamentListContent(
 }
 
 @Composable
-fun TournamentListLoading(
+private fun TournamentListLoading(
     modifier: Modifier = Modifier
 ) {
     Scaffold(
-        modifier = Modifier.then(modifier),
+        modifier = modifier,
         topBar = { TournamentListAppBar() }
     ) {
         Column(
@@ -161,23 +161,37 @@ fun TournamentListLoading(
     }
 }
 
-
 @Composable
-fun TournamentListError(
+private fun TournamentListError(
     modifier: Modifier = Modifier,
-    onEvent: (TournamentListUiEvent) -> Unit
+    state: TournamentListState.Error,
+    onRetry: () -> Unit,
+    actionsFlow: kotlinx.coroutines.flow.Flow<TournamentListAction>,
 ) {
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    LaunchedEffect(Unit) {
+        actionsFlow.collect { action ->
+            when (action) {
+                is TournamentListAction.ShowRefreshError -> {
+                    snackbarHostState.showSnackbar(message = action.message)
+                }
+            }
+        }
+    }
+
     Scaffold(
-        modifier = Modifier.then(modifier),
-        topBar = { TournamentListAppBar() }
+        modifier = modifier,
+        topBar = { TournamentListAppBar() },
+        snackbarHost = { SnackbarHost(snackbarHostState) }
     ) {
         Column(
             modifier = Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterVertically)
         ) {
-            Text("Error happened!")
-            Button(onClick = { onEvent(TournamentListUiEvent.LoadTournaments) }) {
+            Text(state.message)
+            Button(onClick = onRetry) {
                 Text("Try Again")
             }
         }

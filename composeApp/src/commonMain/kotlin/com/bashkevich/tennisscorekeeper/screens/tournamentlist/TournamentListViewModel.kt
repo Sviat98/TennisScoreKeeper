@@ -2,91 +2,105 @@ package com.bashkevich.tennisscorekeeper.screens.tournamentlist
 
 import androidx.lifecycle.viewModelScope
 import com.bashkevich.tennisscorekeeper.core.remote.LoadResult
+import com.bashkevich.tennisscorekeeper.core.remote.doOnError
+import com.bashkevich.tennisscorekeeper.core.util.onetimeStateIn
 import com.bashkevich.tennisscorekeeper.model.auth.repository.AuthRepository
+import com.bashkevich.tennisscorekeeper.model.tournament.domain.Tournament
 import com.bashkevich.tennisscorekeeper.model.tournament.repository.TournamentRepository
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.flow.Flow
-
 import com.bashkevich.tennisscorekeeper.mvi.BaseViewModel
 import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 class TournamentListViewModel(
     private val tournamentRepository: TournamentRepository,
     private val authRepository: AuthRepository,
-) :
-    BaseViewModel<TournamentListState, TournamentListUiEvent, TournamentListAction>() {
+) : BaseViewModel<TournamentListState, TournamentListUiEvent, TournamentListAction>() {
 
-    private val _state = MutableStateFlow(TournamentListState.initial())
-    override val state: StateFlow<TournamentListState>
-        get() = _state.asStateFlow()
+    // --- One-time initial fetch (lazy, OnetimeWhileSubscribed) ---
+
+    private val initialLoadFlow: Flow<LoadResult<Unit, Throwable>> = flow {
+        coroutineScope {
+            val fetchTournamentsAsync = async { tournamentRepository.fetchTournaments() }
+            val checkRefreshTokenAsync = async { authRepository.checkRefreshTokenStatus() }
+
+            val result = fetchTournamentsAsync.await()
+            checkRefreshTokenAsync.await()
+
+            emit(result)
+        }
+    }
+
+    private val initialLoadResult: StateFlow<LoadResult<Unit, Throwable>?> =
+        initialLoadFlow.onetimeStateIn(viewModelScope, null)
+
+    // --- Local DB observation (hot, survives navigation) ---
+
+    private val tournaments: StateFlow<List<Tournament>> =
+        tournamentRepository.observeTournaments()
+            .stateIn(
+                viewModelScope,
+                SharingStarted.WhileSubscribed(5_000),
+                emptyList()
+            )
+
+    // --- Refresh ---
+
+    private val _isRefreshing = MutableStateFlow(false)
+
+    // --- Combined UI state ---
+
+    override val state: StateFlow<TournamentListState> = combine(
+        initialLoadResult,
+        tournaments,
+        _isRefreshing
+    ) { loadResult, tournamentList, isRefreshing ->
+        when {
+            loadResult == null && tournamentList.isEmpty() -> TournamentListState.Loading
+            loadResult is LoadResult.Error && tournamentList.isEmpty() ->
+                TournamentListState.Error(loadResult.result.message ?: "Unknown error")
+            else -> TournamentListState.Content(tournamentList, isRefreshing)
+        }
+    }.stateIn(
+        viewModelScope,
+        SharingStarted.WhileSubscribed(5_000),
+        TournamentListState.Loading
+    )
 
     val actions: Flow<TournamentListAction>
         get() = super.action
 
-    init {
-        showTournaments()
+    // --- User actions ---
 
+    fun refresh() {
         viewModelScope.launch {
-            tournamentRepository.observeTournaments().collect { tournaments ->
-                reduceState { oldState ->
-                    when (oldState.loadingState) {
-                        TournamentListContentState.Loading,
-                        TournamentListContentState.Refreshing ->
-                            oldState.copy(loadingState = TournamentListContentState.Idle, tournaments = tournaments)
+            if (state.value !is TournamentListState.Content) return@launch
 
-                        else -> oldState.copy(tournaments = tournaments)
-                    }
-                }
-            }
+            _isRefreshing.value = true
+            tournamentRepository.fetchTournaments()
+                .doOnError { sendAction(TournamentListAction.ShowRefreshError("Error fetching tournaments list")) }
+            _isRefreshing.value = false
         }
     }
 
-    private fun showTournaments() {
+    fun retry() {
         viewModelScope.launch {
-            reduceState { it.copy(loadingState = TournamentListContentState.Loading) }
-
-            val fetchTournamentsAsync = async { tournamentRepository.fetchTournaments() }
-            val checkRefreshTokenAsync = async { authRepository.checkRefreshTokenStatus() }
-
-            val tournamentsResult = fetchTournamentsAsync.await()
-            checkRefreshTokenAsync.await() // fire-and-forget, errors ignored
-            println("fetchTournaments result 111= $tournamentsResult")
-            if (tournamentsResult is LoadResult.Error) {
-                val message = tournamentsResult.result.message ?: "Unknown error"
-                reduceState { it.copy(loadingState = TournamentListContentState.InitialError(message)) }
-            }
-        }
-    }
-
-    private fun refreshTournaments() {
-        viewModelScope.launch {
-            if (state.value.loadingState != TournamentListContentState.Idle) return@launch
-
-            reduceState { it.copy(loadingState = TournamentListContentState.Refreshing) }
-
-            val result = tournamentRepository.fetchTournaments()
-            println("fetchTournaments result 222= $result")
-            if (result is LoadResult.Error) {
-                val message = result.result.message ?: "Unknown error"
-                reduceState { it.copy(loadingState = TournamentListContentState.Idle) }
-                sendAction(TournamentListAction.ShowRefreshError(message))
-            }
+            tournamentRepository.fetchTournaments()
+                .doOnError { sendAction(TournamentListAction.ShowRefreshError("Error fetching tournaments list")) }
         }
     }
 
     fun onEvent(uiEvent: TournamentListUiEvent) {
         when (uiEvent) {
-            is TournamentListUiEvent.LoadTournaments -> showTournaments()
-            is TournamentListUiEvent.RefreshTournaments -> refreshTournaments()
+            is TournamentListUiEvent.RefreshTournaments -> refresh()
+            is TournamentListUiEvent.Retry -> retry()
         }
     }
-
-    private fun reduceState(reducer: (TournamentListState) -> TournamentListState) {
-        _state.update(reducer)
-    }
-
 }
