@@ -36,3 +36,14 @@ fun TournamentDto.toEntity() = TournamentEntity(
     themeId = themeId,
     setsToWin = setsToWin,
 )
+
+fun com.bashkevich.tennisscorekeeper.model.tournament.domain.Tournament.toEntity() = TournamentEntity(
+    id = id,
+    name = name,
+    type = type.name,
+    status = status.name,
+    regularSetTemplateId = regularSetTemplateId,
+    decidingSetTemplateId = decidingSetTemplateId,
+    themeId = themeId,
+    setsToWin = setsToWin,
+)

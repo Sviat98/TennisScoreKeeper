@@ -29,13 +29,13 @@ class ThemeRepositoryImpl(
         }.mapSuccess { }
     }
 
-    override suspend fun observeThemesFromDatabase(): Flow<List<ScoreboardTheme>> {
+    override fun observeThemesFromDatabase(): Flow<List<ScoreboardTheme>> {
         return themeLocalDataSource.getThemes().map { entities ->
             entities.map { it.toDomain() }
         }
     }
 
-    override suspend fun observeThemeByIdFromDatabase(id: String): Flow<ScoreboardTheme> {
+    override fun observeThemeByIdFromDatabase(id: String): Flow<ScoreboardTheme> {
         return themeLocalDataSource.getThemeById(id).map { entity ->
             entity?.toDomain() ?: ScoreboardTheme.DEFAULT
         }

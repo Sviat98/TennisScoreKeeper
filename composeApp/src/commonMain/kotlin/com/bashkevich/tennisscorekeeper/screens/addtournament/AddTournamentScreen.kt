@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.input.TextFieldState
+import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
@@ -23,8 +24,9 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
@@ -48,6 +50,7 @@ import com.bashkevich.tennisscorekeeper.components.add_match.SetsToWinComponent
 import com.bashkevich.tennisscorekeeper.components.add_match.set_template.SetTemplateCombobox
 import com.bashkevich.tennisscorekeeper.components.icons.IconGroup
 import com.bashkevich.tennisscorekeeper.components.icons.default_icons.ArrowDropDown
+import com.bashkevich.tennisscorekeeper.model.set_template.domain.SetTemplateTypeFilter
 import com.bashkevich.tennisscorekeeper.model.theme.domain.ScoreboardTheme
 import com.bashkevich.tennisscorekeeper.model.tournament.remote.TournamentType
 import com.bashkevich.tennisscorekeeper.model.tournament.remote.mapToDisplayedString
@@ -59,19 +62,28 @@ fun AddTournamentScreen(
     viewModel: AddTournamentViewModel,
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val navController = LocalNavHostController.current
+    val snackbarHostState = remember { SnackbarHostState() }
 
     LaunchedEffect(Unit) {
         viewModel.actions.collect { action ->
+            when (action) {
+                is AddTournamentAction.TournamentAdded -> {
+                    navController.navigateUp()
+                }
+
+                is AddTournamentAction.ShowAddError -> {
+                    snackbarHostState.showSnackbar(message = action.message)
+                }
+            }
         }
     }
-
-    val navController = LocalNavHostController.current
 
     AddTournamentContent(
         modifier = Modifier.then(modifier),
         state = state,
         onEvent = { event -> viewModel.onEvent(event) },
-        onNavigateUp = { navController.navigateUp() }
+        snackbarHostState = snackbarHostState,
     )
 }
 
@@ -81,28 +93,25 @@ fun AddTournamentContent(
     modifier: Modifier = Modifier,
     state: AddTournamentState,
     onEvent: (AddTournamentUiEvent) -> Unit,
-    onNavigateUp: () -> Unit = {},
+    snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
 ) {
-    val tournamentAddingSubstate = state.tournamentAddingSubstate
-
-    if (tournamentAddingSubstate is TournamentAddingSubstate.Success) {
-        onNavigateUp()
-    }
+    val tournamentType = state.tournamentType
 
     val windowSize = currentWindowAdaptiveInfo().windowSizeClass
-    val isWideScreen = windowSize.isWidthAtLeastBreakpoint(WindowSizeClass.WIDTH_DP_MEDIUM_LOWER_BOUND)
+    val isWideScreen =
+        windowSize.isWidthAtLeastBreakpoint(WindowSizeClass.WIDTH_DP_MEDIUM_LOWER_BOUND)
+
+    val tournamentName = rememberTextFieldState()
 
     Scaffold(
         modifier = modifier,
         topBar = {
-            AddTournamentAppBar(onBack = onNavigateUp)
-        }
-    ) { paddingValues ->
-        val tournamentName = state.tournamentName
-        val tournamentType = state.tournamentType
-        val regularTemplates = state.setTemplateOptions.filter { it.isRegular }
-        val decidingTemplates = state.setTemplateOptions.filter { it.isDeciding }
+            AddTournamentAppBar(onBack = {
 
+            })
+        },
+        snackbarHost = { SnackbarHost(snackbarHostState) }
+    ) { paddingValues ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -143,8 +152,8 @@ fun AddTournamentContent(
                 ) {
                     ThemeDropdownMenu(
                         modifier = Modifier.weight(1f),
-                        themes = state.themeOptions,
                         selectedTheme = state.selectedTheme,
+                        loadState = state.themesSubstate,
                         onThemeSelected = { theme ->
                             onEvent(AddTournamentUiEvent.SelectTheme(theme))
                         },
@@ -153,7 +162,13 @@ fun AddTournamentContent(
                     SetsToWinComponent(
                         modifier = Modifier.weight(1f),
                         setsToWin = state.setsToWin,
-                        onValueChange = { delta -> onEvent(AddTournamentUiEvent.ChangeSetsToWin(delta)) }
+                        onValueChange = { delta ->
+                            onEvent(
+                                AddTournamentUiEvent.ChangeSetsToWin(
+                                    delta
+                                )
+                            )
+                        }
                     )
                 }
 
@@ -166,20 +181,32 @@ fun AddTournamentContent(
                 ) {
                     SetTemplateCombobox(
                         modifier = Modifier.weight(1f),
-                        setTemplateOptions = regularTemplates,
                         enabled = state.setsToWin > 1,
                         currentSetTemplate = state.regularSetTemplate,
-                        onSetTemplatesFetch = { onEvent(AddTournamentUiEvent.FetchSetTemplates) },
+                        loadState = state.setTemplatesSubstate,
+                        onSetTemplatesFetch = {
+                            onEvent(
+                                AddTournamentUiEvent.FetchSetTemplates(
+                                    SetTemplateTypeFilter.REGULAR
+                                )
+                            )
+                        },
                         onSetTemplateChange = { template ->
                             onEvent(AddTournamentUiEvent.SelectRegularSetTemplate(template))
                         }
                     )
                     SetTemplateCombobox(
                         modifier = Modifier.weight(1f),
-                        setTemplateOptions = decidingTemplates,
                         enabled = true,
                         currentSetTemplate = state.decidingSetTemplate,
-                        onSetTemplatesFetch = { onEvent(AddTournamentUiEvent.FetchSetTemplates) },
+                        loadState = state.setTemplatesSubstate,
+                        onSetTemplatesFetch = {
+                            onEvent(
+                                AddTournamentUiEvent.FetchSetTemplates(
+                                    SetTemplateTypeFilter.DECIDER
+                                )
+                            )
+                        },
                         onSetTemplateChange = { template ->
                             onEvent(AddTournamentUiEvent.SelectDecidingSetTemplate(template))
                         }
@@ -203,8 +230,8 @@ fun AddTournamentContent(
 
                 ThemeDropdownMenu(
                     modifier = Modifier.widthIn(max = 300.dp).fillMaxWidth(),
-                    themes = state.themeOptions,
                     selectedTheme = state.selectedTheme,
+                    loadState = state.themesSubstate,
                     onThemeSelected = { theme ->
                         onEvent(AddTournamentUiEvent.SelectTheme(theme))
                     },
@@ -219,10 +246,16 @@ fun AddTournamentContent(
 
                 SetTemplateCombobox(
                     modifier = Modifier.widthIn(max = 300.dp).fillMaxWidth(),
-                    setTemplateOptions = regularTemplates,
                     enabled = state.setsToWin > 1,
                     currentSetTemplate = state.regularSetTemplate,
-                    onSetTemplatesFetch = { onEvent(AddTournamentUiEvent.FetchSetTemplates) },
+                    loadState = state.setTemplatesSubstate,
+                    onSetTemplatesFetch = {
+                        onEvent(
+                            AddTournamentUiEvent.FetchSetTemplates(
+                                SetTemplateTypeFilter.REGULAR
+                            )
+                        )
+                    },
                     onSetTemplateChange = { template ->
                         onEvent(AddTournamentUiEvent.SelectRegularSetTemplate(template))
                     }
@@ -230,10 +263,16 @@ fun AddTournamentContent(
 
                 SetTemplateCombobox(
                     modifier = Modifier.widthIn(max = 300.dp).fillMaxWidth(),
-                    setTemplateOptions = decidingTemplates,
                     enabled = true,
                     currentSetTemplate = state.decidingSetTemplate,
-                    onSetTemplatesFetch = { onEvent(AddTournamentUiEvent.FetchSetTemplates) },
+                    loadState = state.setTemplatesSubstate,
+                    onSetTemplatesFetch = {
+                        onEvent(
+                            AddTournamentUiEvent.FetchSetTemplates(
+                                SetTemplateTypeFilter.DECIDER
+                            )
+                        )
+                    },
                     onSetTemplateChange = { template ->
                         onEvent(AddTournamentUiEvent.SelectDecidingSetTemplate(template))
                     }
@@ -243,13 +282,14 @@ fun AddTournamentContent(
             Spacer(modifier = Modifier.height(8.dp))
 
             // Add button
+            val needsRegularSet = state.setsToWin > 1
             val isButtonEnabled =
-                (state.tournamentType != null
+                state.tournamentType != null
                         && tournamentName.text.isNotBlank()
-                        && state.regularSetTemplate.id != "0"
                         && state.decidingSetTemplate.id != "0"
                         && state.selectedTheme != null
-                        ) && tournamentAddingSubstate !is TournamentAddingSubstate.Loading
+                        && (!needsRegularSet || state.regularSetTemplate.id != "0")
+                        && !state.isAdding
 
             Button(
                 onClick = {
@@ -266,17 +306,7 @@ fun AddTournamentContent(
                 },
                 enabled = isButtonEnabled
             ) {
-                if (tournamentAddingSubstate is TournamentAddingSubstate.Loading) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.size(24.dp)
-                    )
-                } else {
-                    Text("Add")
-                }
-            }
-
-            if (tournamentAddingSubstate is TournamentAddingSubstate.Error) {
-                Text(text = tournamentAddingSubstate.message, color = Color.Red)
+                Text("Add")
             }
         }
     }
@@ -339,8 +369,9 @@ fun TournamentTypeCombobox(
 @Composable
 fun ThemeDropdownMenu(
     modifier: Modifier = Modifier,
-    themes: List<ScoreboardTheme>,
+    themes: List<ScoreboardTheme> = emptyList(),
     selectedTheme: ScoreboardTheme?,
+    loadState: DropdownLoadState<ScoreboardTheme> = DropdownLoadState.Idle(emptyList()),
     onThemeSelected: (ScoreboardTheme) -> Unit,
     onThemesFetch: () -> Unit = {},
 ) {
@@ -382,26 +413,53 @@ fun ThemeDropdownMenu(
             expanded = expanded,
             onDismissRequest = { expanded = false }
         ) {
-            themes.forEach { theme ->
-                DropdownMenuItem(
-                    text = {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-                            ColorCircle(color = theme.backgroundColor)
-                            ColorCircle(color = theme.textColor)
-                            Text(
-                                text = theme.name,
-                                color = Color.Black
-                            )
-                        }
-                    },
-                    onClick = {
-                        onThemeSelected(theme)
-                        expanded = false
-                    },
-                )
+            when (loadState) {
+                is DropdownLoadState.Loading -> {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        CircularProgressIndicator(modifier = Modifier.size(24.dp))
+                    }
+                }
+
+                is DropdownLoadState.Error -> {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        Text(text = loadState.message)
+                    }
+                }
+
+                is DropdownLoadState.Idle -> {
+                    val themes = loadState.data
+                    themes.forEach { theme ->
+                        DropdownMenuItem(
+                            text = {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                ) {
+                                    ColorCircle(color = theme.backgroundColor)
+                                    ColorCircle(color = theme.textColor)
+                                    Text(
+                                        text = theme.name,
+                                        color = Color.Black
+                                    )
+                                }
+                            },
+                            onClick = {
+                                onThemeSelected(theme)
+                                expanded = false
+                            },
+                        )
+                    }
+                }
             }
         }
     }

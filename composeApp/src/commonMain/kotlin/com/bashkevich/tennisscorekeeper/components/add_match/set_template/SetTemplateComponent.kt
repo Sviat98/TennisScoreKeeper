@@ -10,6 +10,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.bashkevich.tennisscorekeeper.model.set_template.domain.SetTemplate
+import com.bashkevich.tennisscorekeeper.screens.addtournament.DropdownLoadState
 
 @Composable
 fun SetTemplateComponent(
@@ -18,6 +19,7 @@ fun SetTemplateComponent(
     setTemplateOptions: List<SetTemplate>,
     currentSetTemplate: SetTemplate,
     enabled: Boolean,
+    loadState: DropdownLoadState<SetTemplate> = DropdownLoadState.Idle(emptyList()),
     onSetTemplatesFetch: () -> Unit,
     onSetTemplateChange: (SetTemplate) -> Unit
 ) {
@@ -32,9 +34,9 @@ fun SetTemplateComponent(
         ) {
             Text(label)
             SetTemplateCombobox(
-                setTemplateOptions = setTemplateOptions,
                 enabled = enabled,
                 currentSetTemplate = currentSetTemplate,
+                loadState = loadState,
                 onSetTemplatesFetch = onSetTemplatesFetch,
                 onSetTemplateChange = onSetTemplateChange
             )

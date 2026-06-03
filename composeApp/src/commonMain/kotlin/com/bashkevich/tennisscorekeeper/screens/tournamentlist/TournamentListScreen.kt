@@ -46,28 +46,28 @@ fun TournamentListScreen(
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 
-    when (val currentState = state) {
-        TournamentListState.Loading -> {
+    when (val loadingState = state.loadingState) {
+        is TournamentListLoadingState.Loading -> {
             TournamentListLoading(
                 modifier = modifier,
             )
         }
 
-        is TournamentListState.Content -> {
+        is TournamentListLoadingState.Content -> {
             TournamentListContent(
                 modifier = modifier,
-                state = currentState,
+                loadingState = loadingState,
+                action = state.action,
                 onRefresh = { viewModel.onEvent(TournamentListUiEvent.RefreshTournaments) },
-                actionsFlow = viewModel.actions,
+                onConsumeAction = { viewModel.consumeAction() },
             )
         }
 
-        is TournamentListState.Error -> {
+        is TournamentListLoadingState.Error -> {
             TournamentListError(
                 modifier = modifier,
-                state = currentState,
+                loadingState = loadingState,
                 onRetry = { viewModel.onEvent(TournamentListUiEvent.Retry) },
-                actionsFlow = viewModel.actions,
             )
         }
     }
@@ -76,22 +76,22 @@ fun TournamentListScreen(
 @Composable
 private fun TournamentListContent(
     modifier: Modifier = Modifier,
-    state: TournamentListState.Content,
+    loadingState: TournamentListLoadingState.Content,
+    action: TournamentListAction?,
     onRefresh: () -> Unit,
-    actionsFlow: kotlinx.coroutines.flow.Flow<TournamentListAction>,
+    onConsumeAction: () -> Unit,
 ) {
     val navController = LocalNavHostController.current
     val isAuthorized = LocalAuthorization.current
     val snackbarHostState = remember { SnackbarHostState() }
 
-    LaunchedEffect(Unit) {
-        actionsFlow.collect { action ->
-            when (action) {
-                is TournamentListAction.ShowRefreshError -> {
-                    snackbarHostState.showSnackbar(message = action.message)
-                }
-            }
+    LaunchedEffect(action) {
+        val currentAction = action ?: return@LaunchedEffect
+        when (currentAction) {
+            is TournamentListAction.ShowRefreshError ->
+                snackbarHostState.showSnackbar(message = currentAction.message)
         }
+        onConsumeAction()
     }
 
     Scaffold(
@@ -116,7 +116,7 @@ private fun TournamentListContent(
         snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { paddingValues ->
         PullToRefreshBox(
-            isRefreshing = state.isRefreshing,
+            isRefreshing = loadingState.isRefreshing,
             onRefresh = onRefresh,
             modifier = Modifier.fillMaxSize().padding(paddingValues)
         ) {
@@ -127,7 +127,7 @@ private fun TournamentListContent(
                 contentPadding = PaddingValues(16.dp)
             ) {
                 items(
-                    state.tournaments,
+                    loadingState.tournaments,
                     key = { it.id }) { tournament ->
                     TournamentListItem(
                         modifier = Modifier
@@ -164,33 +164,19 @@ private fun TournamentListLoading(
 @Composable
 private fun TournamentListError(
     modifier: Modifier = Modifier,
-    state: TournamentListState.Error,
+    loadingState: TournamentListLoadingState.Error,
     onRetry: () -> Unit,
-    actionsFlow: kotlinx.coroutines.flow.Flow<TournamentListAction>,
 ) {
-    val snackbarHostState = remember { SnackbarHostState() }
-
-    LaunchedEffect(Unit) {
-        actionsFlow.collect { action ->
-            when (action) {
-                is TournamentListAction.ShowRefreshError -> {
-                    snackbarHostState.showSnackbar(message = action.message)
-                }
-            }
-        }
-    }
-
     Scaffold(
         modifier = modifier,
-        topBar = { TournamentListAppBar() },
-        snackbarHost = { SnackbarHost(snackbarHostState) }
+        topBar = { TournamentListAppBar() }
     ) {
         Column(
             modifier = Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterVertically)
         ) {
-            Text(state.message)
+            Text(loadingState.message)
             Button(onClick = onRetry) {
                 Text("Try Again")
             }
