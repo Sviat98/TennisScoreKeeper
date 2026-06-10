@@ -40,7 +40,7 @@ class TournamentListViewModel(
         _action
     ) { (networkState, tournaments), isRefreshing, action ->
         val loadingState = when {
-            networkState == null && tournaments.isEmpty() ->
+            !isRefreshing && networkState == null && tournaments.isEmpty() ->
                 TournamentListLoadingState.Loading
             networkState is LoadResult.Error && tournaments.isEmpty() ->
                 TournamentListLoadingState.Error(networkState.result.message ?: "Error")
@@ -51,7 +51,7 @@ class TournamentListViewModel(
     }.stateIn(
         viewModelScope,
         SharingStarted.WhileSubscribed(5_000),
-        TournamentListState()
+        TournamentListState.initial()
     )
 
     fun consumeAction() {

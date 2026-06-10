@@ -1,7 +1,11 @@
 package com.bashkevich.tennisscorekeeper.screens.addtournament
 
+import androidx.compose.foundation.text.input.TextFieldState
 import androidx.lifecycle.viewModelScope
+import com.bashkevich.tennisscorekeeper.components.set_template.SetComponentState
+import com.bashkevich.tennisscorekeeper.components.theme.ThemeComponentState
 import com.bashkevich.tennisscorekeeper.core.remote.LoadResult
+import com.bashkevich.tennisscorekeeper.core.remote.UnauthorizedException
 import com.bashkevich.tennisscorekeeper.core.remote.doOnError
 import com.bashkevich.tennisscorekeeper.core.remote.doOnSuccess
 import com.bashkevich.tennisscorekeeper.model.set_template.domain.EMPTY_DECIDING_SET_TEMPLATE
@@ -15,7 +19,7 @@ import com.bashkevich.tennisscorekeeper.model.tournament.remote.AddTournamentBod
 import com.bashkevich.tennisscorekeeper.model.tournament.remote.TournamentType
 import com.bashkevich.tennisscorekeeper.model.tournament.repository.TournamentRepository
 import com.bashkevich.tennisscorekeeper.mvi.BaseViewModel
-import kotlinx.coroutines.flow.Flow
+import com.bashkevich.tennisscorekeeper.core.combine
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -29,72 +33,109 @@ class AddTournamentViewModel(
     private val themeRepository: ThemeRepository,
 ) : BaseViewModel<AddTournamentState, AddTournamentUiEvent, AddTournamentAction>() {
 
+    val tournamentNameState = TextFieldState()
+
     // Form fields
     private val _tournamentType = MutableStateFlow<TournamentType?>(null)
-    private val _regularSetTemplate = MutableStateFlow(EMPTY_REGULAR_SET_TEMPLATE)
-    private val _decidingSetTemplate = MutableStateFlow(EMPTY_DECIDING_SET_TEMPLATE)
+    private val _regularSetSelectedState = MutableStateFlow<SetComponentState.SelectedSetState>(
+        SetComponentState.SelectedSetState.Idle(EMPTY_REGULAR_SET_TEMPLATE)
+    )
+    private val _decidingSetSelectedState = MutableStateFlow<SetComponentState.SelectedSetState>(
+        SetComponentState.SelectedSetState.Idle(EMPTY_DECIDING_SET_TEMPLATE)
+    )
     private val _selectedTheme = MutableStateFlow<ScoreboardTheme?>(null)
     private val _setsToWin = MutableStateFlow(1)
 
     private val _isAdding = MutableStateFlow(false)
 
-    // Network fetch results (null = not started / in progress, like TournamentListScreen)
-    private val _setTemplatesFetchResult = MutableStateFlow<LoadResult<Unit, Throwable>?>(null)
+    // Network fetch results (null = not started / in progress)
+    private val _regularSetTemplatesFetchResult = MutableStateFlow<LoadResult<Unit, Throwable>?>(null)
+    private val _decidingSetTemplatesFetchResult = MutableStateFlow<LoadResult<Unit, Throwable>?>(null)
     private val _themesFetchResult = MutableStateFlow<LoadResult<Unit, Throwable>?>(null)
 
-    // DB observations (property-level, WhileSubscribed)
-    private val setTemplatesFromDb: StateFlow<List<SetTemplate>> =
-        setTemplateRepository.observeSetTemplates(SetTemplateTypeFilter.ALL)
+    // DB observations
+    private val regularSetTemplatesFromDb: StateFlow<List<SetTemplate>> =
+        setTemplateRepository.observeSetTemplates(SetTemplateTypeFilter.REGULAR)
+            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
+
+    private val decidingSetTemplatesFromDb: StateFlow<List<SetTemplate>> =
+        setTemplateRepository.observeSetTemplates(SetTemplateTypeFilter.DECIDER)
             .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
     private val themesFromDb: StateFlow<List<ScoreboardTheme>> =
         themeRepository.observeThemesFromDatabase()
             .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
-    // Derived dropdown substates: combine(fetchResult, dbData) → DropdownLoadState
-    private val setTemplatesSubstate = combine(
-        _setTemplatesFetchResult,
-        setTemplatesFromDb,
+    // Derived dropdown substates
+    private val regularSetOptionsState = combine(
+        _regularSetTemplatesFetchResult,
+        regularSetTemplatesFromDb,
     ) { result, dbData ->
         when {
-            result == null && dbData.isEmpty() -> DropdownLoadState.Loading
-            result is LoadResult.Error && dbData.isEmpty() -> DropdownLoadState.Error("Не удалось загрузить данные")
-            else -> DropdownLoadState.Idle(dbData)
+            result == null && dbData.isEmpty() -> SetComponentState.SetTemplateOptionsState.Loading
+            result is LoadResult.Error && dbData.isEmpty() ->
+                SetComponentState.SetTemplateOptionsState.Error("There are no items")
+            else -> SetComponentState.SetTemplateOptionsState.Idle(dbData)
         }
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), DropdownLoadState.Idle(emptyList()))
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), SetComponentState.SetTemplateOptionsState.Idle(emptyList()))
 
-    private val themesSubstate = combine(
+    private val decidingSetOptionsState = combine(
+        _decidingSetTemplatesFetchResult,
+        decidingSetTemplatesFromDb,
+    ) { result, dbData ->
+        when {
+            result == null && dbData.isEmpty() -> SetComponentState.SetTemplateOptionsState.Loading
+            result is LoadResult.Error && dbData.isEmpty() ->
+                SetComponentState.SetTemplateOptionsState.Error("There are no items")
+            else -> SetComponentState.SetTemplateOptionsState.Idle(dbData)
+        }
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), SetComponentState.SetTemplateOptionsState.Idle(emptyList()))
+
+    private val themeOptionsState = combine(
         _themesFetchResult,
         themesFromDb,
     ) { result, dbData ->
         when {
-            result == null && dbData.isEmpty() -> DropdownLoadState.Loading
-            result is LoadResult.Error && dbData.isEmpty() -> DropdownLoadState.Error("Не удалось загрузить данные")
-            else -> DropdownLoadState.Idle(dbData)
+            result == null && dbData.isEmpty() -> ThemeComponentState.ThemeOptionsState.Loading
+            result is LoadResult.Error && dbData.isEmpty() ->
+                ThemeComponentState.ThemeOptionsState.Error("There are no items")
+            else -> ThemeComponentState.ThemeOptionsState.Idle(dbData)
         }
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), DropdownLoadState.Idle(emptyList()))
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), ThemeComponentState.ThemeOptionsState.Idle(emptyList()))
 
+    // Action
+    private val _action = MutableStateFlow<AddTournamentAction?>(null)
 
     // Single state via combine
     override val state: StateFlow<AddTournamentState> = combine(
         _isAdding,
         _tournamentType,
-        _regularSetTemplate,
-        _decidingSetTemplate,
+        _regularSetSelectedState,
+        _decidingSetSelectedState,
         _selectedTheme,
         _setsToWin,
-        setTemplatesSubstate,
-        themesSubstate,
-    ) { stateValues ->
+        regularSetOptionsState,
+        decidingSetOptionsState,
+        themeOptionsState,
+        _action,
+    ) { isAdding, tournamentType, regularSetState, decidingSetState, theme, setsToWin, regularSetOptsState, decidingSetOptsState, themeOptsState, action ->
         AddTournamentState(
-            isAdding = stateValues[0] as Boolean,
-            tournamentType = stateValues[1] as TournamentType?,
-            regularSetTemplate = stateValues[2] as SetTemplate,
-            decidingSetTemplate = stateValues[3] as SetTemplate,
-            selectedTheme = stateValues[4] as ScoreboardTheme?,
-            setsToWin = stateValues[5] as Int,
-            setTemplatesSubstate = stateValues[6] as DropdownLoadState<SetTemplate>,
-            themesSubstate = stateValues[7] as DropdownLoadState<ScoreboardTheme>,
+            isAdding = isAdding,
+            tournamentType = tournamentType,
+            regularSetComponentState = SetComponentState(
+                selectedSetState = regularSetState,
+                setOptionsState = regularSetOptsState,
+            ),
+            decidingSetComponentState = SetComponentState(
+                selectedSetState = decidingSetState,
+                setOptionsState = decidingSetOptsState,
+            ),
+            themeComponentState = ThemeComponentState(
+                selectedTheme = ThemeComponentState.SelectedThemeState.Idle(theme ?: ScoreboardTheme.DEFAULT),
+                themeOptionsState = themeOptsState,
+            ),
+            setsToWin = setsToWin,
+            action = action,
         )
     }.stateIn(
         viewModelScope,
@@ -102,8 +143,9 @@ class AddTournamentViewModel(
         AddTournamentState.initial()
     )
 
-    val actions: Flow<AddTournamentAction>
-        get() = super.action
+    fun consumeAction() {
+        _action.value = null
+    }
 
     fun onEvent(uiEvent: AddTournamentUiEvent) {
         when (uiEvent) {
@@ -112,11 +154,11 @@ class AddTournamentViewModel(
             }
 
             is AddTournamentUiEvent.SelectRegularSetTemplate -> {
-                _regularSetTemplate.value = uiEvent.setTemplate
+                _regularSetSelectedState.value = SetComponentState.SelectedSetState.Idle(uiEvent.setTemplate)
             }
 
             is AddTournamentUiEvent.SelectDecidingSetTemplate -> {
-                _decidingSetTemplate.value = uiEvent.setTemplate
+                _decidingSetSelectedState.value = SetComponentState.SelectedSetState.Idle(uiEvent.setTemplate)
             }
 
             is AddTournamentUiEvent.SelectTheme -> {
@@ -128,11 +170,11 @@ class AddTournamentViewModel(
                 if (newSetsToWin < 1) return
                 _setsToWin.value = newSetsToWin
                 if (newSetsToWin < 2) {
-                    _regularSetTemplate.value = EMPTY_REGULAR_SET_TEMPLATE
+                    _regularSetSelectedState.value = SetComponentState.SelectedSetState.Idle(EMPTY_REGULAR_SET_TEMPLATE)
                 }
             }
 
-            is AddTournamentUiEvent.FetchSetTemplates -> fetchSetTemplates()
+            is AddTournamentUiEvent.FetchSetTemplates -> fetchSetTemplates(uiEvent.filter)
             is AddTournamentUiEvent.FetchThemes -> fetchThemes()
 
             is AddTournamentUiEvent.AddTournament -> addTournament(
@@ -143,6 +185,38 @@ class AddTournamentViewModel(
                 themeId = uiEvent.themeId,
                 setsToWin = uiEvent.setsToWin,
             )
+        }
+    }
+
+    private fun fetchSetTemplates(filter: SetTemplateTypeFilter) {
+        viewModelScope.launch {
+            when (filter) {
+                SetTemplateTypeFilter.REGULAR -> {
+                    _regularSetTemplatesFetchResult.value = null
+                    val result = setTemplateRepository.fetchSetTemplates(SetTemplateTypeFilter.REGULAR)
+                    _regularSetTemplatesFetchResult.value = result
+                }
+                SetTemplateTypeFilter.DECIDER -> {
+                    _decidingSetTemplatesFetchResult.value = null
+                    val result = setTemplateRepository.fetchSetTemplates(SetTemplateTypeFilter.DECIDER)
+                    _decidingSetTemplatesFetchResult.value = result
+                }
+                SetTemplateTypeFilter.ALL -> {
+                    _regularSetTemplatesFetchResult.value = null
+                    _decidingSetTemplatesFetchResult.value = null
+                    val result = setTemplateRepository.fetchSetTemplates(SetTemplateTypeFilter.ALL)
+                    _regularSetTemplatesFetchResult.value = result
+                    _decidingSetTemplatesFetchResult.value = result
+                }
+            }
+        }
+    }
+
+    private fun fetchThemes() {
+        viewModelScope.launch {
+            _themesFetchResult.value = null
+            val result = themeRepository.fetchThemes()
+            _themesFetchResult.value = result
         }
     }
 
@@ -167,25 +241,15 @@ class AddTournamentViewModel(
             tournamentRepository.addTournament(addTournamentBody)
                 .doOnSuccess {
                     _isAdding.value = false
-                    sendAction(AddTournamentAction.TournamentAdded)
-                }.doOnError {
+                    _action.value = AddTournamentAction.TournamentAdded
+                }.doOnError { throwable ->
                     _isAdding.value = false
-                    sendAction(AddTournamentAction.ShowAddError("Не удалось добавить турнир"))
+                    if (throwable is UnauthorizedException) {
+                        _action.value = AddTournamentAction.ShowUnauthorizedError
+                    } else {
+                        _action.value = AddTournamentAction.ShowAddError("Не удалось добавить турнир")
+                    }
                 }
-        }
-    }
-
-    private fun fetchSetTemplates() {
-        viewModelScope.launch {
-            _setTemplatesFetchResult.value = null
-            _setTemplatesFetchResult.value = setTemplateRepository.fetchSetTemplates(SetTemplateTypeFilter.ALL)
-        }
-    }
-
-    private fun fetchThemes() {
-        viewModelScope.launch {
-            _themesFetchResult.value = null
-            _themesFetchResult.value = themeRepository.fetchThemes()
         }
     }
 }

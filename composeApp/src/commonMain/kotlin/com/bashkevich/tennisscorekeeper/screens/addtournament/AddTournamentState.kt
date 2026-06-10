@@ -1,6 +1,8 @@
 package com.bashkevich.tennisscorekeeper.screens.addtournament
 
 import androidx.compose.runtime.Immutable
+import com.bashkevich.tennisscorekeeper.components.set_template.SetComponentState
+import com.bashkevich.tennisscorekeeper.components.theme.ThemeComponentState
 import com.bashkevich.tennisscorekeeper.model.set_template.domain.EMPTY_DECIDING_SET_TEMPLATE
 import com.bashkevich.tennisscorekeeper.model.set_template.domain.EMPTY_REGULAR_SET_TEMPLATE
 import com.bashkevich.tennisscorekeeper.model.set_template.domain.SetTemplate
@@ -11,13 +13,6 @@ import com.bashkevich.tennisscorekeeper.model.tournament.remote.TournamentType
 import com.bashkevich.tennisscorekeeper.mvi.UiAction
 import com.bashkevich.tennisscorekeeper.mvi.UiEvent
 import com.bashkevich.tennisscorekeeper.mvi.UiState
-
-@Immutable
-sealed class DropdownLoadState<out T> {
-    data class Idle<out T>(val data: List<T>) : DropdownLoadState<T>()
-    data object Loading : DropdownLoadState<Nothing>()
-    data class Error(val message: String) : DropdownLoadState<Nothing>()
-}
 
 @Immutable
 sealed class AddTournamentUiEvent : UiEvent {
@@ -41,23 +36,36 @@ sealed class AddTournamentUiEvent : UiEvent {
 @Immutable
 data class AddTournamentState(
     val tournamentType: TournamentType?,
-    val regularSetTemplate: SetTemplate,
-    val decidingSetTemplate: SetTemplate,
-    val selectedTheme: ScoreboardTheme?,
+    val regularSetComponentState: SetComponentState,
+    val decidingSetComponentState: SetComponentState,
+    val themeComponentState: ThemeComponentState,
     val setsToWin: Int,
     val isAdding: Boolean = false,
-    val setTemplatesSubstate: DropdownLoadState<SetTemplate>,
-    val themesSubstate: DropdownLoadState<ScoreboardTheme>,
+    val action: AddTournamentAction? = null,
 ) : UiState {
     companion object {
         fun initial() = AddTournamentState(
             tournamentType = null,
-            regularSetTemplate = EMPTY_REGULAR_SET_TEMPLATE,
-            decidingSetTemplate = EMPTY_DECIDING_SET_TEMPLATE,
-            selectedTheme = null,
+            regularSetComponentState = SetComponentState(
+                selectedSetState = SetComponentState.SelectedSetState.Idle(
+                    EMPTY_REGULAR_SET_TEMPLATE
+                ),
+                setOptionsState = SetComponentState.SetTemplateOptionsState.Loading,
+            ),
+            decidingSetComponentState = SetComponentState(
+                selectedSetState = SetComponentState.SelectedSetState.Idle(
+                    EMPTY_DECIDING_SET_TEMPLATE
+                ),
+                setOptionsState = SetComponentState.SetTemplateOptionsState.Loading,
+            ),
+            themeComponentState = ThemeComponentState(
+                selectedTheme = ThemeComponentState.SelectedThemeState.Idle(
+                    ScoreboardTheme.DEFAULT
+                ),
+                themeOptionsState = ThemeComponentState.ThemeOptionsState.Loading,
+            ),
             setsToWin = 1,
-            setTemplatesSubstate = DropdownLoadState.Idle(emptyList<SetTemplate>()),
-            themesSubstate = DropdownLoadState.Idle(emptyList<ScoreboardTheme>()),
+            action = null,
         )
     }
 }
@@ -66,7 +74,5 @@ data class AddTournamentState(
 sealed class AddTournamentAction : UiAction {
     data object TournamentAdded : AddTournamentAction()
     data class ShowAddError(val message: String) : AddTournamentAction()
+    data object ShowUnauthorizedError : AddTournamentAction()
 }
-
-//fun <T> DropdownLoadState<T>.items(): List<T> =
-//    (this as? DropdownLoadState.Idle)?.data ?: emptyList()

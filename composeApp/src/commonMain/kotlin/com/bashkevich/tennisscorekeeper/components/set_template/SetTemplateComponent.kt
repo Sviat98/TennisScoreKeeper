@@ -1,4 +1,4 @@
-package com.bashkevich.tennisscorekeeper.components.add_match.set_template
+package com.bashkevich.tennisscorekeeper.components.set_template
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -10,18 +10,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.bashkevich.tennisscorekeeper.model.set_template.domain.SetTemplate
-import com.bashkevich.tennisscorekeeper.screens.addtournament.DropdownLoadState
 
 @Composable
 fun SetTemplateComponent(
     modifier: Modifier = Modifier,
     label: String,
-    setTemplateOptions: List<SetTemplate>,
-    currentSetTemplate: SetTemplate,
     enabled: Boolean,
-    loadState: DropdownLoadState<SetTemplate> = DropdownLoadState.Idle(emptyList()),
+    setComponentState: SetComponentState,
     onSetTemplatesFetch: () -> Unit,
-    onSetTemplateChange: (SetTemplate) -> Unit
+    onSetTemplateChange: (SetTemplate) -> Unit,
+    onRetrySelectedSet: () -> Unit = {},
 ) {
     Column(
         modifier = Modifier.then(modifier),
@@ -35,10 +33,10 @@ fun SetTemplateComponent(
             Text(label)
             SetTemplateCombobox(
                 enabled = enabled,
-                currentSetTemplate = currentSetTemplate,
-                loadState = loadState,
+                setComponentState = setComponentState,
                 onSetTemplatesFetch = onSetTemplatesFetch,
-                onSetTemplateChange = onSetTemplateChange
+                onSetTemplateChange = onSetTemplateChange,
+                onRetrySelectedSet = onRetrySelectedSet,
             )
         }
     }

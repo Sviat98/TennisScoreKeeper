@@ -2,10 +2,8 @@ package com.bashkevich.tennisscorekeeper.components.add_match
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -21,13 +19,14 @@ import androidx.compose.ui.unit.dp
 import androidx.window.core.layout.WindowSizeClass
 import com.bashkevich.tennisscorekeeper.components.ColorPickerDialog
 import com.bashkevich.tennisscorekeeper.components.add_match.participant.AddMatchParticipantsBlock
-import com.bashkevich.tennisscorekeeper.components.add_match.set_template.SetTemplateComponent
+import com.bashkevich.tennisscorekeeper.components.set_template.SetComponentState
+import com.bashkevich.tennisscorekeeper.components.theme.ThemeComponentState
 import com.bashkevich.tennisscorekeeper.model.set_template.domain.SetTemplateTypeFilter
+import com.bashkevich.tennisscorekeeper.model.theme.domain.ScoreboardTheme
 import com.bashkevich.tennisscorekeeper.screens.addmatch.AddMatchState
 import com.bashkevich.tennisscorekeeper.screens.addmatch.AddMatchUiEvent
 import com.bashkevich.tennisscorekeeper.screens.addmatch.MatchAddingSubstate
 import com.bashkevich.tennisscorekeeper.screens.addmatch.OpenColorPickerDialogState
-import com.bashkevich.tennisscorekeeper.screens.addtournament.ThemeDropdownMenu
 
 @Composable
 fun AddMatchComponent(
@@ -89,135 +88,54 @@ fun AddMatchComponent(
         )
 
         val setsToWin = state.setsToWin
-        val setTemplateOptions = state.setTemplateOptions
         val regularSetTemplate = state.regularSetTemplate
         val decidingSetTemplate = state.decidingSetTemplate
 
-        val regularTemplates = setTemplateOptions.filter { it.isRegular }
-        val decidingTemplates = setTemplateOptions.filter { it.isDeciding }
+        val regularTemplates = state.setTemplateOptions.filter { it.isRegular }
+        val decidingTemplates = state.setTemplateOptions.filter { it.isDeciding }
 
         // Settings section
-        if (isWideScreen) {
-            // Row 1: Theme + SetsToWin
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(64.dp),
-            ) {
-                ThemeDropdownMenu(
-                    modifier = Modifier.weight(1f),
-                    themes = state.themeOptions,
-                    selectedTheme = state.selectedTheme,
-                    onThemeSelected = { theme ->
-                        onEvent(AddMatchUiEvent.SelectTheme(theme))
-                    },
-                    onThemesFetch = { onEvent(AddMatchUiEvent.FetchThemes) }
-                )
-                SetsToWinComponent(
-                    modifier = Modifier.weight(1f),
-                    setsToWin = setsToWin,
-                    onValueChange = { delta -> onEvent(AddMatchUiEvent.ChangeSetsToWin(delta)) }
-                )
-            }
-
-            // Row 2: Regular + Deciding set templates
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(64.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                SetTemplateComponent(
-                    modifier = Modifier.weight(1f),
-                    label = "Regular Set Template",
-                    setTemplateOptions = regularTemplates,
-                    enabled = setsToWin > 1,
-                    currentSetTemplate = regularSetTemplate,
-                    onSetTemplatesFetch = {
-                        onEvent(AddMatchUiEvent.FetchSetTemplates(SetTemplateTypeFilter.ALL))
-                    },
-                    onSetTemplateChange = { setTemplate ->
-                        onEvent(
-                            AddMatchUiEvent.SelectSetTemplate(
-                                setTemplateTypeFilter = SetTemplateTypeFilter.REGULAR,
-                                setTemplate = setTemplate
-                            )
-                        )
-                    }
-                )
-                SetTemplateComponent(
-                    modifier = Modifier.weight(1f),
-                    label = "Deciding Set Template",
-                    setTemplateOptions = decidingTemplates,
-                    enabled = true,
-                    currentSetTemplate = decidingSetTemplate,
-                    onSetTemplatesFetch = {
-                        onEvent(AddMatchUiEvent.FetchSetTemplates(SetTemplateTypeFilter.ALL))
-                    },
-                    onSetTemplateChange = { setTemplate ->
-                        onEvent(
-                            AddMatchUiEvent.SelectSetTemplate(
-                                setTemplateTypeFilter = SetTemplateTypeFilter.DECIDER,
-                                setTemplate = setTemplate
-                            )
-                        )
-                    }
-                )
-            }
-        } else {
-            // Narrow screen: vertical layout
-            ThemeDropdownMenu(
-                modifier = Modifier.widthIn(max = 300.dp).fillMaxWidth(),
-                themes = state.themeOptions,
-                selectedTheme = state.selectedTheme,
-                onThemeSelected = { theme ->
-                    onEvent(AddMatchUiEvent.SelectTheme(theme))
-                },
-                onThemesFetch = { onEvent(AddMatchUiEvent.FetchThemes) }
-            )
-
-            SetsToWinComponent(
-                modifier = Modifier.fillMaxWidth(),
-                setsToWin = setsToWin,
-                onValueChange = { delta -> onEvent(AddMatchUiEvent.ChangeSetsToWin(delta)) }
-            )
-
-            SetTemplateComponent(
-                modifier = Modifier.fillMaxWidth(),
-                label = "Regular Set Template",
-                setTemplateOptions = regularTemplates,
-                enabled = setsToWin > 1,
-                currentSetTemplate = regularSetTemplate,
-                onSetTemplatesFetch = {
-                    onEvent(AddMatchUiEvent.FetchSetTemplates(SetTemplateTypeFilter.ALL))
-                },
-                onSetTemplateChange = { setTemplate ->
-                    onEvent(
-                        AddMatchUiEvent.SelectSetTemplate(
-                            setTemplateTypeFilter = SetTemplateTypeFilter.REGULAR,
-                            setTemplate = setTemplate
-                        )
+        MatchScoringAndThemeSettingsBlock(
+            setsToWin = setsToWin,
+            regularSetComponentState = SetComponentState(
+                selectedSetState = SetComponentState.SelectedSetState.Idle(regularSetTemplate),
+                setOptionsState = SetComponentState.SetTemplateOptionsState.Idle(regularTemplates),
+            ),
+            decidingSetComponentState = SetComponentState(
+                selectedSetState = SetComponentState.SelectedSetState.Idle(decidingSetTemplate),
+                setOptionsState = SetComponentState.SetTemplateOptionsState.Idle(decidingTemplates),
+            ),
+            themeComponentState = ThemeComponentState(
+                selectedTheme = ThemeComponentState.SelectedThemeState.Idle(state.selectedTheme ?: ScoreboardTheme.DEFAULT),
+                themeOptionsState = ThemeComponentState.ThemeOptionsState.Idle(state.themeOptions),
+            ),
+            onSetsToWinChange = { delta -> onEvent(AddMatchUiEvent.ChangeSetsToWin(delta)) },
+            onSetTemplatesFetch = { filter ->
+                onEvent(AddMatchUiEvent.FetchSetTemplates(filter))
+            },
+            onRegularSetTemplateChange = { setTemplate ->
+                onEvent(
+                    AddMatchUiEvent.SelectSetTemplate(
+                        setTemplateTypeFilter = SetTemplateTypeFilter.REGULAR,
+                        setTemplate = setTemplate
                     )
-                }
-            )
-
-            SetTemplateComponent(
-                modifier = Modifier.fillMaxWidth(),
-                label = "Deciding Set Template",
-                setTemplateOptions = decidingTemplates,
-                enabled = true,
-                currentSetTemplate = decidingSetTemplate,
-                onSetTemplatesFetch = {
-                    onEvent(AddMatchUiEvent.FetchSetTemplates(SetTemplateTypeFilter.ALL))
-                },
-                onSetTemplateChange = { setTemplate ->
-                    onEvent(
-                        AddMatchUiEvent.SelectSetTemplate(
-                            setTemplateTypeFilter = SetTemplateTypeFilter.DECIDER,
-                            setTemplate = setTemplate
-                        )
+                )
+            },
+            onDecidingSetTemplateChange = { setTemplate ->
+                onEvent(
+                    AddMatchUiEvent.SelectSetTemplate(
+                        setTemplateTypeFilter = SetTemplateTypeFilter.DECIDER,
+                        setTemplate = setTemplate
                     )
-                }
-            )
-        }
+                )
+            },
+            onThemeSelected = { theme ->
+                onEvent(AddMatchUiEvent.SelectTheme(theme))
+            },
+            onThemesFetch = {
+                onEvent(AddMatchUiEvent.FetchThemes)
+            },
+        )
 
         val matchAddingSubstate = state.matchAddingSubstate
 

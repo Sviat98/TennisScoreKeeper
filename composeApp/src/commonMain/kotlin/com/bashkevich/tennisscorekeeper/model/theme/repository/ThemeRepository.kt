@@ -6,6 +6,8 @@ import kotlinx.coroutines.flow.Flow
 
 interface ThemeRepository {
     suspend fun fetchThemes(): LoadResult<Unit, Throwable>
+    fun fetchThemesFlow(): Flow<LoadResult<Unit, Throwable>?>
+    fun refreshThemes()
     suspend fun fetchThemeById(id: String): LoadResult<Unit, Throwable>
     fun observeThemesFromDatabase(): Flow<List<ScoreboardTheme>>
     fun observeThemeByIdFromDatabase(id: String): Flow<ScoreboardTheme>

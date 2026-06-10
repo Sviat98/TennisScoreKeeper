@@ -7,5 +7,7 @@ import kotlinx.coroutines.flow.Flow
 
 interface SetTemplateRepository {
     suspend fun fetchSetTemplates(filter: SetTemplateTypeFilter): LoadResult<Unit, Throwable>
+    fun fetchSetTemplatesFlow(filter: SetTemplateTypeFilter): Flow<LoadResult<Unit, Throwable>?>
+    fun refreshSetTemplates()
     fun observeSetTemplates(filter: SetTemplateTypeFilter): Flow<List<SetTemplate>>
 }

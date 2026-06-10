@@ -10,7 +10,14 @@ import com.bashkevich.tennisscorekeeper.mvi.UiState
 data class TournamentListState(
     val loadingState: TournamentListLoadingState = TournamentListLoadingState.Loading,
     val action: TournamentListAction? = null
-) : UiState
+) : UiState {
+    companion object {
+        fun initial() = TournamentListState(
+            loadingState = TournamentListLoadingState.Loading,
+            action = null
+        )
+    }
+}
 
 @Immutable
 sealed interface TournamentListLoadingState : UiState {

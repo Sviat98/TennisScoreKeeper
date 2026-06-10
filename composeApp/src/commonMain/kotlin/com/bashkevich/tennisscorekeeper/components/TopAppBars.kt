@@ -119,6 +119,8 @@ fun AddMatchAppBar(
 @Composable
 fun AddTournamentAppBar(
     onBack: () -> Unit,
+    isAuthorized: Boolean,
+    onNavigateToLoginOrProfile: () -> Unit,
 ) {
     TopAppBar(
         title = { Text("Add Tournament") },
@@ -129,6 +131,17 @@ fun AddTournamentAppBar(
                 Icon(
                     imageVector = IconGroup.Default.ArrowBack,
                     contentDescription = "Navigate back"
+                )
+            }
+        },
+        actions = {
+            if (isAuthorized) {
+                IconButton(onClick = onNavigateToLoginOrProfile) {
+                    Icon(IconGroup.Filled.Person, contentDescription = "Navigate to profile")
+                }
+            } else {
+                LoginButton(
+                    onNavigateToLogin = onNavigateToLoginOrProfile
                 )
             }
         }
