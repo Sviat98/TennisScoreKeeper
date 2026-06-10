@@ -4,7 +4,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
-import com.bashkevich.tennisscorekeeper.core.LoadResult
+import com.bashkevich.tennisscorekeeper.core.remote.LoadResult
 import com.bashkevich.tennisscorekeeper.model.match.remote.MatchBody
 import com.bashkevich.tennisscorekeeper.model.match.remote.ParticipantInMatchBody
 import com.bashkevich.tennisscorekeeper.model.match.remote.convertToRgbString
@@ -22,6 +22,7 @@ import com.bashkevich.tennisscorekeeper.model.player.domain.PlayerInSinglesMatch
 import com.bashkevich.tennisscorekeeper.model.set_template.domain.EMPTY_REGULAR_SET_TEMPLATE
 import com.bashkevich.tennisscorekeeper.model.set_template.domain.SetTemplateTypeFilter
 import com.bashkevich.tennisscorekeeper.model.set_template.repository.SetTemplateRepository
+import com.bashkevich.tennisscorekeeper.model.theme.repository.ThemeRepository
 import com.bashkevich.tennisscorekeeper.model.tournament.remote.TournamentType
 import com.bashkevich.tennisscorekeeper.model.tournament.repository.TournamentRepository
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -39,7 +40,8 @@ class AddMatchViewModel(
     private val matchRepository: MatchRepository,
     private val tournamentRepository: TournamentRepository,
     private val participantRepository: ParticipantRepository,
-    private val setTemplateRepository: SetTemplateRepository
+    private val setTemplateRepository: SetTemplateRepository,
+    private val themeRepository: ThemeRepository,
 ) : BaseViewModel<AddMatchState, AddMatchUiEvent, AddMatchAction>() {
 
     private val _state = MutableStateFlow(AddMatchState.initial())
@@ -48,6 +50,9 @@ class AddMatchViewModel(
 
     val actions: Flow<AddMatchAction>
         get() = super.action
+
+    private var currentSetTemplateFilter: SetTemplateTypeFilter? = null
+    private var themesLoaded = false
 
     init {
         fetchTournament()
@@ -99,6 +104,12 @@ class AddMatchViewModel(
                         regularSetTemplate = regularSetTemplate
                     )
                 }
+            }
+
+            is AddMatchUiEvent.FetchThemes -> fetchThemes()
+
+            is AddMatchUiEvent.SelectTheme -> {
+                reduceState { oldState -> oldState.copy(selectedTheme = uiEvent.theme) }
             }
 
             is AddMatchUiEvent.SelectSetTemplate -> {
@@ -308,41 +319,43 @@ class AddMatchViewModel(
         viewModelScope.launch {
             val tournamentId = savedStateHandle.toRoute<AddMatchRoute>().tournamentId
 
-            val tournamentResult = tournamentRepository.getTournamentById(tournamentId)
+            launch {
+                tournamentRepository.observeTournamentById(tournamentId).collect { tournament ->
+                    val defaultParticipant = when (tournament.type) {
+                        TournamentType.SINGLES -> PARTICIPANT_IN_SINGLES_MATCH_DEFAULT
+                        TournamentType.DOUBLES -> PARTICIPANT_IN_DOUBLES_MATCH_DEFAULT
+                    }
 
-            if (tournamentResult is LoadResult.Success) {
-
-                val tournament = tournamentResult.result
-
-                val defaultParticipant = when(tournament.type){
-                    TournamentType.SINGLES -> PARTICIPANT_IN_SINGLES_MATCH_DEFAULT
-                    TournamentType.DOUBLES -> PARTICIPANT_IN_DOUBLES_MATCH_DEFAULT
-                }
-
-                reduceState { oldState ->
-                    oldState.copy(
-                        isLoading = false,
-                        tournament = tournament,
-                        firstParticipant = defaultParticipant,
-                        secondParticipant = defaultParticipant
-                    )
+                    reduceState { oldState ->
+                        oldState.copy(
+                            isLoading = false,
+                            tournament = tournament,
+                            firstParticipant = defaultParticipant,
+                            secondParticipant = defaultParticipant
+                        )
+                    }
                 }
             }
+            tournamentRepository.fetchTournamentById(tournamentId)
         }
     }
 
     private fun fetchSetTemplates(setTemplateTypeFilter: SetTemplateTypeFilter) {
-        viewModelScope.launch {
-
-            val setTemplatesResult =
-                setTemplateRepository.getSetTemplates(setTemplateTypeFilter)
-
-            if (setTemplatesResult is LoadResult.Success) {
-                reduceState { oldState ->
-                    oldState.copy(
-                        setTemplateOptions = setTemplatesResult.result
-                    )
+        if (currentSetTemplateFilter != setTemplateTypeFilter) {
+            currentSetTemplateFilter = setTemplateTypeFilter
+            viewModelScope.launch {
+                launch {
+                    setTemplateRepository.observeSetTemplates(setTemplateTypeFilter).collect { templates ->
+                        reduceState { oldState ->
+                            oldState.copy(setTemplateOptions = templates)
+                        }
+                    }
                 }
+                setTemplateRepository.fetchSetTemplates(setTemplateTypeFilter)
+            }
+        } else {
+            viewModelScope.launch {
+                setTemplateRepository.fetchSetTemplates(setTemplateTypeFilter)
             }
         }
     }
@@ -364,6 +377,23 @@ class AddMatchViewModel(
                 }
             }
 
+        }
+    }
+
+    private fun fetchThemes() {
+        if (themesLoaded) return
+        themesLoaded = true
+        viewModelScope.launch {
+            launch {
+                themeRepository.observeThemesFromDatabase().collect { themes ->
+                    reduceState { oldState ->
+                        oldState.copy(
+                            themeOptions = themes,
+                        )
+                    }
+                }
+            }
+            themeRepository.fetchThemes()
         }
     }
 
@@ -517,7 +547,8 @@ class AddMatchViewModel(
                 secondParticipant = secondParticipantInMatchBody,
                 setsToWin = state.setsToWin,
                 regularSet = regularSetTemplateId,
-                decidingSet = state.decidingSetTemplate.id
+                decidingSet = state.decidingSetTemplate.id,
+                themeId = state.selectedTheme?.id ?: "",
             )
 
             val addMatchResult = matchRepository.addNewMatch(tournamentId = tournamentId, matchBody = matchBody)

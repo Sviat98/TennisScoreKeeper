@@ -1,7 +1,6 @@
 package com.bashkevich.tennisscorekeeper.screens.tournamentlist
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -15,12 +14,15 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
-
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -44,45 +46,56 @@ fun TournamentListScreen(
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 
-    LaunchedEffect(Unit) {
-        viewModel.actions.collect { action ->
-        }
-    }
-
-    when (state.loadingState) {
-        TournamentListLoadingState.Loading -> {
+    when (val loadingState = state.loadingState) {
+        is TournamentListLoadingState.Loading -> {
             TournamentListLoading(
-                modifier = Modifier.then(modifier),
+                modifier = modifier,
             )
         }
 
-        TournamentListLoadingState.Error -> {
-            TournamentListError(
-                modifier = Modifier.then(modifier),
-                onEvent = { event -> viewModel.onEvent(event) }
-            )
-        }
-
-        TournamentListLoadingState.Success -> {
+        is TournamentListLoadingState.Content -> {
             TournamentListContent(
-                modifier = Modifier.then(modifier),
-                state = state
+                modifier = modifier,
+                loadingState = loadingState,
+                action = state.action,
+                onRefresh = { viewModel.onEvent(TournamentListUiEvent.RefreshTournaments) },
+                onConsumeAction = { viewModel.consumeAction() },
+            )
+        }
+
+        is TournamentListLoadingState.Error -> {
+            TournamentListError(
+                modifier = modifier,
+                loadingState = loadingState,
+                onRetry = { viewModel.onEvent(TournamentListUiEvent.Retry) },
             )
         }
     }
-
 }
 
 @Composable
-fun TournamentListContent(
+private fun TournamentListContent(
     modifier: Modifier = Modifier,
-    state: TournamentListState,
+    loadingState: TournamentListLoadingState.Content,
+    action: TournamentListAction?,
+    onRefresh: () -> Unit,
+    onConsumeAction: () -> Unit,
 ) {
     val navController = LocalNavHostController.current
-
     val isAuthorized = LocalAuthorization.current
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    LaunchedEffect(action) {
+        val currentAction = action ?: return@LaunchedEffect
+        when (currentAction) {
+            is TournamentListAction.ShowRefreshError ->
+                snackbarHostState.showSnackbar(message = currentAction.message)
+        }
+        onConsumeAction()
+    }
+
     Scaffold(
-        modifier = Modifier.then(modifier),
+        modifier = modifier,
         topBar = {
             TournamentListAppBarWithButton(
                 isAuthorized = isAuthorized,
@@ -99,17 +112,22 @@ fun TournamentListContent(
             FloatingActionButton(onClick = { navController.navigate(AddTournamentRoute) }) {
                 Icon(IconGroup.Default.Add, contentDescription = "Add Tournament")
             }
-        }
+        },
+        snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { paddingValues ->
-        Box(modifier = Modifier.fillMaxSize().padding(paddingValues)) {
+        PullToRefreshBox(
+            isRefreshing = loadingState.isRefreshing,
+            onRefresh = onRefresh,
+            modifier = Modifier.fillMaxSize().padding(paddingValues)
+        ) {
             LazyColumn(
-                modifier = Modifier.align(Alignment.Center),
+                modifier = Modifier.fillMaxSize(),
                 verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterVertically),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 contentPadding = PaddingValues(16.dp)
             ) {
                 items(
-                    state.tournaments,
+                    loadingState.tournaments,
                     key = { it.id }) { tournament ->
                     TournamentListItem(
                         modifier = Modifier
@@ -120,18 +138,17 @@ fun TournamentListContent(
                         onTournamentClick = { navController.navigate(TournamentRoute(tournament.id)) }
                     )
                 }
-
             }
         }
     }
 }
 
 @Composable
-fun TournamentListLoading(
+private fun TournamentListLoading(
     modifier: Modifier = Modifier
 ) {
     Scaffold(
-        modifier = Modifier.then(modifier),
+        modifier = modifier,
         topBar = { TournamentListAppBar() }
     ) {
         Column(
@@ -144,14 +161,14 @@ fun TournamentListLoading(
     }
 }
 
-
 @Composable
-fun TournamentListError(
+private fun TournamentListError(
     modifier: Modifier = Modifier,
-    onEvent: (TournamentListUiEvent) -> Unit
+    loadingState: TournamentListLoadingState.Error,
+    onRetry: () -> Unit,
 ) {
     Scaffold(
-        modifier = Modifier.then(modifier),
+        modifier = modifier,
         topBar = { TournamentListAppBar() }
     ) {
         Column(
@@ -159,11 +176,10 @@ fun TournamentListError(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterVertically)
         ) {
-            Text("Error happened!")
-            Button(onClick = { onEvent(TournamentListUiEvent.LoadTournaments) }) {
+            Text(loadingState.message)
+            Button(onClick = onRetry) {
                 Text("Try Again")
             }
         }
     }
 }
-

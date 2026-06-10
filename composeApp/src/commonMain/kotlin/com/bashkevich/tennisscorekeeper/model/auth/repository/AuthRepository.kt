@@ -1,7 +1,7 @@
 package com.bashkevich.tennisscorekeeper.model.auth.repository
 
-import com.bashkevich.tennisscorekeeper.core.LoadResult
-import com.bashkevich.tennisscorekeeper.core.ResponseMessage
+import com.bashkevich.tennisscorekeeper.core.remote.LoadResult
+import com.bashkevich.tennisscorekeeper.core.remote.ResponseMessage
 import com.bashkevich.tennisscorekeeper.model.auth.remote.LoginBody
 import com.bashkevich.tennisscorekeeper.model.auth.remote.LoginResponseDto
 import kotlinx.coroutines.flow.Flow

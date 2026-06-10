@@ -1,9 +1,9 @@
 package com.bashkevich.tennisscorekeeper
 
-import com.bashkevich.tennisscorekeeper.core.BASE_HOST_BACKEND_DEBUG
-import com.bashkevich.tennisscorekeeper.core.BASE_HOST_BACKEND_RELEASE
-import com.bashkevich.tennisscorekeeper.core.BASE_URL_FRONTEND_DEBUG
-import com.bashkevich.tennisscorekeeper.core.BASE_URL_FRONTEND_RELEASE
+import com.bashkevich.tennisscorekeeper.core.remote.BASE_HOST_BACKEND_DEBUG
+import com.bashkevich.tennisscorekeeper.core.remote.BASE_HOST_BACKEND_RELEASE
+import com.bashkevich.tennisscorekeeper.core.remote.BASE_URL_FRONTEND_DEBUG
+import com.bashkevich.tennisscorekeeper.core.remote.BASE_URL_FRONTEND_RELEASE
 
 data class AppConfig(
     val baseUrlFrontend: String,

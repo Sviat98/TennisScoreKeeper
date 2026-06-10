@@ -22,11 +22,14 @@ class AppViewModel(
 
     init {
         viewModelScope.launch {
-            authRepository.observePlayerId().distinctUntilChanged().collect{playerId->
+            authRepository.observePlayerId().distinctUntilChanged().collect { playerId ->
                 val isAuthorized = playerId.isNotEmpty()
                 _state.value = _state.value.copy(isAuthorized = isAuthorized)
-                println("AppViewModel isAuthorized = $isAuthorized")
             }
+        }
+
+        viewModelScope.launch {
+            authRepository.checkRefreshTokenStatus()
         }
     }
 }

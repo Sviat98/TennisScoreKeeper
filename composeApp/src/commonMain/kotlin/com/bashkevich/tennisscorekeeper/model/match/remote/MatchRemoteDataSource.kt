@@ -1,10 +1,10 @@
 package com.bashkevich.tennisscorekeeper.model.match.remote
 
 import com.bashkevich.tennisscorekeeper.AppConfig
-import com.bashkevich.tennisscorekeeper.core.LoadResult
-import com.bashkevich.tennisscorekeeper.core.ResponseMessage
-import com.bashkevich.tennisscorekeeper.core.runOperationCatching
-import com.bashkevich.tennisscorekeeper.core.webSocketDispatcher
+import com.bashkevich.tennisscorekeeper.core.remote.LoadResult
+import com.bashkevich.tennisscorekeeper.core.remote.ResponseMessage
+import com.bashkevich.tennisscorekeeper.core.remote.runOperationCatching
+import com.bashkevich.tennisscorekeeper.core.remote.webSocketDispatcher
 import com.bashkevich.tennisscorekeeper.model.match.remote.body.ChangeScoreBody
 import com.bashkevich.tennisscorekeeper.model.match.remote.body.MatchStatusBody
 import com.bashkevich.tennisscorekeeper.model.match.remote.body.RetiredParticipantBody

@@ -1,6 +1,6 @@
 package com.bashkevich.tennisscorekeeper.model.match.repository
 
-import com.bashkevich.tennisscorekeeper.core.LoadResult
+import com.bashkevich.tennisscorekeeper.core.remote.LoadResult
 import com.bashkevich.tennisscorekeeper.model.match.domain.Match
 import com.bashkevich.tennisscorekeeper.model.match.domain.ShortMatch
 import com.bashkevich.tennisscorekeeper.model.match.remote.MatchBody

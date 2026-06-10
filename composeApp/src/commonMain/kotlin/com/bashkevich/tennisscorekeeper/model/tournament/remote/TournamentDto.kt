@@ -13,6 +13,14 @@ data class TournamentDto(
     val type: TournamentType,
     @SerialName("status")
     val status: TournamentStatus,
+    @SerialName("regular_set_id")
+    val regularSetTemplateId: String,
+    @SerialName("deciding_set_id")
+    val decidingSetTemplateId: String,
+    @SerialName("theme_id")
+    val themeId: String,
+    @SerialName("sets_to_win")
+    val setsToWin: Int,
 )
 
 enum class TournamentType {

@@ -1,6 +1,6 @@
 package com.bashkevich.tennisscorekeeper.model.auth.local
 
-import com.bashkevich.tennisscorekeeper.core.KeyValueStorage
+import com.bashkevich.tennisscorekeeper.core.local.KeyValueStorage
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first

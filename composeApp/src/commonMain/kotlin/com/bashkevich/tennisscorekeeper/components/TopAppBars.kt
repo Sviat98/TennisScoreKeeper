@@ -117,6 +117,39 @@ fun AddMatchAppBar(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
+fun AddTournamentAppBar(
+    onBack: () -> Unit,
+    isAuthorized: Boolean,
+    onNavigateToLoginOrProfile: () -> Unit,
+) {
+    TopAppBar(
+        title = { Text("Add Tournament") },
+        navigationIcon = {
+            IconButton(
+                onClick = onBack
+            ) {
+                Icon(
+                    imageVector = IconGroup.Default.ArrowBack,
+                    contentDescription = "Navigate back"
+                )
+            }
+        },
+        actions = {
+            if (isAuthorized) {
+                IconButton(onClick = onNavigateToLoginOrProfile) {
+                    Icon(IconGroup.Filled.Person, contentDescription = "Navigate to profile")
+                }
+            } else {
+                LoginButton(
+                    onNavigateToLogin = onNavigateToLoginOrProfile
+                )
+            }
+        }
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
 fun LoginAppBar(
     onBack: () -> Unit
 ) {

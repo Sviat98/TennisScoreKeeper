@@ -1,39 +1,64 @@
 package com.bashkevich.tennisscorekeeper.model.tournament.repository
 
-import com.bashkevich.tennisscorekeeper.core.LoadResult
-import com.bashkevich.tennisscorekeeper.core.ResponseMessage
-import com.bashkevich.tennisscorekeeper.core.mapSuccess
+import com.bashkevich.tennisscorekeeper.core.remote.LoadResult
+import com.bashkevich.tennisscorekeeper.core.remote.ResponseMessage
+import com.bashkevich.tennisscorekeeper.core.remote.doOnError
+import com.bashkevich.tennisscorekeeper.core.remote.doOnSuccess
+import com.bashkevich.tennisscorekeeper.core.remote.mapSuccess
 import com.bashkevich.tennisscorekeeper.model.tournament.domain.Tournament
+import com.bashkevich.tennisscorekeeper.model.tournament.domain.TOURNAMENT_DEFAULT
 import com.bashkevich.tennisscorekeeper.model.tournament.domain.toDomain
+import com.bashkevich.tennisscorekeeper.model.tournament.local.TournamentLocalDataSource
+import com.bashkevich.tennisscorekeeper.model.tournament.local.toEntity
 import com.bashkevich.tennisscorekeeper.model.tournament.remote.AddTournamentBody
 import com.bashkevich.tennisscorekeeper.model.tournament.remote.TournamentRemoteDataSource
 import com.bashkevich.tennisscorekeeper.model.tournament.remote.TournamentStatus
 import com.bashkevich.tennisscorekeeper.model.tournament.remote.TournamentStatusBody
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onStart
 
 class TournamentRepositoryImpl(
-    private val tournamentRemoteDataSource: TournamentRemoteDataSource
+    private val tournamentRemoteDataSource: TournamentRemoteDataSource,
+    private val tournamentLocalDataSource: TournamentLocalDataSource
 ) : TournamentRepository {
-    private val _newTournament = MutableSharedFlow<Tournament>(replay = 1)
 
+    private val refreshTrigger = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
 
-    override suspend fun getTournaments(): LoadResult<List<Tournament>, Throwable> {
-        return tournamentRemoteDataSource.getTournaments().mapSuccess { tournamentDtos ->
-            val tournaments = tournamentDtos.map { it.toDomain() }
-            tournaments
+    override fun fetchTournamentsFlow(): Flow<LoadResult<Unit, Throwable>?> = flow {
+        refreshTrigger.onStart { emit(Unit) }.collect {
+            emit(null)
+            println("refreshTrigger collect")
+            val result = tournamentRemoteDataSource.getTournaments()
+                .doOnSuccess {
+                    tournamentLocalDataSource.replaceAllTournaments(it.map { it.toEntity() })
+                    emit(LoadResult.Success(Unit))
+                }
+                .doOnError {
+                    emit(LoadResult.Error(it))
+                }
+            println("fetchTournamentsFlow result = $result")
         }
     }
 
-    override suspend fun getTournamentById(id: String): LoadResult<Tournament, Throwable> {
-        return tournamentRemoteDataSource.getTournamentById(id).mapSuccess { tournamentDto ->
-            tournamentDto.toDomain()
-        }
+    override fun refreshTournaments() {
+        println("refreshTournaments tryEmit!!!")
+        refreshTrigger.tryEmit(Unit)
+    }
+
+    override suspend fun fetchTournamentById(id: String): LoadResult<Unit, Throwable> {
+        return tournamentRemoteDataSource.getTournamentById(id).doOnSuccess { tournamentDto ->
+            tournamentLocalDataSource.insertTournament(tournamentDto.toEntity())
+        }.mapSuccess { }
     }
 
     override suspend fun addTournament(addTournamentBody: AddTournamentBody): LoadResult<Tournament, Throwable> {
         return tournamentRemoteDataSource.addTournament(addTournamentBody)
+            .doOnSuccess { tournamentDto ->
+                tournamentLocalDataSource.insertTournament(tournamentDto.toEntity())
+            }
             .mapSuccess { tournamentDto ->
                 tournamentDto.toDomain()
             }
@@ -50,10 +75,19 @@ class TournamentRepositoryImpl(
         )
     }
 
-    override fun emitNewTournament(newTournament: Tournament) {
-        _newTournament.tryEmit(newTournament)
+    override suspend fun insertTournament(tournament: Tournament) {
+        tournamentLocalDataSource.insertTournament(tournament.toEntity())
     }
 
-    override fun observeNewTournament(): SharedFlow<Tournament> =
-        _newTournament.asSharedFlow()
+    override fun observeTournaments(): Flow<List<Tournament>> {
+        return tournamentLocalDataSource.getTournaments().map { entities ->
+            entities.map { it.toDomain() }
+        }
+    }
+
+    override fun observeTournamentById(id: String): Flow<Tournament> {
+        return tournamentLocalDataSource.getTournamentById(id).map { entity ->
+            entity?.toDomain() ?: TOURNAMENT_DEFAULT
+        }
+    }
 }

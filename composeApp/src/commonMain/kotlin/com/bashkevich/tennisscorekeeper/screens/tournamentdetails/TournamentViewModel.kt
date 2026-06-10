@@ -3,7 +3,7 @@ package com.bashkevich.tennisscorekeeper.screens.tournamentdetails
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
-import com.bashkevich.tennisscorekeeper.core.LoadResult
+import com.bashkevich.tennisscorekeeper.core.remote.LoadResult
 import com.bashkevich.tennisscorekeeper.model.file.domain.EMPTY_EXCEL_FILE
 import com.bashkevich.tennisscorekeeper.model.match.repository.MatchRepository
 import com.bashkevich.tennisscorekeeper.model.participant.repository.ParticipantRepository
@@ -35,11 +35,18 @@ class TournamentViewModel(
     val actions: Flow<TournamentAction>
         get() = super.action
 
+    private val tournamentId: String = savedStateHandle.toRoute<AddMatchRoute>().tournamentId
+
     init {
         viewModelScope.launch {
-            showTournament()
-
-            val tournamentId = state.value.tournament.id
+            launch {
+                tournamentRepository.observeTournamentById(tournamentId).collect { tournament ->
+                    reduceState { oldState ->
+                        oldState.copy(tournament = tournament)
+                    }
+                }
+            }
+            tournamentRepository.fetchTournamentById(tournamentId)
 
             coroutineScope {
                 launch {
@@ -111,23 +118,6 @@ class TournamentViewModel(
                         )
                     )
                 }
-            }
-        }
-    }
-
-    private suspend fun showTournament() {
-        val tournamentId = savedStateHandle.toRoute<AddMatchRoute>().tournamentId
-
-        val tournamentResult = tournamentRepository.getTournamentById(tournamentId)
-
-        if (tournamentResult is LoadResult.Success) {
-
-            val tournament = tournamentResult.result
-
-            reduceState { oldState ->
-                oldState.copy(
-                    tournament = tournament,
-                )
             }
         }
     }

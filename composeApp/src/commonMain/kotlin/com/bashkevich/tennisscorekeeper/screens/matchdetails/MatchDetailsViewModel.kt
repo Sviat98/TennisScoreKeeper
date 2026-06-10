@@ -3,7 +3,7 @@ package com.bashkevich.tennisscorekeeper.screens.matchdetails
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
-import com.bashkevich.tennisscorekeeper.core.LoadResult
+import com.bashkevich.tennisscorekeeper.core.remote.LoadResult
 import com.bashkevich.tennisscorekeeper.model.match.remote.body.MatchStatus
 import com.bashkevich.tennisscorekeeper.model.match.remote.body.ScoreType
 import com.bashkevich.tennisscorekeeper.model.match.repository.MatchRepository

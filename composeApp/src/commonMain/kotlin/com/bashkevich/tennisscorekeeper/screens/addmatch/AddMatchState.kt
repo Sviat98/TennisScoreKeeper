@@ -9,6 +9,7 @@ import com.bashkevich.tennisscorekeeper.model.set_template.domain.EMPTY_DECIDING
 import com.bashkevich.tennisscorekeeper.model.set_template.domain.EMPTY_REGULAR_SET_TEMPLATE
 import com.bashkevich.tennisscorekeeper.model.set_template.domain.SetTemplate
 import com.bashkevich.tennisscorekeeper.model.set_template.domain.SetTemplateTypeFilter
+import com.bashkevich.tennisscorekeeper.model.theme.domain.ScoreboardTheme
 import com.bashkevich.tennisscorekeeper.model.tournament.domain.TOURNAMENT_DEFAULT
 import com.bashkevich.tennisscorekeeper.model.tournament.domain.Tournament
 
@@ -35,6 +36,9 @@ sealed class AddMatchUiEvent : UiEvent {
     class SelectSecondaryColor(val participantNumber: Int, val color: Color?) : AddMatchUiEvent()
 
     class ChangeSetsToWin(val delta: Int) : AddMatchUiEvent()
+
+    data object FetchThemes : AddMatchUiEvent()
+    class SelectTheme(val theme: ScoreboardTheme) : AddMatchUiEvent()
 
     class FetchSetTemplates(val setTemplateTypeFilter: SetTemplateTypeFilter) : AddMatchUiEvent()
     class SelectSetTemplate(
@@ -63,6 +67,8 @@ data class AddMatchState(
     val setTemplateOptions: List<SetTemplate>,
     val regularSetTemplate: SetTemplate,
     val decidingSetTemplate: SetTemplate,
+    val themeOptions: List<ScoreboardTheme>,
+    val selectedTheme: ScoreboardTheme?,
 ) : UiState {
     companion object {
         fun initial() = AddMatchState(
@@ -76,7 +82,9 @@ data class AddMatchState(
             setsToWin = 1,
             setTemplateOptions = emptyList(),
             regularSetTemplate = EMPTY_REGULAR_SET_TEMPLATE,
-            decidingSetTemplate = EMPTY_DECIDING_SET_TEMPLATE
+            decidingSetTemplate = EMPTY_DECIDING_SET_TEMPLATE,
+            themeOptions = emptyList(),
+            selectedTheme = null,
         )
     }
 }

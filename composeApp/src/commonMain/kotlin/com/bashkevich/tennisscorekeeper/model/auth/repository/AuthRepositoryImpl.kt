@@ -1,10 +1,10 @@
 package com.bashkevich.tennisscorekeeper.model.auth.repository
 
-import com.bashkevich.tennisscorekeeper.core.LoadResult
-import com.bashkevich.tennisscorekeeper.core.ResponseMessage
-import com.bashkevich.tennisscorekeeper.core.UnauthorizedException
-import com.bashkevich.tennisscorekeeper.core.doOnError
-import com.bashkevich.tennisscorekeeper.core.doOnSuccess
+import com.bashkevich.tennisscorekeeper.core.remote.LoadResult
+import com.bashkevich.tennisscorekeeper.core.remote.ResponseMessage
+import com.bashkevich.tennisscorekeeper.core.remote.UnauthorizedException
+import com.bashkevich.tennisscorekeeper.core.remote.doOnError
+import com.bashkevich.tennisscorekeeper.core.remote.doOnSuccess
 import com.bashkevich.tennisscorekeeper.model.auth.local.AuthLocalDataSource
 import com.bashkevich.tennisscorekeeper.model.auth.remote.AuthRemoteDataSource
 import com.bashkevich.tennisscorekeeper.model.auth.remote.LoginBody

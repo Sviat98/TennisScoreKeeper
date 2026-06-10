@@ -15,7 +15,9 @@ data class MatchBody(
     @SerialName("regular_set_id")
     val regularSet: String? = null,
     @SerialName("deciding_set_id")
-    val decidingSet: String
+    val decidingSet: String,
+    @SerialName("theme_id")
+    val themeId: String,
 )
 
 @Serializable

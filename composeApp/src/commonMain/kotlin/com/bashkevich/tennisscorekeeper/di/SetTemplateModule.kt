@@ -1,5 +1,6 @@
 package com.bashkevich.tennisscorekeeper.di
 
+import com.bashkevich.tennisscorekeeper.model.set_template.local.SetTemplateLocalDataSource
 import com.bashkevich.tennisscorekeeper.model.set_template.remote.SetTemplateRemoteDataSource
 import com.bashkevich.tennisscorekeeper.model.set_template.repository.SetTemplateRepository
 import com.bashkevich.tennisscorekeeper.model.set_template.repository.SetTemplateRepositoryImpl
@@ -13,4 +14,5 @@ val setTemplateModule = module {
     }
 
     singleOf(::SetTemplateRemoteDataSource)
+    singleOf(::SetTemplateLocalDataSource)
 }
