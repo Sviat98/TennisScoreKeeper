@@ -48,6 +48,7 @@ fun MatchScoringAndThemeSettingsBlock(
                 Row(
                     modifier = Modifier.widthIn(max = 1000.dp).fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(64.dp),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
                     ThemeComponent(
                         modifier = Modifier.weight(1f),
@@ -56,7 +57,7 @@ fun MatchScoringAndThemeSettingsBlock(
                         onThemesFetch = onThemesFetch,
                         onRetrySelectedTheme = onRetrySelectedTheme,
                     )
-                    SetsToWinComponent(
+                    SetsToWinBlock(
                         modifier = Modifier.weight(1f),
                         setsToWin = setsToWin,
                         onValueChange = onSetsToWinChange,
@@ -101,7 +102,7 @@ fun MatchScoringAndThemeSettingsBlock(
                     onRetrySelectedTheme = onRetrySelectedTheme,
                 )
 
-                SetsToWinComponent(
+                SetsToWinBlock(
                     modifier = Modifier.fillMaxWidth(),
                     setsToWin = setsToWin,
                     onValueChange = onSetsToWinChange,

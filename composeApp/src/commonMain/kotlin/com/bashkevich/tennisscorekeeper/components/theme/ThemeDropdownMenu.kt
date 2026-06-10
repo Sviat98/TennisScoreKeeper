@@ -34,7 +34,7 @@ import com.bashkevich.tennisscorekeeper.components.icons.default_icons.ArrowDrop
 import com.bashkevich.tennisscorekeeper.model.theme.domain.ScoreboardTheme
 
 @Composable
-fun ThemeDropdownMenu(
+fun ThemeCombobox(
     modifier: Modifier = Modifier,
     themeComponentState: ThemeComponentState,
     onThemeSelected: (ScoreboardTheme) -> Unit,
@@ -47,9 +47,9 @@ fun ThemeDropdownMenu(
     val dropdownEnabled = isIdle
 
     Box(modifier = modifier) {
-        when (val selectedState = themeComponentState.selectedTheme) {
+        when (val selectedThemeState = themeComponentState.selectedTheme) {
             is ThemeComponentState.SelectedThemeState.Idle -> {
-                val textFieldState = TextFieldState(selectedState.theme.name)
+                val textFieldState = TextFieldState(selectedThemeState.theme.name)
 
                 TextField(
                     modifier = Modifier.fillMaxWidth(),
@@ -72,8 +72,8 @@ fun ThemeDropdownMenu(
                             horizontalArrangement = Arrangement.spacedBy(4.dp),
                             verticalAlignment = Alignment.CenterVertically,
                         ) {
-                            ColorCircle(color = selectedState.theme.backgroundColor)
-                            ColorCircle(color = selectedState.theme.textColor)
+                            ColorCircle(color = selectedThemeState.theme.backgroundColor)
+                            ColorCircle(color = selectedThemeState.theme.textColor)
                         }
                     },
                     colors = TextFieldDefaults.colors(

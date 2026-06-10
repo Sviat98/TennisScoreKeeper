@@ -22,38 +22,15 @@ fun SetsToWinBlock(
     setsToWin: Int,
     onValueChange: (Int) -> Unit,
 ) {
-    val windowSize = currentWindowAdaptiveInfo().windowSizeClass
-
-    Box(
+    Row(
         modifier = Modifier.then(modifier),
+        horizontalArrangement = Arrangement.Center
     ) {
-        if (windowSize.isWidthAtLeastBreakpoint(WindowSizeClass.WIDTH_DP_MEDIUM_LOWER_BOUND)) {
-            Row(
-                modifier = Modifier
-                    .widthIn(max = 1000.dp)
-                    .fillMaxWidth()
-                    .align(Alignment.Center),
-            ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(0.5f).padding(end = 32.dp),
-                    horizontalArrangement = Arrangement.Center
-                ) {
-                    SetsToWinComponent(
-                        modifier = Modifier.widthIn(max = 300.dp).fillMaxWidth(),
-                        setsToWin = setsToWin,
-                        onValueChange = onValueChange
-                    )
-                }
-
-            }
-
-        } else {
             SetsToWinComponent(
-                modifier = Modifier.widthIn(max = 300.dp).fillMaxWidth().align(Alignment.Center),
+                modifier = Modifier.widthIn(max = 300.dp).fillMaxWidth(),
                 setsToWin = setsToWin,
                 onValueChange = onValueChange
             )
-        }
     }
 }
 
