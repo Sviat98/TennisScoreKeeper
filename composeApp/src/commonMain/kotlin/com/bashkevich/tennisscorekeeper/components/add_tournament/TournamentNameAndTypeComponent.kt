@@ -1,14 +1,13 @@
 package com.bashkevich.tennisscorekeeper.components.add_tournament
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -28,36 +27,40 @@ fun TournamentNameAndTypeComponent(
     val windowSize = currentWindowAdaptiveInfo().windowSizeClass
     val isWideScreen = windowSize.isWidthAtLeastBreakpoint(WindowSizeClass.WIDTH_DP_MEDIUM_LOWER_BOUND)
 
-    if (isWideScreen) {
-        Row(
-            modifier = Modifier.widthIn(max = 1000.dp).fillMaxWidth().then(modifier),
-            horizontalArrangement = Arrangement.spacedBy(64.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            TournamentNameComponent(
-                modifier = Modifier.weight(1f),
-                tournamentNameState = tournamentNameState
-            )
-            TournamentTypeComponent(
-                modifier = Modifier.weight(1f),
-                currentTournamentType = currentTournamentType,
-                onTournamentTypeChange = onTournamentTypeChange,
-            )
-        }
-    } else {
-        Column(
-            modifier = Modifier.fillMaxWidth().then(modifier),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
-        ) {
-            TournamentNameComponent(
-                modifier = Modifier.fillMaxWidth(),
-                tournamentNameState = tournamentNameState
-            )
-            TournamentTypeComponent(
-                modifier = Modifier.fillMaxWidth(),
-                currentTournamentType = currentTournamentType,
-                onTournamentTypeChange = onTournamentTypeChange,
-            )
+    Box(
+       modifier = Modifier.then(modifier)
+    ){
+        if (isWideScreen) {
+            Row(
+                modifier = Modifier.widthIn(max = 1000.dp).fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(64.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                TournamentNameComponent(
+                    modifier = Modifier.weight(1f),
+                    tournamentNameState = tournamentNameState
+                )
+                TournamentTypeComponent(
+                    modifier = Modifier.weight(1f),
+                    currentTournamentType = currentTournamentType,
+                    onTournamentTypeChange = onTournamentTypeChange,
+                )
+            }
+        } else {
+            Column(
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+            ) {
+                TournamentNameComponent(
+                    modifier = Modifier.fillMaxWidth(),
+                    tournamentNameState = tournamentNameState
+                )
+                TournamentTypeComponent(
+                    modifier = Modifier.fillMaxWidth(),
+                    currentTournamentType = currentTournamentType,
+                    onTournamentTypeChange = onTournamentTypeChange,
+                )
+            }
         }
     }
+
 }

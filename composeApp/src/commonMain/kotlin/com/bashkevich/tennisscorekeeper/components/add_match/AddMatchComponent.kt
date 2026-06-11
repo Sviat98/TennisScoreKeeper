@@ -10,13 +10,11 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
-import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import androidx.window.core.layout.WindowSizeClass
 import com.bashkevich.tennisscorekeeper.components.ColorPickerDialog
 import com.bashkevich.tennisscorekeeper.components.add_match.participant.AddMatchParticipantsBlock
 import com.bashkevich.tennisscorekeeper.components.set_template.SetComponentState
@@ -37,9 +35,6 @@ fun AddMatchComponent(
     val participantOptions = state.participantOptions
     val firstParticipant = state.firstParticipant
     val secondParticipant = state.secondParticipant
-
-    val windowSize = currentWindowAdaptiveInfo().windowSizeClass
-    val isWideScreen = windowSize.isWidthAtLeastBreakpoint(WindowSizeClass.WIDTH_DP_MEDIUM_LOWER_BOUND)
 
     Column(
         modifier = Modifier.then(modifier).padding(16.dp)

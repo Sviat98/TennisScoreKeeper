@@ -41,7 +41,7 @@ fun MatchScoringAndThemeSettingsBlock(
     Box(modifier = Modifier.then(modifier)) {
         if (isWideScreen) {
             Column(
-                modifier = Modifier.fillMaxWidth().align(Alignment.Center),
+                modifier = Modifier.align(Alignment.Center),
                 verticalArrangement = Arrangement.spacedBy(16.dp),
             ) {
                 // Row 1: Theme + SetsToWin

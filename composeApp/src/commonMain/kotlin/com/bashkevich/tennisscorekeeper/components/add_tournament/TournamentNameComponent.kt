@@ -11,9 +11,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.bashkevich.tennisscorekeeper.components.set_template.SetComponentState
-import com.bashkevich.tennisscorekeeper.components.set_template.SetTemplateCombobox
-import com.bashkevich.tennisscorekeeper.model.set_template.domain.SetTemplate
 
 @Composable
 fun TournamentNameComponent(
