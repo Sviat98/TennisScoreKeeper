@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "5dbdda82e4df17fd55d64d58e9bf506e",
+    "identityHash": "df5707d10c640bf1bb88908f2569b4fd",
     "entities": [
       {
         "tableName": "tournaments",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `name` TEXT NOT NULL, `type` TEXT NOT NULL, `status` TEXT NOT NULL, `regular_set_id` TEXT NOT NULL, `deciding_set_id` TEXT NOT NULL, `theme_id` TEXT NOT NULL, `sets_to_win` INTEGER NOT NULL, PRIMARY KEY(`id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `name` TEXT NOT NULL, `type` TEXT NOT NULL, `status` TEXT NOT NULL, `regular_set_id` TEXT NOT NULL, `deciding_set_id` TEXT NOT NULL, `theme_id` TEXT NOT NULL, `sets_to_win` INTEGER NOT NULL, `total_participants` INTEGER NOT NULL, `total_matches` INTEGER NOT NULL, `uncompleted_matches` INTEGER NOT NULL, PRIMARY KEY(`id`))",
         "fields": [
           {
             "fieldPath": "id",
@@ -53,6 +53,24 @@
           {
             "fieldPath": "setsToWin",
             "columnName": "sets_to_win",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "totalParticipants",
+            "columnName": "total_participants",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "totalMatches",
+            "columnName": "total_matches",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "uncompletedMatches",
+            "columnName": "uncompleted_matches",
             "affinity": "INTEGER",
             "notNull": true
           }
@@ -157,7 +175,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '5dbdda82e4df17fd55d64d58e9bf506e')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'df5707d10c640bf1bb88908f2569b4fd')"
     ]
   }
 }

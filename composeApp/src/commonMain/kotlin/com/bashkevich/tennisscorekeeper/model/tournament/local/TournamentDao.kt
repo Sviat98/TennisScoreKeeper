@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface TournamentDao {
-    @Query("SELECT * FROM tournaments")
+    @Query("SELECT * FROM tournaments ORDER BY id DESC")
     fun getAllTournaments(): Flow<List<TournamentEntity>>
 
     @Query("SELECT * FROM tournaments WHERE id = :id")

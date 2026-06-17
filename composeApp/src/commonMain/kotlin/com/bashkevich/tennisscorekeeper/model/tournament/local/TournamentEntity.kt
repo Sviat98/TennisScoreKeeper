@@ -24,6 +24,12 @@ data class TournamentEntity(
     val themeId: String,
     @ColumnInfo(name = "sets_to_win")
     val setsToWin: Int,
+    @ColumnInfo(name = "total_participants")
+    val totalParticipants: Int,
+    @ColumnInfo(name = "total_matches")
+    val totalMatches: Int,
+    @ColumnInfo(name = "uncompleted_matches")
+    val uncompletedMatches: Int,
 )
 
 fun TournamentDto.toEntity() = TournamentEntity(
@@ -35,6 +41,9 @@ fun TournamentDto.toEntity() = TournamentEntity(
     decidingSetTemplateId = decidingSetTemplateId,
     themeId = themeId,
     setsToWin = setsToWin,
+    totalParticipants = totalParticipants,
+    totalMatches = totalMatches,
+    uncompletedMatches = uncompletedMatches,
 )
 
 fun com.bashkevich.tennisscorekeeper.model.tournament.domain.Tournament.toEntity() = TournamentEntity(
@@ -46,4 +55,7 @@ fun com.bashkevich.tennisscorekeeper.model.tournament.domain.Tournament.toEntity
     decidingSetTemplateId = decidingSetTemplateId,
     themeId = themeId,
     setsToWin = setsToWin,
+    totalParticipants = totalParticipants,
+    totalMatches = totalMatches,
+    uncompletedMatches = uncompletedMatches,
 )

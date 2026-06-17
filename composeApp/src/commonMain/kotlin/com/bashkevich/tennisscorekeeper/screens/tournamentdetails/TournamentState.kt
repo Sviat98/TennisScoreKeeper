@@ -9,6 +9,7 @@ import com.bashkevich.tennisscorekeeper.model.tournament.remote.TournamentStatus
 import com.bashkevich.tennisscorekeeper.mvi.UiAction
 import com.bashkevich.tennisscorekeeper.mvi.UiEvent
 import com.bashkevich.tennisscorekeeper.mvi.UiState
+import com.bashkevich.tennisscorekeeper.navigation.TournamentTab
 import com.bashkevich.tennisscorekeeper.screens.matchlist.MatchListState
 import com.bashkevich.tennisscorekeeper.screens.participantlist.ParticipantListState
 
@@ -18,12 +19,16 @@ sealed class TournamentUiEvent : UiEvent {
     class ChangeTournamentStatus(val tournamentStatus: TournamentStatus) : TournamentUiEvent()
     class SelectFile(val file: ExcelFile) : TournamentUiEvent()
     data object UploadFile : TournamentUiEvent()
+    class SwitchTab(val tab: TournamentTab) : TournamentUiEvent()
 }
 
 @Immutable
 data class TournamentState(
     val isLoading: Boolean,
     val tournament: Tournament,
+    val activeTab: TournamentTab,
+    val isMatchesLoaded: Boolean,
+    val isParticipantsLoaded: Boolean,
     val matchListState: MatchListState,
     val participantListState: ParticipantListState,
 ) : UiState {
@@ -31,6 +36,9 @@ data class TournamentState(
         fun initial() = TournamentState(
             isLoading = true,
             tournament = TOURNAMENT_DEFAULT,
+            activeTab = TournamentTab.MATCHES,
+            isMatchesLoaded = false,
+            isParticipantsLoaded = false,
             matchListState = MatchListState.initial(),
             participantListState = ParticipantListState.initial()
         )

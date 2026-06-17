@@ -21,6 +21,12 @@ data class TournamentDto(
     val themeId: String,
     @SerialName("sets_to_win")
     val setsToWin: Int,
+    @SerialName("total_participants")
+    val totalParticipants: Int,
+    @SerialName("total_matches")
+    val totalMatches: Int,
+    @SerialName("uncompleted_matches")
+    val uncompletedMatches: Int,
 )
 
 enum class TournamentType {

@@ -101,6 +101,15 @@ fun TournamentContent(
 
     val scope = rememberCoroutineScope()
 
+    LaunchedEffect(pagerState.currentPage) {
+        val tab = when (pagerState.currentPage) {
+            TournamentTab.MATCHES.ordinal -> TournamentTab.MATCHES
+            TournamentTab.PARTICIPANTS.ordinal -> TournamentTab.PARTICIPANTS
+            else -> return@LaunchedEffect
+        }
+        onEvent(TournamentUiEvent.SwitchTab(tab))
+    }
+
     Scaffold(
         modifier = Modifier.then(modifier),
         topBar = {
