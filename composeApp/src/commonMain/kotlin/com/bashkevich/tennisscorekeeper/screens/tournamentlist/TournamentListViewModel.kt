@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 
 class TournamentListViewModel(
+    private val refreshTournamentList: RefreshTournamentListScreenUseCase,
     private val tournamentRepository: TournamentRepository,
 ) : BaseViewModel<TournamentListState, TournamentListUiEvent, TournamentListAction>() {
 
@@ -20,7 +21,7 @@ class TournamentListViewModel(
     private val _action = MutableStateFlow<TournamentListAction?>(null)
 
     private val _networkAndTournaments = combine(
-        tournamentRepository.fetchTournamentsFlow(),
+        refreshTournamentList.fetchTournamentsFlow(),
         tournamentRepository.observeTournaments()
     ) { networkState, tournaments ->
         networkState to tournaments
@@ -60,12 +61,12 @@ class TournamentListViewModel(
 
     fun refresh() {
         _isRefreshing.value = true
-        tournamentRepository.refreshTournaments()
+        refreshTournamentList.refreshTournaments()
         _isRefreshing.value = false
     }
 
     fun retry() {
-        tournamentRepository.refreshTournaments()
+        refreshTournamentList.refreshTournaments()
     }
 
     fun onEvent(uiEvent: TournamentListUiEvent) {
