@@ -84,24 +84,19 @@ class TournamentViewModel(
 
     private fun loadParticipants() {
         viewModelScope.launch {
-            val loadResult =
-                participantRepository.getParticipantsForTournament(tournamentId)
-
-            println("participants loadResult = $loadResult")
-            if (loadResult is LoadResult.Success) {
-                reduceState { oldState ->
-                    oldState.copy(
-                        participantListState = oldState.participantListState.copy(
-                            participants = loadResult.result
-                        ),
-                        isParticipantsLoaded = true
-                    )
-                }
-            } else {
-                reduceState { oldState ->
-                    oldState.copy(isParticipantsLoaded = true)
+            launch {
+                participantRepository.observeParticipantsForTournament(tournamentId).collect { participants ->
+                    reduceState { oldState ->
+                        oldState.copy(
+                            participantListState = oldState.participantListState.copy(
+                                participants = participants
+                            ),
+                            isParticipantsLoaded = true
+                        )
+                    }
                 }
             }
+            participantRepository.fetchParticipantsForTournament(tournamentId)
         }
     }
 

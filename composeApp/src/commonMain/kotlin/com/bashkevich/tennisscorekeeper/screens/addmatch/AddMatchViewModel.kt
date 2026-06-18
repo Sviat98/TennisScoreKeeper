@@ -364,19 +364,14 @@ class AddMatchViewModel(
         viewModelScope.launch {
             val tournamentId = state.value.tournament.id
 
-            if (state.value.participantOptions.isEmpty()) {
-                val participantsResult =
-                    participantRepository.getParticipantsForTournament(tournamentId)
-
-                if (participantsResult is LoadResult.Success) {
+            launch {
+                participantRepository.observeParticipantsForTournament(tournamentId).collect { participants ->
                     reduceState { oldState ->
-                        oldState.copy(
-                            participantOptions = participantsResult.result
-                        )
+                        oldState.copy(participantOptions = participants)
                     }
                 }
             }
-
+            participantRepository.fetchParticipantsForTournament(tournamentId)
         }
     }
 
