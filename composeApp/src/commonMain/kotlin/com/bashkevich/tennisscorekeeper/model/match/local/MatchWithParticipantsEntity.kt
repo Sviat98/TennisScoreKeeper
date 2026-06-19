@@ -13,6 +13,16 @@ import com.bashkevich.tennisscorekeeper.model.participant.local.ParticipantEntit
 import com.bashkevich.tennisscorekeeper.model.participant.local.ParticipantWithPlayersEntity
 import com.bashkevich.tennisscorekeeper.model.player.local.toDomain
 
+data class ParticipantInMatchWithDetails(
+    @Embedded val participantInMatch: ParticipantInMatchEntity,
+    @Relation(
+        entity = ParticipantEntity::class,
+        parentColumns = ["participant_id"],
+        entityColumns = ["id"]
+    )
+    val participant: ParticipantWithPlayersEntity,
+)
+
 data class MatchWithParticipantsEntity(
     @Embedded val match: MatchEntity,
     @Relation(
@@ -26,39 +36,28 @@ data class MatchWithParticipantsEntity(
     )
     val game: MatchGameEntity?,
     @Relation(
-        parentColumns = ["id"],
-        entityColumns = ["match_id"]
-    )
-    val participantsInMatch: List<ParticipantInMatchEntity>,
-    @Relation(
-        entity = ParticipantEntity::class,
+        entity = ParticipantInMatchEntity::class,
         parentColumns = ["first_participant_id"],
-        entityColumns = ["id"]
+        entityColumns = ["participant_id"]
     )
-    val firstParticipant: ParticipantWithPlayersEntity,
+    val firstParticipant: ParticipantInMatchWithDetails,
     @Relation(
-        entity = ParticipantEntity::class,
+        entity = ParticipantInMatchEntity::class,
         parentColumns = ["second_participant_id"],
-        entityColumns = ["id"]
+        entityColumns = ["participant_id"]
     )
-    val secondParticipant: ParticipantWithPlayersEntity,
+    val secondParticipant: ParticipantInMatchWithDetails,
 )
 
 fun MatchWithParticipantsEntity.toDomain(): ShortMatch {
-    val firstPim = participantsInMatch.find { it.participantId == match.firstParticipantId }!!
-    val secondPim = participantsInMatch.find { it.participantId == match.secondParticipantId }!!
-
-    val firstParticipantDomain = firstParticipant.toShortMatchDomain(firstPim)
-    val secondParticipantDomain = secondParticipant.toShortMatchDomain(secondPim)
-
     val sortedSets = sets.sortedBy { it.setNumber }
     val previousSets = sortedSets.filter { !it.isCurrent }.map { it.toDomain() }
     val currentSet = sortedSets.find { it.isCurrent }?.toDomain()
 
     return ShortMatch(
         id = match.id,
-        firstParticipant = firstParticipantDomain,
-        secondParticipant = secondParticipantDomain,
+        firstParticipant = firstParticipant.toDomain(),
+        secondParticipant = secondParticipant.toDomain(),
         status = MatchStatus.valueOf(match.status),
         previousSets = previousSets,
         currentSet = currentSet,
@@ -66,25 +65,23 @@ fun MatchWithParticipantsEntity.toDomain(): ShortMatch {
     )
 }
 
-private fun ParticipantWithPlayersEntity.toShortMatchDomain(
-    pim: ParticipantInMatchEntity
-): ParticipantInShortMatch {
-    return if (secondPlayer != null) {
+private fun ParticipantInMatchWithDetails.toDomain(): ParticipantInShortMatch {
+    return if (participant.secondPlayer != null) {
         ParticipantInShortDoublesMatch(
-            id = participant.id,
-            seed = pim.seed,
-            isWinner = pim.isWinner,
-            isRetired = pim.isRetired,
-            firstPlayer = player.toDomain(),
-            secondPlayer = secondPlayer.toDomain(),
+            id = participantInMatch.participantId,
+            seed = participantInMatch.seed,
+            isWinner = participantInMatch.isWinner,
+            isRetired = participantInMatch.isRetired,
+            firstPlayer = participant.player.toDomain(),
+            secondPlayer = participant.secondPlayer.toDomain(),
         )
     } else {
         ParticipantInShortSinglesMatch(
-            id = participant.id,
-            seed = pim.seed,
-            isWinner = pim.isWinner,
-            isRetired = pim.isRetired,
-            player = player.toDomain(),
+            id = participantInMatch.participantId,
+            seed = participantInMatch.seed,
+            isWinner = participantInMatch.isWinner,
+            isRetired = participantInMatch.isRetired,
+            player = participant.player.toDomain(),
         )
     }
 }
