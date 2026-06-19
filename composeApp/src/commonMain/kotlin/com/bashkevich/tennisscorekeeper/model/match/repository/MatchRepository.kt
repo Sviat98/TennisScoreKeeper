@@ -9,6 +9,9 @@ import com.bashkevich.tennisscorekeeper.model.match.remote.body.ScoreType
 import kotlinx.coroutines.flow.Flow
 
 interface MatchRepository {
+    suspend fun fetchMatchesForTournament(tournamentId: String): LoadResult<Unit, Throwable>
+    fun observeMatchesForTournament(tournamentId: String): Flow<List<ShortMatch>>
+
     suspend fun getMatchesForTournament(tournamentId: String): LoadResult<List<ShortMatch>, Throwable>
     suspend fun closeSession()
     fun connectToMatchUpdates(matchId: String)

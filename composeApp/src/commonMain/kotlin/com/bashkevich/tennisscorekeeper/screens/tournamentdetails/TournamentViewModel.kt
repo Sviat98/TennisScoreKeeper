@@ -59,24 +59,20 @@ class TournamentViewModel(
 
     private fun loadMatches() {
         viewModelScope.launch {
-            val loadResult = matchRepository.getMatchesForTournament(tournamentId)
-
-            println("matches loadResult = $loadResult")
-            if (loadResult is LoadResult.Success) {
-                reduceState { oldState ->
-                    oldState.copy(
-                        matchListState = oldState.matchListState.copy(
-                            matches = loadResult.result
-                        ),
-                        isMatchesLoaded = true,
-                        isLoading = false
-                    )
-                }
-            } else {
-                reduceState { oldState ->
-                    oldState.copy(isMatchesLoaded = true, isLoading = false)
+            launch {
+                matchRepository.observeMatchesForTournament(tournamentId).collect { matches ->
+                    reduceState { oldState ->
+                        oldState.copy(
+                            matchListState = oldState.matchListState.copy(
+                                matches = matches
+                            ),
+                            isMatchesLoaded = true,
+                            isLoading = false
+                        )
+                    }
                 }
             }
+            matchRepository.fetchMatchesForTournament(tournamentId)
 
             startObservingNewMatches()
         }

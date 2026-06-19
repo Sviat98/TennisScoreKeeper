@@ -1,13 +1,15 @@
 package com.bashkevich.tennisscorekeeper.model.match.repository
 
 import com.bashkevich.tennisscorekeeper.core.remote.LoadResult
+import com.bashkevich.tennisscorekeeper.core.remote.doOnSuccess
 import com.bashkevich.tennisscorekeeper.core.remote.mapSuccess
 import com.bashkevich.tennisscorekeeper.model.match.domain.Match
 import com.bashkevich.tennisscorekeeper.model.match.domain.ShortMatch
 import com.bashkevich.tennisscorekeeper.model.match.domain.toDomain
+import com.bashkevich.tennisscorekeeper.model.match.local.MatchLocalDataSource
+import com.bashkevich.tennisscorekeeper.model.match.remote.MatchRemoteDataSource
 import com.bashkevich.tennisscorekeeper.model.match.remote.body.ChangeScoreBody
 import com.bashkevich.tennisscorekeeper.model.match.remote.MatchBody
-import com.bashkevich.tennisscorekeeper.model.match.remote.MatchRemoteDataSource
 import com.bashkevich.tennisscorekeeper.model.match.remote.body.MatchStatus
 import com.bashkevich.tennisscorekeeper.model.match.remote.body.MatchStatusBody
 import com.bashkevich.tennisscorekeeper.model.match.remote.body.RetiredParticipantBody
@@ -21,7 +23,8 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.map
 
 class MatchRepositoryImpl(
-    private val matchRemoteDataSource: MatchRemoteDataSource
+    private val matchRemoteDataSource: MatchRemoteDataSource,
+    private val matchLocalDataSource: MatchLocalDataSource
 ) : MatchRepository {
 
     private val _newMatch = MutableSharedFlow<ShortMatch>(replay = 1)
@@ -35,10 +38,25 @@ class MatchRepositoryImpl(
         matchBody: MatchBody
     ): LoadResult<ShortMatch, Throwable> {
         return matchRemoteDataSource.addNewMatch(tournamentId = tournamentId, matchBody = matchBody)
+            .doOnSuccess { shortMatchDto ->
+                matchLocalDataSource.insertMatch(tournamentId, shortMatchDto)
+            }
             .mapSuccess { shortMatchDto -> shortMatchDto.toDomain() }
     }
 
     override fun observeNewMatch() = _newMatch.asSharedFlow()
+
+    override suspend fun fetchMatchesForTournament(tournamentId: String): LoadResult<Unit, Throwable> {
+        return matchRemoteDataSource.getMatchesByTournament(tournamentId)
+            .doOnSuccess { shortMatchDtos ->
+                matchLocalDataSource.replaceMatchesForTournament(tournamentId, shortMatchDtos)
+            }
+            .mapSuccess { }
+    }
+
+    override fun observeMatchesForTournament(tournamentId: String): Flow<List<ShortMatch>> {
+        return matchLocalDataSource.observeMatches(tournamentId)
+    }
 
     override suspend fun getMatchesForTournament(tournamentId: String): LoadResult<List<ShortMatch>, Throwable> {
         return matchRemoteDataSource.getMatchesByTournament(tournamentId)
