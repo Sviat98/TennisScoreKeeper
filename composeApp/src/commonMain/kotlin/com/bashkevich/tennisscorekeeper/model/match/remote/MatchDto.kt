@@ -13,6 +13,8 @@ data class MatchDto(
     val pointShift: Int,
     @SerialName("video_link")
     val videoLink: String? = null,
+    @SerialName("theme_id")
+    val themeId: String,
     @SerialName("first_participant")
     val firstParticipant: ParticipantInMatchDto,
     @SerialName("second_participant")
