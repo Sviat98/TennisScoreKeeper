@@ -33,6 +33,9 @@ class TournamentListViewModel(
                     networkState.result.message ?: "Error"
                 )
             }
+            if (networkState != null) {
+                _isRefreshing.value = false
+            }
         }
 
     override val state: StateFlow<TournamentListState> = combine(
@@ -62,7 +65,7 @@ class TournamentListViewModel(
     fun refresh() {
         _isRefreshing.value = true
         refreshTournamentList.refreshTournaments()
-        _isRefreshing.value = false
+        // _isRefreshing.value = false ставится после того, как вернется результат
     }
 
     fun retry() {
