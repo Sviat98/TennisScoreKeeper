@@ -7,17 +7,10 @@ import androidx.room3.Index
 import androidx.room3.PrimaryKey
 import com.bashkevich.tennisscorekeeper.model.match.remote.ShortMatchDto
 import com.bashkevich.tennisscorekeeper.model.participant.local.ParticipantEntity
-import com.bashkevich.tennisscorekeeper.model.tournament.local.TournamentEntity
 
 @Entity(
     tableName = "matches",
     foreignKeys = [
-        ForeignKey(
-            entity = TournamentEntity::class,
-            parentColumns = ["id"],
-            childColumns = ["tournament_id"],
-            onDelete = ForeignKey.NO_ACTION
-        ),
         ForeignKey(
             entity = ParticipantEntity::class,
             parentColumns = ["id"],
