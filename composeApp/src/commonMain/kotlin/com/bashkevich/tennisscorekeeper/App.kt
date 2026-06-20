@@ -41,10 +41,10 @@ import com.bashkevich.tennisscorekeeper.screens.tournamentdetails.TournamentView
 import com.bashkevich.tennisscorekeeper.screens.tournamentlist.TournamentListScreen
 import com.bashkevich.tennisscorekeeper.screens.tournamentlist.TournamentListViewModel
 import org.jetbrains.compose.ui.tooling.preview.Preview
-import org.koin.compose.KoinMultiplatformApplication
+import org.koin.compose.KoinApplication
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.annotation.KoinExperimentalAPI
-import org.koin.dsl.KoinConfiguration
+import org.koin.dsl.koinConfiguration
 
 val LocalNavHostController = staticCompositionLocalOf<NavHostController> {
     error("NavController not provided!")
@@ -60,7 +60,7 @@ val LocalAuthorization = staticCompositionLocalOf {
 fun App(
     onNavHostReady: suspend (NavController) -> Unit = {}
 ) {
-    KoinMultiplatformApplication(config = KoinConfiguration {
+    KoinApplication(configuration = koinConfiguration {
         modules(
             coreModule,
             platformModule,
@@ -87,9 +87,10 @@ fun App(
             MaterialTheme {
                 NavHost(
                     modifier = Modifier
-                    .fillMaxSize(),
+                        .fillMaxSize(),
                     navController = navController,
-                    startDestination = TournamentsRoute) {
+                    startDestination = TournamentsRoute
+                ) {
                     composable<TournamentsRoute> {
                         val tournamentListViewModel = koinViewModel<TournamentListViewModel>()
 

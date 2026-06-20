@@ -3,6 +3,7 @@ package com.bashkevich.tennisscorekeeper.model.tournament.local
 import androidx.room3.ColumnInfo
 import androidx.room3.Entity
 import androidx.room3.PrimaryKey
+import com.bashkevich.tennisscorekeeper.model.tournament.domain.Tournament
 import com.bashkevich.tennisscorekeeper.model.tournament.remote.TournamentDto
 
 @Entity(tableName = "tournaments")
@@ -46,7 +47,7 @@ fun TournamentDto.toEntity() = TournamentEntity(
     uncompletedMatches = uncompletedMatches,
 )
 
-fun com.bashkevich.tennisscorekeeper.model.tournament.domain.Tournament.toEntity() = TournamentEntity(
+fun Tournament.toEntity() = TournamentEntity(
     id = id,
     name = name,
     type = type.name,

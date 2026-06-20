@@ -4,6 +4,7 @@ import androidx.compose.runtime.Immutable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.bashkevich.tennisscorekeeper.model.auth.repository.AuthRepository
+import com.bashkevich.tennisscorekeeper.model.match.repository.MatchRepository
 import com.bashkevich.tennisscorekeeper.mvi.UiState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -12,7 +13,8 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 
 class AppViewModel(
-    private val authRepository: AuthRepository
+    private val authRepository: AuthRepository,
+    private val matchRepository: MatchRepository
 ): ViewModel() {
 
     private val _state = MutableStateFlow(AppState.initial())
@@ -26,6 +28,10 @@ class AppViewModel(
                 val isAuthorized = playerId.isNotEmpty()
                 _state.value = _state.value.copy(isAuthorized = isAuthorized)
             }
+        }
+
+        viewModelScope.launch {
+            matchRepository.deleteAllMatchesFromDb()
         }
 
         viewModelScope.launch {

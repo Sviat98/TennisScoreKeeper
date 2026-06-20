@@ -29,6 +29,9 @@ interface MatchDao {
     @Query("DELETE FROM matches WHERE tournament_id = :tournamentId")
     suspend fun deleteMatchesByTournament(tournamentId: String)
 
+    @Query("DELETE FROM matches")
+    suspend fun deleteAllMatches()
+
     @Transaction
     suspend fun replaceAllMatchesForTournament(
         tournamentId: String,

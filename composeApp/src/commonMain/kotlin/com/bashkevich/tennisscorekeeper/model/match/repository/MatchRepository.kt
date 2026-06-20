@@ -24,6 +24,8 @@ interface MatchRepository {
     suspend fun setFirstPlayerInPairToServe(matchId: String,playerId: String)
     suspend fun setParticipantRetired(matchId: String, participantId: String)
     suspend fun setMatchStatus(matchId: String,status: MatchStatus)
+
+    suspend fun deleteAllMatchesFromDb()
     fun emitNewMatch(newMatch: ShortMatch)
     suspend fun addNewMatch(
         tournamentId: String,

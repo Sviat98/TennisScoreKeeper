@@ -61,4 +61,8 @@ class MatchLocalDataSource(
         dto.toMatchGameEntity()?.let { matchDao.insertMatchGames(listOf(it)) }
         matchDao.insertParticipantsInMatch(dto.toParticipantInMatchEntities())
     }
+
+    suspend fun deleteAllMatches(){
+        matchDao.deleteAllMatches()
+    }
 }

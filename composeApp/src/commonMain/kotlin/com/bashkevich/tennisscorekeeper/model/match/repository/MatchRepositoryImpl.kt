@@ -123,5 +123,9 @@ class MatchRepositoryImpl(
             matchStatusBody = matchStatusBody
         )    }
 
+    override suspend fun deleteAllMatchesFromDb() {
+        matchLocalDataSource.deleteAllMatches()
+    }
+
 
 }
