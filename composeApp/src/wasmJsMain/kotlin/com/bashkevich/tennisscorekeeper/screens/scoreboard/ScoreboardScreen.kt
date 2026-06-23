@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 
@@ -23,11 +22,6 @@ fun ScoreboardScreen(
     viewModel: ScoreboardViewModel,
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
-
-    LaunchedEffect(Unit) {
-        viewModel.actions.collect { action ->
-        }
-    }
 
     Box(modifier = Modifier.then(modifier)
         .drawBehind {

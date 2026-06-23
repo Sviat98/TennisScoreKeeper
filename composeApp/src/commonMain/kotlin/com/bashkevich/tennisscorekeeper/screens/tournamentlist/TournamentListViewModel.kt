@@ -18,8 +18,6 @@ class TournamentListViewModel(
 
     private val _isRefreshing = MutableStateFlow(false)
 
-    private val _action = MutableStateFlow<TournamentListAction?>(null)
-
     private val _networkAndTournaments = combine(
         refreshTournamentList.fetchTournamentsFlow(),
         tournamentRepository.observeTournaments()
@@ -29,9 +27,9 @@ class TournamentListViewModel(
         .onEach { (networkState, tournaments) ->
             println("networkState = $networkState")
             if (networkState is LoadResult.Error && tournaments.isNotEmpty()) {
-                _action.value = TournamentListAction.ShowRefreshError(
+                sendAction(TournamentListAction.ShowRefreshError(
                     networkState.result.message ?: "Error"
-                )
+                ))
             }
             if (networkState != null) {
                 _isRefreshing.value = false
@@ -57,10 +55,6 @@ class TournamentListViewModel(
         SharingStarted.WhileSubscribed(5_000),
         TournamentListState.initial()
     )
-
-    fun consumeAction() {
-        _action.value = null
-    }
 
     fun refresh() {
         _isRefreshing.value = true

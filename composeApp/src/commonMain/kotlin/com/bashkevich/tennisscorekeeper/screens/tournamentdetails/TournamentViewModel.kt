@@ -41,7 +41,6 @@ class TournamentViewModel(
     )
 
     private val _isRefreshing = MutableStateFlow(false)
-    private val _action = MutableStateFlow<TournamentAction?>(null)
     private val _currentTab = MutableStateFlow(TournamentTab.MATCHES)
     private val _isUploadInProgress = MutableStateFlow(false)
     private val _participantsFile = MutableStateFlow(EMPTY_EXCEL_FILE)
@@ -82,9 +81,9 @@ class TournamentViewModel(
                 TournamentTab.PARTICIPANTS -> participants.second.isNotEmpty()
             }
             if (hasData) {
-                _action.value = TournamentAction.ShowRefreshError(
+                sendAction(TournamentAction.ShowRefreshError(
                     tabNetworkState.result.message ?: "Error"
-                )
+                ))
             }
         }
 
@@ -166,10 +165,6 @@ class TournamentViewModel(
         SharingStarted.WhileSubscribed(5_000),
         TournamentState.initial()
     )
-
-    fun consumeAction() {
-        _action.value = null
-    }
 
     fun onEvent(uiEvent: TournamentUiEvent) {
         when (uiEvent) {

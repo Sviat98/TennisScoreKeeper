@@ -19,7 +19,6 @@ import com.bashkevich.tennisscorekeeper.model.participant.domain.TennisParticipa
 import com.bashkevich.tennisscorekeeper.model.participant.repository.ParticipantRepository
 import com.bashkevich.tennisscorekeeper.model.player.domain.PlayerInDoublesMatch
 import com.bashkevich.tennisscorekeeper.model.player.domain.PlayerInSinglesMatch
-import com.bashkevich.tennisscorekeeper.model.set_template.domain.EMPTY_REGULAR_SET_TEMPLATE
 import com.bashkevich.tennisscorekeeper.model.set_template.domain.SetTemplateTypeFilter
 import com.bashkevich.tennisscorekeeper.model.set_template.repository.SetTemplateRepository
 import com.bashkevich.tennisscorekeeper.model.theme.repository.ThemeRepository
@@ -29,8 +28,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.flow.Flow
-
 import com.bashkevich.tennisscorekeeper.mvi.BaseViewModel
 import com.bashkevich.tennisscorekeeper.navigation.AddMatchRoute
 import kotlinx.coroutines.launch
@@ -47,9 +44,6 @@ class AddMatchViewModel(
     private val _state = MutableStateFlow(AddMatchState.initial())
     override val state: StateFlow<AddMatchState>
         get() = _state.asStateFlow()
-
-    val actions: Flow<AddMatchAction>
-        get() = super.action
 
     private var currentSetTemplateFilter: SetTemplateTypeFilter? = null
     private var themesLoaded = false
@@ -97,7 +91,7 @@ class AddMatchViewModel(
                 val setsToWinNewValue = state.value.setsToWin + uiEvent.delta
 
                 val regularSetTemplate =
-                    if (setsToWinNewValue < 2) EMPTY_REGULAR_SET_TEMPLATE else state.value.regularSetTemplate
+                    if (setsToWinNewValue < 2) null else state.value.regularSetTemplate
                 reduceState { oldState ->
                     oldState.copy(
                         setsToWin = setsToWinNewValue,
@@ -534,16 +528,13 @@ class AddMatchViewModel(
 
             val regularSetTemplate = state.regularSetTemplate
 
-            val regularSetTemplateId =
-                if (regularSetTemplate == EMPTY_REGULAR_SET_TEMPLATE) null else regularSetTemplate.id
-
             val matchBody = MatchBody(
                 firstParticipant = firstParticipantInMatchBody,
                 secondParticipant = secondParticipantInMatchBody,
                 setsToWin = state.setsToWin,
-                regularSet = regularSetTemplateId,
-                decidingSet = state.decidingSetTemplate.id,
-                themeId = state.selectedTheme?.id ?: "",
+                regularSet = regularSetTemplate?.id,
+                decidingSet = state.decidingSetTemplate!!.id,
+                themeId = state.selectedTheme!!.id,
             )
 
             val addMatchResult = matchRepository.addNewMatch(tournamentId = tournamentId, matchBody = matchBody)

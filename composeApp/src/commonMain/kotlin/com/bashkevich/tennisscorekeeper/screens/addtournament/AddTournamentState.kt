@@ -3,8 +3,6 @@ package com.bashkevich.tennisscorekeeper.screens.addtournament
 import androidx.compose.runtime.Immutable
 import com.bashkevich.tennisscorekeeper.components.set_template.SetComponentState
 import com.bashkevich.tennisscorekeeper.components.theme.ThemeComponentState
-import com.bashkevich.tennisscorekeeper.model.set_template.domain.EMPTY_DECIDING_SET_TEMPLATE
-import com.bashkevich.tennisscorekeeper.model.set_template.domain.EMPTY_REGULAR_SET_TEMPLATE
 import com.bashkevich.tennisscorekeeper.model.set_template.domain.SetTemplate
 import com.bashkevich.tennisscorekeeper.model.set_template.domain.SetTemplateTypeFilter
 import com.bashkevich.tennisscorekeeper.model.theme.domain.ScoreboardTheme
@@ -26,7 +24,7 @@ sealed class AddTournamentUiEvent : UiEvent {
     class AddTournament(
         val tournamentName: String,
         val tournamentType: TournamentType,
-        val defaultSetTemplateId: String,
+        val defaultSetTemplateId: String?,
         val decidingSetTemplateId: String,
         val themeId: String,
         val setsToWin: Int,
@@ -47,21 +45,15 @@ data class AddTournamentState(
         fun initial() = AddTournamentState(
             tournamentType = null,
             regularSetComponentState = SetComponentState(
-                selectedSetState = SetComponentState.SelectedSetState.Idle(
-                    EMPTY_REGULAR_SET_TEMPLATE
-                ),
+                selectedSetState = SetComponentState.SelectedSetState.Idle(null),
                 setOptionsState = SetComponentState.SetTemplateOptionsState.Loading,
             ),
             decidingSetComponentState = SetComponentState(
-                selectedSetState = SetComponentState.SelectedSetState.Idle(
-                    EMPTY_DECIDING_SET_TEMPLATE
-                ),
+                selectedSetState = SetComponentState.SelectedSetState.Idle(null),
                 setOptionsState = SetComponentState.SetTemplateOptionsState.Loading,
             ),
             themeComponentState = ThemeComponentState(
-                selectedTheme = ThemeComponentState.SelectedThemeState.Idle(
-                    ScoreboardTheme.DEFAULT
-                ),
+                selectedTheme = ThemeComponentState.SelectedThemeState.Idle(null),
                 themeOptionsState = ThemeComponentState.ThemeOptionsState.Loading,
             ),
             setsToWin = 1,
@@ -74,5 +66,4 @@ data class AddTournamentState(
 sealed class AddTournamentAction : UiAction {
     data object TournamentAdded : AddTournamentAction()
     data class ShowAddError(val message: String) : AddTournamentAction()
-    data object ShowUnauthorizedError : AddTournamentAction()
 }

@@ -19,7 +19,6 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -33,6 +32,7 @@ import com.bashkevich.tennisscorekeeper.components.TournamentListAppBarWithButto
 import com.bashkevich.tennisscorekeeper.components.modifier.hoverScaleEffect
 import com.bashkevich.tennisscorekeeper.components.modifier.refreshByKeyboard
 import com.bashkevich.tennisscorekeeper.components.icons.IconGroup
+import com.bashkevich.tennisscorekeeper.mvi.LaunchedUiEffectHandler
 import com.bashkevich.tennisscorekeeper.components.icons.default_icons.Add
 import com.bashkevich.tennisscorekeeper.components.tournament.TournamentListItem
 import com.bashkevich.tennisscorekeeper.navigation.AddTournamentRoute
@@ -86,13 +86,14 @@ private fun TournamentListContent(
     val isAuthorized = LocalAuthorization.current
     val snackbarHostState = remember { SnackbarHostState() }
 
-    LaunchedEffect(action) {
-        val currentAction = action ?: return@LaunchedEffect
+    LaunchedUiEffectHandler(
+        effect = action,
+        onConsume = onConsumeAction
+    ) { currentAction ->
         when (currentAction) {
             is TournamentListAction.ShowRefreshError ->
                 snackbarHostState.showSnackbar(message = currentAction.message)
         }
-        onConsumeAction()
     }
 
     Scaffold(

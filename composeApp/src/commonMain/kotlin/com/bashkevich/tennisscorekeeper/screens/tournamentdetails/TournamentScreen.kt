@@ -22,7 +22,6 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -38,6 +37,7 @@ import com.bashkevich.tennisscorekeeper.components.TournamentDetailsAppBar
 import com.bashkevich.tennisscorekeeper.components.modifier.refreshByKeyboard
 import com.bashkevich.tennisscorekeeper.components.tournament.ChangeTournamentStatusButton
 import com.bashkevich.tennisscorekeeper.components.icons.IconGroup
+import com.bashkevich.tennisscorekeeper.mvi.LaunchedUiEffectHandler
 import com.bashkevich.tennisscorekeeper.components.icons.default_icons.Add
 import com.bashkevich.tennisscorekeeper.components.tournament.TournamentDetailsLoading
 import com.bashkevich.tennisscorekeeper.model.match.remote.body.convertToString
@@ -62,6 +62,7 @@ fun TournamentScreen(
     TournamentContent(
         modifier = modifier,
         state = state,
+        action = state.action,
         tournamentDetailsState = state.tournamentDetailsState,
         onEvent = { viewModel.onEvent(it) },
         onRefresh = { viewModel.onEvent(TournamentUiEvent.Refresh) },
@@ -73,6 +74,7 @@ fun TournamentScreen(
 private fun TournamentContent(
     modifier: Modifier = Modifier,
     state: TournamentState,
+    action: TournamentAction?,
     tournamentDetailsState: TournamentDetailsLoadingState,
     onEvent: (TournamentUiEvent) -> Unit,
     onRefresh: () -> Unit,
@@ -82,13 +84,14 @@ private fun TournamentContent(
     val isAuthorized = LocalAuthorization.current
     val snackbarHostState = remember { SnackbarHostState() }
 
-    LaunchedEffect(state.action) {
-        val action = state.action ?: return@LaunchedEffect
-        when (action) {
+    LaunchedUiEffectHandler(
+        effect = action,
+        onConsume = onConsumeAction
+    ) { currentAction ->
+        when (currentAction) {
             is TournamentAction.ShowRefreshError ->
-                snackbarHostState.showSnackbar(message = action.message)
+                snackbarHostState.showSnackbar(message = currentAction.message)
         }
-        onConsumeAction()
     }
 
     val pagerState = rememberPagerState(pageCount = { 2 })
