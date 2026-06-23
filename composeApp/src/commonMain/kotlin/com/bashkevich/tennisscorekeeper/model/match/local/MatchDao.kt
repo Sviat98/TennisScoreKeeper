@@ -18,6 +18,9 @@ interface MatchDao {
     suspend fun insertMatches(entities: List<MatchEntity>)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertMatch(entity: MatchEntity)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertMatchSets(entities: List<MatchSetEntity>)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)

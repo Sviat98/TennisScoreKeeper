@@ -8,6 +8,7 @@ import com.bashkevich.tennisscorekeeper.model.match.domain.ShortMatch
 import com.bashkevich.tennisscorekeeper.model.match.domain.toDomain
 import com.bashkevich.tennisscorekeeper.model.match.local.MatchLocalDataSource
 import com.bashkevich.tennisscorekeeper.model.match.remote.MatchRemoteDataSource
+import com.bashkevich.tennisscorekeeper.model.tournament.local.TournamentLocalDataSource
 import com.bashkevich.tennisscorekeeper.model.match.remote.body.ChangeScoreBody
 import com.bashkevich.tennisscorekeeper.model.match.remote.MatchBody
 import com.bashkevich.tennisscorekeeper.model.match.remote.body.MatchStatus
@@ -24,7 +25,8 @@ import kotlinx.coroutines.flow.map
 
 class MatchRepositoryImpl(
     private val matchRemoteDataSource: MatchRemoteDataSource,
-    private val matchLocalDataSource: MatchLocalDataSource
+    private val matchLocalDataSource: MatchLocalDataSource,
+    private val tournamentLocalDataSource: TournamentLocalDataSource
 ) : MatchRepository {
 
     private val _newMatch = MutableSharedFlow<ShortMatch>(replay = 1)
@@ -40,6 +42,7 @@ class MatchRepositoryImpl(
         return matchRemoteDataSource.addNewMatch(tournamentId = tournamentId, matchBody = matchBody)
             .doOnSuccess { shortMatchDto ->
                 matchLocalDataSource.insertMatch(tournamentId, shortMatchDto)
+                tournamentLocalDataSource.incrementUncompletedMatches(tournamentId)
             }
             .mapSuccess { shortMatchDto -> shortMatchDto.toDomain() }
     }

@@ -2,28 +2,12 @@ package com.bashkevich.tennisscorekeeper.model.match.local
 
 import androidx.room3.ColumnInfo
 import androidx.room3.Entity
-import androidx.room3.ForeignKey
 import androidx.room3.Index
 import androidx.room3.PrimaryKey
 import com.bashkevich.tennisscorekeeper.model.match.remote.ShortMatchDto
-import com.bashkevich.tennisscorekeeper.model.participant.local.ParticipantEntity
 
 @Entity(
     tableName = "matches",
-    foreignKeys = [
-        ForeignKey(
-            entity = ParticipantEntity::class,
-            parentColumns = ["id"],
-            childColumns = ["first_participant_id"],
-            onDelete = ForeignKey.CASCADE
-        ),
-        ForeignKey(
-            entity = ParticipantEntity::class,
-            parentColumns = ["id"],
-            childColumns = ["second_participant_id"],
-            onDelete = ForeignKey.CASCADE
-        )
-    ],
     indices = [
         Index(value = ["tournament_id"]),
         Index(value = ["first_participant_id"]),

@@ -23,4 +23,16 @@ class TournamentLocalDataSource(
     suspend fun replaceAllTournaments(tournaments: List<TournamentEntity>) {
         dao.replaceAllTournaments(tournaments)
     }
+
+    suspend fun updateStatus(id: String, status: String) {
+        dao.updateStatus(id, status)
+    }
+
+    suspend fun updateTotalParticipants(id: String, amount: Int) {
+        dao.updateTotalParticipants(id, amount)
+    }
+
+    suspend fun incrementUncompletedMatches(id: String) {
+        dao.incrementUncompletedMatches(id)
+    }
 }

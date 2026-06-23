@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.Flow
 interface ParticipantDao {
 
     @Transaction
-    @Query("SELECT * FROM participants WHERE tournament_id = :tournamentId")
+    @Query("SELECT * FROM participants WHERE tournament_id = :tournamentId ORDER BY seed NULLS LAST, id")
     fun getParticipantsForTournament(tournamentId: String): Flow<List<ParticipantWithPlayersEntity>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
@@ -26,6 +26,10 @@ interface ParticipantDao {
 
     @Query("DELETE FROM participants WHERE tournament_id = :tournamentId")
     suspend fun deleteParticipantsByTournament(tournamentId: String)
+
+    @Query("DELETE FROM players")
+    // за счет каскада удалятся participants
+    suspend fun deleteAllParticipants()
 
     @Transaction
     suspend fun replaceAllParticipantsForTournament(

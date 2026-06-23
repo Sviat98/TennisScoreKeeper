@@ -30,8 +30,8 @@ import com.bashkevich.tennisscorekeeper.LocalAuthorization
 import com.bashkevich.tennisscorekeeper.LocalNavHostController
 import com.bashkevich.tennisscorekeeper.components.TournamentListAppBar
 import com.bashkevich.tennisscorekeeper.components.TournamentListAppBarWithButton
-import com.bashkevich.tennisscorekeeper.components.hoverScaleEffect
-import com.bashkevich.tennisscorekeeper.components.refreshByKeyboard
+import com.bashkevich.tennisscorekeeper.components.modifier.hoverScaleEffect
+import com.bashkevich.tennisscorekeeper.components.modifier.refreshByKeyboard
 import com.bashkevich.tennisscorekeeper.components.icons.IconGroup
 import com.bashkevich.tennisscorekeeper.components.icons.default_icons.Add
 import com.bashkevich.tennisscorekeeper.components.tournament.TournamentListItem

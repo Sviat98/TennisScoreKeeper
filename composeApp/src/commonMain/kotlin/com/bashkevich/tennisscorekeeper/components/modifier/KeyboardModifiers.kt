@@ -1,4 +1,4 @@
-package com.bashkevich.tennisscorekeeper.components
+package com.bashkevich.tennisscorekeeper.components.modifier
 
 import androidx.compose.foundation.focusable
 import androidx.compose.runtime.LaunchedEffect

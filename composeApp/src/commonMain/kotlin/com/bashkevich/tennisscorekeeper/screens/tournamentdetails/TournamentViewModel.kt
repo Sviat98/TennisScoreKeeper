@@ -5,22 +5,25 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import com.bashkevich.tennisscorekeeper.core.remote.LoadResult
 import com.bashkevich.tennisscorekeeper.model.file.domain.EMPTY_EXCEL_FILE
-import com.bashkevich.tennisscorekeeper.model.match.repository.MatchRepository
+import com.bashkevich.tennisscorekeeper.model.match.domain.ShortMatch
+import com.bashkevich.tennisscorekeeper.model.participant.domain.TennisParticipant
 import com.bashkevich.tennisscorekeeper.model.participant.repository.ParticipantRepository
+import com.bashkevich.tennisscorekeeper.model.tournament.domain.TOURNAMENT_DEFAULT
+import com.bashkevich.tennisscorekeeper.model.tournament.domain.Tournament
 import com.bashkevich.tennisscorekeeper.model.tournament.remote.TournamentStatus
 import com.bashkevich.tennisscorekeeper.model.tournament.repository.TournamentRepository
+import com.bashkevich.tennisscorekeeper.model.match.repository.MatchRepository
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 import com.bashkevich.tennisscorekeeper.mvi.BaseViewModel
-import com.bashkevich.tennisscorekeeper.navigation.AddMatchRoute
+import com.bashkevich.tennisscorekeeper.navigation.TournamentRoute
 import com.bashkevich.tennisscorekeeper.navigation.TournamentTab
+import kotlin.concurrent.Volatile
 
 class TournamentViewModel(
     private val savedStateHandle: SavedStateHandle,
@@ -29,197 +32,219 @@ class TournamentViewModel(
     private val participantRepository: ParticipantRepository
 ) : BaseViewModel<TournamentState, TournamentUiEvent, TournamentAction>() {
 
-    private val _state = MutableStateFlow(TournamentState.initial())
-    override val state: StateFlow<TournamentState>
-        get() = _state.asStateFlow()
+    private val tournamentId: String = savedStateHandle.toRoute<TournamentRoute>().tournamentId
 
-    val actions: Flow<TournamentAction>
-        get() = super.action
+    private val refreshTournamentDetails = RefreshTournamentDetailsUseCase(
+        tournamentRepository = tournamentRepository,
+        matchRepository = matchRepository,
+        participantRepository = participantRepository
+    )
 
-    private val tournamentId: String = savedStateHandle.toRoute<AddMatchRoute>().tournamentId
+    private val _isRefreshing = MutableStateFlow(false)
+    private val _action = MutableStateFlow<TournamentAction?>(null)
+    private val _currentTab = MutableStateFlow(TournamentTab.MATCHES)
+    private val _isUploadInProgress = MutableStateFlow(false)
+    private val _participantsFile = MutableStateFlow(EMPTY_EXCEL_FILE)
+    @Volatile private var hasParticipantsLoaded = false
 
-    private var matchObservationJob: Job? = null
+    private val tournamentDetailsData = combine(
+        refreshTournamentDetails.observeTournamentByIdFromNetwork(
+            tournamentId,
+            TournamentTab.MATCHES
+        ),
+        tournamentRepository.observeTournamentById(tournamentId)
+    ) { network, db -> network to db }
 
-    init {
-        viewModelScope.launch {
-            // Always observe tournament metadata (needed for header/status)
-            launch {
-                tournamentRepository.observeTournamentById(tournamentId).collect { tournament ->
-                    reduceState { oldState ->
-                        oldState.copy(tournament = tournament)
-                    }
-                }
-            }
-            tournamentRepository.fetchTournamentById(tournamentId)
+    private val matchesData = combine(
+        refreshTournamentDetails.observeMatchesListFromNetwork(tournamentId),
+        matchRepository.observeMatchesForTournament(tournamentId)
+    ) { network, db -> network to db }
 
-            // Load matches for the default (MATCHES) tab
-            loadMatches()
+    private val participantsData = combine(
+        refreshTournamentDetails.observeParticipantsFromNetwork(tournamentId),
+        participantRepository.observeParticipantsForTournament(tournamentId)
+    ) { network, db -> network to db }
+
+    private val _data = combine(
+        tournamentDetailsData,
+        matchesData,
+        participantsData,
+        _currentTab
+    ) { tournamentDetails, matches, participants, tab ->
+        val tabNetworkState = when (tab) {
+            TournamentTab.MATCHES -> matches.first
+            TournamentTab.PARTICIPANTS -> participants.first
         }
-    }
 
-    private fun loadMatches() {
-        viewModelScope.launch {
-            launch {
-                matchRepository.observeMatchesForTournament(tournamentId).collect { matches ->
-                    reduceState { oldState ->
-                        oldState.copy(
-                            matchListState = oldState.matchListState.copy(
-                                matches = matches
-                            ),
-                            isMatchesLoaded = true,
-                            isLoading = false
-                        )
-                    }
-                }
+        if (tabNetworkState is LoadResult.Error) {
+            val hasData = when (tab) {
+                TournamentTab.MATCHES -> matches.second.isNotEmpty()
+                TournamentTab.PARTICIPANTS -> participants.second.isNotEmpty()
             }
-            matchRepository.fetchMatchesForTournament(tournamentId)
-
-            startObservingNewMatches()
-        }
-    }
-
-    private fun loadParticipants() {
-        viewModelScope.launch {
-            launch {
-                participantRepository.observeParticipantsForTournament(tournamentId).collect { participants ->
-                    reduceState { oldState ->
-                        oldState.copy(
-                            participantListState = oldState.participantListState.copy(
-                                participants = participants
-                            ),
-                            isParticipantsLoaded = true
-                        )
-                    }
-                }
-            }
-            participantRepository.fetchParticipantsForTournament(tournamentId)
-        }
-    }
-
-    private fun startObservingNewMatches() {
-        if (matchObservationJob?.isActive == true) return
-
-        matchObservationJob = viewModelScope.launch {
-            matchRepository.observeNewMatch().distinctUntilChanged().collect { newMatch ->
-                println("matchBody = $newMatch")
-
-                val matches = state.value.matchListState.matches.toMutableList()
-
-                matches.add(newMatch)
-                reduceState { oldState ->
-                    oldState.copy(
-                        matchListState = oldState.matchListState.copy(
-                            matches = matches.toList()
-                        )
-                    )
-                }
+            if (hasData) {
+                _action.value = TournamentAction.ShowRefreshError(
+                    tabNetworkState.result.message ?: "Error"
+                )
             }
         }
+
+        if (tournamentDetails.first != null && tabNetworkState != null) {
+            _isRefreshing.value = false
+        }
+
+        if (participants.first != null) {
+            hasParticipantsLoaded = true
+        }
+
+        TournamentDetailsData(tournamentDetails, matches, participants, tab)
     }
 
-    private fun stopObservingNewMatches() {
-        matchObservationJob?.cancel()
-        matchObservationJob = null
+    override val state: StateFlow<TournamentState> = combine(
+        _data,
+        _isRefreshing,
+        _action,
+        _isUploadInProgress,
+        _participantsFile
+    ) { data, isRefreshing, action, isUploadInProgress, participantsFile ->
+        val (tournamentNetwork, tournament) = data.tournamentDetails
+        val (matchesNetwork, matchesList) = data.matches
+        val (participantsNetwork, participantsList) = data.participants
+
+        //println("tournamentNetwork = $tournamentNetwork")
+        //println("tournament = $tournament")
+
+
+        val tournamentDetailsState =
+            if (tournamentNetwork == null && tournament == TOURNAMENT_DEFAULT) {
+                TournamentDetailsLoadingState.Loading
+            } else {
+                TournamentDetailsLoadingState.Content(tournament)
+            }
+
+        val matchListLoadingState = when {
+            !isRefreshing && matchesNetwork == null && matchesList.isEmpty() ->
+                MatchListLoadingState.Loading
+
+            matchesNetwork is LoadResult.Error && matchesList.isEmpty() ->
+                MatchListLoadingState.InitialError(
+                    matchesNetwork.result.message ?: "Error"
+                )
+
+            else ->
+                MatchListLoadingState.Content(matchesList)
+        }
+
+        println("matchListLoadingState = $matchListLoadingState")
+
+        val participantListLoadingState = when {
+            !isRefreshing && participantsNetwork == null && participantsList.isEmpty() ->
+                ParticipantListLoadingState.Loading
+
+            participantsNetwork is LoadResult.Error && participantsList.isEmpty() ->
+                ParticipantListLoadingState.InitialError(
+                    participantsNetwork.result.message ?: "Error"
+                )
+
+            else ->
+                ParticipantListLoadingState.Content(
+                    participants = participantsList,
+                    isUploadInProgress = isUploadInProgress,
+                    participantsFile = participantsFile
+                )
+        }
+
+        TournamentState(
+            tournamentDetailsState = tournamentDetailsState,
+            matchListLoadingState = matchListLoadingState,
+            participantListLoadingState = participantListLoadingState,
+            activeTab = data.tab,
+            isRefreshing = isRefreshing,
+            action = action
+        )
+    }.stateIn(
+        viewModelScope,
+        SharingStarted.WhileSubscribed(5_000),
+        TournamentState.initial()
+    )
+
+    fun consumeAction() {
+        _action.value = null
     }
 
     fun onEvent(uiEvent: TournamentUiEvent) {
         when (uiEvent) {
+            is TournamentUiEvent.Refresh -> refreshTournamentDetailsScreen()
             is TournamentUiEvent.ChangeTournamentStatus -> changeTournamentStatus(uiEvent.tournamentStatus)
             TournamentUiEvent.UploadFile -> uploadFile()
             is TournamentUiEvent.SelectFile -> {
-                reduceState { oldState ->
-                    oldState.copy(
-                        participantListState = oldState.participantListState.copy(
-                            participantsFile = uiEvent.file
+                _participantsFile.value = uiEvent.file
+            }
+
+            is TournamentUiEvent.SwitchTab -> {
+                val tab = uiEvent.tab
+                _currentTab.value = tab
+                if (tab == TournamentTab.PARTICIPANTS && !hasParticipantsLoaded) {
+                    refreshTournamentDetails.refresh(
+                        RefreshTournamentDetailsInfo(
+                            tournamentTab = tab,
+                            updateTournamentHeader = false
                         )
                     )
                 }
             }
-            is TournamentUiEvent.SwitchTab -> handleTabSwitch(uiEvent.tab)
         }
     }
 
-    private fun handleTabSwitch(newTab: TournamentTab) {
-        val currentTab = state.value.activeTab
-        if (currentTab == newTab) return
+    private fun refreshTournamentDetailsScreen() {
+        println("REFRESH TournamentViewModel!!!")
 
-        reduceState { it.copy(activeTab = newTab) }
+        val currentState = state.value
 
-        when (newTab) {
-            TournamentTab.MATCHES -> {
-                if (!state.value.isMatchesLoaded) {
-                    loadMatches()
-                } else {
-                    startObservingNewMatches()
-                }
-            }
-            TournamentTab.PARTICIPANTS -> {
-                stopObservingNewMatches()
-                if (!state.value.isParticipantsLoaded) {
-                    loadParticipants()
-                }
-            }
+        if ((currentState.tournamentDetailsState !is TournamentDetailsLoadingState.Loading) &&
+            ((currentState.activeTab == TournamentTab.MATCHES &&
+                    currentState.matchListLoadingState !is MatchListLoadingState.Loading) ||
+                    (currentState.activeTab == TournamentTab.PARTICIPANTS &&
+                            currentState.participantListLoadingState !is ParticipantListLoadingState.Loading))
+        ) {
+            _isRefreshing.value = true
+            refreshTournamentDetails.refresh(
+                RefreshTournamentDetailsInfo(
+                    tournamentTab = _currentTab.value,
+                    updateTournamentHeader = true
+                )
+            )
         }
+
     }
 
     private fun changeTournamentStatus(tournamentStatus: TournamentStatus) {
         viewModelScope.launch {
-
-            val tournament = state.value.tournament
-
-            val tournamentChangeStatusResult =
-                tournamentRepository.changeTournamentStatus(tournament.id, tournamentStatus)
-
-            if (tournamentChangeStatusResult is LoadResult.Success) {
-
-                reduceState { oldState ->
-                    oldState.copy(
-                        tournament = oldState.tournament.copy(status = tournamentStatus)
-                    )
-                }
-            }
+            tournamentRepository.changeTournamentStatus(tournamentId, tournamentStatus)
         }
     }
 
     private fun uploadFile() {
         viewModelScope.launch {
-            val state = state.value
-
-            reduceState { oldState ->
-                oldState.copy(
-                    participantListState = oldState.participantListState.copy(
-                        isUploadInProgress = true
-                    )
-                )
-            }
-
-            val excelFile = state.participantListState.participantsFile
-
-            val tournamentId = state.tournament.id
+            _isUploadInProgress.value = true
 
             val loadResult = participantRepository.uploadParticipantsFile(
                 tournamentId = tournamentId,
-                participantsFile = excelFile
+                participantsFile = _participantsFile.value
             )
 
-            println("participants loadResult after upload = $loadResult")
-
             if (loadResult is LoadResult.Success) {
-                reduceState { oldState ->
-                    oldState.copy(
-                        participantListState = oldState.participantListState.copy(
-                            isUploadInProgress = false,
-                            participants = loadResult.result,
-                            participantsFile = EMPTY_EXCEL_FILE
-                        )
-                    )
-                }
+                _isUploadInProgress.value = false
+                _participantsFile.value = EMPTY_EXCEL_FILE
+            } else {
+                _isUploadInProgress.value = false
             }
         }
     }
 
-    private fun reduceState(reducer: (TournamentState) -> TournamentState) {
-        _state.update(reducer)
-    }
-
+    private data class TournamentDetailsData(
+        val tournamentDetails: Pair<LoadResult<Unit, Throwable>?, Tournament>,
+        val matches: Pair<LoadResult<Unit, Throwable>?, List<ShortMatch>>,
+        val participants: Pair<LoadResult<Unit, Throwable>?, List<TennisParticipant>>,
+        val tab: TournamentTab
+    )
 }

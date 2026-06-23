@@ -9,7 +9,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import com.bashkevich.tennisscorekeeper.components.refreshByKeyboard
+import com.bashkevich.tennisscorekeeper.components.modifier.refreshByKeyboard
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.time.Duration.Companion.milliseconds

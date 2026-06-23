@@ -1,5 +1,8 @@
 package com.bashkevich.tennisscorekeeper.model.match.local
 
+import androidx.room3.Transaction
+import androidx.room3.Transactor
+import androidx.room3.useWriterConnection
 import com.bashkevich.tennisscorekeeper.core.local.AppDatabase
 import com.bashkevich.tennisscorekeeper.model.match.domain.ShortMatch
 import com.bashkevich.tennisscorekeeper.model.match.remote.ShortMatchDto
@@ -9,10 +12,11 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
 class MatchLocalDataSource(
-    db: AppDatabase
+    private val db: AppDatabase
 ) {
     private val matchDao: MatchDao = db.matchDao()
     private val participantDao: ParticipantDao = db.participantDao()
+
 
     fun observeMatches(tournamentId: String): Flow<List<ShortMatch>> {
         return matchDao.getMatchesForTournament(tournamentId).map { matches ->
@@ -33,15 +37,19 @@ class MatchLocalDataSource(
         val games = dtos.mapNotNull { it.toMatchGameEntity() }
         val participantsInMatch = dtos.flatMap { it.toParticipantInMatchEntities() }
 
-        participantDao.insertPlayers(players)
-        participantDao.insertParticipants(participantWithPlayers.map { it.participant })
-        matchDao.replaceAllMatchesForTournament(
-            tournamentId = tournamentId,
-            matches = matches,
-            sets = sets,
-            games = games,
-            participantsInMatch = participantsInMatch,
-        )
+        db.useWriterConnection {
+            it.withTransaction(Transactor.SQLiteTransactionType.IMMEDIATE){
+                participantDao.insertPlayers(players)
+                participantDao.insertParticipants(participantWithPlayers.map { it.participant })
+                matchDao.replaceAllMatchesForTournament(
+                    tournamentId = tournamentId,
+                    matches = matches,
+                    sets = sets,
+                    games = games,
+                    participantsInMatch = participantsInMatch,
+                )
+            }
+        }
     }
 
     suspend fun insertMatch(tournamentId: String, dto: ShortMatchDto) {
@@ -53,16 +61,25 @@ class MatchLocalDataSource(
         val players = participantWithPlayers.map { it.player } +
                 participantWithPlayers.mapNotNull { it.secondPlayer }
 
-        participantDao.insertPlayers(players)
-        participantDao.insertParticipants(participantWithPlayers.map { it.participant })
+        db.useWriterConnection {
+            it.withTransaction(Transactor.SQLiteTransactionType.IMMEDIATE){
+                participantDao.insertPlayers(players)
+                participantDao.insertParticipants(participantWithPlayers.map { it.participant })
 
-        matchDao.insertMatches(listOf(dto.toMatchEntity(tournamentId)))
-        matchDao.insertMatchSets(dto.toMatchSetEntities())
-        dto.toMatchGameEntity()?.let { matchDao.insertMatchGames(listOf(it)) }
-        matchDao.insertParticipantsInMatch(dto.toParticipantInMatchEntities())
+                matchDao.insertMatch(dto.toMatchEntity(tournamentId))
+                matchDao.insertMatchSets(dto.toMatchSetEntities())
+                dto.toMatchGameEntity()?.let { matchDao.insertMatchGames(listOf(it)) }
+                matchDao.insertParticipantsInMatch(dto.toParticipantInMatchEntities())
+            }
+        }
     }
 
     suspend fun deleteAllMatches(){
-        matchDao.deleteAllMatches()
+        db.useWriterConnection {
+            it.withTransaction(Transactor.SQLiteTransactionType.IMMEDIATE){
+                matchDao.deleteAllMatches()
+                participantDao.deleteAllParticipants()
+            }
+        }
     }
 }

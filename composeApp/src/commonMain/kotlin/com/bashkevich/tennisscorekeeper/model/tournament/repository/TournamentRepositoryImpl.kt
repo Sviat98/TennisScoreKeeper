@@ -58,7 +58,9 @@ class TournamentRepositoryImpl(
         return tournamentRemoteDataSource.changeTournamentStatus(
             tournamentId = tournamentId,
             tournamentStatusBody = tournamentStatusBody
-        )
+        ).doOnSuccess {
+            tournamentLocalDataSource.updateStatus(tournamentId, tournamentStatus.name)
+        }
     }
 
     override suspend fun insertTournament(tournament: Tournament) {

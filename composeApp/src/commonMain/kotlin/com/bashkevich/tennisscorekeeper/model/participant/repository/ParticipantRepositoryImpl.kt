@@ -9,12 +9,14 @@ import com.bashkevich.tennisscorekeeper.model.participant.domain.toDomain
 import com.bashkevich.tennisscorekeeper.model.participant.local.ParticipantLocalDataSource
 import com.bashkevich.tennisscorekeeper.model.participant.local.toDomain
 import com.bashkevich.tennisscorekeeper.model.participant.remote.ParticipantRemoteDataSource
+import com.bashkevich.tennisscorekeeper.model.tournament.local.TournamentLocalDataSource
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
 class ParticipantRepositoryImpl(
     private val participantRemoteDataSource: ParticipantRemoteDataSource,
-    private val participantLocalDataSource: ParticipantLocalDataSource
+    private val participantLocalDataSource: ParticipantLocalDataSource,
+    private val tournamentLocalDataSource: TournamentLocalDataSource
 ) : ParticipantRepository {
 
     override suspend fun getParticipantsForTournament(tournamentId: String): LoadResult<List<TennisParticipant>, Throwable> {
@@ -25,6 +27,7 @@ class ParticipantRepositoryImpl(
         return participantRemoteDataSource.uploadParticipantsFile(tournamentId, participantsFile)
             .doOnSuccess { dtos ->
                 participantLocalDataSource.replaceParticipantsForTournament(tournamentId, dtos)
+                tournamentLocalDataSource.updateTotalParticipants(tournamentId, dtos.size)
             }
             .mapSuccess { participants -> participants.map { it.toDomain() } }
     }
