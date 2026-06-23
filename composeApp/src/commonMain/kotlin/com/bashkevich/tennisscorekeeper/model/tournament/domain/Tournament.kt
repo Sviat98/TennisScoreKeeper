@@ -10,7 +10,7 @@ data class Tournament(
     val name: String,
     val type: TournamentType,
     val status: TournamentStatus,
-    val regularSetTemplateId: String,
+    val regularSetTemplateId: String?,
     val decidingSetTemplateId: String,
     val themeId: String,
     val setsToWin: Int,
@@ -21,7 +21,7 @@ data class Tournament(
 
 val TOURNAMENT_DEFAULT = Tournament(
     id = "0", name = "", type = TournamentType.SINGLES, status = TournamentStatus.NOT_STARTED,
-    regularSetTemplateId = "", decidingSetTemplateId = "", themeId = "", setsToWin = 1,
+    regularSetTemplateId = null, decidingSetTemplateId = "", themeId = "", setsToWin = 1,
     totalParticipants = 0, totalMatches = 0, uncompletedMatches = 0
 )
 

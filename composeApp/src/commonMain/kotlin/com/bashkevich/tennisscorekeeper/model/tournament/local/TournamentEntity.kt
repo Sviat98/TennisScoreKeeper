@@ -18,7 +18,7 @@ data class TournamentEntity(
     @ColumnInfo(name = "status")
     val status: String,
     @ColumnInfo(name = "regular_set_id")
-    val regularSetTemplateId: String,
+    val regularSetTemplateId: String?,
     @ColumnInfo(name = "deciding_set_id")
     val decidingSetTemplateId: String,
     @ColumnInfo(name = "theme_id")
