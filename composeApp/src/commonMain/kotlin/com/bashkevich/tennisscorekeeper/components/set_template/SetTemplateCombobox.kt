@@ -50,7 +50,7 @@ fun SetTemplateCombobox(
     ) {
         when (val selectedState = setComponentState.selectedSetState) {
             is SetComponentState.SelectedSetState.Idle -> {
-                val textFieldState = TextFieldState(selectedState.setTemplate.name)
+                val textFieldState = TextFieldState(selectedState.setTemplate?.name ?: "")
 
                 TextField(
                     modifier = Modifier.fillMaxWidth(),

@@ -49,7 +49,7 @@ fun ThemeCombobox(
     Box(modifier = modifier) {
         when (val selectedThemeState = themeComponentState.selectedTheme) {
             is ThemeComponentState.SelectedThemeState.Idle -> {
-                val textFieldState = TextFieldState(selectedThemeState.theme.name)
+                val textFieldState = TextFieldState(selectedThemeState.theme?.name ?: "")
 
                 TextField(
                     modifier = Modifier.fillMaxWidth(),
@@ -68,12 +68,14 @@ fun ThemeCombobox(
                         }
                     },
                     leadingIcon = {
-                        Row(
-                            horizontalArrangement = Arrangement.spacedBy(4.dp),
-                            verticalAlignment = Alignment.CenterVertically,
-                        ) {
-                            ColorCircle(color = selectedThemeState.theme.backgroundColor)
-                            ColorCircle(color = selectedThemeState.theme.textColor)
+                        selectedThemeState.theme?.let { theme ->
+                            Row(
+                                horizontalArrangement = Arrangement.spacedBy(4.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                            ) {
+                                ColorCircle(color = theme.backgroundColor)
+                                ColorCircle(color = theme.textColor)
+                            }
                         }
                     },
                     colors = TextFieldDefaults.colors(

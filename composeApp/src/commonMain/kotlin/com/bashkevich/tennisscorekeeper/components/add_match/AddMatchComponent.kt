@@ -20,7 +20,6 @@ import com.bashkevich.tennisscorekeeper.components.add_match.participant.AddMatc
 import com.bashkevich.tennisscorekeeper.components.set_template.SetComponentState
 import com.bashkevich.tennisscorekeeper.components.theme.ThemeComponentState
 import com.bashkevich.tennisscorekeeper.model.set_template.domain.SetTemplateTypeFilter
-import com.bashkevich.tennisscorekeeper.model.theme.domain.ScoreboardTheme
 import com.bashkevich.tennisscorekeeper.screens.addmatch.AddMatchState
 import com.bashkevich.tennisscorekeeper.screens.addmatch.AddMatchUiEvent
 import com.bashkevich.tennisscorekeeper.screens.addmatch.MatchAddingSubstate
@@ -101,7 +100,7 @@ fun AddMatchComponent(
                 setOptionsState = SetComponentState.SetTemplateOptionsState.Idle(decidingTemplates),
             ),
             themeComponentState = ThemeComponentState(
-                selectedTheme = ThemeComponentState.SelectedThemeState.Idle(state.selectedTheme ?: ScoreboardTheme.DEFAULT),
+                selectedTheme = ThemeComponentState.SelectedThemeState.Idle(state.selectedTheme),
                 themeOptionsState = ThemeComponentState.ThemeOptionsState.Idle(state.themeOptions),
             ),
             onSetsToWinChange = { delta -> onEvent(AddMatchUiEvent.ChangeSetsToWin(delta)) },

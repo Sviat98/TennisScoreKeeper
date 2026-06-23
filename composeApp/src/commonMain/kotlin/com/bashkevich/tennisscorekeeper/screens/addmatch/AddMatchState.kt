@@ -5,8 +5,6 @@ import androidx.compose.ui.graphics.Color
 import com.bashkevich.tennisscorekeeper.model.participant.domain.PARTICIPANT_IN_SINGLES_MATCH_DEFAULT
 import com.bashkevich.tennisscorekeeper.model.participant.domain.TennisParticipant
 import com.bashkevich.tennisscorekeeper.model.participant.domain.TennisParticipantInMatch
-import com.bashkevich.tennisscorekeeper.model.set_template.domain.EMPTY_DECIDING_SET_TEMPLATE
-import com.bashkevich.tennisscorekeeper.model.set_template.domain.EMPTY_REGULAR_SET_TEMPLATE
 import com.bashkevich.tennisscorekeeper.model.set_template.domain.SetTemplate
 import com.bashkevich.tennisscorekeeper.model.set_template.domain.SetTemplateTypeFilter
 import com.bashkevich.tennisscorekeeper.model.theme.domain.ScoreboardTheme
@@ -65,8 +63,8 @@ data class AddMatchState(
     val matchAddingSubstate: MatchAddingSubstate,
     val setsToWin: Int,
     val setTemplateOptions: List<SetTemplate>,
-    val regularSetTemplate: SetTemplate,
-    val decidingSetTemplate: SetTemplate,
+    val regularSetTemplate: SetTemplate?,
+    val decidingSetTemplate: SetTemplate?,
     val themeOptions: List<ScoreboardTheme>,
     val selectedTheme: ScoreboardTheme?,
 ) : UiState {
@@ -81,8 +79,8 @@ data class AddMatchState(
             matchAddingSubstate = MatchAddingSubstate.Idle,
             setsToWin = 1,
             setTemplateOptions = emptyList(),
-            regularSetTemplate = EMPTY_REGULAR_SET_TEMPLATE,
-            decidingSetTemplate = EMPTY_DECIDING_SET_TEMPLATE,
+            regularSetTemplate = null,
+            decidingSetTemplate = null,
             themeOptions = emptyList(),
             selectedTheme = null,
         )

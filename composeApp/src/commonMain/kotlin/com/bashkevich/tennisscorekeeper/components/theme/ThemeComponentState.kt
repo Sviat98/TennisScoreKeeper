@@ -18,7 +18,7 @@ data class ThemeComponentState(
         data class Error(val initialThemeId: String) : SelectedThemeState
 
         @Immutable
-        data class Idle(val theme: ScoreboardTheme) : SelectedThemeState
+        data class Idle(val theme: ScoreboardTheme?) : SelectedThemeState
     }
 
     sealed interface ThemeOptionsState {
