@@ -45,7 +45,6 @@ class AddTournamentViewModel(
 
     private val _isAdding = MutableStateFlow(false)
 
-    // Network fetch results (null = not started / in progress)
     private val _regularSetTemplatesFetchResult = MutableStateFlow<LoadResult<Unit, Throwable>?>(null)
     private val _decidingSetTemplatesFetchResult = MutableStateFlow<LoadResult<Unit, Throwable>?>(null)
     private val _themesFetchResult = MutableStateFlow<LoadResult<Unit, Throwable>?>(null)

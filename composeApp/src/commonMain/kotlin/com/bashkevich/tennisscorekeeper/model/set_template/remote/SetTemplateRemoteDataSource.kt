@@ -21,4 +21,10 @@ class SetTemplateRemoteDataSource(
             setTemplates
         }
     }
+
+    suspend fun getSetTemplateById(id: String): LoadResult<SetTemplateDto, Throwable> {
+        return runOperationCatching {
+            httpClient.get("/set-templates/$id").body<SetTemplateDto>()
+        }
+    }
 }

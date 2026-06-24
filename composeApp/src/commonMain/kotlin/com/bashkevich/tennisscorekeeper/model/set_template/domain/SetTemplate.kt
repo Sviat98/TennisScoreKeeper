@@ -14,6 +14,12 @@ data class SetTemplate(
     val isDeciding: Boolean,
 )
 
+val SET_TEMPLATE_DEFAULT = SetTemplate(
+    id = "0", name = "", gamesToWin = 6, hasDecidingPoint = false,
+    tiebreakMode = TiebreakMode.NO, tiebreakPointsToWin = 7,
+    isRegular = false, isDeciding = false
+)
+
 fun SetTemplateDto.toDomain() = SetTemplate(
     id = this.id,
     name = this.name.replace(";", "\n"),

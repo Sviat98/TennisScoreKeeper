@@ -21,8 +21,14 @@ interface SetTemplateDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertSetTemplates(templates: List<SetTemplateEntity>)
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertSetTemplate(template: SetTemplateEntity)
+
     @Query("DELETE FROM set_templates")
     suspend fun deleteAllSetTemplates()
+
+    @Query("SELECT * FROM set_templates WHERE id = :id")
+    fun getSetTemplateById(id: String): Flow<SetTemplateEntity?>
 
     @Transaction
     suspend fun replaceAllSetTemplates(templates: List<SetTemplateEntity>) {

@@ -20,4 +20,12 @@ class SetTemplateLocalDataSource(
     suspend fun replaceAllSetTemplates(templates: List<SetTemplateEntity>) {
         dao.replaceAllSetTemplates(templates)
     }
+
+    fun getSetTemplateById(id: String): Flow<SetTemplateEntity?> {
+        return dao.getSetTemplateById(id)
+    }
+
+    suspend fun insertSetTemplate(template: SetTemplateEntity) {
+        dao.insertSetTemplate(template)
+    }
 }

@@ -1,22 +1,24 @@
 package com.bashkevich.tennisscorekeeper.screens.addmatch
 
-import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.ui.Alignment
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Scaffold
-
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
-
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.bashkevich.tennisscorekeeper.LocalAuthorization
 import com.bashkevich.tennisscorekeeper.LocalNavHostController
 import com.bashkevich.tennisscorekeeper.components.AddMatchAppBar
 import com.bashkevich.tennisscorekeeper.components.add_match.AddMatchComponent
+import com.bashkevich.tennisscorekeeper.mvi.LaunchedUiEffectHandler
 import com.bashkevich.tennisscorekeeper.navigation.LoginRoute
 import com.bashkevich.tennisscorekeeper.navigation.ProfileRoute
 
@@ -26,14 +28,38 @@ fun AddMatchScreen(
     viewModel: AddMatchViewModel,
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
-
     val navController = LocalNavHostController.current
+    val snackbarHostState = remember { SnackbarHostState() }
+    val isAuthorized = LocalAuthorization.current
+
+    LaunchedUiEffectHandler(
+        effect = state.action,
+        onConsume = { viewModel.consumeAction() }
+    ) { action ->
+        when (action) {
+            is AddMatchAction.MatchAdded -> {
+                navController.navigateUp()
+            }
+            is AddMatchAction.ShowAddError -> {
+                snackbarHostState.showSnackbar(message = action.message)
+            }
+        }
+    }
 
     AddMatchContent(
         modifier = Modifier.then(modifier),
         state = state,
         onEvent = { viewModel.onEvent(it) },
-        onNavigateAfterMatchAdd = { navController.navigateUp() }
+        snackbarHostState = snackbarHostState,
+        isAuthorized = isAuthorized,
+        onBack = { navController.navigateUp() },
+        onNavigateToLoginOrProfile = {
+            if (isAuthorized) {
+                navController.navigate(ProfileRoute)
+            } else {
+                navController.navigate(LoginRoute)
+            }
+        },
     )
 }
 
@@ -42,46 +68,41 @@ fun AddMatchContent(
     modifier: Modifier = Modifier,
     state: AddMatchState,
     onEvent: (AddMatchUiEvent) -> Unit,
-    onNavigateAfterMatchAdd: () -> Unit
+    snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
+    isAuthorized: Boolean = false,
+    onBack: () -> Unit = {},
+    onNavigateToLoginOrProfile: () -> Unit = {},
 ) {
-    val navController = LocalNavHostController.current
-
-    val isAuthorized = LocalAuthorization.current
-
-    val matchAddingSubstate = state.matchAddingSubstate
-    if (matchAddingSubstate is MatchAddingSubstate.Success){
-        onNavigateAfterMatchAdd()
-    }
-
     Scaffold(
         modifier = Modifier.then(modifier),
         topBar = {
             AddMatchAppBar(
-                onBack = { navController.navigateUp() },
+                onBack = onBack,
                 isAuthorized = isAuthorized,
-                onNavigateToLoginOrProfile = {
-                    if (isAuthorized) {
-                        navController.navigate(ProfileRoute)
-                    } else {
-                        navController.navigate(LoginRoute)
-                    }
-                })
-        }
-    ) {paddingValues ->
-        Column(
-            modifier = Modifier.fillMaxSize().padding(paddingValues),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
-            if (state.isLoading) {
-                CircularProgressIndicator()
-            } else {
-                AddMatchComponent(
-                    state = state,
-                    onEvent = onEvent,
-                )
+                onNavigateToLoginOrProfile = onNavigateToLoginOrProfile
+            )
+        },
+        snackbarHost = { SnackbarHost(snackbarHostState) }
+    ) { paddingValues ->
+        when (val loadingState = state.loadingState) {
+            is AddMatchLoadingState.Loading -> {
+                Box(
+                    modifier = Modifier.fillMaxSize().padding(paddingValues),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator()
+                }
+            }
+            is AddMatchLoadingState.Content -> {
+                Column(
+                    modifier = Modifier.fillMaxSize().padding(paddingValues)
+                ) {
+                    AddMatchComponent(
+                        contentState = loadingState,
+                        onEvent = onEvent,
+                    )
+                }
             }
         }
     }
-
 }

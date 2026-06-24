@@ -2,7 +2,9 @@ package com.bashkevich.tennisscorekeeper.components.add_match
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
@@ -13,27 +15,23 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.bashkevich.tennisscorekeeper.components.ColorPickerDialog
 import com.bashkevich.tennisscorekeeper.components.add_match.participant.AddMatchParticipantsBlock
 import com.bashkevich.tennisscorekeeper.components.set_template.SetComponentState
 import com.bashkevich.tennisscorekeeper.components.theme.ThemeComponentState
 import com.bashkevich.tennisscorekeeper.model.set_template.domain.SetTemplateTypeFilter
-import com.bashkevich.tennisscorekeeper.screens.addmatch.AddMatchState
+import com.bashkevich.tennisscorekeeper.screens.addmatch.AddMatchLoadingState
 import com.bashkevich.tennisscorekeeper.screens.addmatch.AddMatchUiEvent
-import com.bashkevich.tennisscorekeeper.screens.addmatch.MatchAddingSubstate
 import com.bashkevich.tennisscorekeeper.screens.addmatch.OpenColorPickerDialogState
 
 @Composable
 fun AddMatchComponent(
     modifier: Modifier = Modifier,
-    state: AddMatchState,
+    contentState: AddMatchLoadingState.Content,
     onEvent: (AddMatchUiEvent) -> Unit,
 ) {
-    val participantOptions = state.participantOptions
-    val firstParticipant = state.firstParticipant
-    val secondParticipant = state.secondParticipant
+    val participantState = contentState.participantComponentState
 
     Column(
         modifier = Modifier.then(modifier).padding(16.dp)
@@ -43,9 +41,9 @@ fun AddMatchComponent(
     ) {
         AddMatchParticipantsBlock(
             modifier = Modifier.fillMaxWidth(),
-            participantOptions = participantOptions,
-            firstParticipant = firstParticipant,
-            secondParticipant = secondParticipant,
+            participantOptions = participantState.options,
+            firstParticipant = participantState.firstParticipant,
+            secondParticipant = participantState.secondParticipant,
             onParticipantsFetch = { onEvent(AddMatchUiEvent.FetchParticipants) },
             onParticipantChange = { participantNumber, participant ->
                 onEvent(
@@ -81,28 +79,11 @@ fun AddMatchComponent(
             }
         )
 
-        val setsToWin = state.setsToWin
-        val regularSetTemplate = state.regularSetTemplate
-        val decidingSetTemplate = state.decidingSetTemplate
-
-        val regularTemplates = state.setTemplateOptions.filter { it.isRegular }
-        val decidingTemplates = state.setTemplateOptions.filter { it.isDeciding }
-
-        // Settings section
         MatchScoringAndThemeSettingsBlock(
-            setsToWin = setsToWin,
-            regularSetComponentState = SetComponentState(
-                selectedSetState = SetComponentState.SelectedSetState.Idle(regularSetTemplate),
-                setOptionsState = SetComponentState.SetTemplateOptionsState.Idle(regularTemplates),
-            ),
-            decidingSetComponentState = SetComponentState(
-                selectedSetState = SetComponentState.SelectedSetState.Idle(decidingSetTemplate),
-                setOptionsState = SetComponentState.SetTemplateOptionsState.Idle(decidingTemplates),
-            ),
-            themeComponentState = ThemeComponentState(
-                selectedTheme = ThemeComponentState.SelectedThemeState.Idle(state.selectedTheme),
-                themeOptionsState = ThemeComponentState.ThemeOptionsState.Idle(state.themeOptions),
-            ),
+            setsToWin = contentState.setsToWin,
+            regularSetComponentState = contentState.regularSetComponentState,
+            decidingSetComponentState = contentState.decidingSetComponentState,
+            themeComponentState = contentState.themeComponentState,
             onSetsToWinChange = { delta -> onEvent(AddMatchUiEvent.ChangeSetsToWin(delta)) },
             onSetTemplatesFetch = { filter ->
                 onEvent(AddMatchUiEvent.FetchSetTemplates(filter))
@@ -131,9 +112,28 @@ fun AddMatchComponent(
             },
         )
 
-        val matchAddingSubstate = state.matchAddingSubstate
+        Spacer(modifier = Modifier.height(8.dp))
 
-        val isButtonEnabled = matchAddingSubstate !is MatchAddingSubstate.Loading
+        // Add button
+        val regularSetTemplate = contentState.regularSetComponentState.selectedSetState.let {
+            (it as? SetComponentState.SelectedSetState.Idle)?.setTemplate
+        }
+        val decidingSetTemplate = contentState.decidingSetComponentState.selectedSetState.let {
+            (it as? SetComponentState.SelectedSetState.Idle)?.setTemplate
+        }
+        val selectedTheme = contentState.themeComponentState.selectedTheme.let {
+            (it as? ThemeComponentState.SelectedThemeState.Idle)?.theme
+        }
+
+        val needsRegularSet = contentState.setsToWin > 1
+        val isButtonEnabled =
+            participantState.firstParticipant.id != "0"
+                    && participantState.secondParticipant.id != "0"
+                    && participantState.firstParticipant.id != participantState.secondParticipant.id
+                    && decidingSetTemplate != null
+                    && selectedTheme != null
+                    && (!needsRegularSet || regularSetTemplate != null)
+                    && !contentState.isAdding
 
         Button(
             onClick = {
@@ -141,34 +141,29 @@ fun AddMatchComponent(
             },
             enabled = isButtonEnabled
         ) {
-            if (matchAddingSubstate is MatchAddingSubstate.Loading){
+            if (contentState.isAdding) {
                 CircularProgressIndicator(modifier = Modifier.size(24.dp))
-            }else{
+            } else {
                 Text("Add Match")
             }
         }
 
-        if (matchAddingSubstate is MatchAddingSubstate.Error){
-            Text(text = matchAddingSubstate.message, color = Color.Red)
-        }
-
-        val dialogState = state.dialogState
+        val dialogState = contentState.dialogState
         if (dialogState is OpenColorPickerDialogState.OpenColorPicker) {
-
             val colorNumber = dialogState.colorNumber
             val participantNumber = dialogState.participantNumber
 
             val initialColor = if (colorNumber == 1) {
                 if (participantNumber == 1) {
-                    state.firstParticipant.primaryColor
+                    participantState.firstParticipant.primaryColor
                 } else {
-                    state.secondParticipant.primaryColor
+                    participantState.secondParticipant.primaryColor
                 }
             } else {
                 if (participantNumber == 1) {
-                    state.firstParticipant.secondaryColor!!
+                    participantState.firstParticipant.secondaryColor!!
                 } else {
-                    state.secondParticipant.secondaryColor!!
+                    participantState.secondParticipant.secondaryColor!!
                 }
             }
             ColorPickerDialog(
@@ -182,7 +177,6 @@ fun AddMatchComponent(
                                 color = color
                             )
                         )
-
                         2 -> onEvent(
                             AddMatchUiEvent.SelectSecondaryColor(
                                 participantNumber = participantNumber,
@@ -190,7 +184,6 @@ fun AddMatchComponent(
                             )
                         )
                     }
-
                 })
         }
     }
