@@ -17,14 +17,15 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
-
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
-
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
@@ -32,16 +33,18 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.bashkevich.tennisscorekeeper.LocalAuthorization
 import com.bashkevich.tennisscorekeeper.LocalNavHostController
-import com.bashkevich.tennisscorekeeper.components.DefaultLoadingComponent
 import com.bashkevich.tennisscorekeeper.components.TournamentDetailsAppBar
-import com.bashkevich.tennisscorekeeper.components.icons.IconGroup
-import com.bashkevich.tennisscorekeeper.components.icons.default_icons.Add
+import com.bashkevich.tennisscorekeeper.components.modifier.refreshByKeyboard
 import com.bashkevich.tennisscorekeeper.components.tournament.ChangeTournamentStatusButton
-import com.bashkevich.tennisscorekeeper.model.match.remote.body.MatchStatus
+import com.bashkevich.tennisscorekeeper.components.icons.IconGroup
+import com.bashkevich.tennisscorekeeper.mvi.LaunchedUiEffectHandler
+import com.bashkevich.tennisscorekeeper.components.icons.default_icons.Add
+import com.bashkevich.tennisscorekeeper.components.tournament.TournamentDetailsLoading
 import com.bashkevich.tennisscorekeeper.model.match.remote.body.convertToString
 import com.bashkevich.tennisscorekeeper.model.tournament.remote.TournamentStatus
 import com.bashkevich.tennisscorekeeper.navigation.AddMatchRoute
 import com.bashkevich.tennisscorekeeper.navigation.LoginRoute
+import com.bashkevich.tennisscorekeeper.navigation.MatchDetailsRoute
 import com.bashkevich.tennisscorekeeper.navigation.ProfileRoute
 import com.bashkevich.tennisscorekeeper.navigation.TournamentTab
 import com.bashkevich.tennisscorekeeper.navigation.toDisplayString
@@ -56,53 +59,46 @@ fun TournamentScreen(
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 
-    LaunchedEffect(Unit) {
-        viewModel.actions.collect { action ->
-        }
-    }
-
-    if (state.isLoading) {
-        DefaultLoadingComponent(
-            modifier = Modifier.then(modifier),
-            progressIndicatorSize = 128.dp
-        )
-    } else {
-        TournamentContent(
-            modifier = Modifier.then(modifier),
-            state = state,
-            onEvent = { viewModel.onEvent(it) },
-        )
-    }
-
+    TournamentContent(
+        modifier = modifier,
+        state = state,
+        action = state.action,
+        tournamentDetailsState = state.tournamentDetailsState,
+        onEvent = { viewModel.onEvent(it) },
+        onRefresh = { viewModel.onEvent(TournamentUiEvent.Refresh) },
+        onConsumeAction = { viewModel.consumeAction() },
+    )
 }
 
 @Composable
-fun TournamentContent(
+private fun TournamentContent(
     modifier: Modifier = Modifier,
     state: TournamentState,
+    action: TournamentAction?,
+    tournamentDetailsState: TournamentDetailsLoadingState,
     onEvent: (TournamentUiEvent) -> Unit,
+    onRefresh: () -> Unit,
+    onConsumeAction: () -> Unit,
 ) {
-    val tournament = state.tournament
-
     val navController = LocalNavHostController.current
-
     val isAuthorized = LocalAuthorization.current
+    val snackbarHostState = remember { SnackbarHostState() }
 
-    val matchListState = state.matchListState
-
-    val uncompletedMatches =
-        matchListState.matches.filter { it.status != MatchStatus.COMPLETED }.size
-
-    val participantListState = state.participantListState
-
-    val participantsAmount = participantListState.participants.size
+    LaunchedUiEffectHandler(
+        effect = action,
+        onConsume = onConsumeAction
+    ) { currentAction ->
+        when (currentAction) {
+            is TournamentAction.ShowRefreshError ->
+                snackbarHostState.showSnackbar(message = currentAction.message)
+        }
+    }
 
     val pagerState = rememberPagerState(pageCount = { 2 })
-
     val scope = rememberCoroutineScope()
 
     Scaffold(
-        modifier = Modifier.then(modifier),
+        modifier = Modifier.then(modifier).refreshByKeyboard(onRefresh),
         topBar = {
             TournamentDetailsAppBar(
                 onBack = { navController.navigateUp() },
@@ -113,101 +109,128 @@ fun TournamentContent(
                     } else {
                         navController.navigate(LoginRoute)
                     }
-                })
+                }
+            )
         },
         floatingActionButton = {
-            if (tournament.status== TournamentStatus.IN_PROGRESS){
-                val onClick :()-> Unit = {
-                    if (pagerState.currentPage == TournamentTab.MATCHES.ordinal) {
+            val tournament = (tournamentDetailsState as? TournamentDetailsLoadingState.Content)?.tournament
+            if (tournament?.status == TournamentStatus.IN_PROGRESS) {
+                FloatingActionButton(
+                    onClick = {
                         navController.navigate(AddMatchRoute(tournament.id))
+                    }
+                ) {
+                    Icon(IconGroup.Default.Add, contentDescription = "Add match")
+                }
+            }
+        },
+        snackbarHost = { SnackbarHost(snackbarHostState) }
+    ) { paddingValues ->
+        PullToRefreshBox(
+            isRefreshing = state.isRefreshing,
+            onRefresh = onRefresh,
+            modifier = Modifier.fillMaxSize().padding(paddingValues)
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 16.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.Top),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                when (tournamentDetailsState) {
+                    is TournamentDetailsLoadingState.Loading -> {
+                        TournamentDetailsLoading(
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
+
+                    is TournamentDetailsLoadingState.Content -> {
+                        val tournament = tournamentDetailsState.tournament
+                        Row(
+                            horizontalArrangement = Arrangement.spacedBy(16.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Column(
+                                modifier = Modifier.weight(1f)
+                            ) {
+                                Text(tournament.name, fontSize = 28.sp)
+                                Text("Status: ${tournament.status.convertToString()}")
+                            }
+                            ChangeTournamentStatusButton(
+                                modifier = Modifier.weight(1f),
+                                status = tournament.status,
+                                onStatusChange = { status ->
+                                    onEvent(TournamentUiEvent.ChangeTournamentStatus(status))
+                                },
+                                uncompletedMatches = tournament.uncompletedMatches,
+                                participantsAmount = tournament.totalParticipants
+                            )
+                        }
                     }
                 }
 
-                val contantDescription = if (pagerState.currentPage == TournamentTab.MATCHES.ordinal) "Add match" else "Add participant"
-                FloatingActionButton(onClick = onClick) {
-                    Icon(IconGroup.Default.Add, contentDescription = contantDescription)
-                }
-            }
-        }
-    ) { paddingValues ->
-        Column(
-            modifier = Modifier.padding(paddingValues).padding(horizontal = 16.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterVertically)
-        ) {
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(16.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Column(
-                    modifier = Modifier.weight(1f)
+                Box(
+                    modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text(tournament.name, fontSize = 28.sp)
-                    Text("Status: ${tournament.status.convertToString()}")
-                }
-                ChangeTournamentStatusButton(
-                    modifier = Modifier.weight(1f),
-                    status = tournament.status,
-                    onStatusChange = { status ->
-                        onEvent(
-                            TournamentUiEvent.ChangeTournamentStatus(
-                                status
+                    Row(
+                        modifier = Modifier
+                            .widthIn(max = 480.dp)
+                            .fillMaxWidth()
+                            .background(
+                                color = Color.Gray.copy(alpha = 0.3f),
+                                shape = RoundedCornerShape(4.dp)
                             )
+                            .padding(8.dp)
+                            .align(Alignment.Center),
+                        horizontalArrangement = Arrangement.SpaceEvenly
+                    ) {
+                        Text(
+                            text = TournamentTab.MATCHES.toDisplayString(),
+                            modifier = Modifier.clickable {
+                                scope.launch {
+                                    pagerState.animateScrollToPage(TournamentTab.MATCHES.ordinal)
+                                    onEvent(TournamentUiEvent.SwitchTab(TournamentTab.MATCHES))
+                                }
+                            },
+                            color = if (pagerState.currentPage == TournamentTab.MATCHES.ordinal)
+                                MaterialTheme.colorScheme.primary else Color.DarkGray
                         )
-                    },
-                    uncompletedMatches = uncompletedMatches,
-                    participantsAmount = participantsAmount
-                )
-            }
-            Box(
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Row(
-                    modifier = Modifier.widthIn(max = 480.dp).fillMaxWidth()
-                        .background(
-                            color = Color.Gray.copy(alpha = 0.3f),
-                            shape = RoundedCornerShape(4.dp)
+                        Text(
+                            text = TournamentTab.PARTICIPANTS.toDisplayString(),
+                            modifier = Modifier.clickable {
+                                scope.launch {
+                                    pagerState.animateScrollToPage(TournamentTab.PARTICIPANTS.ordinal)
+                                    onEvent(TournamentUiEvent.SwitchTab(TournamentTab.PARTICIPANTS))
+                                }
+                            },
+                            color = if (pagerState.currentPage == TournamentTab.PARTICIPANTS.ordinal)
+                                MaterialTheme.colorScheme.primary else Color.DarkGray
                         )
-                        .padding(8.dp).align(Alignment.Center),
-                    horizontalArrangement = Arrangement.SpaceEvenly
-                ) {
-                    Text(
-                        text = TournamentTab.MATCHES.toDisplayString(),
-                        modifier = Modifier.clickable {
-                            scope.launch {
-                                pagerState.animateScrollToPage(TournamentTab.MATCHES.ordinal)
-                            }
-                        },
-                        color = if (pagerState.currentPage == TournamentTab.MATCHES.ordinal) MaterialTheme.colorScheme.primary else Color.DarkGray
-                    )
-                    Text(
-                        text = TournamentTab.PARTICIPANTS.toDisplayString(),
-                        modifier = Modifier.clickable {
-                            scope.launch {
-                                pagerState.animateScrollToPage(TournamentTab.PARTICIPANTS.ordinal)
-                            }
-                        },
-                        color = if (pagerState.currentPage == TournamentTab.PARTICIPANTS.ordinal) MaterialTheme.colorScheme.primary else Color.DarkGray
-                    )
+                    }
                 }
 
-            }
+                HorizontalPager(
+                    state = pagerState,
+                    modifier = Modifier.fillMaxSize()
+                ) { index ->
+                    when (index) {
+                        TournamentTab.MATCHES.ordinal -> MatchListScreen(
+                            modifier = Modifier.fillMaxSize(),
+                            matchListLoadingState = state.matchListLoadingState,
+                            onItemClick = { match -> navController.navigate(MatchDetailsRoute(match.id)) }
+                        )
 
-            HorizontalPager(state = pagerState) { index ->
-                when (index) {
-                    TournamentTab.MATCHES.ordinal -> MatchListScreen(
-                        modifier = Modifier.fillMaxSize(),
-                        state = state,
-                        onEvent = onEvent
-                    )
-
-                    TournamentTab.PARTICIPANTS.ordinal -> ParticipantListScreen(
-                        modifier = Modifier.fillMaxSize(),
-                        state = state,
-                        onEvent = onEvent
-                    )
+                        TournamentTab.PARTICIPANTS.ordinal -> ParticipantListScreen(
+                            modifier = Modifier.fillMaxSize(),
+                            participantListLoadingState = state.participantListLoadingState,
+                            tournamentStatus = (tournamentDetailsState as? TournamentDetailsLoadingState.Content)?.tournament?.status ?: TournamentStatus.NOT_STARTED,
+                            onUploadFile = { onEvent(TournamentUiEvent.UploadFile) },
+                            onSelectFile = { file -> onEvent(TournamentUiEvent.SelectFile(file)) }
+                        )
+                    }
                 }
             }
         }
     }
-
 }

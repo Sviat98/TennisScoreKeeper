@@ -8,8 +8,7 @@ import com.bashkevich.tennisscorekeeper.model.tournament.remote.TournamentStatus
 import kotlinx.coroutines.flow.Flow
 
 interface TournamentRepository {
-    fun fetchTournamentsFlow(): Flow<LoadResult<Unit, Throwable>?>
-    fun refreshTournaments()
+    suspend fun fetchTournaments(): LoadResult<Unit, Throwable>
     suspend fun fetchTournamentById(id: String): LoadResult<Unit, Throwable>
     suspend fun addTournament(addTournamentBody: AddTournamentBody): LoadResult<Tournament, Throwable>
     suspend fun changeTournamentStatus(tournamentId: String, tournamentStatus: TournamentStatus): LoadResult<ResponseMessage, Throwable>

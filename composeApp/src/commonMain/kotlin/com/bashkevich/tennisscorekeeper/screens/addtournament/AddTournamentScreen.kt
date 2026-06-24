@@ -16,7 +16,6 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -29,6 +28,7 @@ import com.bashkevich.tennisscorekeeper.components.add_match.MatchScoringAndThem
 import com.bashkevich.tennisscorekeeper.components.add_tournament.TournamentNameAndTypeComponent
 import com.bashkevich.tennisscorekeeper.components.set_template.SetComponentState
 import com.bashkevich.tennisscorekeeper.components.theme.ThemeComponentState
+import com.bashkevich.tennisscorekeeper.mvi.LaunchedUiEffectHandler
 import com.bashkevich.tennisscorekeeper.navigation.LoginRoute
 import com.bashkevich.tennisscorekeeper.navigation.ProfileRoute
 
@@ -42,8 +42,10 @@ fun AddTournamentScreen(
     val snackbarHostState = remember { SnackbarHostState() }
     val isAuthorized = LocalAuthorization.current
 
-    LaunchedEffect(state.action) {
-        val action = state.action ?: return@LaunchedEffect
+    LaunchedUiEffectHandler(
+        effect = state.action,
+        onConsume = { viewModel.consumeAction() }
+    ) { action ->
         when (action) {
             is AddTournamentAction.TournamentAdded -> {
                 navController.navigateUp()
@@ -52,12 +54,7 @@ fun AddTournamentScreen(
             is AddTournamentAction.ShowAddError -> {
                 snackbarHostState.showSnackbar(message = action.message)
             }
-
-            is AddTournamentAction.ShowUnauthorizedError -> {
-                snackbarHostState.showSnackbar(message = "You need to login for this action")
-            }
         }
-        viewModel.consumeAction()
     }
 
     AddTournamentContent(
@@ -158,9 +155,9 @@ fun AddTournamentContent(
             val isButtonEnabled =
                 state.tournamentType != null
                         && tournamentNameState.text.toString().isNotBlank()
-                        && decidingSetTemplate != null && decidingSetTemplate.id != "0"
+                        && decidingSetTemplate != null
                         && selectedTheme != null
-                        && (!needsRegularSet || (regularSetTemplate != null && regularSetTemplate.id != "0"))
+                        && (!needsRegularSet || regularSetTemplate != null)
                         && !state.isAdding
 
             Button(
@@ -169,7 +166,7 @@ fun AddTournamentContent(
                         AddTournamentUiEvent.AddTournament(
                             tournamentName = tournamentNameState.text.toString(),
                             tournamentType = tournamentType!!,
-                            defaultSetTemplateId = regularSetTemplate!!.id,
+                            defaultSetTemplateId = regularSetTemplate?.id,
                             decidingSetTemplateId = decidingSetTemplate!!.id,
                             themeId = selectedTheme!!.id,
                             setsToWin = state.setsToWin,

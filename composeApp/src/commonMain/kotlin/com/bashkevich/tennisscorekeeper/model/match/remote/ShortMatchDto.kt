@@ -15,6 +15,8 @@ data class ShortMatchDto(
     val secondParticipant: ParticipantInShortMatchDto,
     @SerialName("status")
     val status: MatchStatus,
+    @SerialName("theme_id")
+    val themeId: String,
     @SerialName("previous_sets")
     val previousSets: List<TennisSetDto>,
     @SerialName("current_set")

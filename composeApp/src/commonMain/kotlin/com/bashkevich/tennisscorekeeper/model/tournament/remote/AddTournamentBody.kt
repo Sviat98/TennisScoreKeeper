@@ -10,7 +10,7 @@ data class AddTournamentBody(
     @SerialName("type")
     val type: TournamentType,
     @SerialName("regular_set_id")
-    val regularSetTemplateId: String,
+    val regularSetTemplateId: String? = null,
     @SerialName("deciding_set_id")
     val decidingSetTemplateId: String,
     @SerialName("theme_id")

@@ -3,62 +3,87 @@ package com.bashkevich.tennisscorekeeper.screens.matchlist
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.bashkevich.tennisscorekeeper.LocalNavHostController
-import com.bashkevich.tennisscorekeeper.components.hoverScaleEffect
+import com.bashkevich.tennisscorekeeper.components.modifier.hoverScaleEffect
 import com.bashkevich.tennisscorekeeper.components.scoreboard.short.ShortMatchScoreboardCard
 import com.bashkevich.tennisscorekeeper.model.match.domain.ShortMatch
-import com.bashkevich.tennisscorekeeper.navigation.MatchDetailsRoute
-import com.bashkevich.tennisscorekeeper.screens.tournamentdetails.TournamentState
-import com.bashkevich.tennisscorekeeper.screens.tournamentdetails.TournamentUiEvent
+import com.bashkevich.tennisscorekeeper.screens.tournamentdetails.MatchListLoadingState
 
 @Composable
 fun MatchListScreen(
     modifier: Modifier = Modifier,
-    state: TournamentState,
-    onEvent: (TournamentUiEvent) -> Unit
+    matchListLoadingState: MatchListLoadingState,
+    onItemClick: (ShortMatch) -> Unit
 ) {
-    val navController = LocalNavHostController.current
+    Box(modifier = modifier) {
+        when (matchListLoadingState) {
+            is MatchListLoadingState.Loading -> {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator()
+                }
+            }
 
-    MatchListContent(
-        modifier = Modifier.then(modifier),
-        state = state,
-        onItemClick = { match -> navController.navigate(MatchDetailsRoute(match.id)) },
-    )
+            is MatchListLoadingState.InitialError -> {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    androidx.compose.foundation.layout.Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.CenterVertically)
+                    ) {
+                        Text("Couldn't load data", color = MaterialTheme.colorScheme.onSurface)
+                        Text(
+                            "Pull down to update",
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
+            }
 
-}
-
-@Composable
-fun MatchListContent(
-    modifier: Modifier = Modifier,
-    state: TournamentState,
-    onItemClick: (ShortMatch) -> Unit,
-) {
-    val matchListState = state.matchListState
-    Box(
-        modifier = Modifier.then(modifier)
-    ) {
-        LazyColumn(
-            modifier = Modifier.align(Alignment.Center),
-            verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterVertically),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            contentPadding = PaddingValues(vertical = 16.dp)
-        ) {
-            items(
-                matchListState.matches,
-                key = { it.id }) { match ->
-                ShortMatchScoreboardCard(
-                    modifier = Modifier.widthIn(max = 400.dp).fillMaxWidth().hoverScaleEffect(),
-                    match = match,
-                    onClick = { onItemClick(match) }
-                )
+            is MatchListLoadingState.Content -> {
+                if (matchListLoadingState.matches.isEmpty()) {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            "Match list is empty",
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                } else {
+                    LazyColumn(
+                        modifier = Modifier.fillMaxSize(),
+                        verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterVertically),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        contentPadding = PaddingValues(vertical = 16.dp)
+                    ) {
+                        items(
+                            matchListLoadingState.matches,
+                            key = { it.id }) { match ->
+                            ShortMatchScoreboardCard(
+                                modifier = Modifier.widthIn(max = 400.dp).fillMaxWidth().hoverScaleEffect(),
+                                match = match,
+                                onClick = { onItemClick(match) }
+                            )
+                        }
+                    }
+                }
             }
         }
     }

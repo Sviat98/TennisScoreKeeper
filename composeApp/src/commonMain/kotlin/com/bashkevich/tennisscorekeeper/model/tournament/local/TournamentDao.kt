@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface TournamentDao {
-    @Query("SELECT * FROM tournaments")
+    @Query("SELECT * FROM tournaments ORDER BY id DESC")
     fun getAllTournaments(): Flow<List<TournamentEntity>>
 
     @Query("SELECT * FROM tournaments WHERE id = :id")
@@ -23,6 +23,15 @@ interface TournamentDao {
 
     @Query("DELETE FROM tournaments")
     suspend fun deleteAllTournaments()
+
+    @Query("UPDATE tournaments SET status = :status WHERE id = :id")
+    suspend fun updateStatus(id: String, status: String)
+
+    @Query("UPDATE tournaments SET total_participants = :amount WHERE id = :id")
+    suspend fun updateTotalParticipants(id: String, amount: Int)
+
+    @Query("UPDATE tournaments SET uncompleted_matches = uncompleted_matches + 1 WHERE id = :id")
+    suspend fun incrementUncompletedMatches(id: String)
 
     @Transaction
     suspend fun replaceAllTournaments(tournaments: List<TournamentEntity>) {

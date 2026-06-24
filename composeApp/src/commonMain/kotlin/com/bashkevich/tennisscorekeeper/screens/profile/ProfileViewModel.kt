@@ -6,8 +6,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.flow.Flow
-
 import com.bashkevich.tennisscorekeeper.mvi.BaseViewModel
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
@@ -19,9 +17,6 @@ class ProfileViewModel(
     private val _state = MutableStateFlow(ProfileState.initial())
     override val state: StateFlow<ProfileState>
         get() = _state.asStateFlow()
-
-    val actions: Flow<ProfileAction>
-        get() = super.action
 
     init {
         viewModelScope.launch {

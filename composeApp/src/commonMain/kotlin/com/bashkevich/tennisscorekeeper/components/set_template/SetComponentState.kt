@@ -19,7 +19,7 @@ data class SetComponentState(
         data class Error(val initialSetTemplateId: String) : SelectedSetState
 
         @Immutable
-        data class Idle(val setTemplate: SetTemplate) : SelectedSetState
+        data class Idle(val setTemplate: SetTemplate?) : SelectedSetState
     }
 
     sealed interface SetTemplateOptionsState {

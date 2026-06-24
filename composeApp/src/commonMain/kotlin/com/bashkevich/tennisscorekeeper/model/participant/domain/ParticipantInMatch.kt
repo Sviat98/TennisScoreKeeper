@@ -7,7 +7,6 @@ import com.bashkevich.tennisscorekeeper.model.participant.remote.ParticipantInSi
 import com.bashkevich.tennisscorekeeper.model.player.domain.PlayerInDoublesMatch
 import com.bashkevich.tennisscorekeeper.model.player.domain.PlayerInSinglesMatch
 import com.bashkevich.tennisscorekeeper.model.player.domain.TennisPlayerInMatch
-import com.bashkevich.tennisscorekeeper.model.player.domain.toDomain
 
 sealed class TennisParticipantInMatch {
     abstract val id: String
@@ -57,11 +56,26 @@ fun ParticipantInMatchDto.toDomain() =
                 isServing = this.isServing,
                 isWinner = this.isWinner,
                 isRetired = this.isRetired,
-                player = this.player.toDomain()
+                player = PlayerInSinglesMatch(
+                    id = this.player.id,
+                    surname = this.player.surname,
+                    name = this.player.name,
+                )
             )
         }
 
         is ParticipantInDoublesMatchDto -> {
+            fun servingState(playerId: String): Pair<Boolean, Boolean> {
+                val isServingNow = this.isServing && this.servingPlayerId == playerId
+                val isServingNext = this.servingPlayerId != null &&
+                    ((this.isServing && this.servingPlayerId != playerId) ||
+                     (!this.isServing && this.servingPlayerId == playerId))
+                return Pair(isServingNow, isServingNext)
+            }
+
+            val (fpServingNow, fpServingNext) = servingState(this.firstPlayer.id)
+            val (spServingNow, spServingNext) = servingState(this.secondPlayer.id)
+
             ParticipantInDoublesMatch(
                 id = this.id,
                 seed = this.seed,
@@ -71,8 +85,20 @@ fun ParticipantInMatchDto.toDomain() =
                 isServing = this.isServing,
                 isWinner = this.isWinner,
                 isRetired = this.isRetired,
-                firstPlayer = this.firstPlayer.toDomain(),
-                secondPlayer = this.secondPlayer.toDomain()
+                firstPlayer = PlayerInDoublesMatch(
+                    id = this.firstPlayer.id,
+                    surname = this.firstPlayer.surname,
+                    name = this.firstPlayer.name,
+                    isServingNow = fpServingNow,
+                    isServingNext = fpServingNext,
+                ),
+                secondPlayer = PlayerInDoublesMatch(
+                    id = this.secondPlayer.id,
+                    surname = this.secondPlayer.surname,
+                    name = this.secondPlayer.name,
+                    isServingNow = spServingNow,
+                    isServingNext = spServingNext,
+                ),
             )
         }
     }

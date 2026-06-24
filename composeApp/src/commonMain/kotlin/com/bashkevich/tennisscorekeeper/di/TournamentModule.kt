@@ -6,6 +6,7 @@ import com.bashkevich.tennisscorekeeper.model.tournament.repository.TournamentRe
 import com.bashkevich.tennisscorekeeper.model.tournament.repository.TournamentRepositoryImpl
 import com.bashkevich.tennisscorekeeper.screens.addtournament.AddTournamentViewModel
 import com.bashkevich.tennisscorekeeper.screens.tournamentdetails.TournamentViewModel
+import com.bashkevich.tennisscorekeeper.screens.tournamentlist.RefreshTournamentListScreenUseCase
 import com.bashkevich.tennisscorekeeper.screens.tournamentlist.TournamentListViewModel
 import org.koin.core.module.dsl.bind
 import org.koin.core.module.dsl.singleOf
@@ -14,6 +15,7 @@ import org.koin.dsl.module
 
 val tournamentModule = module {
     viewModelOf(::TournamentListViewModel)
+    singleOf(::RefreshTournamentListScreenUseCase)
     viewModelOf(::TournamentViewModel)
     viewModelOf(::AddTournamentViewModel)
 

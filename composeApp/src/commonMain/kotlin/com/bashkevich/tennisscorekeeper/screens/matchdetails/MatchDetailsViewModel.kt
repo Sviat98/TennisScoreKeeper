@@ -11,8 +11,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.flow.Flow
-
 import com.bashkevich.tennisscorekeeper.mvi.BaseViewModel
 import com.bashkevich.tennisscorekeeper.navigation.MatchDetailsRoute
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -27,9 +25,6 @@ class MatchDetailsViewModel(
     private val _state = MutableStateFlow(MatchDetailsState.initial())
     override val state: StateFlow<MatchDetailsState>
         get() = _state.asStateFlow()
-
-    val actions: Flow<MatchDetailsAction>
-        get() = super.action
 
     init {
         val matchId = savedStateHandle.toRoute<MatchDetailsRoute>().id

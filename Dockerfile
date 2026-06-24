@@ -1,5 +1,5 @@
 # Используем образ с Java и Gradle для сборки
-FROM gradle:9.2.1-jdk21 AS build
+FROM gradle:9.5.1-jdk21 AS build
 
 ARG BUILD_MODE=DEBUG
 ENV BUILD_MODE=$BUILD_MODE

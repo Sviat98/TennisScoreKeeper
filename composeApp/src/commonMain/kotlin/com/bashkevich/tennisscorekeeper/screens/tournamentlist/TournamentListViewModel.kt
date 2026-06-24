@@ -12,15 +12,14 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 
 class TournamentListViewModel(
+    private val refreshTournamentList: RefreshTournamentListScreenUseCase,
     private val tournamentRepository: TournamentRepository,
 ) : BaseViewModel<TournamentListState, TournamentListUiEvent, TournamentListAction>() {
 
     private val _isRefreshing = MutableStateFlow(false)
 
-    private val _action = MutableStateFlow<TournamentListAction?>(null)
-
     private val _networkAndTournaments = combine(
-        tournamentRepository.fetchTournamentsFlow(),
+        refreshTournamentList.fetchTournamentsFlow(),
         tournamentRepository.observeTournaments()
     ) { networkState, tournaments ->
         networkState to tournaments
@@ -28,9 +27,12 @@ class TournamentListViewModel(
         .onEach { (networkState, tournaments) ->
             println("networkState = $networkState")
             if (networkState is LoadResult.Error && tournaments.isNotEmpty()) {
-                _action.value = TournamentListAction.ShowRefreshError(
+                sendAction(TournamentListAction.ShowRefreshError(
                     networkState.result.message ?: "Error"
-                )
+                ))
+            }
+            if (networkState != null) {
+                _isRefreshing.value = false
             }
         }
 
@@ -54,18 +56,14 @@ class TournamentListViewModel(
         TournamentListState.initial()
     )
 
-    fun consumeAction() {
-        _action.value = null
-    }
-
     fun refresh() {
         _isRefreshing.value = true
-        tournamentRepository.refreshTournaments()
-        _isRefreshing.value = false
+        refreshTournamentList.refreshTournaments()
+        // _isRefreshing.value = false ставится после того, как вернется результат
     }
 
     fun retry() {
-        tournamentRepository.refreshTournaments()
+        refreshTournamentList.refreshTournaments()
     }
 
     fun onEvent(uiEvent: TournamentListUiEvent) {

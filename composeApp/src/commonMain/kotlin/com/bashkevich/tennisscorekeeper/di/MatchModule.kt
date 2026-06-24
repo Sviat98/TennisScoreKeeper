@@ -1,5 +1,6 @@
 package com.bashkevich.tennisscorekeeper.di
 
+import com.bashkevich.tennisscorekeeper.model.match.local.MatchLocalDataSource
 import com.bashkevich.tennisscorekeeper.model.match.remote.MatchRemoteDataSource
 import com.bashkevich.tennisscorekeeper.model.match.repository.MatchRepository
 import com.bashkevich.tennisscorekeeper.model.match.repository.MatchRepositoryImpl
@@ -18,4 +19,5 @@ val matchModule = module {
         bind<MatchRepository>()
     }
     singleOf(::MatchRemoteDataSource)
+    singleOf(::MatchLocalDataSource)
 }

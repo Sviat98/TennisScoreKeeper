@@ -7,6 +7,7 @@ import com.bashkevich.tennisscorekeeper.core.local.KeyValueStorage
 import com.bashkevich.tennisscorekeeper.core.PlatformConfiguration
 import com.bashkevich.tennisscorekeeper.core.local.getDatabaseBuilder
 import com.bashkevich.tennisscorekeeper.core.remote.ResponseMessage
+import com.bashkevich.tennisscorekeeper.core.remote.UnauthorizedActionException
 import com.bashkevich.tennisscorekeeper.core.remote.UnauthorizedException
 import com.bashkevich.tennisscorekeeper.core.remote.doOnError
 import com.bashkevich.tennisscorekeeper.core.remote.doOnSuccess
@@ -85,7 +86,15 @@ val coreModule = module {
                     if (exceptionResponse.status == HttpStatusCode.Unauthorized) {
                         val exceptionResponseText =
                             exceptionResponse.body<ResponseMessage>().message
-                        throw UnauthorizedException(exceptionResponseText)
+                        val path = request.url.encodedPath
+                        val isAuthEndpoint = path in listOf(
+                            "/login", "/refreshToken", "/refreshTokenStatus", "/logout"
+                        )
+                        if (isAuthEndpoint) {
+                            throw UnauthorizedException(exceptionResponseText)
+                        } else {
+                            throw UnauthorizedActionException()
+                        }
                     }
                 }
             }

@@ -4,6 +4,7 @@ import com.bashkevich.tennisscorekeeper.core.remote.LoadResult
 import com.bashkevich.tennisscorekeeper.core.remote.doOnError
 import com.bashkevich.tennisscorekeeper.core.remote.doOnSuccess
 import com.bashkevich.tennisscorekeeper.core.remote.mapSuccess
+import com.bashkevich.tennisscorekeeper.model.set_template.domain.SET_TEMPLATE_DEFAULT
 import com.bashkevich.tennisscorekeeper.model.set_template.domain.SetTemplate
 import com.bashkevich.tennisscorekeeper.model.set_template.domain.SetTemplateTypeFilter
 import com.bashkevich.tennisscorekeeper.model.set_template.domain.toDomain
@@ -52,6 +53,20 @@ class SetTemplateRepositoryImpl(
     override fun observeSetTemplates(filter: SetTemplateTypeFilter): Flow<List<SetTemplate>> {
         return setTemplateLocalDataSource.getSetTemplates(filter).map { entities ->
             entities.map { it.toDomain() }
+        }
+    }
+
+    override suspend fun fetchSetTemplateById(id: String): LoadResult<Unit, Throwable> {
+        return setTemplateRemoteDataSource.getSetTemplateById(id)
+            .doOnSuccess { dto ->
+                setTemplateLocalDataSource.insertSetTemplate(dto.toEntity())
+            }
+            .mapSuccess { }
+    }
+
+    override fun observeSetTemplateById(id: String): Flow<SetTemplate> {
+        return setTemplateLocalDataSource.getSetTemplateById(id).map { entity ->
+            entity?.toDomain() ?: SET_TEMPLATE_DEFAULT
         }
     }
 }

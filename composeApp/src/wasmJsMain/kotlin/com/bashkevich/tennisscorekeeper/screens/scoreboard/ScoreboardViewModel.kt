@@ -9,8 +9,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.flow.Flow
-
 import com.bashkevich.tennisscorekeeper.mvi.BaseViewModel
 import com.bashkevich.tennisscorekeeper.navigation.ScoreboardRoute
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -24,10 +22,6 @@ class ScoreboardViewModel(
     private val _state = MutableStateFlow(ScoreboardState.initial())
     override val state: StateFlow<ScoreboardState>
         get() = _state.asStateFlow()
-
-    val actions: Flow<ScoreboardAction>
-        get() = super.action
-
 
     init {
         val matchId = savedStateHandle.toRoute<ScoreboardRoute>().matchId

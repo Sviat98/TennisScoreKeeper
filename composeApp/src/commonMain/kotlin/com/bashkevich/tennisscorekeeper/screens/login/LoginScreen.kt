@@ -25,10 +25,6 @@ fun LoginScreen(
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 
-    LaunchedEffect(Unit) {
-        viewModel.actions.collect { action ->
-        }
-    }
     LoginScreenContent(
         modifier = Modifier.then(modifier),
         state = state,

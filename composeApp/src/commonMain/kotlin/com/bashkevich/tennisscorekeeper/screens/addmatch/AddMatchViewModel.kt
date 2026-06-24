@@ -4,7 +4,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
+import com.bashkevich.tennisscorekeeper.components.set_template.SetComponentState
+import com.bashkevich.tennisscorekeeper.components.theme.ThemeComponentState
+import com.bashkevich.tennisscorekeeper.core.combine
 import com.bashkevich.tennisscorekeeper.core.remote.LoadResult
+import com.bashkevich.tennisscorekeeper.core.remote.doOnError
+import com.bashkevich.tennisscorekeeper.core.remote.doOnSuccess
+import com.bashkevich.tennisscorekeeper.mvi.BaseViewModel
 import com.bashkevich.tennisscorekeeper.model.match.remote.MatchBody
 import com.bashkevich.tennisscorekeeper.model.match.remote.ParticipantInMatchBody
 import com.bashkevich.tennisscorekeeper.model.match.remote.convertToRgbString
@@ -16,25 +22,34 @@ import com.bashkevich.tennisscorekeeper.model.participant.domain.ParticipantInSi
 import com.bashkevich.tennisscorekeeper.model.participant.domain.PARTICIPANT_IN_SINGLES_MATCH_DEFAULT
 import com.bashkevich.tennisscorekeeper.model.participant.domain.SinglesParticipant
 import com.bashkevich.tennisscorekeeper.model.participant.domain.TennisParticipant
+import com.bashkevich.tennisscorekeeper.model.participant.domain.TennisParticipantInMatch
 import com.bashkevich.tennisscorekeeper.model.participant.repository.ParticipantRepository
 import com.bashkevich.tennisscorekeeper.model.player.domain.PlayerInDoublesMatch
 import com.bashkevich.tennisscorekeeper.model.player.domain.PlayerInSinglesMatch
-import com.bashkevich.tennisscorekeeper.model.set_template.domain.EMPTY_REGULAR_SET_TEMPLATE
+import com.bashkevich.tennisscorekeeper.model.set_template.domain.SET_TEMPLATE_DEFAULT
+import com.bashkevich.tennisscorekeeper.model.set_template.domain.SetTemplate
 import com.bashkevich.tennisscorekeeper.model.set_template.domain.SetTemplateTypeFilter
 import com.bashkevich.tennisscorekeeper.model.set_template.repository.SetTemplateRepository
+import com.bashkevich.tennisscorekeeper.model.theme.domain.ScoreboardTheme
 import com.bashkevich.tennisscorekeeper.model.theme.repository.ThemeRepository
-import com.bashkevich.tennisscorekeeper.model.tournament.remote.TournamentType
+import com.bashkevich.tennisscorekeeper.model.tournament.domain.TOURNAMENT_DEFAULT
+import com.bashkevich.tennisscorekeeper.model.tournament.domain.Tournament
 import com.bashkevich.tennisscorekeeper.model.tournament.repository.TournamentRepository
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.flow.Flow
-
-import com.bashkevich.tennisscorekeeper.mvi.BaseViewModel
 import com.bashkevich.tennisscorekeeper.navigation.AddMatchRoute
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class AddMatchViewModel(
     private val savedStateHandle: SavedStateHandle,
     private val matchRepository: MatchRepository,
@@ -44,533 +59,524 @@ class AddMatchViewModel(
     private val themeRepository: ThemeRepository,
 ) : BaseViewModel<AddMatchState, AddMatchUiEvent, AddMatchAction>() {
 
-    private val _state = MutableStateFlow(AddMatchState.initial())
-    override val state: StateFlow<AddMatchState>
-        get() = _state.asStateFlow()
+    private val tournamentId: String = savedStateHandle.toRoute<AddMatchRoute>().tournamentId
 
-    val actions: Flow<AddMatchAction>
-        get() = super.action
+    // --- Tournament from DB (no fetchTournamentById, tournament is already cached) ---
+    private val tournamentFromDb: StateFlow<Tournament> =
+        tournamentRepository.observeTournamentById(tournamentId)
+            .onEach { tournament->
+                if ( tournament != TOURNAMENT_DEFAULT) {
+                    _regularSetId.value = tournament.regularSetTemplateId
+                    _decidingSetId.value = tournament.decidingSetTemplateId.takeIf { it.isNotEmpty() }
+                    _themeId.value = tournament.themeId.takeIf { it.isNotEmpty() }
+                    _setsToWin.value = tournament.setsToWin
+                }
+            }
+            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), TOURNAMENT_DEFAULT)
 
-    private var currentSetTemplateFilter: SetTemplateTypeFilter? = null
-    private var themesLoaded = false
+    // --- Selected IDs (single source of truth) ---
+    private val _regularSetId = MutableStateFlow<String?>(null)
+    private val _decidingSetId = MutableStateFlow<String?>(null)
+    private val _themeId = MutableStateFlow<String?>(null)
+    private val _setsToWin = MutableStateFlow(1)
 
-    init {
-        fetchTournament()
-    }
+    // --- Fetch results as Flows with onStart (triggered on subscription, NOT in init) ---
+    private val regularSetFetchResult: StateFlow<LoadResult<Unit, Throwable>?> =
+        tournamentFromDb.flatMapLatest { tournament: Tournament ->
+            val id = tournament.regularSetTemplateId
+            if (id == null) flowOf(null as LoadResult<Unit, Throwable>?)
+            else flow<LoadResult<Unit, Throwable>?> {
+                emit(setTemplateRepository.fetchSetTemplateById(id))
+            }.onStart { emit(null) }
+        }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
+
+    private val decidingSetFetchResult: StateFlow<LoadResult<Unit, Throwable>?> =
+        tournamentFromDb.flatMapLatest { tournament: Tournament ->
+            val id = tournament.decidingSetTemplateId
+            if (id.isEmpty()) flowOf(null as LoadResult<Unit, Throwable>?)
+            else flow<LoadResult<Unit, Throwable>?> {
+                emit(setTemplateRepository.fetchSetTemplateById(id))
+            }.onStart { emit(null) }
+        }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
+
+    private val themeFetchResult: StateFlow<LoadResult<Unit, Throwable>?> =
+        tournamentFromDb.flatMapLatest { tournament: Tournament ->
+            val id = tournament.themeId
+            if (id.isEmpty()) flowOf(null as LoadResult<Unit, Throwable>?)
+            else flow<LoadResult<Unit, Throwable>?> {
+                emit(themeRepository.fetchThemeById(id))
+            }.onStart { emit(null) }
+        }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
+
+    // --- DB observations by selected IDs (reactive to user selection changes) ---
+    private val regularSetFromDb: StateFlow<SetTemplate> =
+        _regularSetId.flatMapLatest { id ->
+            if (id == null) flowOf(SET_TEMPLATE_DEFAULT)
+            else setTemplateRepository.observeSetTemplateById(id)
+        }.stateIn(viewModelScope, SharingStarted.Lazily, SET_TEMPLATE_DEFAULT)
+
+    private val decidingSetFromDb: StateFlow<SetTemplate> =
+        _decidingSetId.flatMapLatest { id ->
+            if (id == null) flowOf(SET_TEMPLATE_DEFAULT)
+            else setTemplateRepository.observeSetTemplateById(id)
+        }.stateIn(viewModelScope, SharingStarted.Lazily, SET_TEMPLATE_DEFAULT)
+
+    private val themeFromDb: StateFlow<ScoreboardTheme> =
+        _themeId.flatMapLatest { id ->
+            if (id == null) flowOf(ScoreboardTheme.DEFAULT)
+            else themeRepository.observeThemeByIdFromDatabase(id)
+        }.stateIn(viewModelScope, SharingStarted.Lazily, ScoreboardTheme.DEFAULT)
+
+    // --- Selected states: Loading/Error/Idle based on fetch result + DB value ---
+    private val regularSelectedState = combine(
+        _regularSetId,
+        regularSetFetchResult,
+        regularSetFromDb,
+    ) { id: String?, fetchResult: LoadResult<Unit, Throwable>?, dbValue: SetTemplate ->
+        when {
+            id == null -> SetComponentState.SelectedSetState.Idle(null)
+            dbValue != SET_TEMPLATE_DEFAULT -> SetComponentState.SelectedSetState.Idle(dbValue)
+            fetchResult == null -> SetComponentState.SelectedSetState.Loading(id)
+            fetchResult is LoadResult.Error -> SetComponentState.SelectedSetState.Error(id)
+            else -> SetComponentState.SelectedSetState.Idle(dbValue)
+        }
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), SetComponentState.SelectedSetState.Idle(null))
+
+    private val decidingSelectedState = combine(
+        _decidingSetId,
+        decidingSetFetchResult,
+        decidingSetFromDb,
+    ) { id: String?, fetchResult: LoadResult<Unit, Throwable>?, dbValue: SetTemplate ->
+        when {
+            id == null -> SetComponentState.SelectedSetState.Idle(null)
+            dbValue != SET_TEMPLATE_DEFAULT -> SetComponentState.SelectedSetState.Idle(dbValue)
+            fetchResult == null -> SetComponentState.SelectedSetState.Loading(id)
+            fetchResult is LoadResult.Error -> SetComponentState.SelectedSetState.Error(id)
+            else -> SetComponentState.SelectedSetState.Idle(dbValue)
+        }
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), SetComponentState.SelectedSetState.Idle(null))
+
+    private val themeSelectedState = combine(
+        _themeId,
+        themeFetchResult,
+        themeFromDb,
+    ) { id: String?, fetchResult: LoadResult<Unit, Throwable>?, dbValue: ScoreboardTheme ->
+        when {
+            id == null -> ThemeComponentState.SelectedThemeState.Idle(null)
+            dbValue != ScoreboardTheme.DEFAULT -> ThemeComponentState.SelectedThemeState.Idle(dbValue)
+            fetchResult == null -> ThemeComponentState.SelectedThemeState.Loading(id)
+            fetchResult is LoadResult.Error -> ThemeComponentState.SelectedThemeState.Error(id)
+            else -> ThemeComponentState.SelectedThemeState.Idle(dbValue)
+        }
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), ThemeComponentState.SelectedThemeState.Idle(null))
+
+    // --- Options fetch results (on-demand via FetchSetTemplates/FetchThemes) ---
+    private val _regularSetOptionsFetchResult = MutableStateFlow<LoadResult<Unit, Throwable>?>(null)
+    private val _decidingSetOptionsFetchResult = MutableStateFlow<LoadResult<Unit, Throwable>?>(null)
+    private val _themesFetchResult = MutableStateFlow<LoadResult<Unit, Throwable>?>(null)
+
+    // --- DB observations for options ---
+    private val regularSetTemplatesFromDb: StateFlow<List<SetTemplate>> =
+        setTemplateRepository.observeSetTemplates(SetTemplateTypeFilter.REGULAR)
+            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
+
+    private val decidingSetTemplatesFromDb: StateFlow<List<SetTemplate>> =
+        setTemplateRepository.observeSetTemplates(SetTemplateTypeFilter.DECIDER)
+            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
+
+    private val themesFromDb: StateFlow<List<ScoreboardTheme>> =
+        themeRepository.observeThemesFromDatabase()
+            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
+
+    // --- Options states (same pattern as AddTournament) ---
+    private val regularSetOptionsState = combine(
+        _regularSetOptionsFetchResult,
+        regularSetTemplatesFromDb,
+    ) { result: LoadResult<Unit, Throwable>?, dbData: List<SetTemplate> ->
+        when {
+            result == null && dbData.isEmpty() -> SetComponentState.SetTemplateOptionsState.Loading
+            result is LoadResult.Error && dbData.isEmpty() -> SetComponentState.SetTemplateOptionsState.Error("Error")
+            else -> SetComponentState.SetTemplateOptionsState.Idle(dbData)
+        }
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), SetComponentState.SetTemplateOptionsState.Idle(emptyList()))
+
+    private val decidingSetOptionsState = combine(
+        _decidingSetOptionsFetchResult,
+        decidingSetTemplatesFromDb,
+    ) { result: LoadResult<Unit, Throwable>?, dbData: List<SetTemplate> ->
+        when {
+            result == null && dbData.isEmpty() -> SetComponentState.SetTemplateOptionsState.Loading
+            result is LoadResult.Error && dbData.isEmpty() -> SetComponentState.SetTemplateOptionsState.Error("Error")
+            else -> SetComponentState.SetTemplateOptionsState.Idle(dbData)
+        }
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), SetComponentState.SetTemplateOptionsState.Idle(emptyList()))
+
+    private val themeOptionsState = combine(
+        _themesFetchResult,
+        themesFromDb,
+    ) { result: LoadResult<Unit, Throwable>?, dbData: List<ScoreboardTheme> ->
+        when {
+            result == null && dbData.isEmpty() -> ThemeComponentState.ThemeOptionsState.Loading
+            result is LoadResult.Error && dbData.isEmpty() -> ThemeComponentState.ThemeOptionsState.Error("Error")
+            else -> ThemeComponentState.ThemeOptionsState.Idle(dbData)
+        }
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), ThemeComponentState.ThemeOptionsState.Idle(emptyList()))
+
+    // --- Component states (combine selected + options) ---
+    private val regularSetComponentState = combine(
+        regularSelectedState, regularSetOptionsState
+    ) { selected: SetComponentState.SelectedSetState, options: SetComponentState.SetTemplateOptionsState ->
+        SetComponentState(selected, options)
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), SetComponentState(
+        SetComponentState.SelectedSetState.Idle(null), SetComponentState.SetTemplateOptionsState.Idle(emptyList())
+    ))
+
+    private val decidingSetComponentState = combine(
+        decidingSelectedState, decidingSetOptionsState
+    ) { selected: SetComponentState.SelectedSetState, options: SetComponentState.SetTemplateOptionsState ->
+        SetComponentState(selected, options)
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), SetComponentState(
+        SetComponentState.SelectedSetState.Idle(null), SetComponentState.SetTemplateOptionsState.Idle(emptyList())
+    ))
+
+    private val themeComponentState = combine(
+        themeSelectedState, themeOptionsState
+    ) { selected: ThemeComponentState.SelectedThemeState, options: ThemeComponentState.ThemeOptionsState ->
+        ThemeComponentState(selected, options)
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), ThemeComponentState(
+        ThemeComponentState.SelectedThemeState.Idle(null), ThemeComponentState.ThemeOptionsState.Idle(emptyList())
+    ))
+
+    // --- User input ---
+    private val _firstParticipant = MutableStateFlow<TennisParticipantInMatch>(PARTICIPANT_IN_SINGLES_MATCH_DEFAULT)
+    private val _secondParticipant = MutableStateFlow<TennisParticipantInMatch>(PARTICIPANT_IN_SINGLES_MATCH_DEFAULT)
+    private val _isAdding = MutableStateFlow(false)
+    private val _dialogState = MutableStateFlow<OpenColorPickerDialogState>(OpenColorPickerDialogState.None)
+
+    // --- DB observations for participants ---
+    private val participantsFromDb: StateFlow<List<TennisParticipant>> =
+        participantRepository.observeParticipantsForTournament(tournamentId)
+            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
+
+    // --- Participant data ---
+    private val participantData: StateFlow<ParticipantComponentState> = combine(
+        participantsFromDb,
+        _firstParticipant,
+        _secondParticipant,
+    ) { options: List<TennisParticipant>, first: TennisParticipantInMatch, second: TennisParticipantInMatch ->
+        ParticipantComponentState(options, first, second)
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), ParticipantComponentState(
+        emptyList(), PARTICIPANT_IN_SINGLES_MATCH_DEFAULT, PARTICIPANT_IN_SINGLES_MATCH_DEFAULT
+    ))
+
+    // --- Final state (9 params — within core.combine limit of 10) ---
+    override val state: StateFlow<AddMatchState> = combine(
+        tournamentFromDb,
+        regularSetComponentState,
+        decidingSetComponentState,
+        themeComponentState,
+        participantData,
+        _setsToWin,
+        _isAdding,
+        _dialogState,
+        _action,
+    ) { tournament: Tournament,
+        regularComp: SetComponentState,
+        decidingComp: SetComponentState,
+        themeComp: ThemeComponentState,
+        participantState: ParticipantComponentState,
+        setsToWin: Int,
+        isAdding: Boolean,
+        dialogState: OpenColorPickerDialogState,
+        action: AddMatchAction?,
+    ->
+        if (tournament == TOURNAMENT_DEFAULT) {
+            AddMatchState(loadingState = AddMatchLoadingState.Loading, action = action)
+        } else {
+            AddMatchState(
+                loadingState = AddMatchLoadingState.Content(
+                    tournament = tournament,
+                    setsToWin = setsToWin,
+                    regularSetComponentState = regularComp,
+                    decidingSetComponentState = decidingComp,
+                    themeComponentState = themeComp,
+                    participantComponentState = participantState,
+                    isAdding = isAdding,
+                    dialogState = dialogState,
+                ),
+                action = action,
+            )
+        }
+    }.stateIn(
+        viewModelScope,
+        SharingStarted.WhileSubscribed(5_000),
+        AddMatchState.initial()
+    )
 
     fun onEvent(uiEvent: AddMatchUiEvent) {
-        // some feature-specific logic
         when (uiEvent) {
             is AddMatchUiEvent.FetchParticipants -> fetchParticipants()
-            is AddMatchUiEvent.FetchSetTemplates -> fetchSetTemplates(uiEvent.setTemplateTypeFilter)
             is AddMatchUiEvent.SelectParticipant -> selectParticipant(
                 participantNumber = uiEvent.participantNumber,
                 participant = uiEvent.participant
             )
-            is AddMatchUiEvent.ChangeDisplayName->changeDisplayName(participantNumber = uiEvent.participantNumber, displayName = uiEvent.displayName)
+            is AddMatchUiEvent.ChangeDisplayName -> changeDisplayName(
+                participantNumber = uiEvent.participantNumber,
+                displayName = uiEvent.displayName
+            )
             is AddMatchUiEvent.SelectPrimaryColor -> selectPrimaryColor(
                 participantNumber = uiEvent.participantNumber,
                 color = uiEvent.color
             )
-
             is AddMatchUiEvent.SelectSecondaryColor -> selectSecondaryColor(
                 participantNumber = uiEvent.participantNumber,
                 color = uiEvent.color
             )
-
             is AddMatchUiEvent.OpenColorPickerDialog -> {
-                reduceState { oldState ->
-                    oldState.copy(
-                        dialogState = OpenColorPickerDialogState.OpenColorPicker(
-                            participantNumber = uiEvent.participantNumber,
-                            colorNumber = uiEvent.colorNumber
-                        )
-                    )
-                }
+                _dialogState.value = OpenColorPickerDialogState.OpenColorPicker(
+                    participantNumber = uiEvent.participantNumber,
+                    colorNumber = uiEvent.colorNumber
+                )
             }
-
             AddMatchUiEvent.CloseColorPickerDialog -> {
-                reduceState { oldState -> oldState.copy(dialogState = OpenColorPickerDialogState.None) }
+                _dialogState.value = OpenColorPickerDialogState.None
             }
-
             is AddMatchUiEvent.ChangeSetsToWin -> {
-                val setsToWinNewValue = state.value.setsToWin + uiEvent.delta
-
-                val regularSetTemplate =
-                    if (setsToWinNewValue < 2) EMPTY_REGULAR_SET_TEMPLATE else state.value.regularSetTemplate
-                reduceState { oldState ->
-                    oldState.copy(
-                        setsToWin = setsToWinNewValue,
-                        regularSetTemplate = regularSetTemplate
-                    )
+                val new = _setsToWin.value + uiEvent.delta
+                if (new < 1) return
+                _setsToWin.value = new
+                if (new < 2) {
+                    _regularSetId.value = null
                 }
             }
-
             is AddMatchUiEvent.FetchThemes -> fetchThemes()
-
             is AddMatchUiEvent.SelectTheme -> {
-                reduceState { oldState -> oldState.copy(selectedTheme = uiEvent.theme) }
+                _themeId.value = uiEvent.theme.id
             }
-
+            is AddMatchUiEvent.FetchSetTemplates -> fetchSetTemplates(uiEvent.setTemplateTypeFilter)
             is AddMatchUiEvent.SelectSetTemplate -> {
-                val setTemplate = uiEvent.setTemplate
                 when (uiEvent.setTemplateTypeFilter) {
-                    SetTemplateTypeFilter.REGULAR -> reduceState { oldState ->
-                        oldState.copy(
-                            regularSetTemplate = setTemplate,
-                        )
-                    }
-
-                    SetTemplateTypeFilter.DECIDER -> reduceState { oldState ->
-                        oldState.copy(
-                            decidingSetTemplate = setTemplate,
-                        )
-                    }
-
+                    SetTemplateTypeFilter.REGULAR -> _regularSetId.value = uiEvent.setTemplate.id
+                    SetTemplateTypeFilter.DECIDER -> _decidingSetId.value = uiEvent.setTemplate.id
                     else -> Unit
                 }
             }
-
-            is AddMatchUiEvent.AddMatch -> buildAndEmitMatchBody()
+            is AddMatchUiEvent.AddMatch -> addMatch()
         }
     }
 
     private fun changeDisplayName(participantNumber: Int, displayName: String) {
-        val state = state.value
-
         when (participantNumber) {
-            1 -> {
-                val firstParticipant = state.firstParticipant
-                when (firstParticipant) {
-                    is ParticipantInSinglesMatch -> {
-                        reduceState { oldState ->
-                            oldState.copy(
-                                firstParticipant = firstParticipant.copy(
-                                    displayName = displayName
-                                )
-                            )
-                        }
-                    }
-
-                    is ParticipantInDoublesMatch -> {
-                        reduceState { oldState ->
-                            oldState.copy(
-                                firstParticipant = firstParticipant.copy(
-                                    displayName = displayName
-                                )
-                            )
-                        }
-                    }
+            1 -> _firstParticipant.value = _firstParticipant.value.let { p ->
+                when (p) {
+                    is ParticipantInSinglesMatch -> p.copy(displayName = displayName)
+                    is ParticipantInDoublesMatch -> p.copy(displayName = displayName)
                 }
             }
-
-            2 -> {
-                val secondParticipant = state.secondParticipant
-                when (secondParticipant) {
-                    is ParticipantInSinglesMatch -> {
-                        reduceState { oldState ->
-                            oldState.copy(
-                                secondParticipant = secondParticipant.copy(
-                                    displayName = displayName
-                                )
-                            )
-                        }
-                    }
-
-                    is ParticipantInDoublesMatch -> {
-                        reduceState { oldState ->
-                            oldState.copy(
-                                secondParticipant = secondParticipant.copy(
-                                    displayName = displayName
-                                )
-                            )
-                        }
-                    }
+            2 -> _secondParticipant.value = _secondParticipant.value.let { p ->
+                when (p) {
+                    is ParticipantInSinglesMatch -> p.copy(displayName = displayName)
+                    is ParticipantInDoublesMatch -> p.copy(displayName = displayName)
                 }
             }
         }
-
-        reduceState { oldState -> oldState.copy(dialogState = OpenColorPickerDialogState.None) }
     }
 
-    private fun selectPrimaryColor(
-        participantNumber: Int,
-        color: Color
-    ) {
-        val state = state.value
-
+    private fun selectPrimaryColor(participantNumber: Int, color: Color) {
         when (participantNumber) {
-            1 -> {
-                val firstParticipant = state.firstParticipant
-                when (firstParticipant) {
-                    is ParticipantInSinglesMatch -> {
-                        reduceState { oldState ->
-                            oldState.copy(
-                                firstParticipant = firstParticipant.copy(
-                                    primaryColor = color
-                                )
-                            )
-                        }
-                    }
-
-                    is ParticipantInDoublesMatch -> {
-                        reduceState { oldState ->
-                            oldState.copy(
-                                firstParticipant = firstParticipant.copy(
-                                    primaryColor = color
-                                )
-                            )
-                        }
-                    }
+            1 -> _firstParticipant.value = _firstParticipant.value.let { p ->
+                when (p) {
+                    is ParticipantInSinglesMatch -> p.copy(primaryColor = color)
+                    is ParticipantInDoublesMatch -> p.copy(primaryColor = color)
                 }
             }
-
-            2 -> {
-                val secondParticipant = state.secondParticipant
-                when (secondParticipant) {
-                    is ParticipantInSinglesMatch -> {
-                        reduceState { oldState ->
-                            oldState.copy(
-                                secondParticipant = secondParticipant.copy(
-                                    primaryColor = color
-                                )
-                            )
-                        }
-                    }
-
-                    is ParticipantInDoublesMatch -> {
-                        reduceState { oldState ->
-                            oldState.copy(
-                                secondParticipant = secondParticipant.copy(
-                                    primaryColor = color
-                                )
-                            )
-                        }
-                    }
+            2 -> _secondParticipant.value = _secondParticipant.value.let { p ->
+                when (p) {
+                    is ParticipantInSinglesMatch -> p.copy(primaryColor = color)
+                    is ParticipantInDoublesMatch -> p.copy(primaryColor = color)
                 }
             }
         }
-
-        reduceState { oldState -> oldState.copy(dialogState = OpenColorPickerDialogState.None) }
+        _dialogState.value = OpenColorPickerDialogState.None
     }
 
-    private fun selectSecondaryColor(
-        participantNumber: Int,
-        color: Color?
-    ) {
-        val state = state.value
-
+    private fun selectSecondaryColor(participantNumber: Int, color: Color?) {
         when (participantNumber) {
-            1 -> {
-                val firstParticipant = state.firstParticipant
-                when (firstParticipant) {
-                    is ParticipantInSinglesMatch -> {
-                        reduceState { oldState ->
-                            oldState.copy(
-                                firstParticipant = firstParticipant.copy(
-                                    secondaryColor = color
-                                )
-                            )
-                        }
-                    }
-
-                    is ParticipantInDoublesMatch -> {
-                        reduceState { oldState ->
-                            oldState.copy(
-                                firstParticipant = firstParticipant.copy(
-                                    secondaryColor = color
-                                )
-                            )
-                        }
-                    }
+            1 -> _firstParticipant.value = _firstParticipant.value.let { p ->
+                when (p) {
+                    is ParticipantInSinglesMatch -> p.copy(secondaryColor = color)
+                    is ParticipantInDoublesMatch -> p.copy(secondaryColor = color)
                 }
             }
-
-            2 -> {
-                val secondParticipant = state.secondParticipant
-                when (secondParticipant) {
-                    is ParticipantInSinglesMatch -> {
-                        reduceState { oldState ->
-                            oldState.copy(
-                                secondParticipant = secondParticipant.copy(
-                                    secondaryColor = color
-                                )
-                            )
-                        }
-                    }
-
-                    is ParticipantInDoublesMatch -> {
-                        reduceState { oldState ->
-                            oldState.copy(
-                                secondParticipant = secondParticipant.copy(
-                                    secondaryColor = color
-                                )
-                            )
-                        }
-                    }
+            2 -> _secondParticipant.value = _secondParticipant.value.let { p ->
+                when (p) {
+                    is ParticipantInSinglesMatch -> p.copy(secondaryColor = color)
+                    is ParticipantInDoublesMatch -> p.copy(secondaryColor = color)
                 }
             }
         }
-        reduceState { oldState -> oldState.copy(dialogState = OpenColorPickerDialogState.None) }
-
+        _dialogState.value = OpenColorPickerDialogState.None
     }
 
-    private fun fetchTournament() {
+    private fun fetchSetTemplates(filter: SetTemplateTypeFilter) {
         viewModelScope.launch {
-            val tournamentId = savedStateHandle.toRoute<AddMatchRoute>().tournamentId
-
-            launch {
-                tournamentRepository.observeTournamentById(tournamentId).collect { tournament ->
-                    val defaultParticipant = when (tournament.type) {
-                        TournamentType.SINGLES -> PARTICIPANT_IN_SINGLES_MATCH_DEFAULT
-                        TournamentType.DOUBLES -> PARTICIPANT_IN_DOUBLES_MATCH_DEFAULT
-                    }
-
-                    reduceState { oldState ->
-                        oldState.copy(
-                            isLoading = false,
-                            tournament = tournament,
-                            firstParticipant = defaultParticipant,
-                            secondParticipant = defaultParticipant
-                        )
-                    }
+            when (filter) {
+                SetTemplateTypeFilter.REGULAR -> {
+                    _regularSetOptionsFetchResult.value = null
+                    val result = setTemplateRepository.fetchSetTemplates(SetTemplateTypeFilter.REGULAR)
+                    _regularSetOptionsFetchResult.value = result
                 }
-            }
-            tournamentRepository.fetchTournamentById(tournamentId)
-        }
-    }
-
-    private fun fetchSetTemplates(setTemplateTypeFilter: SetTemplateTypeFilter) {
-        if (currentSetTemplateFilter != setTemplateTypeFilter) {
-            currentSetTemplateFilter = setTemplateTypeFilter
-            viewModelScope.launch {
-                launch {
-                    setTemplateRepository.observeSetTemplates(setTemplateTypeFilter).collect { templates ->
-                        reduceState { oldState ->
-                            oldState.copy(setTemplateOptions = templates)
-                        }
-                    }
+                SetTemplateTypeFilter.DECIDER -> {
+                    _decidingSetOptionsFetchResult.value = null
+                    val result = setTemplateRepository.fetchSetTemplates(SetTemplateTypeFilter.DECIDER)
+                    _decidingSetOptionsFetchResult.value = result
                 }
-                setTemplateRepository.fetchSetTemplates(setTemplateTypeFilter)
-            }
-        } else {
-            viewModelScope.launch {
-                setTemplateRepository.fetchSetTemplates(setTemplateTypeFilter)
+                SetTemplateTypeFilter.ALL -> {
+                    _regularSetOptionsFetchResult.value = null
+                    _decidingSetOptionsFetchResult.value = null
+                    val result = setTemplateRepository.fetchSetTemplates(SetTemplateTypeFilter.ALL)
+                    _regularSetOptionsFetchResult.value = result
+                    _decidingSetOptionsFetchResult.value = result
+                }
             }
         }
     }
 
     private fun fetchParticipants() {
         viewModelScope.launch {
-            val tournamentId = state.value.tournament.id
-
-            if (state.value.participantOptions.isEmpty()) {
-                val participantsResult =
-                    participantRepository.getParticipantsForTournament(tournamentId)
-
-                if (participantsResult is LoadResult.Success) {
-                    reduceState { oldState ->
-                        oldState.copy(
-                            participantOptions = participantsResult.result
-                        )
-                    }
-                }
-            }
-
+            participantRepository.fetchParticipantsForTournament(tournamentId)
         }
     }
 
     private fun fetchThemes() {
-        if (themesLoaded) return
-        themesLoaded = true
         viewModelScope.launch {
-            launch {
-                themeRepository.observeThemesFromDatabase().collect { themes ->
-                    reduceState { oldState ->
-                        oldState.copy(
-                            themeOptions = themes,
-                        )
-                    }
-                }
-            }
-            themeRepository.fetchThemes()
+            _themesFetchResult.value = null
+            val result = themeRepository.fetchThemes()
+            _themesFetchResult.value = result
         }
     }
 
     private fun selectParticipant(participantNumber: Int, participant: TennisParticipant) {
-        val state = state.value
         when (participant) {
             is SinglesParticipant -> {
                 val displayName = participant.player.surname.uppercase()
-
                 when (participantNumber) {
                     1 -> {
-                        val participantToUpdate =
-                            state.firstParticipant as ParticipantInSinglesMatch
-
-                        val playerToUpdate = participantToUpdate.player as PlayerInSinglesMatch
-                        reduceState { oldState ->
-                            oldState.copy(
-                                firstParticipant = participantToUpdate.copy(
-                                    id = participant.id,
-                                    seed = participant.seed,
-                                    displayName = displayName,
-                                    player = playerToUpdate.copy(
-                                        id = participant.player.id,
-                                        surname = participant.player.surname,
-                                        name = participant.player.name
-                                    )
-                                ),
+                        val current = _firstParticipant.value as ParticipantInSinglesMatch
+                        val player = current.player as PlayerInSinglesMatch
+                        _firstParticipant.value = current.copy(
+                            id = participant.id,
+                            seed = participant.seed,
+                            displayName = displayName,
+                            player = player.copy(
+                                id = participant.player.id,
+                                surname = participant.player.surname,
+                                name = participant.player.name
                             )
-                        }
+                        )
                     }
-
                     2 -> {
-                        val participantToUpdate =
-                            state.secondParticipant as ParticipantInSinglesMatch
-
-                        val playerToUpdate = participantToUpdate.player as PlayerInSinglesMatch
-                        reduceState { oldState ->
-                            oldState.copy(
-                                secondParticipant = participantToUpdate.copy(
-                                    id = participant.id,
-                                    seed = participant.seed,
-                                    displayName = displayName,
-                                    player = playerToUpdate.copy(
-                                        id = participant.player.id,
-                                        surname = participant.player.surname,
-                                        name = participant.player.name
-                                    )
-                                ),
+                        val current = _secondParticipant.value as ParticipantInSinglesMatch
+                        val player = current.player as PlayerInSinglesMatch
+                        _secondParticipant.value = current.copy(
+                            id = participant.id,
+                            seed = participant.seed,
+                            displayName = displayName,
+                            player = player.copy(
+                                id = participant.player.id,
+                                surname = participant.player.surname,
+                                name = participant.player.name
                             )
-                        }
+                        )
                     }
                 }
             }
-
             is DoublesParticipant -> {
-
-                val participantDisplayName =
-                    "${participant.firstPlayer.surname}/${participant.secondPlayer.surname}".uppercase()
-
+                val displayName = "${participant.firstPlayer.surname}/${participant.secondPlayer.surname}".uppercase()
                 when (participantNumber) {
                     1 -> {
-                        val participantToUpdate =
-                            state.firstParticipant as ParticipantInDoublesMatch
-
-                        val firstPlayerToUpdate =
-                            participantToUpdate.firstPlayer as PlayerInDoublesMatch
-                        val secondPlayerToUpdate =
-                            participantToUpdate.secondPlayer as PlayerInDoublesMatch
-
-                        reduceState { oldState ->
-                            oldState.copy(
-                                firstParticipant = participantToUpdate.copy(
-                                    id = participant.id,
-                                    seed = participant.seed,
-                                    displayName = participantDisplayName,
-                                    firstPlayer = firstPlayerToUpdate.copy(
-                                        id = participant.firstPlayer.id,
-                                        surname = participant.firstPlayer.surname,
-                                        name = participant.firstPlayer.name
-                                    ),
-                                    secondPlayer = secondPlayerToUpdate.copy(
-                                        id = participant.secondPlayer.id,
-                                        surname = participant.secondPlayer.surname,
-                                        name = participant.secondPlayer.name
-                                    ),
-                                ),
-                            )
-                        }
+                        val current = _firstParticipant.value as ParticipantInDoublesMatch
+                        val fp = current.firstPlayer as PlayerInDoublesMatch
+                        val sp = current.secondPlayer as PlayerInDoublesMatch
+                        _firstParticipant.value = current.copy(
+                            id = participant.id,
+                            seed = participant.seed,
+                            displayName = displayName,
+                            firstPlayer = fp.copy(
+                                id = participant.firstPlayer.id,
+                                surname = participant.firstPlayer.surname,
+                                name = participant.firstPlayer.name
+                            ),
+                            secondPlayer = sp.copy(
+                                id = participant.secondPlayer.id,
+                                surname = participant.secondPlayer.surname,
+                                name = participant.secondPlayer.name
+                            ),
+                        )
                     }
-
                     2 -> {
-                        val participantToUpdate =
-                            state.secondParticipant as ParticipantInDoublesMatch
-
-                        val firstPlayerToUpdate =
-                            participantToUpdate.firstPlayer as PlayerInDoublesMatch
-                        val secondPlayerToUpdate =
-                            participantToUpdate.secondPlayer as PlayerInDoublesMatch
-                        reduceState { oldState ->
-                            oldState.copy(
-                                secondParticipant = participantToUpdate.copy(
-                                    id = participant.id,
-                                    seed = participant.seed,
-                                    displayName = participantDisplayName,
-                                    firstPlayer = firstPlayerToUpdate.copy(
-                                        id = participant.firstPlayer.id,
-                                        surname = participant.firstPlayer.surname,
-                                        name = participant.firstPlayer.name
-                                    ),
-                                    secondPlayer = secondPlayerToUpdate.copy(
-                                        id = participant.secondPlayer.id,
-                                        surname = participant.secondPlayer.surname,
-                                        name = participant.secondPlayer.name
-                                    ),
-                                ),
-                            )
-                        }
+                        val current = _secondParticipant.value as ParticipantInDoublesMatch
+                        val fp = current.firstPlayer as PlayerInDoublesMatch
+                        val sp = current.secondPlayer as PlayerInDoublesMatch
+                        _secondParticipant.value = current.copy(
+                            id = participant.id,
+                            seed = participant.seed,
+                            displayName = displayName,
+                            firstPlayer = fp.copy(
+                                id = participant.firstPlayer.id,
+                                surname = participant.firstPlayer.surname,
+                                name = participant.firstPlayer.name
+                            ),
+                            secondPlayer = sp.copy(
+                                id = participant.secondPlayer.id,
+                                surname = participant.secondPlayer.surname,
+                                name = participant.secondPlayer.name
+                            ),
+                        )
                     }
                 }
             }
         }
     }
 
-    private fun buildAndEmitMatchBody() {
+    private fun addMatch() {
         viewModelScope.launch {
-            reduceState { oldState -> oldState.copy(matchAddingSubstate = MatchAddingSubstate.Loading) }
-            val state = state.value
+            _isAdding.value = true
 
-            val tournamentId = state.tournament.id
+            val first = _firstParticipant.value
+            val second = _secondParticipant.value
 
-            val firstParticipantInMatchBody = ParticipantInMatchBody(
-                id = state.firstParticipant.id,
-                displayName = state.firstParticipant.displayName,
-                primaryColor = state.firstParticipant.primaryColor.convertToRgbString(),
-                secondaryColor = state.firstParticipant.secondaryColor?.convertToRgbString()
+            val firstParticipantBody = ParticipantInMatchBody(
+                id = first.id,
+                displayName = first.displayName,
+                primaryColor = first.primaryColor.convertToRgbString(),
+                secondaryColor = first.secondaryColor?.convertToRgbString()
             )
-            val secondParticipantInMatchBody = ParticipantInMatchBody(
-                id = state.secondParticipant.id,
-                displayName = state.secondParticipant.displayName,
-                primaryColor = state.secondParticipant.primaryColor.convertToRgbString(),
-                secondaryColor = state.secondParticipant.secondaryColor?.convertToRgbString()
+            val secondParticipantBody = ParticipantInMatchBody(
+                id = second.id,
+                displayName = second.displayName,
+                primaryColor = second.primaryColor.convertToRgbString(),
+                secondaryColor = second.secondaryColor?.convertToRgbString()
             )
-
-            val regularSetTemplate = state.regularSetTemplate
-
-            val regularSetTemplateId =
-                if (regularSetTemplate == EMPTY_REGULAR_SET_TEMPLATE) null else regularSetTemplate.id
 
             val matchBody = MatchBody(
-                firstParticipant = firstParticipantInMatchBody,
-                secondParticipant = secondParticipantInMatchBody,
-                setsToWin = state.setsToWin,
-                regularSet = regularSetTemplateId,
-                decidingSet = state.decidingSetTemplate.id,
-                themeId = state.selectedTheme?.id ?: "",
+                firstParticipant = firstParticipantBody,
+                secondParticipant = secondParticipantBody,
+                setsToWin = _setsToWin.value,
+                regularSet = _regularSetId.value,
+                decidingSet = _decidingSetId.value ?: "",
+                themeId = _themeId.value ?: "",
             )
 
-            val addMatchResult = matchRepository.addNewMatch(tournamentId = tournamentId, matchBody = matchBody)
-
-            when(addMatchResult){
-                is LoadResult.Success ->{
-                    val newMatch = addMatchResult.result
-
-                    matchRepository.emitNewMatch(newMatch)
-                    reduceState { oldState -> oldState.copy(matchAddingSubstate = MatchAddingSubstate.Success) }
+            matchRepository.addNewMatch(tournamentId = tournamentId, matchBody = matchBody)
+                .doOnSuccess {
+                    _isAdding.value = false
+                    sendAction(AddMatchAction.MatchAdded)
                 }
-                is LoadResult.Error ->{
-                    val errorMessage = addMatchResult.result.message ?: ""
-
-                    reduceState { oldState -> oldState.copy(matchAddingSubstate = MatchAddingSubstate.Error(message = errorMessage)) }
+                .doOnError { throwable ->
+                    _isAdding.value = false
+                    sendAction(AddMatchAction.ShowAddError(throwable.message ?: "Error"))
                 }
-            }
         }
     }
-
-    private fun reduceState(reducer: (AddMatchState) -> AddMatchState) {
-        _state.update(reducer)
-    }
-
 }

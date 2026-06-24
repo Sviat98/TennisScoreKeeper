@@ -4,6 +4,7 @@ import com.bashkevich.tennisscorekeeper.core.remote.LoadResult
 import com.bashkevich.tennisscorekeeper.core.remote.ResponseMessage
 import com.bashkevich.tennisscorekeeper.core.remote.doOnError
 import com.bashkevich.tennisscorekeeper.core.remote.doOnSuccess
+import com.bashkevich.tennisscorekeeper.core.remote.mapError
 import com.bashkevich.tennisscorekeeper.core.remote.mapSuccess
 import com.bashkevich.tennisscorekeeper.model.tournament.domain.Tournament
 import com.bashkevich.tennisscorekeeper.model.tournament.domain.TOURNAMENT_DEFAULT
@@ -25,27 +26,12 @@ class TournamentRepositoryImpl(
     private val tournamentLocalDataSource: TournamentLocalDataSource
 ) : TournamentRepository {
 
-    private val refreshTrigger = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
-
-    override fun fetchTournamentsFlow(): Flow<LoadResult<Unit, Throwable>?> = flow {
-        refreshTrigger.onStart { emit(Unit) }.collect {
-            emit(null)
-            println("refreshTrigger collect")
-            val result = tournamentRemoteDataSource.getTournaments()
-                .doOnSuccess {
-                    tournamentLocalDataSource.replaceAllTournaments(it.map { it.toEntity() })
-                    emit(LoadResult.Success(Unit))
-                }
-                .doOnError {
-                    emit(LoadResult.Error(it))
-                }
-            println("fetchTournamentsFlow result = $result")
-        }
-    }
-
-    override fun refreshTournaments() {
-        println("refreshTournaments tryEmit!!!")
-        refreshTrigger.tryEmit(Unit)
+    override suspend fun fetchTournaments(): LoadResult<Unit, Throwable>{
+        return tournamentRemoteDataSource.getTournaments()
+            .doOnSuccess {
+                tournamentLocalDataSource.replaceAllTournaments(it.map { it.toEntity() })
+            }
+            .mapSuccess {  }
     }
 
     override suspend fun fetchTournamentById(id: String): LoadResult<Unit, Throwable> {
@@ -72,7 +58,9 @@ class TournamentRepositoryImpl(
         return tournamentRemoteDataSource.changeTournamentStatus(
             tournamentId = tournamentId,
             tournamentStatusBody = tournamentStatusBody
-        )
+        ).doOnSuccess {
+            tournamentLocalDataSource.updateStatus(tournamentId, tournamentStatus.name)
+        }
     }
 
     override suspend fun insertTournament(tournament: Tournament) {

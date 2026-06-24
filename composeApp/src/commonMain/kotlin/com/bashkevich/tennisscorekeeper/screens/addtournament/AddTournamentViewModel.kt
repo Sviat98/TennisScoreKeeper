@@ -5,11 +5,8 @@ import androidx.lifecycle.viewModelScope
 import com.bashkevich.tennisscorekeeper.components.set_template.SetComponentState
 import com.bashkevich.tennisscorekeeper.components.theme.ThemeComponentState
 import com.bashkevich.tennisscorekeeper.core.remote.LoadResult
-import com.bashkevich.tennisscorekeeper.core.remote.UnauthorizedException
 import com.bashkevich.tennisscorekeeper.core.remote.doOnError
 import com.bashkevich.tennisscorekeeper.core.remote.doOnSuccess
-import com.bashkevich.tennisscorekeeper.model.set_template.domain.EMPTY_DECIDING_SET_TEMPLATE
-import com.bashkevich.tennisscorekeeper.model.set_template.domain.EMPTY_REGULAR_SET_TEMPLATE
 import com.bashkevich.tennisscorekeeper.model.set_template.domain.SetTemplate
 import com.bashkevich.tennisscorekeeper.model.set_template.domain.SetTemplateTypeFilter
 import com.bashkevich.tennisscorekeeper.model.set_template.repository.SetTemplateRepository
@@ -38,17 +35,16 @@ class AddTournamentViewModel(
     // Form fields
     private val _tournamentType = MutableStateFlow<TournamentType?>(null)
     private val _regularSetSelectedState = MutableStateFlow<SetComponentState.SelectedSetState>(
-        SetComponentState.SelectedSetState.Idle(EMPTY_REGULAR_SET_TEMPLATE)
+        SetComponentState.SelectedSetState.Idle(null)
     )
     private val _decidingSetSelectedState = MutableStateFlow<SetComponentState.SelectedSetState>(
-        SetComponentState.SelectedSetState.Idle(EMPTY_DECIDING_SET_TEMPLATE)
+        SetComponentState.SelectedSetState.Idle(null)
     )
     private val _selectedTheme = MutableStateFlow<ScoreboardTheme?>(null)
     private val _setsToWin = MutableStateFlow(1)
 
     private val _isAdding = MutableStateFlow(false)
 
-    // Network fetch results (null = not started / in progress)
     private val _regularSetTemplatesFetchResult = MutableStateFlow<LoadResult<Unit, Throwable>?>(null)
     private val _decidingSetTemplatesFetchResult = MutableStateFlow<LoadResult<Unit, Throwable>?>(null)
     private val _themesFetchResult = MutableStateFlow<LoadResult<Unit, Throwable>?>(null)
@@ -103,9 +99,6 @@ class AddTournamentViewModel(
         }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), ThemeComponentState.ThemeOptionsState.Idle(emptyList()))
 
-    // Action
-    private val _action = MutableStateFlow<AddTournamentAction?>(null)
-
     // Single state via combine
     override val state: StateFlow<AddTournamentState> = combine(
         _isAdding,
@@ -131,7 +124,7 @@ class AddTournamentViewModel(
                 setOptionsState = decidingSetOptsState,
             ),
             themeComponentState = ThemeComponentState(
-                selectedTheme = ThemeComponentState.SelectedThemeState.Idle(theme ?: ScoreboardTheme.DEFAULT),
+                selectedTheme = ThemeComponentState.SelectedThemeState.Idle(theme),
                 themeOptionsState = themeOptsState,
             ),
             setsToWin = setsToWin,
@@ -142,10 +135,6 @@ class AddTournamentViewModel(
         SharingStarted.WhileSubscribed(5_000),
         AddTournamentState.initial()
     )
-
-    fun consumeAction() {
-        _action.value = null
-    }
 
     fun onEvent(uiEvent: AddTournamentUiEvent) {
         when (uiEvent) {
@@ -170,7 +159,7 @@ class AddTournamentViewModel(
                 if (newSetsToWin < 1) return
                 _setsToWin.value = newSetsToWin
                 if (newSetsToWin < 2) {
-                    _regularSetSelectedState.value = SetComponentState.SelectedSetState.Idle(EMPTY_REGULAR_SET_TEMPLATE)
+                    _regularSetSelectedState.value = SetComponentState.SelectedSetState.Idle(null)
                 }
             }
 
@@ -223,7 +212,7 @@ class AddTournamentViewModel(
     private fun addTournament(
         tournamentName: String,
         tournamentType: TournamentType,
-        defaultSetTemplateId: String,
+        defaultSetTemplateId: String?,
         decidingSetTemplateId: String,
         themeId: String,
         setsToWin: Int,
@@ -241,14 +230,10 @@ class AddTournamentViewModel(
             tournamentRepository.addTournament(addTournamentBody)
                 .doOnSuccess {
                     _isAdding.value = false
-                    _action.value = AddTournamentAction.TournamentAdded
+                    sendAction(AddTournamentAction.TournamentAdded)
                 }.doOnError { throwable ->
                     _isAdding.value = false
-                    if (throwable is UnauthorizedException) {
-                        _action.value = AddTournamentAction.ShowUnauthorizedError
-                    } else {
-                        _action.value = AddTournamentAction.ShowAddError("Не удалось добавить турнир")
-                    }
+                    sendAction(AddTournamentAction.ShowAddError(throwable.message ?: "Не удалось добавить турнир"))
                 }
         }
     }
