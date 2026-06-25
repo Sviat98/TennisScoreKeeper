@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "9570fe11da7d54cf763104c23548d252",
+    "identityHash": "3f451f02867b1b599ffbccc551146602",
     "entities": [
       {
         "tableName": "tournaments",
@@ -203,7 +203,7 @@
       },
       {
         "tableName": "participants",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `tournament_id` TEXT NOT NULL, `seed` INTEGER, `player_id` TEXT NOT NULL, `second_player_id` TEXT, PRIMARY KEY(`id`), FOREIGN KEY(`player_id`) REFERENCES `players`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`second_player_id`) REFERENCES `players`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `tournament_id` TEXT NOT NULL, `seed` INTEGER, `player_id` TEXT NOT NULL, `second_player_id` TEXT, PRIMARY KEY(`id`), FOREIGN KEY(`player_id`) REFERENCES `players`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION , FOREIGN KEY(`second_player_id`) REFERENCES `players`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
         "fields": [
           {
             "fieldPath": "id",
@@ -272,7 +272,7 @@
         "foreignKeys": [
           {
             "table": "players",
-            "onDelete": "CASCADE",
+            "onDelete": "NO ACTION",
             "onUpdate": "NO ACTION",
             "columns": [
               "player_id"
@@ -283,7 +283,7 @@
           },
           {
             "table": "players",
-            "onDelete": "CASCADE",
+            "onDelete": "NO ACTION",
             "onUpdate": "NO ACTION",
             "columns": [
               "second_player_id"
@@ -583,7 +583,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '9570fe11da7d54cf763104c23548d252')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '3f451f02867b1b599ffbccc551146602')"
     ]
   }
 }
