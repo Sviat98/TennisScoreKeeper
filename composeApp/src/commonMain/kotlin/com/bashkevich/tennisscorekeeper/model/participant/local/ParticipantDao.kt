@@ -28,8 +28,16 @@ interface ParticipantDao {
     suspend fun deleteParticipantsByTournament(tournamentId: String)
 
     @Query("DELETE FROM players")
-    // за счет каскада удалятся participants
+    suspend fun deleteAllPlayers()
+
+    @Query("DELETE FROM participants")
     suspend fun deleteAllParticipants()
+
+    @Transaction
+    suspend fun deleteAllParticipantsWithPlayers(){
+        deleteAllParticipants()
+        deleteAllPlayers()
+    }
 
     @Transaction
     suspend fun replaceAllParticipantsForTournament(

@@ -1,6 +1,5 @@
 package com.bashkevich.tennisscorekeeper.model.match.local
 
-import androidx.room3.Transaction
 import androidx.room3.Transactor
 import androidx.room3.useWriterConnection
 import com.bashkevich.tennisscorekeeper.core.local.AppDatabase
@@ -78,7 +77,7 @@ class MatchLocalDataSource(
         db.useWriterConnection {
             it.withTransaction(Transactor.SQLiteTransactionType.IMMEDIATE){
                 matchDao.deleteAllMatches()
-                participantDao.deleteAllParticipants()
+                participantDao.deleteAllParticipantsWithPlayers()
             }
         }
     }

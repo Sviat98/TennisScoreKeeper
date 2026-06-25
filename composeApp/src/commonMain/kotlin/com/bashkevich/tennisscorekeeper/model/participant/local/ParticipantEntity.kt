@@ -21,13 +21,13 @@ import com.bashkevich.tennisscorekeeper.model.player.local.toEntity
             entity = PlayerEntity::class,
             parentColumns = ["id"],
             childColumns = ["player_id"],
-            onDelete = ForeignKey.CASCADE
+            onDelete = ForeignKey.NO_ACTION
         ),
         ForeignKey(
             entity = PlayerEntity::class,
             parentColumns = ["id"],
             childColumns = ["second_player_id"],
-            onDelete = ForeignKey.CASCADE
+            onDelete = ForeignKey.NO_ACTION
         )
     ],
     indices = [
