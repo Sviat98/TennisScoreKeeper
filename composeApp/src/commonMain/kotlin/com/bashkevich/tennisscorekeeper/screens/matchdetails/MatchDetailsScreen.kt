@@ -1,5 +1,6 @@
 package com.bashkevich.tennisscorekeeper.screens.matchdetails
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -12,15 +13,18 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
-
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
-
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.platform.LocalClipboard
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -28,14 +32,16 @@ import com.bashkevich.tennisscorekeeper.LocalAuthorization
 import com.bashkevich.tennisscorekeeper.LocalNavHostController
 import com.bashkevich.tennisscorekeeper.components.MatchDetailsAppBar
 import com.bashkevich.tennisscorekeeper.components.expect.MatchDetailsContentWrapper
-import com.bashkevich.tennisscorekeeper.components.match_details.serve.ChooseServePanel
+import com.bashkevich.tennisscorekeeper.components.expect.setText
 import com.bashkevich.tennisscorekeeper.components.match_details.MatchStatusButton
 import com.bashkevich.tennisscorekeeper.components.match_details.ParticipantsPointsControlPanel
 import com.bashkevich.tennisscorekeeper.components.match_details.RetireParticipantPanel
-import com.bashkevich.tennisscorekeeper.components.expect.setText
+import com.bashkevich.tennisscorekeeper.components.match_details.serve.ChooseServePanel
 import com.bashkevich.tennisscorekeeper.components.scoreboard.match_details.MatchDetailsScoreboardView
+import com.bashkevich.tennisscorekeeper.components.showUnauthorizedActionSnackbar
 import com.bashkevich.tennisscorekeeper.model.match.remote.body.MatchStatus
 import com.bashkevich.tennisscorekeeper.model.match.remote.body.convertToString
+import com.bashkevich.tennisscorekeeper.mvi.LaunchedUiEffectHandler
 import com.bashkevich.tennisscorekeeper.navigation.LoginRoute
 import com.bashkevich.tennisscorekeeper.navigation.ProfileRoute
 import kotlinx.coroutines.launch
@@ -47,15 +53,54 @@ fun MatchDetailsScreen(
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    val navController = LocalNavHostController.current
+
+    LaunchedUiEffectHandler(
+        effect = state.action,
+        onConsume = { viewModel.consumeAction() }
+    ) { currentAction ->
+        when (currentAction) {
+            is MatchDetailsAction.ShowUnauthorizedError ->
+                snackbarHostState.showUnauthorizedActionSnackbar(
+                    navController = navController)
+    }
+}
+
+Box(modifier = Modifier.then(modifier).fillMaxSize()) {
+    SnackbarHost(
+        hostState = snackbarHostState,
+        modifier = Modifier.align(Alignment.TopCenter)
+    )
+
     MatchDetailsContentWrapper(
-        modifier = Modifier.then(modifier).fillMaxSize(),
+        modifier = Modifier.fillMaxSize(),
         state = state,
         onEvent = { viewModel.onEvent(it) }
     )
+
+    if (state.connectionState == ConnectionState.Disconnected) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .clickable(enabled = true, onClick = { })
+                .alpha(0.7f),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = "Connection with scoreboard lost",
+                color = MaterialTheme.colorScheme.error,
+                style = MaterialTheme.typography.titleLarge
+            )
+        }
+    }
+}
 }
 
+// вызывается из MatchDetailsContentWrapper (Desktop/WasmJS)
 @Composable
-fun MatchDetailsContent(
+fun MatchDetailsCommonContent(
     modifier: Modifier = Modifier,
     state: MatchDetailsState,
     onEvent: (MatchDetailsUiEvent) -> Unit
@@ -74,16 +119,16 @@ fun MatchDetailsContent(
             MatchDetailsAppBar(
                 matchId = match.id,
                 onBack = { navController.navigateUp() },
-                onCopyLink = { link->
+                onCopyLink = { link ->
                     scope.launch {
                         clipboard.setText(link)
                     }
                 },
                 isAuthorized = isAuthorized,
                 onNavigateToLoginOrProfile = {
-                    if (isAuthorized){
+                    if (isAuthorized) {
                         navController.navigate(ProfileRoute)
-                    }else{
+                    } else {
                         navController.navigate(LoginRoute)
                     }
                 }
@@ -91,8 +136,9 @@ fun MatchDetailsContent(
         }
     ) { paddingValues ->
         Box(
-            modifier = Modifier.fillMaxWidth().padding(paddingValues).padding(all = 16.dp).verticalScroll(state = rememberScrollState())
-        ){
+            modifier = Modifier.fillMaxWidth().padding(paddingValues).padding(all = 16.dp)
+                .verticalScroll(state = rememberScrollState())
+        ) {
             Column(
                 modifier = Modifier.widthIn(max = 600.dp).fillMaxWidth().align(Alignment.Center),
                 verticalArrangement = Arrangement.SpaceAround,
@@ -107,7 +153,13 @@ fun MatchDetailsContent(
 
                 MatchStatusButton(
                     match = match,
-                    onStatusChange = { status -> onEvent(MatchDetailsUiEvent.ChangeMatchStatus(status = status)) }
+                    onStatusChange = { status ->
+                        onEvent(
+                            MatchDetailsUiEvent.ChangeMatchStatus(
+                                status = status
+                            )
+                        )
+                    }
                 )
 
                 when (match.status) {

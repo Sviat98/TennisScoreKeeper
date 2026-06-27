@@ -27,6 +27,7 @@ import com.bashkevich.tennisscorekeeper.components.AddTournamentAppBar
 import com.bashkevich.tennisscorekeeper.components.add_match.MatchScoringAndThemeSettingsBlock
 import com.bashkevich.tennisscorekeeper.components.add_tournament.TournamentNameAndTypeComponent
 import com.bashkevich.tennisscorekeeper.components.set_template.SetComponentState
+import com.bashkevich.tennisscorekeeper.components.showUnauthorizedActionSnackbar
 import com.bashkevich.tennisscorekeeper.components.theme.ThemeComponentState
 import com.bashkevich.tennisscorekeeper.mvi.LaunchedUiEffectHandler
 import com.bashkevich.tennisscorekeeper.navigation.LoginRoute
@@ -49,6 +50,12 @@ fun AddTournamentScreen(
         when (action) {
             is AddTournamentAction.TournamentAdded -> {
                 navController.navigateUp()
+            }
+
+            is AddTournamentAction.ShowUnauthorizedActionError -> {
+                snackbarHostState.showUnauthorizedActionSnackbar(
+                    navController = navController
+                )
             }
 
             is AddTournamentAction.ShowAddError -> {
@@ -89,9 +96,12 @@ fun AddTournamentContent(
 ) {
     val tournamentType = state.tournamentType
 
-    val regularSetTemplate = (state.regularSetComponentState.selectedSetState as? SetComponentState.SelectedSetState.Idle)?.setTemplate
-    val decidingSetTemplate = (state.decidingSetComponentState.selectedSetState as? SetComponentState.SelectedSetState.Idle)?.setTemplate
-    val selectedTheme = (state.themeComponentState.selectedTheme as? ThemeComponentState.SelectedThemeState.Idle)?.theme
+    val regularSetTemplate =
+        (state.regularSetComponentState.selectedSetState as? SetComponentState.SelectedSetState.Idle)?.setTemplate
+    val decidingSetTemplate =
+        (state.decidingSetComponentState.selectedSetState as? SetComponentState.SelectedSetState.Idle)?.setTemplate
+    val selectedTheme =
+        (state.themeComponentState.selectedTheme as? ThemeComponentState.SelectedThemeState.Idle)?.theme
 
     Scaffold(
         modifier = modifier,

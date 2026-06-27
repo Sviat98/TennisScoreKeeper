@@ -82,4 +82,5 @@ data class AddMatchState(
 sealed class AddMatchAction : UiAction {
     data object MatchAdded : AddMatchAction()
     data class ShowAddError(val message: String) : AddMatchAction()
+    data object ShowUnauthorizedActionError : AddMatchAction()
 }

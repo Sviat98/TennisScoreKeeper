@@ -8,6 +8,7 @@ import com.bashkevich.tennisscorekeeper.components.set_template.SetComponentStat
 import com.bashkevich.tennisscorekeeper.components.theme.ThemeComponentState
 import com.bashkevich.tennisscorekeeper.core.combine
 import com.bashkevich.tennisscorekeeper.core.remote.LoadResult
+import com.bashkevich.tennisscorekeeper.core.remote.UnauthorizedActionException
 import com.bashkevich.tennisscorekeeper.core.remote.doOnError
 import com.bashkevich.tennisscorekeeper.core.remote.doOnSuccess
 import com.bashkevich.tennisscorekeeper.mvi.BaseViewModel
@@ -573,10 +574,19 @@ class AddMatchViewModel(
                     _isAdding.value = false
                     sendAction(AddMatchAction.MatchAdded)
                 }
-                .doOnError { throwable ->
+                .doOnError {
                     _isAdding.value = false
-                    sendAction(AddMatchAction.ShowAddError(throwable.message ?: "Error"))
+                    handleError(it)
                 }
+        }
+    }
+
+    private fun handleError(e: Throwable) {
+        when (e) {
+            is UnauthorizedActionException ->
+                sendAction(AddMatchAction.ShowUnauthorizedActionError)
+            else ->
+                sendAction(AddMatchAction.ShowAddError(e.message ?: "Error"))
         }
     }
 }

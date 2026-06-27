@@ -19,6 +19,7 @@ import com.bashkevich.tennisscorekeeper.LocalNavHostController
 import com.bashkevich.tennisscorekeeper.components.AddMatchAppBar
 import com.bashkevich.tennisscorekeeper.components.add_match.AddMatchComponent
 import com.bashkevich.tennisscorekeeper.mvi.LaunchedUiEffectHandler
+import com.bashkevich.tennisscorekeeper.components.showUnauthorizedActionSnackbar
 import com.bashkevich.tennisscorekeeper.navigation.LoginRoute
 import com.bashkevich.tennisscorekeeper.navigation.ProfileRoute
 
@@ -39,6 +40,11 @@ fun AddMatchScreen(
         when (action) {
             is AddMatchAction.MatchAdded -> {
                 navController.navigateUp()
+            }
+            is AddMatchAction.ShowUnauthorizedActionError -> {
+                snackbarHostState.showUnauthorizedActionSnackbar(
+                    navController = navController
+                )
             }
             is AddMatchAction.ShowAddError -> {
                 snackbarHostState.showSnackbar(message = action.message)

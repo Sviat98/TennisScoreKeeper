@@ -11,9 +11,12 @@ import com.bashkevich.tennisscorekeeper.mvi.UiEvent
 import com.bashkevich.tennisscorekeeper.mvi.UiState
 
 
+enum class ConnectionState {
+    Loading, Connected, Disconnected
+}
+
 @Immutable
 sealed class MatchDetailsUiEvent : UiEvent {
-    class ShowMatch(val match: Match) : MatchDetailsUiEvent()
     class SetFirstParticipantToServe(val participantId: String) :
         MatchDetailsUiEvent()
 
@@ -37,7 +40,10 @@ sealed class MatchDetailsUiEvent : UiEvent {
 
 @Immutable
 data class MatchDetailsState(
-    val match: Match
+    val match: Match,
+    val connectionState: ConnectionState = ConnectionState.Loading,
+    val error: Throwable? = null,
+    val action: MatchDetailsAction? = null
 ) : UiState {
     companion object {
         fun initial() = MatchDetailsState(
@@ -48,5 +54,5 @@ data class MatchDetailsState(
 
 @Immutable
 sealed class MatchDetailsAction : UiAction {
-
+    data object ShowUnauthorizedError : MatchDetailsAction()
 }
