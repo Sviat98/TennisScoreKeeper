@@ -3,56 +3,69 @@ package com.bashkevich.tennisscorekeeper.screens.matchdetails
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
-import com.bashkevich.tennisscorekeeper.core.remote.LoadResult
+import com.bashkevich.tennisscorekeeper.core.remote.doOnError
+import com.bashkevich.tennisscorekeeper.core.remote.doOnSuccess
+import com.bashkevich.tennisscorekeeper.core.remote.UnauthorizedActionException
+import com.bashkevich.tennisscorekeeper.model.match.domain.SAMPLE_MATCH
 import com.bashkevich.tennisscorekeeper.model.match.remote.body.MatchStatus
 import com.bashkevich.tennisscorekeeper.model.match.remote.body.ScoreType
 import com.bashkevich.tennisscorekeeper.model.match.repository.MatchRepository
+import com.bashkevich.tennisscorekeeper.model.theme.repository.ThemeRepository
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
+
 import com.bashkevich.tennisscorekeeper.mvi.BaseViewModel
 import com.bashkevich.tennisscorekeeper.navigation.MatchDetailsRoute
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.launch
 
 class MatchDetailsViewModel(
     savedStateHandle: SavedStateHandle,
-    private val matchRepository: MatchRepository
+    private val matchRepository: MatchRepository,
+    private val themeRepository: ThemeRepository
 ) :
     BaseViewModel<MatchDetailsState, MatchDetailsUiEvent, MatchDetailsAction>() {
+    private val matchId: String = savedStateHandle.toRoute<MatchDetailsRoute>().id
 
-    private val _state = MutableStateFlow(MatchDetailsState.initial())
-    override val state: StateFlow<MatchDetailsState>
-        get() = _state.asStateFlow()
+    private val _connectionState = MutableStateFlow(ConnectionState.Loading)
 
     init {
-        val matchId = savedStateHandle.toRoute<MatchDetailsRoute>().id
-
-        matchRepository.connectToMatchUpdates(matchId = matchId)
-
         viewModelScope.launch {
-            matchRepository.observeMatchUpdates().distinctUntilChanged().collect { result ->
-                println("match result = $result")
-                when (result) {
-                    is LoadResult.Success -> {
-                        reduceState { oldState -> oldState.copy(match = result.result) }
-                    }
-
-                    is LoadResult.Error -> {
-                        println(result.result.message)
-                    }
-                }
+            themeRepository.observeThemeByIdFromDatabase(1.toString()).collect {
+                println(it)
             }
         }
     }
 
-    fun onEvent(uiEvent: MatchDetailsUiEvent) {
-        // some feature-specific logic
-        when (uiEvent) {
-            is MatchDetailsUiEvent.ShowMatch -> {
-            }
+    private val networkUpdates = matchRepository.observeMatchUpdatesFromNetwork(matchId)
+        .onEach { result ->
+            result
+                .doOnSuccess { _connectionState.value = ConnectionState.Connected }
+                .doOnError { _connectionState.value = ConnectionState.Disconnected }
+        }
 
+    override val state: StateFlow<MatchDetailsState> = combine(
+        networkUpdates,
+        matchRepository.observeMatchById(matchId),
+        _connectionState,
+        _action
+    ) { _, match, connectionState, action ->
+        MatchDetailsState(
+            match = match ?: SAMPLE_MATCH,
+            connectionState = connectionState,
+            action = action
+        )
+    }.stateIn(
+        viewModelScope,
+        SharingStarted.WhileSubscribed(5_000),
+        MatchDetailsState.initial()
+    )
+
+    fun onEvent(uiEvent: MatchDetailsUiEvent) {
+        when (uiEvent) {
             is MatchDetailsUiEvent.UpdateScore -> updateMatchScore(
                 participantId = uiEvent.participantId,
                 scoreType = uiEvent.scoreType
@@ -65,7 +78,7 @@ class MatchDetailsViewModel(
             is MatchDetailsUiEvent.SetFirstPlayerInPairToServe -> setFirstPlayerInPairToServe(
                 playerId = uiEvent.playerId
             )
-            is MatchDetailsUiEvent.SetParticipantRetired-> setParticipantRetired(
+            is MatchDetailsUiEvent.SetParticipantRetired -> setParticipantRetired(
                 participantId = uiEvent.participantId
             )
             is MatchDetailsUiEvent.ChangeMatchStatus -> changeMatchStatus(status = uiEvent.status)
@@ -79,99 +92,110 @@ class MatchDetailsViewModel(
 
     private fun updateMatchScore(participantId: String, scoreType: ScoreType) {
         viewModelScope.launch {
-            val state = state.value
-
-            val matchId = state.match.id
+            val matchId = state.value.match.id
             matchRepository.updateMatchScore(
                 matchId = matchId,
                 participantId = participantId,
                 scoreType = scoreType
-            )
+            ).doOnError { error ->
+                handleError(error)
+            }
         }
     }
 
     private fun setFirstParticipantToServe(participantId: String) {
         viewModelScope.launch {
-            val state = state.value
-
-            val matchId = state.match.id
+            val matchId = state.value.match.id
             matchRepository.setFirstParticipantToServe(
                 matchId = matchId,
                 participantId = participantId,
-            )
+            ).doOnError { error ->
+                handleError(error)
+            }
         }
     }
 
     private fun setFirstPlayerInPairToServe(playerId: String) {
         viewModelScope.launch {
-            val state = state.value
-
-            val matchId = state.match.id
+            val matchId = state.value.match.id
             matchRepository.setFirstPlayerInPairToServe(
                 matchId = matchId,
                 playerId = playerId,
-            )
+            ).doOnError { error ->
+                handleError(error)
+            }
         }
     }
 
     private fun setParticipantRetired(participantId: String) {
         viewModelScope.launch {
-            val state = state.value
-
-            val matchId = state.match.id
+            val matchId = state.value.match.id
             matchRepository.setParticipantRetired(
                 matchId = matchId,
                 participantId = participantId,
-            )
-        }    }
+            ).doOnError { error ->
+                handleError(error)
+            }
+        }
+    }
 
     private fun changeMatchStatus(status: MatchStatus) {
         viewModelScope.launch {
-            val state = state.value
-
-            val matchId = state.match.id
+            val matchId = state.value.match.id
             matchRepository.setMatchStatus(
                 matchId = matchId,
                 status = status,
-            )
+            ).doOnError { error ->
+                handleError(error)
+            }
         }
     }
 
-    private fun undoPoint(){
+    private fun undoPoint() {
         viewModelScope.launch {
-            val state = state.value
-
-            val matchId = state.match.id
+            val matchId = state.value.match.id
             matchRepository.undoPoint(
                 matchId = matchId,
-            )
+            ).doOnError { error ->
+                handleError(error)
+            }
         }
     }
 
-    private fun redoPoint(){
+    private fun redoPoint() {
         viewModelScope.launch {
-            val state = state.value
-
-            val matchId = state.match.id
+            val matchId = state.value.match.id
             matchRepository.redoPoint(
                 matchId = matchId,
-            )
+            ).doOnError { error ->
+                handleError(error)
+            }
         }
     }
+
     private fun attachVideoLink(videoLink: String) {
         viewModelScope.launch {
-            val state = state.value
-
-            val matchId = state.match.id
+            val matchId = state.value.match.id
             matchRepository.attachVideoLink(
                 matchId = matchId,
                 videoLink = videoLink
-            )
+            ).doOnError { error ->
+                handleError(error)
+            }
         }
     }
 
-    private fun reduceState(reducer: (MatchDetailsState) -> MatchDetailsState) {
-        _state.update(reducer)
+    private fun handleError(e: Throwable){
+        println("e = $e")
+        if (e is UnauthorizedActionException) {
+            sendAction(MatchDetailsAction.ShowUnauthorizedError)
+        }
     }
 
+    override fun onCleared() {
+        super.onCleared()
+        viewModelScope.launch {
+            matchRepository.closeSession()
+        }
+    }
 }

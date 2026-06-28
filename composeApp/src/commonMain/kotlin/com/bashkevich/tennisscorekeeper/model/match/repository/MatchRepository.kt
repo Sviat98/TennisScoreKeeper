@@ -1,6 +1,7 @@
 package com.bashkevich.tennisscorekeeper.model.match.repository
 
 import com.bashkevich.tennisscorekeeper.core.remote.LoadResult
+import com.bashkevich.tennisscorekeeper.core.remote.ResponseMessage
 import com.bashkevich.tennisscorekeeper.model.match.domain.Match
 import com.bashkevich.tennisscorekeeper.model.match.domain.ShortMatch
 import com.bashkevich.tennisscorekeeper.model.match.remote.MatchBody
@@ -14,23 +15,21 @@ interface MatchRepository {
 
     suspend fun getMatchesForTournament(tournamentId: String): LoadResult<List<ShortMatch>, Throwable>
     suspend fun closeSession()
-    fun connectToMatchUpdates(matchId: String)
-    fun observeMatchUpdates(): Flow<LoadResult<Match, Throwable>>
-    suspend fun updateMatchScore(matchId: String, participantId: String, scoreType: ScoreType)
-    suspend fun undoPoint(matchId: String)
-    suspend fun redoPoint(matchId: String)
-    suspend fun attachVideoLink(matchId: String, videoLink: String)
-    suspend fun setFirstParticipantToServe(matchId: String,participantId: String)
-    suspend fun setFirstPlayerInPairToServe(matchId: String,playerId: String)
-    suspend fun setParticipantRetired(matchId: String, participantId: String)
-    suspend fun setMatchStatus(matchId: String,status: MatchStatus)
+    fun observeMatchById(matchId: String): Flow<Match?>
+    fun observeMatchUpdatesFromNetwork(matchId: String): Flow<LoadResult<Match, Throwable>>
+
+    suspend fun updateMatchScore(matchId: String, participantId: String, scoreType: ScoreType): LoadResult<ResponseMessage, Throwable>
+    suspend fun undoPoint(matchId: String): LoadResult<ResponseMessage, Throwable>
+    suspend fun redoPoint(matchId: String): LoadResult<ResponseMessage, Throwable>
+    suspend fun attachVideoLink(matchId: String, videoLink: String): LoadResult<ResponseMessage, Throwable>
+    suspend fun setFirstParticipantToServe(matchId: String, participantId: String): LoadResult<ResponseMessage, Throwable>
+    suspend fun setFirstPlayerInPairToServe(matchId: String, playerId: String): LoadResult<ResponseMessage, Throwable>
+    suspend fun setParticipantRetired(matchId: String, participantId: String): LoadResult<ResponseMessage, Throwable>
+    suspend fun setMatchStatus(matchId: String, status: MatchStatus): LoadResult<ResponseMessage, Throwable>
 
     suspend fun deleteAllMatchesFromDb()
-    fun emitNewMatch(newMatch: ShortMatch)
     suspend fun addNewMatch(
         tournamentId: String,
         matchBody: MatchBody
-    ): LoadResult<ShortMatch, Throwable>
-
-    fun observeNewMatch(): Flow<ShortMatch>
+    ): LoadResult<Unit, Throwable>
 }

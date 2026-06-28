@@ -66,4 +66,5 @@ data class AddTournamentState(
 sealed class AddTournamentAction : UiAction {
     data object TournamentAdded : AddTournamentAction()
     data class ShowAddError(val message: String) : AddTournamentAction()
+    data object ShowUnauthorizedActionError : AddTournamentAction()
 }

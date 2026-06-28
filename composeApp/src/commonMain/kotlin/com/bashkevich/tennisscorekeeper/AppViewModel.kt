@@ -31,7 +31,7 @@ class AppViewModel(
         }
 
         viewModelScope.launch {
-            matchRepository.deleteAllMatchesFromDb()
+            //matchRepository.deleteAllMatchesFromDb()
         }
 
         viewModelScope.launch {

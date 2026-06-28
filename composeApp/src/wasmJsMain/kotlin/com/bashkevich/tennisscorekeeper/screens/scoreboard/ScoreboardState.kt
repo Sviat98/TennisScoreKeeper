@@ -3,19 +3,19 @@ package com.bashkevich.tennisscorekeeper.screens.scoreboard
 import androidx.compose.runtime.Immutable
 import com.bashkevich.tennisscorekeeper.model.match.domain.Match
 import com.bashkevich.tennisscorekeeper.model.match.domain.SAMPLE_MATCH
+import com.bashkevich.tennisscorekeeper.screens.matchdetails.ConnectionState
 
 import com.bashkevich.tennisscorekeeper.mvi.UiAction
 import com.bashkevich.tennisscorekeeper.mvi.UiEvent
 import com.bashkevich.tennisscorekeeper.mvi.UiState
 
 @Immutable
-sealed class ScoreboardUiEvent : UiEvent {
-    data class ShowMatch(val match: Match) : ScoreboardUiEvent()
-}
+sealed class ScoreboardUiEvent : UiEvent
 
 @Immutable
 data class ScoreboardState(
-    val match: Match
+    val match: Match,
+    val connectionState: ConnectionState = ConnectionState.Loading
 ) : UiState {
     companion object {
         fun initial() = ScoreboardState(
