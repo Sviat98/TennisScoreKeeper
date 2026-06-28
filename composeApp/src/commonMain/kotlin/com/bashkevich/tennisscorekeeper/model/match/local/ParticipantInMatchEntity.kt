@@ -4,7 +4,10 @@ import androidx.room3.ColumnInfo
 import androidx.room3.Entity
 import androidx.room3.ForeignKey
 import androidx.room3.Index
+import com.bashkevich.tennisscorekeeper.model.match.remote.MatchDto
 import com.bashkevich.tennisscorekeeper.model.match.remote.ShortMatchDto
+import com.bashkevich.tennisscorekeeper.model.participant.remote.ParticipantInDoublesMatchDto
+import com.bashkevich.tennisscorekeeper.model.participant.remote.ParticipantInMatchDto
 import com.bashkevich.tennisscorekeeper.model.participant.remote.ParticipantInShortMatchDto
 
 @Entity(
@@ -59,6 +62,29 @@ fun ParticipantInShortMatchDto.toEntity(matchId: String) = ParticipantInMatchEnt
 )
 
 fun ShortMatchDto.toParticipantInMatchEntities(): List<ParticipantInMatchEntity> {
+    return listOf(
+        firstParticipant.toEntity(matchId = id),
+        secondParticipant.toEntity(matchId = id),
+    )
+}
+
+fun ParticipantInMatchDto.toEntity(matchId: String): ParticipantInMatchEntity = ParticipantInMatchEntity(
+    matchId = matchId,
+    participantId = id,
+    seed = seed,
+    displayName = displayName,
+    primaryColor = primaryColor,
+    secondaryColor = secondaryColor,
+    isServing = isServing,
+    isWinner = isWinner,
+    isRetired = isRetired,
+    servingPlayerId = when (this) {
+        is ParticipantInDoublesMatchDto -> servingPlayerId
+        else -> null
+    },
+)
+
+fun MatchDto.toParticipantInMatchEntities(): List<ParticipantInMatchEntity> {
     return listOf(
         firstParticipant.toEntity(matchId = id),
         secondParticipant.toEntity(matchId = id),

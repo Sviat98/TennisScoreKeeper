@@ -4,6 +4,7 @@ import androidx.room3.ColumnInfo
 import androidx.room3.Entity
 import androidx.room3.ForeignKey
 import androidx.room3.PrimaryKey
+import com.bashkevich.tennisscorekeeper.model.match.remote.MatchDto
 import com.bashkevich.tennisscorekeeper.model.match.remote.ShortMatchDto
 
 @Entity(
@@ -28,6 +29,15 @@ data class MatchGameEntity(
 )
 
 fun ShortMatchDto.toMatchGameEntity(): MatchGameEntity? {
+    val game = currentGame ?: return null
+    return MatchGameEntity(
+        matchId = id,
+        firstParticipantPoints = game.firstParticipantPoints,
+        secondParticipantPoints = game.secondParticipantPoints,
+    )
+}
+
+fun MatchDto.toMatchGameEntity(): MatchGameEntity? {
     val game = currentGame ?: return null
     return MatchGameEntity(
         matchId = id,

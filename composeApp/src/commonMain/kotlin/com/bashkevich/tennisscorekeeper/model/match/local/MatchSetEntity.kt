@@ -3,6 +3,7 @@ package com.bashkevich.tennisscorekeeper.model.match.local
 import androidx.room3.ColumnInfo
 import androidx.room3.Entity
 import androidx.room3.ForeignKey
+import com.bashkevich.tennisscorekeeper.model.match.remote.MatchDto
 import com.bashkevich.tennisscorekeeper.model.match.remote.ShortMatchDto
 import com.bashkevich.tennisscorekeeper.model.match.remote.TennisSetDto
 
@@ -40,6 +41,17 @@ fun TennisSetDto.toMatchSetEntity(matchId: String, setNumber: Int, isCurrent: Bo
 )
 
 fun ShortMatchDto.toMatchSetEntities(): List<MatchSetEntity> {
+    val entities = mutableListOf<MatchSetEntity>()
+    previousSets.forEachIndexed { index, setDto ->
+        entities.add(setDto.toMatchSetEntity(matchId = id, setNumber = index + 1, isCurrent = false))
+    }
+    currentSet?.let {
+        entities.add(it.toMatchSetEntity(matchId = id, setNumber = previousSets.size + 1, isCurrent = true))
+    }
+    return entities
+}
+
+fun MatchDto.toMatchSetEntities(): List<MatchSetEntity> {
     val entities = mutableListOf<MatchSetEntity>()
     previousSets.forEachIndexed { index, setDto ->
         entities.add(setDto.toMatchSetEntity(matchId = id, setNumber = index + 1, isCurrent = false))

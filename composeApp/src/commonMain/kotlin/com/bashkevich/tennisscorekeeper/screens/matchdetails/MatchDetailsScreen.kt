@@ -61,6 +61,7 @@ fun MatchDetailsScreen(
         effect = state.action,
         onConsume = { viewModel.consumeAction() }
     ) { currentAction ->
+        println("action = $currentAction")
         when (currentAction) {
             is MatchDetailsAction.ShowUnauthorizedError ->
                 snackbarHostState.showUnauthorizedActionSnackbar(
@@ -69,14 +70,10 @@ fun MatchDetailsScreen(
 }
 
 Box(modifier = Modifier.then(modifier).fillMaxSize()) {
-    SnackbarHost(
-        hostState = snackbarHostState,
-        modifier = Modifier.align(Alignment.TopCenter)
-    )
-
     MatchDetailsContentWrapper(
         modifier = Modifier.fillMaxSize(),
         state = state,
+        snackbarHostState = snackbarHostState,
         onEvent = { viewModel.onEvent(it) }
     )
 
@@ -103,6 +100,7 @@ Box(modifier = Modifier.then(modifier).fillMaxSize()) {
 fun MatchDetailsCommonContent(
     modifier: Modifier = Modifier,
     state: MatchDetailsState,
+    snackbarHostState: SnackbarHostState,
     onEvent: (MatchDetailsUiEvent) -> Unit
 ) {
     val navController = LocalNavHostController.current
@@ -115,6 +113,7 @@ fun MatchDetailsCommonContent(
     val scope = rememberCoroutineScope()
     Scaffold(
         modifier = Modifier.then(modifier),
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             MatchDetailsAppBar(
                 matchId = match.id,

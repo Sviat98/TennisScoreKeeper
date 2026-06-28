@@ -34,6 +34,7 @@ import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
+import kotlin.time.Duration.Companion.milliseconds
 
 class MatchRemoteDataSource(
     private val httpClient: HttpClient
@@ -221,7 +222,7 @@ class MatchRemoteDataSource(
                 } catch (e: Exception) {
                     _matchFlow.emit(LoadResult.Error(e))
                 }
-                delay(reconnectionTime)
+                delay(reconnectionTime.milliseconds)
             }
         }
     }

@@ -22,6 +22,8 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.ScaffoldDefaults
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -70,6 +72,7 @@ val LocalFullScreenState = compositionLocalOf<FullScreenState> {
 actual fun MatchDetailsContentWrapper(
     modifier: Modifier,
     state: MatchDetailsState,
+    snackbarHostState: SnackbarHostState,
     onEvent: (MatchDetailsUiEvent) -> Unit
 ) {
     val navController = LocalNavHostController.current
@@ -157,6 +160,7 @@ actual fun MatchDetailsContentWrapper(
     ) {
         Scaffold(
             modifier = Modifier.then(modifier),
+            snackbarHost = { SnackbarHost(snackbarHostState) },
             topBar = {
                 if (!isFullScreen) {
                     MatchDetailsAppBar(

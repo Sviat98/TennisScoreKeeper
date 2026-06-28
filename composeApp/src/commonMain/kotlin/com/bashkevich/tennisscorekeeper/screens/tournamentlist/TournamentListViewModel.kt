@@ -18,6 +18,10 @@ class TournamentListViewModel(
 
     private val _isRefreshing = MutableStateFlow(false)
 
+    init {
+        println("TournamentListViewModel INIT")
+    }
+
     private val _networkAndTournaments = combine(
         refreshTournamentList.fetchTournamentsFlow(),
         tournamentRepository.observeTournaments()

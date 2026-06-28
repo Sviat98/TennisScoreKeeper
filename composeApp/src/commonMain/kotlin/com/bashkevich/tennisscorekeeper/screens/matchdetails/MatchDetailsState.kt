@@ -42,7 +42,6 @@ sealed class MatchDetailsUiEvent : UiEvent {
 data class MatchDetailsState(
     val match: Match,
     val connectionState: ConnectionState = ConnectionState.Loading,
-    val error: Throwable? = null,
     val action: MatchDetailsAction? = null
 ) : UiState {
     companion object {

@@ -3,12 +3,10 @@ package com.bashkevich.tennisscorekeeper.model.match.local
 import androidx.room3.Transactor
 import androidx.room3.useWriterConnection
 import com.bashkevich.tennisscorekeeper.core.local.AppDatabase
-import com.bashkevich.tennisscorekeeper.model.match.domain.ShortMatch
 import com.bashkevich.tennisscorekeeper.model.match.remote.ShortMatchDto
 import com.bashkevich.tennisscorekeeper.model.participant.local.ParticipantDao
 import com.bashkevich.tennisscorekeeper.model.participant.local.toEntity
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
 
 class MatchLocalDataSource(
     private val db: AppDatabase
@@ -17,10 +15,12 @@ class MatchLocalDataSource(
     private val participantDao: ParticipantDao = db.participantDao()
 
 
-    fun observeMatches(tournamentId: String): Flow<List<ShortMatch>> {
-        return matchDao.getMatchesForTournament(tournamentId).map { matches ->
-            matches.map { it.toDomain() }
-        }
+    fun observeMatches(tournamentId: String): Flow<List<MatchWithParticipantsEntity>> {
+        return matchDao.getMatchesForTournament(tournamentId)
+    }
+
+    fun observeMatchById(matchId: String): Flow<MatchWithParticipantsEntity?> {
+        return matchDao.observeMatchById(matchId)
     }
 
     suspend fun replaceMatchesForTournament(tournamentId: String, dtos: List<ShortMatchDto>) {
@@ -38,6 +38,11 @@ class MatchLocalDataSource(
 
         db.useWriterConnection {
             it.withTransaction(Transactor.SQLiteTransactionType.IMMEDIATE){
+                // полное удаление матчей и участников всех турниров
+                // (чтобы матчи и участники были загружены только для одного просматриваемого турнира)
+                matchDao.deleteAllMatches()
+                participantDao.deleteAllParticipantsWithPlayers()
+                // конец удаления
                 participantDao.insertPlayers(players)
                 participantDao.insertParticipants(participantWithPlayers.map { it.participant })
                 matchDao.replaceAllMatchesForTournament(
@@ -78,6 +83,28 @@ class MatchLocalDataSource(
             it.withTransaction(Transactor.SQLiteTransactionType.IMMEDIATE){
                 matchDao.deleteAllMatches()
                 participantDao.deleteAllParticipantsWithPlayers()
+            }
+        }
+    }
+
+    suspend fun getMatchById(matchId: String): MatchEntity? {
+        return matchDao.getMatchById(matchId)
+    }
+
+    suspend fun updateMatchDetails(
+        match: MatchEntity,
+        sets: List<MatchSetEntity>,
+        game: MatchGameEntity?,
+        participants: List<ParticipantInMatchEntity>
+    ) {
+        db.useWriterConnection {
+            it.withTransaction(Transactor.SQLiteTransactionType.IMMEDIATE) {
+                matchDao.updateMatch(match)
+                matchDao.insertMatchSets(sets)
+                if (game != null) {
+                    matchDao.insertMatchGames(listOf(game))
+                }
+                matchDao.insertParticipantsInMatch(participants)
             }
         }
     }
