@@ -13,4 +13,5 @@ interface ParticipantRepository {
     ): LoadResult<List<TennisParticipant>, Throwable>
     suspend fun fetchParticipantsForTournament(tournamentId: String): LoadResult<Unit, Throwable>
     fun observeParticipantsForTournament(tournamentId: String): Flow<List<TennisParticipant>>
+    suspend fun deleteParticipantsForTournament(tournamentId: String)
 }

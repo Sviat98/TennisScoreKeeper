@@ -13,6 +13,10 @@ class ParticipantLocalDataSource(
         return dao.getParticipantsForTournament(tournamentId)
     }
 
+    suspend fun deleteParticipantsForTournament(tournamentId: String) {
+        dao.deleteParticipantsByTournament(tournamentId)
+    }
+
     suspend fun replaceParticipantsForTournament(tournamentId: String, dtos: List<ParticipantDto>) {
         val entities = dtos.map { it.toEntity(tournamentId) }
         dao.replaceAllParticipantsForTournament(tournamentId, entities)

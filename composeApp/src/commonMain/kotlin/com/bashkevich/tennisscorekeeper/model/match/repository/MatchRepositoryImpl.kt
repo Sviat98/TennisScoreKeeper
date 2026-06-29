@@ -153,6 +153,10 @@ class MatchRepositoryImpl(
         )
     }
 
+    override suspend fun deleteMatchesForTournament(tournamentId: String) {
+        matchLocalDataSource.deleteMatchesForTournament(tournamentId)
+    }
+
     override suspend fun deleteAllMatchesFromDb() {
         matchLocalDataSource.deleteAllMatches()
     }
