@@ -13,6 +13,9 @@ import com.bashkevich.tennisscorekeeper.model.tournament.domain.Tournament
 import com.bashkevich.tennisscorekeeper.model.tournament.remote.TournamentStatus
 import com.bashkevich.tennisscorekeeper.model.tournament.repository.TournamentRepository
 import com.bashkevich.tennisscorekeeper.model.match.repository.MatchRepository
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -241,10 +244,12 @@ class TournamentViewModel(
     }
 
     override fun onCleared() {
-        viewModelScope.launch {
-            println("onCleared TRIGGER")
-            matchRepository.deleteMatchesForTournament(tournamentId)
-            participantRepository.deleteParticipantsForTournament(tournamentId)
+        CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate).launch {
+            runCatching {
+                println("onCLeared TRIGGER")
+                matchRepository.deleteMatchesForTournament(tournamentId)
+                participantRepository.deleteParticipantsForTournament(tournamentId)
+            }
         }
         super.onCleared()
     }
