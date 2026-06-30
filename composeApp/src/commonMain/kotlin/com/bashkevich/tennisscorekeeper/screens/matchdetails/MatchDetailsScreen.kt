@@ -59,6 +59,7 @@ fun MatchDetailsScreen(
 
     LaunchedUiEffectHandler(
         effect = state.action,
+        onDismissSnackbar = { snackbarHostState.currentSnackbarData?.dismiss() },
         onConsume = { viewModel.consumeAction() }
     ) { currentAction ->
         println("action = $currentAction")

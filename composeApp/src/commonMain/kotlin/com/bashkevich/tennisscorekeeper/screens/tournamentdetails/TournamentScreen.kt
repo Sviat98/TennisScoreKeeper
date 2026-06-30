@@ -86,6 +86,7 @@ private fun TournamentContent(
 
     LaunchedUiEffectHandler(
         effect = action,
+        onDismissSnackbar = { snackbarHostState.currentSnackbarData?.dismiss() },
         onConsume = onConsumeAction
     ) { currentAction ->
         when (currentAction) {

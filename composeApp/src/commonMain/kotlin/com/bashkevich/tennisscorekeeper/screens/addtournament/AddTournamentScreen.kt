@@ -45,6 +45,7 @@ fun AddTournamentScreen(
 
     LaunchedUiEffectHandler(
         effect = state.action,
+        onDismissSnackbar = { snackbarHostState.currentSnackbarData?.dismiss() },
         onConsume = { viewModel.consumeAction() }
     ) { action ->
         when (action) {
