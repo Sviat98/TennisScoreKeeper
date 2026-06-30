@@ -13,6 +13,9 @@ import com.bashkevich.tennisscorekeeper.model.tournament.domain.Tournament
 import com.bashkevich.tennisscorekeeper.model.tournament.remote.TournamentStatus
 import com.bashkevich.tennisscorekeeper.model.tournament.repository.TournamentRepository
 import com.bashkevich.tennisscorekeeper.model.match.repository.MatchRepository
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -23,7 +26,6 @@ import kotlinx.coroutines.launch
 import com.bashkevich.tennisscorekeeper.mvi.BaseViewModel
 import com.bashkevich.tennisscorekeeper.navigation.TournamentRoute
 import com.bashkevich.tennisscorekeeper.navigation.TournamentTab
-import kotlin.concurrent.Volatile
 
 class TournamentViewModel(
     private val savedStateHandle: SavedStateHandle,
@@ -48,13 +50,10 @@ class TournamentViewModel(
     private val _currentTab = MutableStateFlow(TournamentTab.MATCHES)
     private val _isUploadInProgress = MutableStateFlow(false)
     private val _participantsFile = MutableStateFlow(EMPTY_EXCEL_FILE)
-    @Volatile private var hasParticipantsLoaded = false
+    private val hasTabLoaded = mutableMapOf<TournamentTab, Boolean>()
 
     private val tournamentDetailsData = combine(
-        refreshTournamentDetails.observeTournamentByIdFromNetwork(
-            tournamentId,
-            TournamentTab.MATCHES
-        ),
+        refreshTournamentDetails.observeTournamentByIdFromNetwork(tournamentId),
         tournamentRepository.observeTournamentById(tournamentId)
     ) { network, db -> network to db }
 
@@ -95,8 +94,12 @@ class TournamentViewModel(
             _isRefreshing.value = false
         }
 
+        if (matches.first != null) {
+            hasTabLoaded[TournamentTab.MATCHES] = true
+        }
+
         if (participants.first != null) {
-            hasParticipantsLoaded = true
+            hasTabLoaded[TournamentTab.PARTICIPANTS] = true
         }
 
         TournamentDetailsData(tournamentDetails, matches, participants, tab)
@@ -166,7 +169,7 @@ class TournamentViewModel(
         )
     }.stateIn(
         viewModelScope,
-        SharingStarted.WhileSubscribed(5_000),
+        SharingStarted.Lazily,
         TournamentState.initial()
     )
 
@@ -182,7 +185,7 @@ class TournamentViewModel(
             is TournamentUiEvent.SwitchTab -> {
                 val tab = uiEvent.tab
                 _currentTab.value = tab
-                if (tab == TournamentTab.PARTICIPANTS && !hasParticipantsLoaded) {
+                if (hasTabLoaded[tab] != true) {
                     refreshTournamentDetails.refresh(
                         RefreshTournamentDetailsInfo(
                             tournamentTab = tab,
@@ -238,6 +241,17 @@ class TournamentViewModel(
                 _isUploadInProgress.value = false
             }
         }
+    }
+
+    override fun onCleared() {
+        CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate).launch {
+            runCatching {
+                println("onCLeared TRIGGER")
+                matchRepository.deleteMatchesForTournament(tournamentId)
+                participantRepository.deleteParticipantsForTournament(tournamentId)
+            }
+        }
+        super.onCleared()
     }
 
     private data class TournamentDetailsData(

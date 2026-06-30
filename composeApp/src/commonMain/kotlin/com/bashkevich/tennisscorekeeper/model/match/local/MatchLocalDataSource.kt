@@ -38,11 +38,6 @@ class MatchLocalDataSource(
 
         db.useWriterConnection {
             it.withTransaction(Transactor.SQLiteTransactionType.IMMEDIATE){
-                // полное удаление матчей и участников всех турниров
-                // (чтобы матчи и участники были загружены только для одного просматриваемого турнира)
-                matchDao.deleteAllMatches()
-                participantDao.deleteAllParticipantsWithPlayers()
-                // конец удаления
                 participantDao.insertPlayers(players)
                 participantDao.insertParticipants(participantWithPlayers.map { it.participant })
                 matchDao.replaceAllMatchesForTournament(
@@ -74,6 +69,14 @@ class MatchLocalDataSource(
                 matchDao.insertMatchSets(dto.toMatchSetEntities())
                 dto.toMatchGameEntity()?.let { matchDao.insertMatchGames(listOf(it)) }
                 matchDao.insertParticipantsInMatch(dto.toParticipantInMatchEntities())
+            }
+        }
+    }
+
+    suspend fun deleteMatchesForTournament(tournamentId: String) {
+        db.useWriterConnection {
+            it.withTransaction(Transactor.SQLiteTransactionType.IMMEDIATE) {
+                matchDao.deleteMatchesByTournament(tournamentId)
             }
         }
     }

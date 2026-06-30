@@ -40,6 +40,10 @@ class ParticipantRepositoryImpl(
             .mapSuccess { }
     }
 
+    override suspend fun deleteParticipantsForTournament(tournamentId: String) {
+        participantLocalDataSource.deleteParticipantsForTournament(tournamentId)
+    }
+
     override fun observeParticipantsForTournament(tournamentId: String): Flow<List<TennisParticipant>> {
         return participantLocalDataSource.observeParticipants(tournamentId).map { list ->
             list.map { it.toDomain() }

@@ -26,52 +26,55 @@ class RefreshTournamentDetailsUseCase(
     }
 
     fun observeTournamentByIdFromNetwork(
-        tournamentId: String,
-        initialTab: TournamentTab
+        tournamentId: String
     ): Flow<LoadResult<Unit, Throwable>?> = flow {
-        refreshTrigger.onStart {
-            refreshTrigger.tryEmit(
-                RefreshTournamentDetailsInfo(
-                    tournamentTab = initialTab,
-                    updateTournamentHeader = true
+        emit(null)
+        refreshTrigger
+            .onStart {
+                refreshTrigger.tryEmit(
+                    RefreshTournamentDetailsInfo(
+                        tournamentTab = TournamentTab.MATCHES,
+                        updateTournamentHeader = true
+                    )
                 )
-            )
-        }.filter { it.updateTournamentHeader }.collect {
-            println("observeTournamentByIdFromNetwork collect $it")
-            emit(null)
-
-            val result = tournamentRepository.fetchTournamentById(tournamentId)
-                .doOnSuccess { emit(LoadResult.Success(Unit)) }
-                .doOnError { emit(LoadResult.Error(it)) }
-
-            println("observeTournamentByIdFromNetwork result $result")
-        }
+            }
+            .filter { it.updateTournamentHeader }
+            .collect {
+                emit(null)
+                tournamentRepository.fetchTournamentById(tournamentId)
+                    .doOnSuccess { emit(LoadResult.Success(Unit)) }
+                    .doOnError { emit(LoadResult.Error(it)) }
+            }
     }
 
-    fun observeMatchesListFromNetwork(tournamentId: String): Flow<LoadResult<Unit, Throwable>?> =
+    fun observeMatchesListFromNetwork(
+        tournamentId: String
+    ): Flow<LoadResult<Unit, Throwable>?> =
         flow {
             emit(null)
-
-            refreshTrigger.filter { it.tournamentTab == TournamentTab.MATCHES }.collect {
-                emit(null)
-
-                matchRepository.fetchMatchesForTournament(tournamentId)
-                    .doOnSuccess { emit(LoadResult.Success(Unit)) }
-                    .doOnError { emit(LoadResult.Error(it)) }
-            }
+            refreshTrigger
+                .filter { it.tournamentTab == TournamentTab.MATCHES }
+                .collect {
+                    emit(null)
+                    matchRepository.fetchMatchesForTournament(tournamentId)
+                        .doOnSuccess { emit(LoadResult.Success(Unit)) }
+                        .doOnError { emit(LoadResult.Error(it)) }
+                }
         }
 
-    fun observeParticipantsFromNetwork(tournamentId: String): Flow<LoadResult<Unit, Throwable>?> =
+    fun observeParticipantsFromNetwork(
+        tournamentId: String
+    ): Flow<LoadResult<Unit, Throwable>?> =
         flow {
             emit(null)
-
-            refreshTrigger.filter { it.tournamentTab == TournamentTab.PARTICIPANTS }.collect {
-                emit(null)
-
-                participantRepository.fetchParticipantsForTournament(tournamentId)
-                    .doOnSuccess { emit(LoadResult.Success(Unit)) }
-                    .doOnError { emit(LoadResult.Error(it)) }
-            }
+            refreshTrigger
+                .filter { it.tournamentTab == TournamentTab.PARTICIPANTS }
+                .collect {
+                    emit(null)
+                    participantRepository.fetchParticipantsForTournament(tournamentId)
+                        .doOnSuccess { emit(LoadResult.Success(Unit)) }
+                        .doOnError { emit(LoadResult.Error(it)) }
+                }
         }
 }
 

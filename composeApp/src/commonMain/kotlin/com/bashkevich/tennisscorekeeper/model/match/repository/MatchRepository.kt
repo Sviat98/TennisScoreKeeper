@@ -27,6 +27,7 @@ interface MatchRepository {
     suspend fun setParticipantRetired(matchId: String, participantId: String): LoadResult<ResponseMessage, Throwable>
     suspend fun setMatchStatus(matchId: String, status: MatchStatus): LoadResult<ResponseMessage, Throwable>
 
+    suspend fun deleteMatchesForTournament(tournamentId: String)
     suspend fun deleteAllMatchesFromDb()
     suspend fun addNewMatch(
         tournamentId: String,
