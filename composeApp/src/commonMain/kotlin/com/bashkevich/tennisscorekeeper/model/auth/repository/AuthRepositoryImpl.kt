@@ -56,6 +56,7 @@ class AuthRepositoryImpl(
         // удаляем данные в ЛЮБОМ случае
         authLocalDataSource.savePlayerId("")
         authLocalDataSource.saveTokens(accessToken = "", refreshToken = "")
+        authRemoteDataSource.clearAuthTokens()
         authRemoteDataSource.logout(refreshToken)
     }
 }

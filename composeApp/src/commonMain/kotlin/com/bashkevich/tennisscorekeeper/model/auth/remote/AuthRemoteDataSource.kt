@@ -5,6 +5,7 @@ import com.bashkevich.tennisscorekeeper.core.remote.ResponseMessage
 import com.bashkevich.tennisscorekeeper.core.remote.runOperationCatching
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
+import io.ktor.client.plugins.auth.clearAuthTokens
 import io.ktor.client.request.forms.submitForm
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
@@ -34,6 +35,10 @@ class AuthRemoteDataSource(
 
             refreshTokenStatusMessage
         }
+    }
+
+    fun clearAuthTokens() {
+        httpClient.clearAuthTokens()
     }
 
     suspend fun logout(refreshToken: String): LoadResult<ResponseMessage, Throwable> {
