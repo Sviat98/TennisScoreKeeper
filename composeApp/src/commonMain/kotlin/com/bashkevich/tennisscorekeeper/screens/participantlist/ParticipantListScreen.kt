@@ -6,6 +6,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -39,6 +41,7 @@ fun ParticipantListScreen(
     Box(modifier = modifier) {
         when (participantListLoadingState) {
             is ParticipantListLoadingState.Loading -> {
+                // тут НЕ делаем verticalScroll, в состояни Loading refresh не должен быть доступен
                 Box(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center
@@ -49,7 +52,7 @@ fun ParticipantListScreen(
 
             is ParticipantListLoadingState.InitialError -> {
                 Box(
-                    modifier = Modifier.fillMaxSize(),
+                    modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()),
                     contentAlignment = Alignment.Center
                 ) {
                     Column(
@@ -116,7 +119,7 @@ private fun ParticipantListContent(
     ) {
         if (participantListLoadingState.participants.isEmpty()) {
             Column(
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {

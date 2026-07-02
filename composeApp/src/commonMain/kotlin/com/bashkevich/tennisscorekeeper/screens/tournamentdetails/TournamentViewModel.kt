@@ -50,7 +50,7 @@ class TournamentViewModel(
     private val _currentTab = MutableStateFlow(TournamentTab.MATCHES)
     private val _isUploadInProgress = MutableStateFlow(false)
     private val _participantsFile = MutableStateFlow(EMPTY_EXCEL_FILE)
-    private val hasTabLoaded = mutableMapOf<TournamentTab, Boolean>()
+    private val hasTabOpened = TournamentTab.entries.associateWith { false }.toMutableMap()
 
     private val tournamentDetailsData = combine(
         refreshTournamentDetails.observeTournamentByIdFromNetwork(tournamentId),
@@ -84,9 +84,11 @@ class TournamentViewModel(
                 TournamentTab.PARTICIPANTS -> participants.second.isNotEmpty()
             }
             if (hasData) {
-                sendAction(TournamentAction.ShowRefreshError(
-                    tabNetworkState.result.message ?: "Error"
-                ))
+                sendAction(
+                    TournamentAction.ShowRefreshError(
+                        tabNetworkState.result.message ?: "Error"
+                    )
+                )
             }
         }
 
@@ -95,11 +97,11 @@ class TournamentViewModel(
         }
 
         if (matches.first != null) {
-            hasTabLoaded[TournamentTab.MATCHES] = true
+            hasTabOpened[TournamentTab.MATCHES] = true
         }
 
         if (participants.first != null) {
-            hasTabLoaded[TournamentTab.PARTICIPANTS] = true
+            hasTabOpened[TournamentTab.PARTICIPANTS] = true
         }
 
         TournamentDetailsData(tournamentDetails, matches, participants, tab)
@@ -116,9 +118,6 @@ class TournamentViewModel(
         val (matchesNetwork, matchesList) = data.matches
         val (participantsNetwork, participantsList) = data.participants
 
-        //println("tournamentNetwork = $tournamentNetwork")
-        //println("tournament = $tournament")
-
 
         val tournamentDetailsState =
             if (tournamentNetwork == null && tournament == TOURNAMENT_DEFAULT) {
@@ -128,28 +127,22 @@ class TournamentViewModel(
             }
 
         val matchListLoadingState = when {
-            !isRefreshing && matchesNetwork == null && matchesList.isEmpty() ->
+            hasTabOpened[TournamentTab.MATCHES] == false && matchesNetwork == null && matchesList.isEmpty() ->
                 MatchListLoadingState.Loading
 
             matchesNetwork is LoadResult.Error && matchesList.isEmpty() ->
-                MatchListLoadingState.InitialError(
-                    matchesNetwork.result.message ?: "Error"
-                )
+                MatchListLoadingState.InitialError
 
             else ->
                 MatchListLoadingState.Content(matchesList)
         }
 
-        println("matchListLoadingState = $matchListLoadingState")
-
         val participantListLoadingState = when {
-            !isRefreshing && participantsNetwork == null && participantsList.isEmpty() ->
+            hasTabOpened[TournamentTab.PARTICIPANTS] == false && participantsNetwork == null && participantsList.isEmpty() ->
                 ParticipantListLoadingState.Loading
 
             participantsNetwork is LoadResult.Error && participantsList.isEmpty() ->
-                ParticipantListLoadingState.InitialError(
-                    participantsNetwork.result.message ?: "Error"
-                )
+                ParticipantListLoadingState.InitialError
 
             else ->
                 ParticipantListLoadingState.Content(
@@ -185,7 +178,7 @@ class TournamentViewModel(
             is TournamentUiEvent.SwitchTab -> {
                 val tab = uiEvent.tab
                 _currentTab.value = tab
-                if (hasTabLoaded[tab] != true) {
+                if (hasTabOpened[tab] == false) {
                     refreshTournamentDetails.refresh(
                         RefreshTournamentDetailsInfo(
                             tournamentTab = tab,
@@ -198,25 +191,13 @@ class TournamentViewModel(
     }
 
     private fun refreshTournamentDetailsScreen() {
-        println("REFRESH TournamentViewModel!!!")
-
-        val currentState = state.value
-
-        if ((currentState.tournamentDetailsState !is TournamentDetailsLoadingState.Loading) &&
-            ((currentState.activeTab == TournamentTab.MATCHES &&
-                    currentState.matchListLoadingState !is MatchListLoadingState.Loading) ||
-                    (currentState.activeTab == TournamentTab.PARTICIPANTS &&
-                            currentState.participantListLoadingState !is ParticipantListLoadingState.Loading))
-        ) {
-            _isRefreshing.value = true
-            refreshTournamentDetails.refresh(
-                RefreshTournamentDetailsInfo(
-                    tournamentTab = _currentTab.value,
-                    updateTournamentHeader = true
-                )
+        _isRefreshing.value = true
+        refreshTournamentDetails.refresh(
+            RefreshTournamentDetailsInfo(
+                tournamentTab = _currentTab.value,
+                updateTournamentHeader = true
             )
-        }
-
+        )
     }
 
     private fun changeTournamentStatus(tournamentStatus: TournamentStatus) {

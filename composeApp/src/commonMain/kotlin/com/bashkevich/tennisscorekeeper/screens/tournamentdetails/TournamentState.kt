@@ -22,14 +22,14 @@ sealed interface TournamentDetailsLoadingState {
 @Immutable
 sealed interface MatchListLoadingState {
     data object Loading : MatchListLoadingState
-    data class InitialError(val message: String) : MatchListLoadingState
+    data object InitialError : MatchListLoadingState
     data class Content(val matches: List<ShortMatch>) : MatchListLoadingState
 }
 
 @Immutable
 sealed interface ParticipantListLoadingState {
     data object Loading : ParticipantListLoadingState
-    data class InitialError(val message: String) : ParticipantListLoadingState
+    data object InitialError : ParticipantListLoadingState
     data class Content(
         val participants: List<TennisParticipant>,
         val isUploadInProgress: Boolean = false,
