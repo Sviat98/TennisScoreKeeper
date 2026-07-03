@@ -12,10 +12,10 @@ data class ThemeComponentState(
     sealed interface SelectedThemeState {
 
         @Immutable
-        data class Loading(val initialThemeId: String) : SelectedThemeState
+        data class Loading(val initialThemeId: Int) : SelectedThemeState
 
         @Immutable
-        data class Error(val initialThemeId: String) : SelectedThemeState
+        data class Error(val initialThemeId: Int) : SelectedThemeState
 
         @Immutable
         data class Idle(val theme: ScoreboardTheme?) : SelectedThemeState

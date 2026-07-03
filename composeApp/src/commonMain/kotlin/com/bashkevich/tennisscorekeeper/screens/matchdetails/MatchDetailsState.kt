@@ -17,19 +17,19 @@ enum class ConnectionState {
 
 @Immutable
 sealed class MatchDetailsUiEvent : UiEvent {
-    class SetFirstParticipantToServe(val participantId: String) :
+    class SetFirstParticipantToServe(val participantId: Int) :
         MatchDetailsUiEvent()
 
-    class SetFirstPlayerInPairToServe(val playerId: String) :
+    class SetFirstPlayerInPairToServe(val playerId: Int) :
         MatchDetailsUiEvent()
 
-    class SetParticipantRetired(val participantId: String) :
+    class SetParticipantRetired(val participantId: Int) :
         MatchDetailsUiEvent()
 
     class ChangeMatchStatus(val status: MatchStatus) :
         MatchDetailsUiEvent()
 
-    class UpdateScore(val participantId: String, val scoreType: ScoreType) :
+    class UpdateScore(val participantId: Int, val scoreType: ScoreType) :
         MatchDetailsUiEvent()
 
     data object UndoPoint : MatchDetailsUiEvent()

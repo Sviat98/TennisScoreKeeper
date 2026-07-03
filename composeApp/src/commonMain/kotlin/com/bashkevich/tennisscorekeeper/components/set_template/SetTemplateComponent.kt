@@ -19,7 +19,7 @@ fun SetTemplateComponent(
     setComponentState: SetComponentState,
     onSetTemplatesFetch: () -> Unit,
     onSetTemplateChange: (SetTemplate) -> Unit,
-    onRetrySelectedSet: () -> Unit = {},
+    onRetrySelectedSet: (Int) -> Unit,
 ) {
     Column(
         modifier = Modifier.then(modifier),

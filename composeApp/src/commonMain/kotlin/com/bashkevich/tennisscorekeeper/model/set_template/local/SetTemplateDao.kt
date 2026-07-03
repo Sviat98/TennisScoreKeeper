@@ -28,7 +28,7 @@ interface SetTemplateDao {
     suspend fun deleteAllSetTemplates()
 
     @Query("SELECT * FROM set_templates WHERE id = :id")
-    fun getSetTemplateById(id: String): Flow<SetTemplateEntity?>
+    fun getSetTemplateById(id: Int): Flow<SetTemplateEntity?>
 
     @Transaction
     suspend fun replaceAllSetTemplates(templates: List<SetTemplateEntity>) {

@@ -20,7 +20,7 @@ fun FirstServeParticipantComponent(
     label: String,
     participantOptions: List<TennisParticipantInMatch>,
     currentParticipant: TennisParticipantInMatch,
-    onParticipantChange: (String) -> Unit,
+    onParticipantChange: (Int) -> Unit,
 ) {
     val windowSizeClass = currentWindowAdaptiveInfo().windowSizeClass
 

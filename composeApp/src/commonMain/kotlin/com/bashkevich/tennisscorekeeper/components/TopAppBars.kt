@@ -16,9 +16,8 @@ import androidx.compose.runtime.setValue
 import com.bashkevich.tennisscorekeeper.AppConfig
 import com.bashkevich.tennisscorekeeper.components.icons.IconGroup
 import com.bashkevich.tennisscorekeeper.components.icons.default_icons.ArrowBack
-import com.bashkevich.tennisscorekeeper.components.icons.default_icons.Person
+import com.bashkevich.tennisscorekeeper.components.icons.default_icons.Settings
 import com.bashkevich.tennisscorekeeper.components.icons.default_icons.Share
-import com.bashkevich.tennisscorekeeper.components.icons.filled_icons.Person
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -30,20 +29,13 @@ fun TournamentListAppBar() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TournamentListAppBarWithButton(
-    isAuthorized: Boolean,
-    onNavigateToLoginOrProfile: () -> Unit
+    onNavigateToSettings: () -> Unit
 ) {
     TopAppBar(
         title = { Text("Tournaments") },
         actions = {
-            if (isAuthorized){
-                IconButton(onClick = onNavigateToLoginOrProfile){
-                    Icon(IconGroup.Default.Person, contentDescription = "Navigate to profile")
-                }
-            }else{
-                LoginButton(
-                    onNavigateToLogin = onNavigateToLoginOrProfile
-                )
+            IconButton(onClick = onNavigateToSettings) {
+                Icon(IconGroup.Default.Settings, contentDescription = "Navigate to settings")
             }
         }
     )
@@ -53,8 +45,7 @@ fun TournamentListAppBarWithButton(
 @Composable
 fun TournamentDetailsAppBar(
     onBack: () -> Unit,
-    isAuthorized: Boolean,
-    onNavigateToLoginOrProfile: () -> Unit
+    onNavigateToSettings: () -> Unit
 ) {
     TopAppBar(
         title = { Text("Tournament") },
@@ -69,14 +60,8 @@ fun TournamentDetailsAppBar(
             }
         },
         actions = {
-            if (isAuthorized){
-                IconButton(onClick = onNavigateToLoginOrProfile){
-                    Icon(IconGroup.Filled.Person, contentDescription = "Navigate to profile")
-                }
-            }else{
-                LoginButton(
-                    onNavigateToLogin = onNavigateToLoginOrProfile
-                )
+            IconButton(onClick = onNavigateToSettings) {
+                Icon(IconGroup.Default.Settings, contentDescription = "Navigate to settings")
             }
         }
     )
@@ -86,8 +71,7 @@ fun TournamentDetailsAppBar(
 @Composable
 fun AddMatchAppBar(
     onBack: () -> Unit,
-    isAuthorized: Boolean,
-    onNavigateToLoginOrProfile: () -> Unit
+    onNavigateToSettings: () -> Unit
 ) {
     TopAppBar(
         title = { Text("Add Match") },
@@ -102,14 +86,8 @@ fun AddMatchAppBar(
             }
         },
         actions = {
-            if (isAuthorized){
-                IconButton(onClick = onNavigateToLoginOrProfile){
-                    Icon(IconGroup.Filled.Person, contentDescription = "Navigate to profile")
-                }
-            }else{
-                LoginButton(
-                    onNavigateToLogin = onNavigateToLoginOrProfile
-                )
+            IconButton(onClick = onNavigateToSettings) {
+                Icon(IconGroup.Default.Settings, contentDescription = "Navigate to settings")
             }
         }
     )
@@ -119,8 +97,7 @@ fun AddMatchAppBar(
 @Composable
 fun AddTournamentAppBar(
     onBack: () -> Unit,
-    isAuthorized: Boolean,
-    onNavigateToLoginOrProfile: () -> Unit,
+    onNavigateToSettings: () -> Unit,
 ) {
     TopAppBar(
         title = { Text("Add Tournament") },
@@ -135,14 +112,8 @@ fun AddTournamentAppBar(
             }
         },
         actions = {
-            if (isAuthorized) {
-                IconButton(onClick = onNavigateToLoginOrProfile) {
-                    Icon(IconGroup.Filled.Person, contentDescription = "Navigate to profile")
-                }
-            } else {
-                LoginButton(
-                    onNavigateToLogin = onNavigateToLoginOrProfile
-                )
+            IconButton(onClick = onNavigateToSettings) {
+                Icon(IconGroup.Default.Settings, contentDescription = "Navigate to settings")
             }
         }
     )
@@ -171,11 +142,10 @@ fun LoginAppBar(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MatchDetailsAppBar(
-    matchId: String,
+    matchId: Int,
     onBack: () -> Unit,
     onCopyLink: (String) -> Unit,
-    isAuthorized: Boolean,
-    onNavigateToLoginOrProfile: () -> Unit
+    onNavigateToSettings: () -> Unit
 ) {
     var expanded by remember { mutableStateOf(false) }
 
@@ -214,14 +184,8 @@ fun MatchDetailsAppBar(
                     })
                 }
             }
-            if (isAuthorized){
-                IconButton(onClick = onNavigateToLoginOrProfile){
-                    Icon(IconGroup.Filled.Person, contentDescription = "Navigate to profile")
-                }
-            }else{
-                LoginButton(
-                    onNavigateToLogin = onNavigateToLoginOrProfile
-                )
+            IconButton(onClick = onNavigateToSettings) {
+                Icon(IconGroup.Default.Settings, contentDescription = "Navigate to settings")
             }
         }
     )

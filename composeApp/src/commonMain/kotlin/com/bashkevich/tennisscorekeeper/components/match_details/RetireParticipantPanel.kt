@@ -13,7 +13,7 @@ import com.bashkevich.tennisscorekeeper.model.match.domain.Match
 fun RetireParticipantPanel(
     modifier: Modifier = Modifier,
     match: Match,
-    onParticipantRetire: (String)-> Unit
+    onParticipantRetire: (Int)-> Unit
 ){
     val firstParticipant = match.firstParticipant
     val secondParticipant = match.secondParticipant

@@ -33,7 +33,9 @@ fun MatchScoringAndThemeSettingsBlock(
     onDecidingSetTemplateChange: (SetTemplate) -> Unit,
     onThemeSelected: (ScoreboardTheme) -> Unit,
     onThemesFetch: () -> Unit,
-    onRetrySelectedTheme: () -> Unit = {},
+    onRetrySelectedTheme: (Int) -> Unit = {},
+    onRetrySelectedRegularSet: (Int) -> Unit = {},
+    onRetrySelectedDecidingSet: (Int) -> Unit = {},
 ) {
     val windowSize = currentWindowAdaptiveInfo().windowSizeClass
     val isWideScreen = windowSize.isWidthAtLeastBreakpoint(WindowSizeClass.WIDTH_DP_MEDIUM_LOWER_BOUND)
@@ -77,6 +79,7 @@ fun MatchScoringAndThemeSettingsBlock(
                         setComponentState = regularSetComponentState,
                         onSetTemplatesFetch = { onSetTemplatesFetch(SetTemplateTypeFilter.REGULAR) },
                         onSetTemplateChange = onRegularSetTemplateChange,
+                        onRetrySelectedSet = onRetrySelectedRegularSet,
                     )
                     SetTemplateComponent(
                         modifier = Modifier.weight(1f),
@@ -85,6 +88,7 @@ fun MatchScoringAndThemeSettingsBlock(
                         setComponentState = decidingSetComponentState,
                         onSetTemplatesFetch = { onSetTemplatesFetch(SetTemplateTypeFilter.DECIDER) },
                         onSetTemplateChange = onDecidingSetTemplateChange,
+                        onRetrySelectedSet = onRetrySelectedDecidingSet,
                     )
                 }
             }
@@ -115,6 +119,7 @@ fun MatchScoringAndThemeSettingsBlock(
                     setComponentState = regularSetComponentState,
                     onSetTemplatesFetch = { onSetTemplatesFetch(SetTemplateTypeFilter.REGULAR) },
                     onSetTemplateChange = onRegularSetTemplateChange,
+                    onRetrySelectedSet = onRetrySelectedRegularSet,
                 )
 
                 SetTemplateComponent(
@@ -124,6 +129,7 @@ fun MatchScoringAndThemeSettingsBlock(
                     setComponentState = decidingSetComponentState,
                     onSetTemplatesFetch = { onSetTemplatesFetch(SetTemplateTypeFilter.DECIDER) },
                     onSetTemplateChange = onDecidingSetTemplateChange,
+                    onRetrySelectedSet = onRetrySelectedDecidingSet,
                 )
             }
         }

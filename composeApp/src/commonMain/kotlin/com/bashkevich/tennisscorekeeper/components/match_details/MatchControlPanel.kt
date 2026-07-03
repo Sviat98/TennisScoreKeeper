@@ -23,7 +23,7 @@ import com.bashkevich.tennisscorekeeper.model.match.remote.body.ScoreType
 fun ParticipantsPointsControlPanel(
     modifier: Modifier = Modifier,
     match: Match,
-    onUpdateScore: (String, ScoreType) -> Unit,
+    onUpdateScore: (Int, ScoreType) -> Unit,
     onUndoPoint: () -> Unit,
     onRedoPoint: () -> Unit
 ) {

@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.input.TextObfuscationMode
-import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -25,7 +24,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -36,40 +34,29 @@ import com.bashkevich.tennisscorekeeper.components.icons.default_icons.Visibilit
 @Composable
 fun LoginComponent(
     modifier: Modifier = Modifier,
-    onLoginChange: (String) -> Unit,
-    onPasswordChange: (String) -> Unit,
-    onLoginClick: ()-> Unit
+    loginTextFieldState: TextFieldState,
+    passwordTextFieldState: TextFieldState,
+    enabled: Boolean = true,
+    onLoginClick: () -> Unit
 ) {
     Column(
         modifier = Modifier.then(modifier),
         verticalArrangement = Arrangement.spacedBy(8.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        val loginTextFieldState = rememberTextFieldState()
-
-        LaunchedEffect(loginTextFieldState) {
-            snapshotFlow { loginTextFieldState.text.trim().toString() }.collect { login ->
-                onLoginChange(login)
-            }
-        }
         TextField(
             state = loginTextFieldState,
             label = { Text("Login") }
         )
 
-        val passwordTextFieldState = rememberTextFieldState()
-
-        LaunchedEffect(passwordTextFieldState) {
-            snapshotFlow { passwordTextFieldState.text.trim().toString() }.collect { password ->
-                onPasswordChange(password)
-            }
-        }
-
         PasswordTextField(
             textFieldState = passwordTextFieldState,
         )
 
-        Button(onClick = onLoginClick) {
+        Button(
+            onClick = onLoginClick,
+            enabled = enabled
+        ) {
             Text("Login")
         }
     }

@@ -21,7 +21,7 @@ import com.bashkevich.tennisscorekeeper.model.match.remote.TennisSetDto
 )
 data class MatchSetEntity(
     @ColumnInfo(name = "match_id")
-    val matchId: String,
+    val matchId: Int,
     @ColumnInfo(name = "set_number")
     val setNumber: Int,
     @ColumnInfo(name = "is_current")
@@ -32,7 +32,7 @@ data class MatchSetEntity(
     val secondParticipantGames: Int,
 )
 
-fun TennisSetDto.toMatchSetEntity(matchId: String, setNumber: Int, isCurrent: Boolean) = MatchSetEntity(
+fun TennisSetDto.toMatchSetEntity(matchId: Int, setNumber: Int, isCurrent: Boolean) = MatchSetEntity(
     matchId = matchId,
     setNumber = setNumber,
     isCurrent = isCurrent,
@@ -43,10 +43,10 @@ fun TennisSetDto.toMatchSetEntity(matchId: String, setNumber: Int, isCurrent: Bo
 fun ShortMatchDto.toMatchSetEntities(): List<MatchSetEntity> {
     val entities = mutableListOf<MatchSetEntity>()
     previousSets.forEachIndexed { index, setDto ->
-        entities.add(setDto.toMatchSetEntity(matchId = id, setNumber = index + 1, isCurrent = false))
+        entities.add(setDto.toMatchSetEntity(matchId = id.toInt(), setNumber = index + 1, isCurrent = false))
     }
     currentSet?.let {
-        entities.add(it.toMatchSetEntity(matchId = id, setNumber = previousSets.size + 1, isCurrent = true))
+        entities.add(it.toMatchSetEntity(matchId = id.toInt(), setNumber = previousSets.size + 1, isCurrent = true))
     }
     return entities
 }
@@ -54,10 +54,10 @@ fun ShortMatchDto.toMatchSetEntities(): List<MatchSetEntity> {
 fun MatchDto.toMatchSetEntities(): List<MatchSetEntity> {
     val entities = mutableListOf<MatchSetEntity>()
     previousSets.forEachIndexed { index, setDto ->
-        entities.add(setDto.toMatchSetEntity(matchId = id, setNumber = index + 1, isCurrent = false))
+        entities.add(setDto.toMatchSetEntity(matchId = id.toInt(), setNumber = index + 1, isCurrent = false))
     }
     currentSet?.let {
-        entities.add(it.toMatchSetEntity(matchId = id, setNumber = previousSets.size + 1, isCurrent = true))
+        entities.add(it.toMatchSetEntity(matchId = id.toInt(), setNumber = previousSets.size + 1, isCurrent = true))
     }
     return entities
 }

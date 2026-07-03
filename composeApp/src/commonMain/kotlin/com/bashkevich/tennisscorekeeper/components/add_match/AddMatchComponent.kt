@@ -110,6 +110,15 @@ fun AddMatchComponent(
             onThemesFetch = {
                 onEvent(AddMatchUiEvent.FetchThemes)
             },
+            onRetrySelectedTheme = { themeId ->
+                onEvent(AddMatchUiEvent.RetrySelectedTheme(themeId))
+            },
+            onRetrySelectedRegularSet = { setId ->
+                onEvent(AddMatchUiEvent.RetrySelectedRegularSet(setId))
+            },
+            onRetrySelectedDecidingSet = { setId ->
+                onEvent(AddMatchUiEvent.RetrySelectedDecidingSet(setId))
+            },
         )
 
         Spacer(modifier = Modifier.height(8.dp))
@@ -127,8 +136,8 @@ fun AddMatchComponent(
 
         val needsRegularSet = contentState.setsToWin > 1
         val isButtonEnabled =
-            participantState.firstParticipant.id != "0"
-                    && participantState.secondParticipant.id != "0"
+            participantState.firstParticipant.id != 0
+                    && participantState.secondParticipant.id != 0
                     && participantState.firstParticipant.id != participantState.secondParticipant.id
                     && decidingSetTemplate != null
                     && selectedTheme != null

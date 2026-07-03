@@ -7,14 +7,14 @@ import com.bashkevich.tennisscorekeeper.model.player.domain.PlayerInParticipant
 import com.bashkevich.tennisscorekeeper.model.player.domain.toDomain
 
 sealed class ParticipantInShortMatch {
-    abstract val id: String
+    abstract val id: Int
     abstract val seed: Int?
     abstract val isWinner: Boolean
     abstract val isRetired: Boolean
 }
 
 data class ParticipantInShortSinglesMatch(
-    override val id: String,
+    override val id: Int,
     override val seed: Int?,
     override val isWinner: Boolean,
     override val isRetired: Boolean,
@@ -23,7 +23,7 @@ data class ParticipantInShortSinglesMatch(
 
 
 data class ParticipantInShortDoublesMatch(
-    override val id: String,
+    override val id: Int,
     override val seed: Int?,
     override val isWinner: Boolean,
     override val isRetired: Boolean,
@@ -33,7 +33,7 @@ data class ParticipantInShortDoublesMatch(
 
 fun ParticipantInShortMatchDto.toDomain(): ParticipantInShortMatch = when (this) {
     is ParticipantInShortSinglesMatchDto -> ParticipantInShortSinglesMatch(
-        id = this.id,
+        id = this.id.toInt(),
         seed = this.seed,
         isWinner = this.isWinner,
         isRetired = this.isRetired,
@@ -41,7 +41,7 @@ fun ParticipantInShortMatchDto.toDomain(): ParticipantInShortMatch = when (this)
     )
 
     is ParticipantInShortDoublesMatchDto -> ParticipantInShortDoublesMatch(
-        id = this.id,
+        id = this.id.toInt(),
         seed = this.seed,
         isWinner = this.isWinner,
         isRetired = this.isRetired,

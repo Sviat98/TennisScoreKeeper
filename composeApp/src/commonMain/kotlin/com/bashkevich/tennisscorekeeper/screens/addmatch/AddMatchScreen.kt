@@ -20,8 +20,7 @@ import com.bashkevich.tennisscorekeeper.components.AddMatchAppBar
 import com.bashkevich.tennisscorekeeper.components.add_match.AddMatchComponent
 import com.bashkevich.tennisscorekeeper.mvi.LaunchedUiEffectHandler
 import com.bashkevich.tennisscorekeeper.components.showUnauthorizedActionSnackbar
-import com.bashkevich.tennisscorekeeper.navigation.LoginRoute
-import com.bashkevich.tennisscorekeeper.navigation.ProfileRoute
+import com.bashkevich.tennisscorekeeper.navigation.SettingsRoute
 
 @Composable
 fun AddMatchScreen(
@@ -31,7 +30,6 @@ fun AddMatchScreen(
     val state by viewModel.state.collectAsStateWithLifecycle()
     val navController = LocalNavHostController.current
     val snackbarHostState = remember { SnackbarHostState() }
-    val isAuthorized = LocalAuthorization.current
 
     LaunchedUiEffectHandler(
         effect = state.action,
@@ -58,15 +56,8 @@ fun AddMatchScreen(
         state = state,
         onEvent = { viewModel.onEvent(it) },
         snackbarHostState = snackbarHostState,
-        isAuthorized = isAuthorized,
         onBack = { navController.navigateUp() },
-        onNavigateToLoginOrProfile = {
-            if (isAuthorized) {
-                navController.navigate(ProfileRoute)
-            } else {
-                navController.navigate(LoginRoute)
-            }
-        },
+        onNavigateToSettings = { navController.navigate(SettingsRoute) },
     )
 }
 
@@ -76,17 +67,15 @@ fun AddMatchContent(
     state: AddMatchState,
     onEvent: (AddMatchUiEvent) -> Unit,
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
-    isAuthorized: Boolean = false,
     onBack: () -> Unit = {},
-    onNavigateToLoginOrProfile: () -> Unit = {},
+    onNavigateToSettings: () -> Unit = {},
 ) {
     Scaffold(
         modifier = Modifier.then(modifier),
         topBar = {
             AddMatchAppBar(
                 onBack = onBack,
-                isAuthorized = isAuthorized,
-                onNavigateToLoginOrProfile = onNavigateToLoginOrProfile
+                onNavigateToSettings = onNavigateToSettings
             )
         },
         snackbarHost = { SnackbarHost(snackbarHostState) }

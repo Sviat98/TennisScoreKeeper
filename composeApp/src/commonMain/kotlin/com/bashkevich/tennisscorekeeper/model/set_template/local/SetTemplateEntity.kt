@@ -9,7 +9,7 @@ import com.bashkevich.tennisscorekeeper.model.set_template.remote.SetTemplateDto
 data class SetTemplateEntity(
     @PrimaryKey
     @ColumnInfo(name = "id")
-    val id: String,
+    val id: Int,
     @ColumnInfo(name = "name")
     val name: String,
     @ColumnInfo(name = "games_to_win")
@@ -27,7 +27,7 @@ data class SetTemplateEntity(
 )
 
 fun SetTemplateDto.toEntity() = SetTemplateEntity(
-    id = id,
+    id = id.toInt(),
     name = name,
     gamesToWin = gamesToWin,
     hasDecidingPoint = hasDecidingPoint,

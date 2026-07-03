@@ -39,24 +39,24 @@ import com.bashkevich.tennisscorekeeper.model.player.local.toEntity
 data class ParticipantEntity(
     @PrimaryKey
     @ColumnInfo(name = "id")
-    val id: String,
+    val id: Int,
     @ColumnInfo(name = "tournament_id")
-    val tournamentId: String,
+    val tournamentId: Int,
     @ColumnInfo(name = "seed")
     val seed: Int?,
     @ColumnInfo(name = "player_id")
-    val playerId: String,
+    val playerId: Int,
     @ColumnInfo(name = "second_player_id")
-    val secondPlayerId: String?,
+    val secondPlayerId: Int?,
 )
 
-fun ParticipantDto.toEntity(tournamentId: String) = when (this) {
+fun ParticipantDto.toEntity(tournamentId: Int) = when (this) {
     is SinglesParticipantDto -> ParticipantWithPlayersEntity(
         participant = ParticipantEntity(
-            id = id,
+            id = id.toInt(),
             tournamentId = tournamentId,
             seed = seed,
-            playerId = player.id,
+            playerId = player.id.toInt(),
             secondPlayerId = null,
         ),
         player = player.toEntity(),
@@ -64,24 +64,24 @@ fun ParticipantDto.toEntity(tournamentId: String) = when (this) {
     )
     is DoublesParticipantDto -> ParticipantWithPlayersEntity(
         participant = ParticipantEntity(
-            id = id,
+            id = id.toInt(),
             tournamentId = tournamentId,
             seed = seed,
-            playerId = firstPlayer.id,
-            secondPlayerId = secondPlayer.id,
+            playerId = firstPlayer.id.toInt(),
+            secondPlayerId = secondPlayer.id.toInt(),
         ),
         player = firstPlayer.toEntity(),
         secondPlayer = secondPlayer.toEntity(),
     )
 }
 
-fun ParticipantInShortMatchDto.toEntity(tournamentId: String) = when (this) {
+fun ParticipantInShortMatchDto.toEntity(tournamentId: Int) = when (this) {
     is ParticipantInShortSinglesMatchDto -> ParticipantWithPlayersEntity(
         participant = ParticipantEntity(
-            id = id,
+            id = id.toInt(),
             tournamentId = tournamentId,
             seed = seed,
-            playerId = player.id,
+            playerId = player.id.toInt(),
             secondPlayerId = null,
         ),
         player = player.toEntity(),
@@ -89,11 +89,11 @@ fun ParticipantInShortMatchDto.toEntity(tournamentId: String) = when (this) {
     )
     is ParticipantInShortDoublesMatchDto -> ParticipantWithPlayersEntity(
         participant = ParticipantEntity(
-            id = id,
+            id = id.toInt(),
             tournamentId = tournamentId,
             seed = seed,
-            playerId = firstPlayer.id,
-            secondPlayerId = secondPlayer.id,
+            playerId = firstPlayer.id.toInt(),
+            secondPlayerId = secondPlayer.id.toInt(),
         ),
         player = firstPlayer.toEntity(),
         secondPlayer = secondPlayer.toEntity(),

@@ -14,7 +14,7 @@ interface ThemeDao {
     fun getAllThemes(): Flow<List<ThemeEntity>>
 
     @Query("SELECT * FROM scoreboard_theme WHERE id = :id")
-    fun getThemeById(id: String): Flow<ThemeEntity?>
+    fun getThemeById(id: Int): Flow<ThemeEntity?>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertTheme(theme: ThemeEntity)

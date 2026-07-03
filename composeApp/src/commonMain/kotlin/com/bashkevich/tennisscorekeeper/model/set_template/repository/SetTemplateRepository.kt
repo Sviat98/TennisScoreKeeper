@@ -10,6 +10,6 @@ interface SetTemplateRepository {
     fun fetchSetTemplatesFlow(filter: SetTemplateTypeFilter): Flow<LoadResult<Unit, Throwable>?>
     fun refreshSetTemplates()
     fun observeSetTemplates(filter: SetTemplateTypeFilter): Flow<List<SetTemplate>>
-    suspend fun fetchSetTemplateById(id: String): LoadResult<Unit, Throwable>
-    fun observeSetTemplateById(id: String): Flow<SetTemplate>
+    suspend fun fetchSetTemplateById(id: Int): LoadResult<Unit, Throwable>
+    fun observeSetTemplateById(id: Int): Flow<SetTemplate>
 }

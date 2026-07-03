@@ -16,7 +16,7 @@ fun FirstServePlayerInPairBlock(
     modifier: Modifier = Modifier,
     participantOptions: List<TennisParticipantInMatch>,
     firstParticipantToServe: TennisParticipantInMatch,
-    onFirstPlayerInPairToServeChoose: (String)->Unit,
+    onFirstPlayerInPairToServeChoose: (Int)->Unit,
 ){
     var nextParticipantToServeInDoublesMatch: ParticipantInDoublesMatch?
     var firstServePlayerOptions = emptyList<PlayerInDoublesMatch>()

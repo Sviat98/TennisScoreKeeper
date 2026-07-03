@@ -23,6 +23,7 @@ import com.bashkevich.tennisscorekeeper.navigation.AddTournamentRoute
 import com.bashkevich.tennisscorekeeper.navigation.LoginRoute
 import com.bashkevich.tennisscorekeeper.navigation.MatchDetailsRoute
 import com.bashkevich.tennisscorekeeper.navigation.ProfileRoute
+import com.bashkevich.tennisscorekeeper.navigation.SettingsRoute
 import com.bashkevich.tennisscorekeeper.navigation.TournamentRoute
 import com.bashkevich.tennisscorekeeper.navigation.TournamentsRoute
 import com.bashkevich.tennisscorekeeper.navigation.platformSpecificRoutes
@@ -36,6 +37,8 @@ import com.bashkevich.tennisscorekeeper.screens.matchdetails.MatchDetailsScreen
 import com.bashkevich.tennisscorekeeper.screens.matchdetails.MatchDetailsViewModel
 import com.bashkevich.tennisscorekeeper.screens.profile.ProfileScreen
 import com.bashkevich.tennisscorekeeper.screens.profile.ProfileViewModel
+import com.bashkevich.tennisscorekeeper.screens.settings.SettingsScreen
+import com.bashkevich.tennisscorekeeper.screens.settings.SettingsViewModel
 import com.bashkevich.tennisscorekeeper.screens.tournamentdetails.TournamentScreen
 import com.bashkevich.tennisscorekeeper.screens.tournamentdetails.TournamentViewModel
 import com.bashkevich.tennisscorekeeper.screens.tournamentlist.TournamentListScreen
@@ -129,6 +132,11 @@ fun App(
                         val profileViewModel = koinViewModel<ProfileViewModel>()
 
                         ProfileScreen(viewModel = profileViewModel)
+                    }
+                    composable<SettingsRoute> {
+                        val settingsViewModel = koinViewModel<SettingsViewModel>()
+
+                        SettingsScreen(viewModel = settingsViewModel)
                     }
                     composable<AddMatchRoute> {
                         val addMatchViewModel = koinViewModel<AddMatchViewModel>()

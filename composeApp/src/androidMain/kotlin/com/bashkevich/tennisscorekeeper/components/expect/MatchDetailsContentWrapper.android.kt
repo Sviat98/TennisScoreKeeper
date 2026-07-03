@@ -53,6 +53,7 @@ import com.bashkevich.tennisscorekeeper.model.match.remote.body.MatchStatus
 import com.bashkevich.tennisscorekeeper.model.match.remote.body.convertToString
 import com.bashkevich.tennisscorekeeper.navigation.LoginRoute
 import com.bashkevich.tennisscorekeeper.navigation.ProfileRoute
+import com.bashkevich.tennisscorekeeper.navigation.SettingsRoute
 import com.bashkevich.tennisscorekeeper.screens.matchdetails.MatchDetailsState
 import com.bashkevich.tennisscorekeeper.screens.matchdetails.MatchDetailsUiEvent
 import kotlinx.coroutines.launch
@@ -171,14 +172,7 @@ actual fun MatchDetailsContentWrapper(
                                 clipboard.setText(link)
                             }
                         },
-                        isAuthorized = isAuthorized,
-                        onNavigateToLoginOrProfile = {
-                            if (isAuthorized) {
-                                navController.navigate(ProfileRoute)
-                            } else {
-                                navController.navigate(LoginRoute)
-                            }
-                        }
+                        onNavigateToSettings = { navController.navigate(SettingsRoute) }
                     )
                 }
             },

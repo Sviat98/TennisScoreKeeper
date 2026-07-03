@@ -26,7 +26,7 @@ class RefreshTournamentDetailsUseCase(
     }
 
     fun observeTournamentByIdFromNetwork(
-        tournamentId: String
+        tournamentId: Int
     ): Flow<LoadResult<Unit, Throwable>?> = flow {
         emit(null)
         refreshTrigger
@@ -48,7 +48,7 @@ class RefreshTournamentDetailsUseCase(
     }
 
     fun observeMatchesListFromNetwork(
-        tournamentId: String
+        tournamentId: Int
     ): Flow<LoadResult<Unit, Throwable>?> =
         flow {
             emit(null)
@@ -63,7 +63,7 @@ class RefreshTournamentDetailsUseCase(
         }
 
     fun observeParticipantsFromNetwork(
-        tournamentId: String
+        tournamentId: Int
     ): Flow<LoadResult<Unit, Throwable>?> =
         flow {
             emit(null)

@@ -21,7 +21,7 @@ import com.bashkevich.tennisscorekeeper.model.match.remote.ShortMatchDto
 data class MatchGameEntity(
     @PrimaryKey
     @ColumnInfo(name = "match_id")
-    val matchId: String,
+    val matchId: Int,
     @ColumnInfo(name = "first_participant_points")
     val firstParticipantPoints: String,
     @ColumnInfo(name = "second_participant_points")
@@ -31,7 +31,7 @@ data class MatchGameEntity(
 fun ShortMatchDto.toMatchGameEntity(): MatchGameEntity? {
     val game = currentGame ?: return null
     return MatchGameEntity(
-        matchId = id,
+        matchId = id.toInt(),
         firstParticipantPoints = game.firstParticipantPoints,
         secondParticipantPoints = game.secondParticipantPoints,
     )
@@ -40,7 +40,7 @@ fun ShortMatchDto.toMatchGameEntity(): MatchGameEntity? {
 fun MatchDto.toMatchGameEntity(): MatchGameEntity? {
     val game = currentGame ?: return null
     return MatchGameEntity(
-        matchId = id,
+        matchId = id.toInt(),
         firstParticipantPoints = game.firstParticipantPoints,
         secondParticipantPoints = game.secondParticipantPoints,
     )

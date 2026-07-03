@@ -30,8 +30,7 @@ import com.bashkevich.tennisscorekeeper.components.set_template.SetComponentStat
 import com.bashkevich.tennisscorekeeper.components.showUnauthorizedActionSnackbar
 import com.bashkevich.tennisscorekeeper.components.theme.ThemeComponentState
 import com.bashkevich.tennisscorekeeper.mvi.LaunchedUiEffectHandler
-import com.bashkevich.tennisscorekeeper.navigation.LoginRoute
-import com.bashkevich.tennisscorekeeper.navigation.ProfileRoute
+import com.bashkevich.tennisscorekeeper.navigation.SettingsRoute
 
 @Composable
 fun AddTournamentScreen(
@@ -41,7 +40,6 @@ fun AddTournamentScreen(
     val state by viewModel.state.collectAsStateWithLifecycle()
     val navController = LocalNavHostController.current
     val snackbarHostState = remember { SnackbarHostState() }
-    val isAuthorized = LocalAuthorization.current
 
     LaunchedUiEffectHandler(
         effect = state.action,
@@ -71,15 +69,8 @@ fun AddTournamentScreen(
         tournamentNameState = viewModel.tournamentNameState,
         onEvent = { event -> viewModel.onEvent(event) },
         snackbarHostState = snackbarHostState,
-        isAuthorized = isAuthorized,
         onBack = { navController.navigateUp() },
-        onNavigateToLoginOrProfile = {
-            if (isAuthorized) {
-                navController.navigate(ProfileRoute)
-            } else {
-                navController.navigate(LoginRoute)
-            }
-        },
+        onNavigateToSettings = { navController.navigate(SettingsRoute) },
     )
 }
 
@@ -91,9 +82,8 @@ fun AddTournamentContent(
     tournamentNameState: TextFieldState,
     onEvent: (AddTournamentUiEvent) -> Unit,
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
-    isAuthorized: Boolean = false,
     onBack: () -> Unit = {},
-    onNavigateToLoginOrProfile: () -> Unit = {},
+    onNavigateToSettings: () -> Unit = {},
 ) {
     val tournamentType = state.tournamentType
 
@@ -109,8 +99,7 @@ fun AddTournamentContent(
         topBar = {
             AddTournamentAppBar(
                 onBack = onBack,
-                isAuthorized = isAuthorized,
-                onNavigateToLoginOrProfile = onNavigateToLoginOrProfile,
+                onNavigateToSettings = onNavigateToSettings,
             )
         },
         snackbarHost = { SnackbarHost(snackbarHostState) }

@@ -28,13 +28,13 @@ class MatchDetailsViewModel(
     private val themeRepository: ThemeRepository
 ) :
     BaseViewModel<MatchDetailsState, MatchDetailsUiEvent, MatchDetailsAction>() {
-    private val matchId: String = savedStateHandle.toRoute<MatchDetailsRoute>().id
+    private val matchId: Int = savedStateHandle.toRoute<MatchDetailsRoute>().id
 
     private val _connectionState = MutableStateFlow(ConnectionState.Loading)
 
     init {
         viewModelScope.launch {
-            themeRepository.observeThemeByIdFromDatabase(1.toString()).collect {
+            themeRepository.observeThemeByIdFromDatabase(1).collect {
                 println(it)
             }
         }
@@ -90,7 +90,7 @@ class MatchDetailsViewModel(
         }
     }
 
-    private fun updateMatchScore(participantId: String, scoreType: ScoreType) {
+    private fun updateMatchScore(participantId: Int, scoreType: ScoreType) {
         viewModelScope.launch {
             val matchId = state.value.match.id
             matchRepository.updateMatchScore(
@@ -103,7 +103,7 @@ class MatchDetailsViewModel(
         }
     }
 
-    private fun setFirstParticipantToServe(participantId: String) {
+    private fun setFirstParticipantToServe(participantId: Int) {
         viewModelScope.launch {
             val matchId = state.value.match.id
             matchRepository.setFirstParticipantToServe(
@@ -115,7 +115,7 @@ class MatchDetailsViewModel(
         }
     }
 
-    private fun setFirstPlayerInPairToServe(playerId: String) {
+    private fun setFirstPlayerInPairToServe(playerId: Int) {
         viewModelScope.launch {
             val matchId = state.value.match.id
             matchRepository.setFirstPlayerInPairToServe(
@@ -127,7 +127,7 @@ class MatchDetailsViewModel(
         }
     }
 
-    private fun setParticipantRetired(participantId: String) {
+    private fun setParticipantRetired(participantId: Int) {
         viewModelScope.launch {
             val matchId = state.value.match.id
             matchRepository.setParticipantRetired(

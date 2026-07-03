@@ -13,7 +13,7 @@ interface ParticipantDao {
 
     @Transaction
     @Query("SELECT * FROM participants WHERE tournament_id = :tournamentId ORDER BY seed NULLS LAST, id")
-    fun getParticipantsForTournament(tournamentId: String): Flow<List<ParticipantWithPlayersEntity>>
+    fun getParticipantsForTournament(tournamentId: Int): Flow<List<ParticipantWithPlayersEntity>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertParticipant(entity: ParticipantEntity)
@@ -25,7 +25,7 @@ interface ParticipantDao {
     suspend fun insertPlayers(players: List<PlayerEntity>)
 
     @Query("DELETE FROM participants WHERE tournament_id = :tournamentId")
-    suspend fun deleteParticipantsByTournament(tournamentId: String)
+    suspend fun deleteParticipantsByTournament(tournamentId: Int)
 
     @Query("DELETE FROM players")
     suspend fun deleteAllPlayers()
@@ -41,7 +41,7 @@ interface ParticipantDao {
 
     @Transaction
     suspend fun replaceAllParticipantsForTournament(
-        tournamentId: String,
+        tournamentId: Int,
         entities: List<ParticipantWithPlayersEntity>
     ) {
         deleteParticipantsByTournament(tournamentId)

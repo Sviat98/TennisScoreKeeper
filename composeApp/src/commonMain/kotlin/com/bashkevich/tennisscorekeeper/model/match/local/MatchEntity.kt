@@ -17,33 +17,33 @@ import com.bashkevich.tennisscorekeeper.model.match.remote.ShortMatchDto
 data class MatchEntity(
     @PrimaryKey
     @ColumnInfo(name = "id")
-    val id: String,
+    val id: Int,
     @ColumnInfo(name = "tournament_id")
-    val tournamentId: String,
+    val tournamentId: Int,
     @ColumnInfo(name = "first_participant_id")
-    val firstParticipantId: String,
+    val firstParticipantId: Int,
     @ColumnInfo(name = "second_participant_id")
-    val secondParticipantId: String,
+    val secondParticipantId: Int,
     @ColumnInfo(name = "point_shift")
     val pointShift: Int,
     @ColumnInfo(name = "video_link")
     val videoLink: String?,
     @ColumnInfo(name = "theme_id")
-    val themeId: String,
+    val themeId: Int,
     @ColumnInfo(name = "status")
     val status: String,
     @ColumnInfo(name = "current_set_mode")
     val currentSetMode: String?,
 )
 
-fun ShortMatchDto.toMatchEntity(tournamentId: String) = MatchEntity(
-    id = id,
+fun ShortMatchDto.toMatchEntity(tournamentId: Int) = MatchEntity(
+    id = id.toInt(),
     tournamentId = tournamentId,
-    firstParticipantId = firstParticipant.id,
-    secondParticipantId = secondParticipant.id,
+    firstParticipantId = firstParticipant.id.toInt(),
+    secondParticipantId = secondParticipant.id.toInt(),
     pointShift = 0,
     videoLink = null,
-    themeId = themeId,
+    themeId = themeId.toInt(),
     status = status.name,
     currentSetMode = null,
 )

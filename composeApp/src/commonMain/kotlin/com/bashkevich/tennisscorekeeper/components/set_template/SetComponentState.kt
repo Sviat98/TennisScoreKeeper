@@ -13,10 +13,10 @@ data class SetComponentState(
     sealed interface SelectedSetState {
 
         @Immutable
-        data class Loading(val initialSetTemplateId: String) : SelectedSetState
+        data class Loading(val initialSetTemplateId: Int) : SelectedSetState
 
         @Immutable
-        data class Error(val initialSetTemplateId: String) : SelectedSetState
+        data class Error(val initialSetTemplateId: Int) : SelectedSetState
 
         @Immutable
         data class Idle(val setTemplate: SetTemplate?) : SelectedSetState

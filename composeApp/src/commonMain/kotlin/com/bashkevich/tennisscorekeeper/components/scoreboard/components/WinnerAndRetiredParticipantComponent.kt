@@ -22,10 +22,10 @@ import com.bashkevich.tennisscorekeeper.components.icons.default_icons.Check
 @Composable
 fun WinnerAndRetiredParticipantComponent(
     modifier: Modifier = Modifier,
-    firstParticipantId: String,
-    secondParticipantId: String,
-    winnerParticipantId: String?,
-    retiredParticipantId: String?,
+    firstParticipantId: Int,
+    secondParticipantId: Int,
+    winnerParticipantId: Int?,
+    retiredParticipantId: Int?,
     paddingFromCenter: Dp = 0.dp,
     winnerIconSize: Dp = 24.dp,
     retiredLabelFontSize: TextUnit = 20.sp

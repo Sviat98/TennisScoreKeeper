@@ -10,7 +10,7 @@ import com.bashkevich.tennisscorekeeper.model.player.remote.PlayerInParticipantD
 data class PlayerEntity(
     @PrimaryKey
     @ColumnInfo(name = "id")
-    val id: String,
+    val id: Int,
     @ColumnInfo(name = "surname")
     val surname: String,
     @ColumnInfo(name = "name")
@@ -18,7 +18,7 @@ data class PlayerEntity(
 )
 
 fun PlayerInParticipantDto.toEntity() = PlayerEntity(
-    id = id,
+    id = id.toInt(),
     surname = surname,
     name = name,
 )

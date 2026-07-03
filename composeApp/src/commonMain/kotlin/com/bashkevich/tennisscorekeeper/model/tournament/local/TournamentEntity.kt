@@ -10,7 +10,7 @@ import com.bashkevich.tennisscorekeeper.model.tournament.remote.TournamentDto
 data class TournamentEntity(
     @PrimaryKey
     @ColumnInfo(name = "id")
-    val id: String,
+    val id: Int,
     @ColumnInfo(name = "name")
     val name: String,
     @ColumnInfo(name = "type")
@@ -18,11 +18,11 @@ data class TournamentEntity(
     @ColumnInfo(name = "status")
     val status: String,
     @ColumnInfo(name = "regular_set_id")
-    val regularSetTemplateId: String?,
+    val regularSetTemplateId: Int?,
     @ColumnInfo(name = "deciding_set_id")
-    val decidingSetTemplateId: String,
+    val decidingSetTemplateId: Int,
     @ColumnInfo(name = "theme_id")
-    val themeId: String,
+    val themeId: Int,
     @ColumnInfo(name = "sets_to_win")
     val setsToWin: Int,
     @ColumnInfo(name = "total_participants")
@@ -34,13 +34,13 @@ data class TournamentEntity(
 )
 
 fun TournamentDto.toEntity() = TournamentEntity(
-    id = id,
+    id = id.toInt(),
     name = name,
     type = type.name,
     status = status.name,
-    regularSetTemplateId = regularSetTemplateId,
-    decidingSetTemplateId = decidingSetTemplateId,
-    themeId = themeId,
+    regularSetTemplateId = regularSetTemplateId?.toInt(),
+    decidingSetTemplateId = decidingSetTemplateId.toInt(),
+    themeId = themeId.toInt(),
     setsToWin = setsToWin,
     totalParticipants = totalParticipants,
     totalMatches = totalMatches,

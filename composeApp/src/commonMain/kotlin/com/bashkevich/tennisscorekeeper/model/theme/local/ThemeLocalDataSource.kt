@@ -12,7 +12,7 @@ class ThemeLocalDataSource(
         return dao.getAllThemes()
     }
 
-    fun getThemeById(id: String): Flow<ThemeEntity?> {
+    fun getThemeById(id: Int): Flow<ThemeEntity?> {
         return dao.getThemeById(id)
     }
 

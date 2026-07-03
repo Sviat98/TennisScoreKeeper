@@ -213,9 +213,9 @@ class AddTournamentViewModel(
     private fun addTournament(
         tournamentName: String,
         tournamentType: TournamentType,
-        defaultSetTemplateId: String?,
-        decidingSetTemplateId: String,
-        themeId: String,
+        defaultSetTemplateId: Int?,
+        decidingSetTemplateId: Int,
+        themeId: Int,
         setsToWin: Int,
     ) {
         viewModelScope.launch {
@@ -223,9 +223,9 @@ class AddTournamentViewModel(
             val addTournamentBody = AddTournamentBody(
                 name = tournamentName,
                 type = tournamentType,
-                regularSetTemplateId = defaultSetTemplateId,
-                decidingSetTemplateId = decidingSetTemplateId,
-                themeId = themeId,
+                regularSetTemplateId = defaultSetTemplateId?.toString(),
+                decidingSetTemplateId = decidingSetTemplateId.toString(),
+                themeId = themeId.toString(),
                 setsToWin = setsToWin,
             )
             tournamentRepository.addTournament(addTournamentBody)
