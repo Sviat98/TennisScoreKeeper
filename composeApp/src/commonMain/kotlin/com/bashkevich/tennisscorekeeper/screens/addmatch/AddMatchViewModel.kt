@@ -60,7 +60,7 @@ class AddMatchViewModel(
     private val themeRepository: ThemeRepository,
 ) : BaseViewModel<AddMatchState, AddMatchUiEvent, AddMatchAction>() {
 
-    private val tournamentId: String = savedStateHandle.toRoute<AddMatchRoute>().tournamentId
+    private val tournamentId: Int = savedStateHandle.toRoute<AddMatchRoute>().tournamentId
 
     // --- Tournament from DB (no fetchTournamentById, tournament is already cached) ---
     private val tournamentFromDb: StateFlow<Tournament> =
@@ -68,17 +68,17 @@ class AddMatchViewModel(
             .onEach { tournament->
                 if ( tournament != TOURNAMENT_DEFAULT) {
                     _regularSetId.value = tournament.regularSetTemplateId
-                    _decidingSetId.value = tournament.decidingSetTemplateId.takeIf { it.isNotEmpty() }
-                    _themeId.value = tournament.themeId.takeIf { it.isNotEmpty() }
+                    _decidingSetId.value = tournament.decidingSetTemplateId.takeIf { it != 0 }
+                    _themeId.value = tournament.themeId.takeIf { it != 0 }
                     _setsToWin.value = tournament.setsToWin
                 }
             }
             .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), TOURNAMENT_DEFAULT)
 
     // --- Selected IDs (single source of truth) ---
-    private val _regularSetId = MutableStateFlow<String?>(null)
-    private val _decidingSetId = MutableStateFlow<String?>(null)
-    private val _themeId = MutableStateFlow<String?>(null)
+    private val _regularSetId = MutableStateFlow<Int?>(null)
+    private val _decidingSetId = MutableStateFlow<Int?>(null)
+    private val _themeId = MutableStateFlow<Int?>(null)
     private val _setsToWin = MutableStateFlow(1)
 
     // --- Fetch results as Flows with onStart (triggered on subscription, NOT in init) ---
@@ -94,7 +94,7 @@ class AddMatchViewModel(
     private val decidingSetFetchResult: StateFlow<LoadResult<Unit, Throwable>?> =
         tournamentFromDb.flatMapLatest { tournament: Tournament ->
             val id = tournament.decidingSetTemplateId
-            if (id.isEmpty()) flowOf(null as LoadResult<Unit, Throwable>?)
+            if (id == 0) flowOf(null as LoadResult<Unit, Throwable>?)
             else flow<LoadResult<Unit, Throwable>?> {
                 emit(setTemplateRepository.fetchSetTemplateById(id))
             }.onStart { emit(null) }
@@ -103,7 +103,7 @@ class AddMatchViewModel(
     private val themeFetchResult: StateFlow<LoadResult<Unit, Throwable>?> =
         tournamentFromDb.flatMapLatest { tournament: Tournament ->
             val id = tournament.themeId
-            if (id.isEmpty()) flowOf(null as LoadResult<Unit, Throwable>?)
+            if (id == 0) flowOf(null as LoadResult<Unit, Throwable>?)
             else flow<LoadResult<Unit, Throwable>?> {
                 emit(themeRepository.fetchThemeById(id))
             }.onStart { emit(null) }
@@ -133,7 +133,7 @@ class AddMatchViewModel(
         _regularSetId,
         regularSetFetchResult,
         regularSetFromDb,
-    ) { id: String?, fetchResult: LoadResult<Unit, Throwable>?, dbValue: SetTemplate ->
+    ) { id: Int?, fetchResult: LoadResult<Unit, Throwable>?, dbValue: SetTemplate ->
         when {
             id == null -> SetComponentState.SelectedSetState.Idle(null)
             dbValue != SET_TEMPLATE_DEFAULT -> SetComponentState.SelectedSetState.Idle(dbValue)
@@ -147,7 +147,7 @@ class AddMatchViewModel(
         _decidingSetId,
         decidingSetFetchResult,
         decidingSetFromDb,
-    ) { id: String?, fetchResult: LoadResult<Unit, Throwable>?, dbValue: SetTemplate ->
+    ) { id: Int?, fetchResult: LoadResult<Unit, Throwable>?, dbValue: SetTemplate ->
         when {
             id == null -> SetComponentState.SelectedSetState.Idle(null)
             dbValue != SET_TEMPLATE_DEFAULT -> SetComponentState.SelectedSetState.Idle(dbValue)
@@ -161,7 +161,7 @@ class AddMatchViewModel(
         _themeId,
         themeFetchResult,
         themeFromDb,
-    ) { id: String?, fetchResult: LoadResult<Unit, Throwable>?, dbValue: ScoreboardTheme ->
+    ) { id: Int?, fetchResult: LoadResult<Unit, Throwable>?, dbValue: ScoreboardTheme ->
         when {
             id == null -> ThemeComponentState.SelectedThemeState.Idle(null)
             dbValue != ScoreboardTheme.DEFAULT -> ThemeComponentState.SelectedThemeState.Idle(dbValue)
@@ -548,13 +548,13 @@ class AddMatchViewModel(
             val second = _secondParticipant.value
 
             val firstParticipantBody = ParticipantInMatchBody(
-                id = first.id,
+                id = first.id.toString(),
                 displayName = first.displayName,
                 primaryColor = first.primaryColor.convertToRgbString(),
                 secondaryColor = first.secondaryColor?.convertToRgbString()
             )
             val secondParticipantBody = ParticipantInMatchBody(
-                id = second.id,
+                id = second.id.toString(),
                 displayName = second.displayName,
                 primaryColor = second.primaryColor.convertToRgbString(),
                 secondaryColor = second.secondaryColor?.convertToRgbString()
@@ -564,9 +564,9 @@ class AddMatchViewModel(
                 firstParticipant = firstParticipantBody,
                 secondParticipant = secondParticipantBody,
                 setsToWin = _setsToWin.value,
-                regularSet = _regularSetId.value,
-                decidingSet = _decidingSetId.value ?: "",
-                themeId = _themeId.value ?: "",
+                regularSet = _regularSetId.value?.toString(),
+                decidingSet = _decidingSetId.value?.toString() ?: "",
+                themeId = _themeId.value?.toString() ?: "",
             )
 
             matchRepository.addNewMatch(tournamentId = tournamentId, matchBody = matchBody)

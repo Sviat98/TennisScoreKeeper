@@ -15,8 +15,8 @@ import com.bashkevich.tennisscorekeeper.model.participant.domain.ParticipantInDo
 fun ChooseServePanel(
     modifier: Modifier = Modifier,
     match: Match,
-    onFirstParticipantToServeChoose: (String) -> Unit,
-    onFirstPlayerInPairToServeChoose: (String) -> Unit
+    onFirstParticipantToServeChoose: (Int) -> Unit,
+    onFirstPlayerInPairToServeChoose: (Int) -> Unit
 ) {
     val firstParticipant = match.firstParticipant
     val secondParticipant = match.secondParticipant

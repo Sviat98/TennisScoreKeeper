@@ -5,19 +5,19 @@ import com.bashkevich.tennisscorekeeper.model.player.remote.PlayerInMatchDto
 import com.bashkevich.tennisscorekeeper.model.player.remote.PlayerInSinglesMatchDto
 
 sealed class TennisPlayerInMatch{
-    abstract val id: String
+    abstract val id: Int
     abstract val surname: String
     abstract val name: String
 }
 
 data class PlayerInSinglesMatch(
-    override val id: String,
+    override val id: Int,
     override val surname: String,
     override val name: String,
 ) : TennisPlayerInMatch()
 
 data class PlayerInDoublesMatch(
-    override val id: String,
+    override val id: Int,
     override val surname: String,
     override val name: String,
     val isServingNow: Boolean,
@@ -26,12 +26,12 @@ data class PlayerInDoublesMatch(
 
 fun PlayerInMatchDto.toDomain(): TennisPlayerInMatch = when(this) {
     is PlayerInSinglesMatchDto -> PlayerInSinglesMatch(
-        id = this.id,
+        id = this.id.toInt(),
         surname = this.surname,
         name = this.name,
     )
     is PlayerInDoublesMatchDto -> PlayerInDoublesMatch(
-        id = this.id,
+        id = this.id.toInt(),
         surname = this.surname,
         name = this.name,
         isServingNow = this.isServingNow,
@@ -40,7 +40,7 @@ fun PlayerInMatchDto.toDomain(): TennisPlayerInMatch = when(this) {
 }
 
 val PLAYER_IN_DOUBLES_MATCH_DEFAULT = PlayerInDoublesMatch(
-    id = "0",
+    id = 0,
     surname = "",
     name = "",
     isServingNow = false,

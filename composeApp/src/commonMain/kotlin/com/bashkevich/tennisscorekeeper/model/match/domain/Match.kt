@@ -14,7 +14,7 @@ import com.bashkevich.tennisscorekeeper.model.player.domain.PlayerInDoublesMatch
 import com.bashkevich.tennisscorekeeper.model.player.domain.PlayerInSinglesMatch
 
 data class Match(
-    val id: String,
+    val id: Int,
     val pointShift: Int,
     val videoLink: String?,
     val firstParticipant: TennisParticipantInMatch,
@@ -42,7 +42,7 @@ data class TennisGame(
 val EMPTY_TENNIS_SET = TennisSet(firstParticipantGamesWon = 0, secondParticipantGamesWon = 0)
 
 fun MatchDto.toDomain() = Match(
-    id = this.id,
+    id = this.id.toInt(),
     pointShift = this.pointShift,
     videoLink = this.videoLink,
     firstParticipant = this.firstParticipant.toDomain(),
@@ -67,11 +67,11 @@ fun TennisGameDto.toDomain() = TennisGame(
 
 
 val SAMPLE_MATCH = Match(
-    id = "1",
+    id = 1,
     pointShift = 0,
     videoLink = null,
     firstParticipant = ParticipantInSinglesMatch(
-        id = "1",
+        id = 1,
         seed = 1,
         //displayName = "DJOKOVIC",
         displayName = "VENNEGOOR OF HESSELINK",
@@ -80,10 +80,10 @@ val SAMPLE_MATCH = Match(
         isServing = false,
         isWinner = false,
         isRetired = false,
-        player = PlayerInSinglesMatch(id = "1", surname = "Djokovic", name = "Novak")
+        player = PlayerInSinglesMatch(id = 1, surname = "Djokovic", name = "Novak")
     ),
     secondParticipant = ParticipantInSinglesMatch(
-        id = "2",
+        id = 2,
         seed = null,
         displayName = "AUGER-ALIASSIME",
         primaryColor = Color.Red,
@@ -91,7 +91,7 @@ val SAMPLE_MATCH = Match(
         isServing = true,
         isWinner = false,
         isRetired = false,
-        player = PlayerInSinglesMatch(id = "2", surname = "Auger-Aliassime", name = "Felix")
+        player = PlayerInSinglesMatch(id = 2, surname = "Auger-Aliassime", name = "Felix")
     ),
     status = MatchStatus.IN_PROGRESS,
     previousSets = listOf(
@@ -105,11 +105,11 @@ val SAMPLE_MATCH = Match(
 )
 
 val DOUBLES_SAMPLE_MATCH = Match(
-    id = "2",
+    id = 2,
     pointShift = 0,
     videoLink = null,
     firstParticipant = ParticipantInDoublesMatch(
-        id = "5",
+        id = 5,
         seed = 1,
         displayName = "DJOKOVIC/NADAL",
         primaryColor = Color.White,
@@ -118,14 +118,14 @@ val DOUBLES_SAMPLE_MATCH = Match(
         isWinner = false,
         isRetired = false,
         firstPlayer = PlayerInDoublesMatch(
-            id = "1",
+            id = 1,
             surname = "Djokovic",
             name = "Novak",
             isServingNow = false,
             isServingNext = true
         ),
         secondPlayer = PlayerInDoublesMatch(
-            id = "3",
+            id = 3,
             surname = "Nadal",
             name = "Rafael",
             isServingNow = false,
@@ -133,7 +133,7 @@ val DOUBLES_SAMPLE_MATCH = Match(
         )
     ),
     secondParticipant = ParticipantInDoublesMatch(
-        id = "6",
+        id = 6,
         seed = null,
         displayName = "MURRAY/FEDERER",
         primaryColor = Color.White,
@@ -142,14 +142,14 @@ val DOUBLES_SAMPLE_MATCH = Match(
         isWinner = false,
         isRetired = false,
         firstPlayer = PlayerInDoublesMatch(
-            id = "4",
+            id = 4,
             surname = "Murray",
             name = "Andy",
             isServingNow = false,
             isServingNext = false
         ),
         secondPlayer = PlayerInDoublesMatch(
-            id = "5",
+            id = 5,
             surname = "Federer",
             name = "Roger",
             isServingNow = true,
@@ -165,45 +165,3 @@ val DOUBLES_SAMPLE_MATCH = Match(
     currentSetMode = null,
     currentGame = TennisGame(firstParticipantPointsWon = "30", secondParticipantPointsWon = "15")
 )
-
-//val SECOND_SAMPLE_MATCH = Match(
-//    id = "2",
-//    pointShift = 0,
-//    firstParticipant = ParticipantInSinglesMatch(
-//        id = "1",
-//        seed = 10,
-//        displayName = "Djokovic",
-//        primaryColor = Color.White,
-//        secondaryColor = null,
-//        isServing = false,
-//        isWinner = false,
-//        isRetired = false,
-//        player = DoublesPlayerInMatch(id = "1", surname = "Djokovic", name = "Novak", isServing = false)
-//    ),
-//    secondParticipant = ParticipantInDoublesMatch(
-//        id = "2",
-//        seed = null,
-//        displayName = "Auger-Aliassime",
-//        primaryColor = Color.White,
-//        secondaryColor = null,
-//        isServing = true,
-//        isWinner = false,
-//        isRetired = false,
-//        player = SinglesPlayerInMatch(
-//            id = "2",
-//            surname = "Auger-Aliassime",
-//            name = "Felix",
-//            isServing = true
-//        )
-//    ),
-//    status = MatchStatus.IN_PROGRESS,
-//    previousSets = listOf(
-//        TennisSet(firstParticipantGamesWon = 12, secondParticipantGamesWon = 10),
-//        TennisSet(firstParticipantGamesWon = 10, secondParticipantGamesWon = 12),
-//        TennisSet(firstParticipantGamesWon = 12, secondParticipantGamesWon = 10),
-//        TennisSet(firstParticipantGamesWon = 10, secondParticipantGamesWon = 12),
-//    ),
-//    currentSet = TennisSet(firstParticipantGamesWon = 10, secondParticipantGamesWon = 9),
-//    currentSetMode = null,
-//    currentGame = TennisGame(firstParticipantPointsWon = "30", secondParticipantPointsWon = "15")
-//)

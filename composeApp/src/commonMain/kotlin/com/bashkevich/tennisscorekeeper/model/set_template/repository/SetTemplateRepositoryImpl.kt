@@ -56,15 +56,15 @@ class SetTemplateRepositoryImpl(
         }
     }
 
-    override suspend fun fetchSetTemplateById(id: String): LoadResult<Unit, Throwable> {
-        return setTemplateRemoteDataSource.getSetTemplateById(id)
+    override suspend fun fetchSetTemplateById(id: Int): LoadResult<Unit, Throwable> {
+        return setTemplateRemoteDataSource.getSetTemplateById(id.toString())
             .doOnSuccess { dto ->
                 setTemplateLocalDataSource.insertSetTemplate(dto.toEntity())
             }
             .mapSuccess { }
     }
 
-    override fun observeSetTemplateById(id: String): Flow<SetTemplate> {
+    override fun observeSetTemplateById(id: Int): Flow<SetTemplate> {
         return setTemplateLocalDataSource.getSetTemplateById(id).map { entity ->
             entity?.toDomain() ?: SET_TEMPLATE_DEFAULT
         }

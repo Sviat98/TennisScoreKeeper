@@ -142,7 +142,7 @@ fun LoginAppBar(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MatchDetailsAppBar(
-    matchId: String,
+    matchId: Int,
     onBack: () -> Unit,
     onCopyLink: (String) -> Unit,
     onNavigateToSettings: () -> Unit

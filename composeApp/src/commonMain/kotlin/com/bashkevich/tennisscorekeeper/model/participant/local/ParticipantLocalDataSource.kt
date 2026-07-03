@@ -9,15 +9,15 @@ class ParticipantLocalDataSource(
 ) {
     private val dao: ParticipantDao = db.participantDao()
 
-    fun observeParticipants(tournamentId: String): Flow<List<ParticipantWithPlayersEntity>> {
+    fun observeParticipants(tournamentId: Int): Flow<List<ParticipantWithPlayersEntity>> {
         return dao.getParticipantsForTournament(tournamentId)
     }
 
-    suspend fun deleteParticipantsForTournament(tournamentId: String) {
+    suspend fun deleteParticipantsForTournament(tournamentId: Int) {
         dao.deleteParticipantsByTournament(tournamentId)
     }
 
-    suspend fun replaceParticipantsForTournament(tournamentId: String, dtos: List<ParticipantDto>) {
+    suspend fun replaceParticipantsForTournament(tournamentId: Int, dtos: List<ParticipantDto>) {
         val entities = dtos.map { it.toEntity(tournamentId) }
         dao.replaceAllParticipantsForTournament(tournamentId, entities)
     }

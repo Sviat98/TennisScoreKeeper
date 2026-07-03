@@ -24,9 +24,9 @@ sealed class AddTournamentUiEvent : UiEvent {
     class AddTournament(
         val tournamentName: String,
         val tournamentType: TournamentType,
-        val defaultSetTemplateId: String?,
-        val decidingSetTemplateId: String,
-        val themeId: String,
+        val defaultSetTemplateId: Int?,
+        val decidingSetTemplateId: Int,
+        val themeId: Int,
         val setsToWin: Int,
     ) : AddTournamentUiEvent()
 }

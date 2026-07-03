@@ -34,8 +34,8 @@ class TournamentRepositoryImpl(
             .mapSuccess {  }
     }
 
-    override suspend fun fetchTournamentById(id: String): LoadResult<Unit, Throwable> {
-        return tournamentRemoteDataSource.getTournamentById(id).doOnSuccess { tournamentDto ->
+    override suspend fun fetchTournamentById(id: Int): LoadResult<Unit, Throwable> {
+        return tournamentRemoteDataSource.getTournamentById(id.toString()).doOnSuccess { tournamentDto ->
             tournamentLocalDataSource.insertTournament(tournamentDto.toEntity())
         }.mapSuccess { }
     }
@@ -51,12 +51,12 @@ class TournamentRepositoryImpl(
     }
 
     override suspend fun changeTournamentStatus(
-        tournamentId: String,
+        tournamentId: Int,
         tournamentStatus: TournamentStatus
     ): LoadResult<ResponseMessage, Throwable> {
         val tournamentStatusBody = TournamentStatusBody(tournamentStatus)
         return tournamentRemoteDataSource.changeTournamentStatus(
-            tournamentId = tournamentId,
+            tournamentId = tournamentId.toString(),
             tournamentStatusBody = tournamentStatusBody
         ).doOnSuccess {
             tournamentLocalDataSource.updateStatus(tournamentId, tournamentStatus.name)
@@ -73,7 +73,7 @@ class TournamentRepositoryImpl(
         }
     }
 
-    override fun observeTournamentById(id: String): Flow<Tournament> {
+    override fun observeTournamentById(id: Int): Flow<Tournament> {
         return tournamentLocalDataSource.getTournamentById(id).map { entity ->
             entity?.toDomain() ?: TOURNAMENT_DEFAULT
         }

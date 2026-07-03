@@ -9,7 +9,7 @@ import com.bashkevich.tennisscorekeeper.model.player.domain.PlayerInSinglesMatch
 import com.bashkevich.tennisscorekeeper.model.player.domain.TennisPlayerInMatch
 
 sealed class TennisParticipantInMatch {
-    abstract val id: String
+    abstract val id: Int
     abstract val seed: Int?
     abstract val displayName: String
     abstract val primaryColor: Color
@@ -20,7 +20,7 @@ sealed class TennisParticipantInMatch {
 }
 
 data class ParticipantInSinglesMatch(
-    override val id: String,
+    override val id: Int,
     override val seed: Int?,
     override val displayName: String,
     override val primaryColor: Color,
@@ -32,7 +32,7 @@ data class ParticipantInSinglesMatch(
 ) : TennisParticipantInMatch()
 
 data class ParticipantInDoublesMatch(
-    override val id: String,
+    override val id: Int,
     override val seed: Int?,
     override val displayName: String,
     override val primaryColor: Color,
@@ -48,7 +48,7 @@ fun ParticipantInMatchDto.toDomain() =
     when (this) {
         is ParticipantInSinglesMatchDto -> {
             ParticipantInSinglesMatch(
-                id = this.id,
+                id = this.id.toInt(),
                 seed = this.seed,
                 displayName = this.displayName,
                 primaryColor = Color(this.primaryColor.convertColor()),
@@ -57,7 +57,7 @@ fun ParticipantInMatchDto.toDomain() =
                 isWinner = this.isWinner,
                 isRetired = this.isRetired,
                 player = PlayerInSinglesMatch(
-                    id = this.player.id,
+                    id = this.player.id.toInt(),
                     surname = this.player.surname,
                     name = this.player.name,
                 )
@@ -77,7 +77,7 @@ fun ParticipantInMatchDto.toDomain() =
             val (spServingNow, spServingNext) = servingState(this.secondPlayer.id)
 
             ParticipantInDoublesMatch(
-                id = this.id,
+                id = this.id.toInt(),
                 seed = this.seed,
                 displayName = this.displayName,
                 primaryColor = Color(this.primaryColor.convertColor()),
@@ -86,14 +86,14 @@ fun ParticipantInMatchDto.toDomain() =
                 isWinner = this.isWinner,
                 isRetired = this.isRetired,
                 firstPlayer = PlayerInDoublesMatch(
-                    id = this.firstPlayer.id,
+                    id = this.firstPlayer.id.toInt(),
                     surname = this.firstPlayer.surname,
                     name = this.firstPlayer.name,
                     isServingNow = fpServingNow,
                     isServingNext = fpServingNext,
                 ),
                 secondPlayer = PlayerInDoublesMatch(
-                    id = this.secondPlayer.id,
+                    id = this.secondPlayer.id.toInt(),
                     surname = this.secondPlayer.surname,
                     name = this.secondPlayer.name,
                     isServingNow = spServingNow,
@@ -106,7 +106,7 @@ fun ParticipantInMatchDto.toDomain() =
 fun String.convertColor() = "FF$this".toLong(16)
 
 val PARTICIPANT_IN_SINGLES_MATCH_DEFAULT = ParticipantInSinglesMatch(
-    id = "0",
+    id = 0,
     seed = null,
     displayName = "",
     primaryColor = Color.White,
@@ -114,11 +114,11 @@ val PARTICIPANT_IN_SINGLES_MATCH_DEFAULT = ParticipantInSinglesMatch(
     isServing = false,
     isWinner = false,
     isRetired = false,
-    player = PlayerInSinglesMatch(id = "0", surname = "", name = ""),
+    player = PlayerInSinglesMatch(id = 0, surname = "", name = ""),
 )
 
 val PARTICIPANT_IN_DOUBLES_MATCH_DEFAULT = ParticipantInDoublesMatch(
-    id = "0",
+    id = 0,
     seed = null,
     displayName = "",
     primaryColor = Color.White,
@@ -127,14 +127,14 @@ val PARTICIPANT_IN_DOUBLES_MATCH_DEFAULT = ParticipantInDoublesMatch(
     isWinner = false,
     isRetired = false,
     firstPlayer = PlayerInDoublesMatch(
-        id = "0",
+        id = 0,
         surname = "",
         name = "",
         isServingNow = false,
         isServingNext = false
     ),
     secondPlayer = PlayerInDoublesMatch(
-        id = "0",
+        id = 0,
         surname = "",
         name = "",
         isServingNow = false,

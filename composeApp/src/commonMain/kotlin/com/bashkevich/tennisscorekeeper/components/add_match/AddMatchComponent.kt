@@ -127,8 +127,8 @@ fun AddMatchComponent(
 
         val needsRegularSet = contentState.setsToWin > 1
         val isButtonEnabled =
-            participantState.firstParticipant.id != "0"
-                    && participantState.secondParticipant.id != "0"
+            participantState.firstParticipant.id != 0
+                    && participantState.secondParticipant.id != 0
                     && participantState.firstParticipant.id != participantState.secondParticipant.id
                     && decidingSetTemplate != null
                     && selectedTheme != null

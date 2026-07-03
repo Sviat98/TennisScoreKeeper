@@ -12,7 +12,7 @@ class TournamentLocalDataSource(
         return dao.getAllTournaments()
     }
 
-    fun getTournamentById(id: String): Flow<TournamentEntity?> {
+    fun getTournamentById(id: Int): Flow<TournamentEntity?> {
         return dao.getTournamentById(id)
     }
 
@@ -24,15 +24,15 @@ class TournamentLocalDataSource(
         dao.replaceAllTournaments(tournaments)
     }
 
-    suspend fun updateStatus(id: String, status: String) {
+    suspend fun updateStatus(id: Int, status: String) {
         dao.updateStatus(id, status)
     }
 
-    suspend fun updateTotalParticipants(id: String, amount: Int) {
+    suspend fun updateTotalParticipants(id: Int, amount: Int) {
         dao.updateTotalParticipants(id, amount)
     }
 
-    suspend fun incrementUncompletedMatches(id: String) {
+    suspend fun incrementUncompletedMatches(id: Int) {
         dao.incrementUncompletedMatches(id)
     }
 }

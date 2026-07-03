@@ -13,14 +13,14 @@ interface MatchDao {
 
     @Transaction
     @Query("SELECT * FROM matches WHERE tournament_id = :tournamentId ORDER BY id DESC")
-    fun getMatchesForTournament(tournamentId: String): Flow<List<MatchWithParticipantsEntity>>
+    fun getMatchesForTournament(tournamentId: Int): Flow<List<MatchWithParticipantsEntity>>
 
     @Transaction
     @Query("SELECT * FROM matches WHERE id = :matchId LIMIT 1")
-    fun observeMatchById(matchId: String): Flow<MatchWithParticipantsEntity?>
+    fun observeMatchById(matchId: Int): Flow<MatchWithParticipantsEntity?>
 
     @Query("SELECT * FROM matches WHERE id = :matchId LIMIT 1")
-    suspend fun getMatchById(matchId: String): MatchEntity?
+    suspend fun getMatchById(matchId: Int): MatchEntity?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertMatches(entities: List<MatchEntity>)
@@ -41,14 +41,14 @@ interface MatchDao {
     suspend fun insertParticipantsInMatch(entities: List<ParticipantInMatchEntity>)
 
     @Query("DELETE FROM matches WHERE tournament_id = :tournamentId")
-    suspend fun deleteMatchesByTournament(tournamentId: String)
+    suspend fun deleteMatchesByTournament(tournamentId: Int)
 
     @Query("DELETE FROM matches")
     suspend fun deleteAllMatches()
 
     @Transaction
     suspend fun replaceAllMatchesForTournament(
-        tournamentId: String,
+        tournamentId: Int,
         matches: List<MatchEntity>,
         sets: List<MatchSetEntity>,
         games: List<MatchGameEntity>,

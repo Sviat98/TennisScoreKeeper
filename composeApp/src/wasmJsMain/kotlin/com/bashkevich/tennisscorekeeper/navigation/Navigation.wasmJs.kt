@@ -11,7 +11,7 @@ import org.koin.compose.viewmodel.koinViewModel
 @Serializable
 @SerialName("scoreboard")
 data class ScoreboardRoute(
-    val matchId: String = ""
+    val matchId: Int = 0
 )
 
 actual fun NavGraphBuilder.platformSpecificRoutes(){

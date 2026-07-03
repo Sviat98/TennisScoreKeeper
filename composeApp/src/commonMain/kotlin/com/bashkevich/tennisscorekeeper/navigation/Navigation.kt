@@ -10,7 +10,7 @@ data object TournamentsRoute
 
 @Serializable
 @SerialName("tournaments")
-data class TournamentRoute(val tournamentId: String)
+data class TournamentRoute(val tournamentId: Int)
 
 @Serializable
 @SerialName("addTournament")
@@ -19,7 +19,7 @@ data object AddTournamentRoute
 
 @Serializable
 @SerialName("matches")
-data class MatchDetailsRoute(val id: String)
+data class MatchDetailsRoute(val id: Int)
 
 @Serializable
 @SerialName("login")
@@ -31,7 +31,7 @@ data object ProfileRoute
 @Serializable
 @SerialName("addMatch")
 //@SerialName("matches/add") распознает как MatchDetailsRoute(id=add) на НЕ-Андроид
-data class AddMatchRoute(val tournamentId: String = "")
+data class AddMatchRoute(val tournamentId: Int = 0)
 
 @Serializable
 @SerialName("settings")

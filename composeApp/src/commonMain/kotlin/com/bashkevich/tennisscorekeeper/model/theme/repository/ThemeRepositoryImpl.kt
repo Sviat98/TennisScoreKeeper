@@ -48,8 +48,8 @@ class ThemeRepositoryImpl(
         refreshTrigger.tryEmit(Unit)
     }
 
-    override suspend fun fetchThemeById(id: String): LoadResult<Unit, Throwable> {
-        return themeRemoteDataSource.getThemeById(id).doOnSuccess { themeDto ->
+    override suspend fun fetchThemeById(id: Int): LoadResult<Unit, Throwable> {
+        return themeRemoteDataSource.getThemeById(id.toString()).doOnSuccess { themeDto ->
             themeLocalDataSource.insertTheme(themeDto.toEntity())
         }.mapSuccess { }
     }
@@ -60,7 +60,7 @@ class ThemeRepositoryImpl(
         }
     }
 
-    override fun observeThemeByIdFromDatabase(id: String): Flow<ScoreboardTheme> {
+    override fun observeThemeByIdFromDatabase(id: Int): Flow<ScoreboardTheme> {
         return themeLocalDataSource.getThemeById(id).map { entity ->
             entity?.toDomain() ?: ScoreboardTheme.DEFAULT
         }

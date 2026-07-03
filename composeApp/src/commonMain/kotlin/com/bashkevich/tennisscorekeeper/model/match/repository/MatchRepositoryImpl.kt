@@ -40,10 +40,10 @@ class MatchRepositoryImpl(
 ) : MatchRepository {
 
     override suspend fun addNewMatch(
-        tournamentId: String,
+        tournamentId: Int,
         matchBody: MatchBody
     ): LoadResult<Unit, Throwable> {
-        return matchRemoteDataSource.addNewMatch(tournamentId = tournamentId, matchBody = matchBody)
+        return matchRemoteDataSource.addNewMatch(tournamentId = tournamentId.toString(), matchBody = matchBody)
             .doOnSuccess { shortMatchDto ->
                 matchLocalDataSource.insertMatch(tournamentId, shortMatchDto)
                 tournamentLocalDataSource.incrementUncompletedMatches(tournamentId)
@@ -51,22 +51,22 @@ class MatchRepositoryImpl(
             .mapSuccess {  }
     }
 
-    override suspend fun fetchMatchesForTournament(tournamentId: String): LoadResult<Unit, Throwable> {
-        return matchRemoteDataSource.getMatchesByTournament(tournamentId)
+    override suspend fun fetchMatchesForTournament(tournamentId: Int): LoadResult<Unit, Throwable> {
+        return matchRemoteDataSource.getMatchesByTournament(tournamentId.toString())
             .doOnSuccess { shortMatchDtos ->
                 matchLocalDataSource.replaceMatchesForTournament(tournamentId, shortMatchDtos)
             }
             .mapSuccess { }
     }
 
-    override fun observeMatchesForTournament(tournamentId: String): Flow<List<ShortMatch>> {
+    override fun observeMatchesForTournament(tournamentId: Int): Flow<List<ShortMatch>> {
         return matchLocalDataSource.observeMatches(tournamentId).map { matches ->
             matches.map { it.toDomain() }
         }
     }
 
-    override suspend fun getMatchesForTournament(tournamentId: String): LoadResult<List<ShortMatch>, Throwable> {
-        return matchRemoteDataSource.getMatchesByTournament(tournamentId)
+    override suspend fun getMatchesForTournament(tournamentId: Int): LoadResult<List<ShortMatch>, Throwable> {
+        return matchRemoteDataSource.getMatchesByTournament(tournamentId.toString())
             .mapSuccess { shortMatches -> shortMatches.map { it.toDomain() } }
     }
 
@@ -74,15 +74,15 @@ class MatchRepositoryImpl(
         matchRemoteDataSource.closeSession()
     }
 
-    override fun observeMatchById(matchId: String): Flow<Match?> {
+    override fun observeMatchById(matchId: Int): Flow<Match?> {
         return matchLocalDataSource.observeMatchById(matchId).
             onEach { println("match From Db = $it") }
             .map { it?.toMatchDomain() }
     }
 
-    override fun observeMatchUpdatesFromNetwork(matchId: String): Flow<LoadResult<Match, Throwable>> =
+    override fun observeMatchUpdatesFromNetwork(matchId: Int): Flow<LoadResult<Match, Throwable>> =
         matchRemoteDataSource.observeMatchUpdates()
-            .onStart { matchRemoteDataSource.connectToMatchUpdates(matchId) }
+            .onStart { matchRemoteDataSource.connectToMatchUpdates(matchId.toString()) }
             .onEach { result ->
                 println("observeMatchUpdatesFromNetwork = $result")
                 result.doOnSuccess {
@@ -92,7 +92,7 @@ class MatchRepositoryImpl(
             .map { result -> result.mapSuccess { matchDto -> matchDto.toDomain() } }
 
     private suspend fun saveMatchDetailsToDb(matchDto: MatchDto) {
-        val existingMatch = matchLocalDataSource.getMatchById(matchDto.id) ?: return
+        val existingMatch = matchLocalDataSource.getMatchById(matchDto.id.toInt()) ?: return
 
         val matchEntity = existingMatch.copy(
             status = matchDto.status.name,
@@ -109,51 +109,51 @@ class MatchRepositoryImpl(
         )
     }
 
-    override suspend fun updateMatchScore(matchId: String, participantId: String, scoreType: ScoreType): LoadResult<ResponseMessage, Throwable> {
-        val changeScoreBody = ChangeScoreBody(playerId = participantId, scoreType = scoreType)
-        return matchRemoteDataSource.updateMatchScore(matchId = matchId, changeScoreBody = changeScoreBody)
+    override suspend fun updateMatchScore(matchId: Int, participantId: Int, scoreType: ScoreType): LoadResult<ResponseMessage, Throwable> {
+        val changeScoreBody = ChangeScoreBody(playerId = participantId.toString(), scoreType = scoreType)
+        return matchRemoteDataSource.updateMatchScore(matchId = matchId.toString(), changeScoreBody = changeScoreBody)
     }
 
-    override suspend fun undoPoint(matchId: String): LoadResult<ResponseMessage, Throwable> {
-        return matchRemoteDataSource.undoPoint(matchId = matchId)
+    override suspend fun undoPoint(matchId: Int): LoadResult<ResponseMessage, Throwable> {
+        return matchRemoteDataSource.undoPoint(matchId = matchId.toString())
     }
 
-    override suspend fun redoPoint(matchId: String): LoadResult<ResponseMessage, Throwable> {
-        return matchRemoteDataSource.redoPoint(matchId = matchId)
+    override suspend fun redoPoint(matchId: Int): LoadResult<ResponseMessage, Throwable> {
+        return matchRemoteDataSource.redoPoint(matchId = matchId.toString())
     }
 
-    override suspend fun attachVideoLink(matchId: String, videoLink: String): LoadResult<ResponseMessage, Throwable> {
+    override suspend fun attachVideoLink(matchId: Int, videoLink: String): LoadResult<ResponseMessage, Throwable> {
         val videoLinkBody = VideoLinkBody(videoLink)
-        return matchRemoteDataSource.attachVideoLink(matchId = matchId, videoLinkBody = videoLinkBody)
+        return matchRemoteDataSource.attachVideoLink(matchId = matchId.toString(), videoLinkBody = videoLinkBody)
     }
 
-    override suspend fun setFirstParticipantToServe(matchId: String, participantId: String): LoadResult<ResponseMessage, Throwable> {
-        val serveBody = ServeBody(participantId)
-        return matchRemoteDataSource.setFirstParticipantToServe(matchId = matchId, serveBody = serveBody)
+    override suspend fun setFirstParticipantToServe(matchId: Int, participantId: Int): LoadResult<ResponseMessage, Throwable> {
+        val serveBody = ServeBody(participantId.toString())
+        return matchRemoteDataSource.setFirstParticipantToServe(matchId = matchId.toString(), serveBody = serveBody)
     }
 
-    override suspend fun setFirstPlayerInPairToServe(matchId: String, playerId: String): LoadResult<ResponseMessage, Throwable> {
-        val serveInPairBody = ServeInPairBody(playerId)
+    override suspend fun setFirstPlayerInPairToServe(matchId: Int, playerId: Int): LoadResult<ResponseMessage, Throwable> {
+        val serveInPairBody = ServeInPairBody(playerId.toString())
         return matchRemoteDataSource.setFirstServeInPair(
-            matchId = matchId,
+            matchId = matchId.toString(),
             serveInPairBody = serveInPairBody
         )
     }
 
-    override suspend fun setParticipantRetired(matchId: String, participantId: String): LoadResult<ResponseMessage, Throwable> {
-        val retiredParticipantBody = RetiredParticipantBody(retiredParticipantId = participantId)
-        return matchRemoteDataSource.setParticipantRetired(matchId = matchId, retiredParticipantBody = retiredParticipantBody)
+    override suspend fun setParticipantRetired(matchId: Int, participantId: Int): LoadResult<ResponseMessage, Throwable> {
+        val retiredParticipantBody = RetiredParticipantBody(retiredParticipantId = participantId.toString())
+        return matchRemoteDataSource.setParticipantRetired(matchId = matchId.toString(), retiredParticipantBody = retiredParticipantBody)
     }
 
-    override suspend fun setMatchStatus(matchId: String, status: MatchStatus): LoadResult<ResponseMessage, Throwable> {
+    override suspend fun setMatchStatus(matchId: Int, status: MatchStatus): LoadResult<ResponseMessage, Throwable> {
         val matchStatusBody = MatchStatusBody(status)
         return matchRemoteDataSource.updateMatchStatus(
-            matchId = matchId,
+            matchId = matchId.toString(),
             matchStatusBody = matchStatusBody
         )
     }
 
-    override suspend fun deleteMatchesForTournament(tournamentId: String) {
+    override suspend fun deleteMatchesForTournament(tournamentId: Int) {
         matchLocalDataSource.deleteMatchesForTournament(tournamentId)
     }
 

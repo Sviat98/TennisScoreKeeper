@@ -26,7 +26,7 @@ fun main() {
             when {
                 // Identifies the corresponding route and navigates to it
                 initRoute.contains("scoreboard") -> {
-                    val matchId = initRoute.substring(findNthOccurrence(initRoute,'/',1)+1,findNthOccurrence(initRoute,'/',2))
+                    val matchId = initRoute.substring(findNthOccurrence(initRoute,'/',1)+1,findNthOccurrence(initRoute,'/',2)).toInt()
                     navController.navigate(ScoreboardRoute(matchId = matchId))
                 }
                 // Identifies the corresponding route and navigates to it
@@ -37,7 +37,7 @@ fun main() {
                     navController.navigate(AddTournamentRoute)
                 }
                 initRoute.matches(Regex("tournaments/[0-9]+/addMatch")) ->{
-                    val tournamentId = initRoute.substring(findNthOccurrence(initRoute,'/',1)+1,findNthOccurrence(initRoute,'/',2))
+                    val tournamentId = initRoute.substring(findNthOccurrence(initRoute,'/',1)+1,findNthOccurrence(initRoute,'/',2)).toInt()
 
                     navController.navigate(AddMatchRoute(tournamentId = tournamentId))
                 }

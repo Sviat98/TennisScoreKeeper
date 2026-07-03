@@ -4,7 +4,7 @@ import com.bashkevich.tennisscorekeeper.model.set_template.local.SetTemplateEnti
 import com.bashkevich.tennisscorekeeper.model.set_template.remote.SetTemplateDto
 
 data class SetTemplate(
-    val id: String,
+    val id: Int,
     val name: String,
     val gamesToWin: Int,
     val hasDecidingPoint: Boolean,
@@ -15,13 +15,13 @@ data class SetTemplate(
 )
 
 val SET_TEMPLATE_DEFAULT = SetTemplate(
-    id = "0", name = "", gamesToWin = 6, hasDecidingPoint = false,
+    id = 0, name = "", gamesToWin = 6, hasDecidingPoint = false,
     tiebreakMode = TiebreakMode.NO, tiebreakPointsToWin = 7,
     isRegular = false, isDeciding = false
 )
 
 fun SetTemplateDto.toDomain() = SetTemplate(
-    id = this.id,
+    id = this.id.toInt(),
     name = this.name.replace(";", "\n"),
     gamesToWin = this.gamesToWin,
     hasDecidingPoint = this.hasDecidingPoint,

@@ -10,27 +10,27 @@ import com.bashkevich.tennisscorekeeper.model.match.remote.body.ScoreType
 import kotlinx.coroutines.flow.Flow
 
 interface MatchRepository {
-    suspend fun fetchMatchesForTournament(tournamentId: String): LoadResult<Unit, Throwable>
-    fun observeMatchesForTournament(tournamentId: String): Flow<List<ShortMatch>>
+    suspend fun fetchMatchesForTournament(tournamentId: Int): LoadResult<Unit, Throwable>
+    fun observeMatchesForTournament(tournamentId: Int): Flow<List<ShortMatch>>
 
-    suspend fun getMatchesForTournament(tournamentId: String): LoadResult<List<ShortMatch>, Throwable>
+    suspend fun getMatchesForTournament(tournamentId: Int): LoadResult<List<ShortMatch>, Throwable>
     suspend fun closeSession()
-    fun observeMatchById(matchId: String): Flow<Match?>
-    fun observeMatchUpdatesFromNetwork(matchId: String): Flow<LoadResult<Match, Throwable>>
+    fun observeMatchById(matchId: Int): Flow<Match?>
+    fun observeMatchUpdatesFromNetwork(matchId: Int): Flow<LoadResult<Match, Throwable>>
 
-    suspend fun updateMatchScore(matchId: String, participantId: String, scoreType: ScoreType): LoadResult<ResponseMessage, Throwable>
-    suspend fun undoPoint(matchId: String): LoadResult<ResponseMessage, Throwable>
-    suspend fun redoPoint(matchId: String): LoadResult<ResponseMessage, Throwable>
-    suspend fun attachVideoLink(matchId: String, videoLink: String): LoadResult<ResponseMessage, Throwable>
-    suspend fun setFirstParticipantToServe(matchId: String, participantId: String): LoadResult<ResponseMessage, Throwable>
-    suspend fun setFirstPlayerInPairToServe(matchId: String, playerId: String): LoadResult<ResponseMessage, Throwable>
-    suspend fun setParticipantRetired(matchId: String, participantId: String): LoadResult<ResponseMessage, Throwable>
-    suspend fun setMatchStatus(matchId: String, status: MatchStatus): LoadResult<ResponseMessage, Throwable>
+    suspend fun updateMatchScore(matchId: Int, participantId: Int, scoreType: ScoreType): LoadResult<ResponseMessage, Throwable>
+    suspend fun undoPoint(matchId: Int): LoadResult<ResponseMessage, Throwable>
+    suspend fun redoPoint(matchId: Int): LoadResult<ResponseMessage, Throwable>
+    suspend fun attachVideoLink(matchId: Int, videoLink: String): LoadResult<ResponseMessage, Throwable>
+    suspend fun setFirstParticipantToServe(matchId: Int, participantId: Int): LoadResult<ResponseMessage, Throwable>
+    suspend fun setFirstPlayerInPairToServe(matchId: Int, playerId: Int): LoadResult<ResponseMessage, Throwable>
+    suspend fun setParticipantRetired(matchId: Int, participantId: Int): LoadResult<ResponseMessage, Throwable>
+    suspend fun setMatchStatus(matchId: Int, status: MatchStatus): LoadResult<ResponseMessage, Throwable>
 
-    suspend fun deleteMatchesForTournament(tournamentId: String)
+    suspend fun deleteMatchesForTournament(tournamentId: Int)
     suspend fun deleteAllMatchesFromDb()
     suspend fun addNewMatch(
-        tournamentId: String,
+        tournamentId: Int,
         matchBody: MatchBody
     ): LoadResult<Unit, Throwable>
 }

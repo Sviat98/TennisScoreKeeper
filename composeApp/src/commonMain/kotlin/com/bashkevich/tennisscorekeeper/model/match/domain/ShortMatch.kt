@@ -9,7 +9,7 @@ import com.bashkevich.tennisscorekeeper.model.participant.domain.toDomain
 import com.bashkevich.tennisscorekeeper.model.player.domain.PlayerInParticipant
 
 data class ShortMatch(
-    val id: String,
+    val id: Int,
     val firstParticipant: ParticipantInShortMatch,
     val secondParticipant: ParticipantInShortMatch,
     val status: MatchStatus,
@@ -19,7 +19,7 @@ data class ShortMatch(
 )
 
 fun ShortMatchDto.toDomain() = ShortMatch(
-    id = this.id,
+    id = this.id.toInt(),
     firstParticipant = this.firstParticipant.toDomain(),
     secondParticipant = this.secondParticipant.toDomain(),
     status = this.status,
@@ -29,25 +29,25 @@ fun ShortMatchDto.toDomain() = ShortMatch(
 )
 
 val SAMPLE_SINGLES_SHORT_MATCH = ShortMatch(
-    id = "1",
+    id = 1,
     firstParticipant = ParticipantInShortSinglesMatch(
-        id = "5",
+        id = 5,
         seed = 1,
         isWinner = false,
         isRetired = false,
         player = PlayerInParticipant(
-            id = "1",
+            id = 1,
             surname = "Djokovic",
             name = "Novak",
         ),
     ),
     secondParticipant = ParticipantInShortSinglesMatch(
-        id = "6",
+        id = 6,
         seed = null,
         isWinner = false,
         isRetired = false,
         player = PlayerInParticipant(
-            id = "4",
+            id = 4,
             surname = "Murray",
             name = "Andy",
         ),
@@ -63,34 +63,34 @@ val SAMPLE_SINGLES_SHORT_MATCH = ShortMatch(
 )
 
 val SAMPLE_DOUBLES_SHORT_MATCH = ShortMatch(
-    id = "12",
+    id = 12,
     firstParticipant = ParticipantInShortDoublesMatch(
-        id = "34",
+        id = 34,
         seed = 1,
         isWinner = true,
         isRetired = false,
         firstPlayer = PlayerInParticipant(
-            id = "1",
+            id = 1,
             surname = "Vennegoor of Hesselink",
             name = "Jan"
         ),
         secondPlayer = PlayerInParticipant(
-            id = "3",
+            id = 3,
             surname = "Vennegoor of Hesselink", name = "Lucas"
         ),
     ),
     secondParticipant = ParticipantInShortDoublesMatch(
-        id = "35",
+        id = 35,
         seed = 2,
         isWinner = false,
         isRetired = false,
         firstPlayer = PlayerInParticipant(
-            id = "4",
+            id = 4,
             surname = "Murray",
             name = "Andy",
         ),
         secondPlayer = PlayerInParticipant(
-            id = "6",
+            id = 6,
             surname = "Federer",
             name = "Roger",
         ),

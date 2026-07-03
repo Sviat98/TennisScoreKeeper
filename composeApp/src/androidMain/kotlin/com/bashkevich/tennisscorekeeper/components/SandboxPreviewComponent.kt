@@ -70,22 +70,22 @@ fun ParticipantListContentPreview() {
         participantListLoadingState = ParticipantListLoadingState.Content(
             participants = listOf(
                 DoublesParticipant(
-                    "1",
                     1,
-                    firstPlayer = PlayerInParticipant("1", "Djokovic", "Novak"),
-                    secondPlayer = PlayerInParticipant("1", "Nadal", "Rafael")
+                    1,
+                    firstPlayer = PlayerInParticipant(1, "Djokovic", "Novak"),
+                    secondPlayer = PlayerInParticipant(2, "Nadal", "Rafael")
                 ),
                 DoublesParticipant(
-                    "2",
+                    2,
                     10,
-                    firstPlayer = PlayerInParticipant("1", "Vennegoor of Hesselink", "Jan"),
-                    secondPlayer = PlayerInParticipant("1", "Vennegoor of Hesselink", "Lucas")
+                    firstPlayer = PlayerInParticipant(3, "Vennegoor of Hesselink", "Jan"),
+                    secondPlayer = PlayerInParticipant(4, "Vennegoor of Hesselink", "Lucas")
                 ),
                 DoublesParticipant(
-                    "3",
+                    3,
                     null,
-                    firstPlayer = PlayerInParticipant("1", "Auger-Aliassime", "Felix"),
-                    secondPlayer = PlayerInParticipant("1", "Davidivich Fokina", "Alejandro")
+                    firstPlayer = PlayerInParticipant(5, "Auger-Aliassime", "Felix"),
+                    secondPlayer = PlayerInParticipant(6, "Davidivich Fokina", "Alejandro")
                 ),
             )
         ),
@@ -101,22 +101,22 @@ fun ParticipantListComponentPreview() {
     ParticipantListComponent(
         participants = listOf(
             DoublesParticipant(
-                "1",
                 1,
-                firstPlayer = PlayerInParticipant("1", "Djokovic", "Novak"),
-                secondPlayer = PlayerInParticipant("1", "Nadal", "Rafael")
+                1,
+                firstPlayer = PlayerInParticipant(1, "Djokovic", "Novak"),
+                secondPlayer = PlayerInParticipant(2, "Nadal", "Rafael")
             ),
             DoublesParticipant(
-                "2",
+                2,
                 10,
-                firstPlayer = PlayerInParticipant("1", "Vennegoor of Hesselink", "Jan"),
-                secondPlayer = PlayerInParticipant("1", "Vennegoor of Hesselink", "Lucas")
+                firstPlayer = PlayerInParticipant(3, "Vennegoor of Hesselink", "Jan"),
+                secondPlayer = PlayerInParticipant(4, "Vennegoor of Hesselink", "Lucas")
             ),
             DoublesParticipant(
-                "3",
+                3,
                 null,
-                firstPlayer = PlayerInParticipant("1", "Auger-Aliassime", "Felix"),
-                secondPlayer = PlayerInParticipant("1", "Davidivich Fokina", "Alejandro")
+                firstPlayer = PlayerInParticipant(5, "Auger-Aliassime", "Felix"),
+                secondPlayer = PlayerInParticipant(6, "Davidivich Fokina", "Alejandro")
             ),
         )
     )

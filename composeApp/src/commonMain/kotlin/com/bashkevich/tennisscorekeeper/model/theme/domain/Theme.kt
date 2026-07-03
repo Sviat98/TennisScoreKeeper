@@ -8,13 +8,13 @@ import com.bashkevich.tennisscorekeeper.model.theme.remote.ThemeDto
 import kotlinx.serialization.json.Json
 
 data class ScoreboardTheme(
-    val id: String,
+    val id: Int,
     val name: String,
     val backgroundColor: Color,
     val textColor: Color,
 ) {
     companion object {
-        val DEFAULT = ScoreboardTheme("0", "", Color.Blue, Color.White)
+        val DEFAULT = ScoreboardTheme(0, "", Color.Blue, Color.White)
     }
 }
 
@@ -23,7 +23,7 @@ fun String.convertColor() = "FF$this".toLong(16)
 fun ThemeColor.toColor() = Color(color.removePrefix("#").convertColor()).copy(alpha = alpha)
 
 fun ThemeDto.toDomain() = ScoreboardTheme(
-    id = id,
+    id = id.toInt(),
     name = name,
     backgroundColor = content.backgroundColor.toColor(),
     textColor = content.textColor.toColor(),

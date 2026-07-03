@@ -13,7 +13,7 @@ interface TournamentDao {
     fun getAllTournaments(): Flow<List<TournamentEntity>>
 
     @Query("SELECT * FROM tournaments WHERE id = :id")
-    fun getTournamentById(id: String): Flow<TournamentEntity?>
+    fun getTournamentById(id: Int): Flow<TournamentEntity?>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertTournament(tournament: TournamentEntity)
@@ -25,13 +25,13 @@ interface TournamentDao {
     suspend fun deleteAllTournaments()
 
     @Query("UPDATE tournaments SET status = :status WHERE id = :id")
-    suspend fun updateStatus(id: String, status: String)
+    suspend fun updateStatus(id: Int, status: String)
 
     @Query("UPDATE tournaments SET total_participants = :amount WHERE id = :id")
-    suspend fun updateTotalParticipants(id: String, amount: Int)
+    suspend fun updateTotalParticipants(id: Int, amount: Int)
 
     @Query("UPDATE tournaments SET uncompleted_matches = uncompleted_matches + 1 WHERE id = :id")
-    suspend fun incrementUncompletedMatches(id: String)
+    suspend fun incrementUncompletedMatches(id: Int)
 
     @Transaction
     suspend fun replaceAllTournaments(tournaments: List<TournamentEntity>) {

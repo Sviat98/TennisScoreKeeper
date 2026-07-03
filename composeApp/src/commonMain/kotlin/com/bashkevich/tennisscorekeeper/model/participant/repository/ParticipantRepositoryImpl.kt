@@ -19,12 +19,12 @@ class ParticipantRepositoryImpl(
     private val tournamentLocalDataSource: TournamentLocalDataSource
 ) : ParticipantRepository {
 
-    override suspend fun getParticipantsForTournament(tournamentId: String): LoadResult<List<TennisParticipant>, Throwable> {
-        return participantRemoteDataSource.getParticipants(tournamentId).mapSuccess { participants -> participants.map { it.toDomain() } }
+    override suspend fun getParticipantsForTournament(tournamentId: Int): LoadResult<List<TennisParticipant>, Throwable> {
+        return participantRemoteDataSource.getParticipants(tournamentId.toString()).mapSuccess { participants -> participants.map { it.toDomain() } }
     }
 
-    override suspend fun uploadParticipantsFile(tournamentId: String, participantsFile: ExcelFile): LoadResult<List<TennisParticipant>, Throwable> {
-        return participantRemoteDataSource.uploadParticipantsFile(tournamentId, participantsFile)
+    override suspend fun uploadParticipantsFile(tournamentId: Int, participantsFile: ExcelFile): LoadResult<List<TennisParticipant>, Throwable> {
+        return participantRemoteDataSource.uploadParticipantsFile(tournamentId.toString(), participantsFile)
             .doOnSuccess { dtos ->
                 participantLocalDataSource.replaceParticipantsForTournament(tournamentId, dtos)
                 tournamentLocalDataSource.updateTotalParticipants(tournamentId, dtos.size)
@@ -32,19 +32,19 @@ class ParticipantRepositoryImpl(
             .mapSuccess { participants -> participants.map { it.toDomain() } }
     }
 
-    override suspend fun fetchParticipantsForTournament(tournamentId: String): LoadResult<Unit, Throwable> {
-        return participantRemoteDataSource.getParticipants(tournamentId)
+    override suspend fun fetchParticipantsForTournament(tournamentId: Int): LoadResult<Unit, Throwable> {
+        return participantRemoteDataSource.getParticipants(tournamentId.toString())
             .doOnSuccess { dtos ->
                 participantLocalDataSource.replaceParticipantsForTournament(tournamentId, dtos)
             }
             .mapSuccess { }
     }
 
-    override suspend fun deleteParticipantsForTournament(tournamentId: String) {
+    override suspend fun deleteParticipantsForTournament(tournamentId: Int) {
         participantLocalDataSource.deleteParticipantsForTournament(tournamentId)
     }
 
-    override fun observeParticipantsForTournament(tournamentId: String): Flow<List<TennisParticipant>> {
+    override fun observeParticipantsForTournament(tournamentId: Int): Flow<List<TennisParticipant>> {
         return participantLocalDataSource.observeParticipants(tournamentId).map { list ->
             list.map { it.toDomain() }
         }

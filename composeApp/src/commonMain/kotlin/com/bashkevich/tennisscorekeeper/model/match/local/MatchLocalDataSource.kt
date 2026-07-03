@@ -15,15 +15,15 @@ class MatchLocalDataSource(
     private val participantDao: ParticipantDao = db.participantDao()
 
 
-    fun observeMatches(tournamentId: String): Flow<List<MatchWithParticipantsEntity>> {
+    fun observeMatches(tournamentId: Int): Flow<List<MatchWithParticipantsEntity>> {
         return matchDao.getMatchesForTournament(tournamentId)
     }
 
-    fun observeMatchById(matchId: String): Flow<MatchWithParticipantsEntity?> {
+    fun observeMatchById(matchId: Int): Flow<MatchWithParticipantsEntity?> {
         return matchDao.observeMatchById(matchId)
     }
 
-    suspend fun replaceMatchesForTournament(tournamentId: String, dtos: List<ShortMatchDto>) {
+    suspend fun replaceMatchesForTournament(tournamentId: Int, dtos: List<ShortMatchDto>) {
         val participantWithPlayers = dtos.flatMap { dto ->
             listOf(dto.firstParticipant, dto.secondParticipant).map { it.toEntity(tournamentId) }
         }
@@ -51,7 +51,7 @@ class MatchLocalDataSource(
         }
     }
 
-    suspend fun insertMatch(tournamentId: String, dto: ShortMatchDto) {
+    suspend fun insertMatch(tournamentId: Int, dto: ShortMatchDto) {
         val participantWithPlayers = listOf(
             dto.firstParticipant.toEntity(tournamentId),
             dto.secondParticipant.toEntity(tournamentId),
@@ -73,7 +73,7 @@ class MatchLocalDataSource(
         }
     }
 
-    suspend fun deleteMatchesForTournament(tournamentId: String) {
+    suspend fun deleteMatchesForTournament(tournamentId: Int) {
         db.useWriterConnection {
             it.withTransaction(Transactor.SQLiteTransactionType.IMMEDIATE) {
                 matchDao.deleteMatchesByTournament(tournamentId)
@@ -90,7 +90,7 @@ class MatchLocalDataSource(
         }
     }
 
-    suspend fun getMatchById(matchId: String): MatchEntity? {
+    suspend fun getMatchById(matchId: Int): MatchEntity? {
         return matchDao.getMatchById(matchId)
     }
 

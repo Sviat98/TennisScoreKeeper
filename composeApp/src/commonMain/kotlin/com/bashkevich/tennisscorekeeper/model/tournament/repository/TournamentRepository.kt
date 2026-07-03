@@ -9,10 +9,10 @@ import kotlinx.coroutines.flow.Flow
 
 interface TournamentRepository {
     suspend fun fetchTournaments(): LoadResult<Unit, Throwable>
-    suspend fun fetchTournamentById(id: String): LoadResult<Unit, Throwable>
+    suspend fun fetchTournamentById(id: Int): LoadResult<Unit, Throwable>
     suspend fun addTournament(addTournamentBody: AddTournamentBody): LoadResult<Tournament, Throwable>
-    suspend fun changeTournamentStatus(tournamentId: String, tournamentStatus: TournamentStatus): LoadResult<ResponseMessage, Throwable>
+    suspend fun changeTournamentStatus(tournamentId: Int, tournamentStatus: TournamentStatus): LoadResult<ResponseMessage, Throwable>
     suspend fun insertTournament(tournament: Tournament)
     fun observeTournaments(): Flow<List<Tournament>>
-    fun observeTournamentById(id: String): Flow<Tournament>
+    fun observeTournamentById(id: Int): Flow<Tournament>
 }

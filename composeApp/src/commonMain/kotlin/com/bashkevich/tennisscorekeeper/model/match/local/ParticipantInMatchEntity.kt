@@ -27,9 +27,9 @@ import com.bashkevich.tennisscorekeeper.model.participant.remote.ParticipantInSh
 )
 data class ParticipantInMatchEntity(
     @ColumnInfo(name = "match_id")
-    val matchId: String,
+    val matchId: Int,
     @ColumnInfo(name = "participant_id")
-    val participantId: String,
+    val participantId: Int,
     @ColumnInfo(name = "seed")
     val seed: Int?,
     @ColumnInfo(name = "display_name")
@@ -45,12 +45,12 @@ data class ParticipantInMatchEntity(
     @ColumnInfo(name = "is_retired")
     val isRetired: Boolean,
     @ColumnInfo(name = "serving_player_id")
-    val servingPlayerId: String?,
+    val servingPlayerId: Int?,
 )
 
-fun ParticipantInShortMatchDto.toEntity(matchId: String) = ParticipantInMatchEntity(
+fun ParticipantInShortMatchDto.toEntity(matchId: Int) = ParticipantInMatchEntity(
     matchId = matchId,
-    participantId = id,
+    participantId = id.toInt(),
     seed = seed,
     displayName = "",
     primaryColor = "",
@@ -63,14 +63,14 @@ fun ParticipantInShortMatchDto.toEntity(matchId: String) = ParticipantInMatchEnt
 
 fun ShortMatchDto.toParticipantInMatchEntities(): List<ParticipantInMatchEntity> {
     return listOf(
-        firstParticipant.toEntity(matchId = id),
-        secondParticipant.toEntity(matchId = id),
+        firstParticipant.toEntity(matchId = id.toInt()),
+        secondParticipant.toEntity(matchId = id.toInt()),
     )
 }
 
-fun ParticipantInMatchDto.toEntity(matchId: String): ParticipantInMatchEntity = ParticipantInMatchEntity(
+fun ParticipantInMatchDto.toEntity(matchId: Int): ParticipantInMatchEntity = ParticipantInMatchEntity(
     matchId = matchId,
-    participantId = id,
+    participantId = id.toInt(),
     seed = seed,
     displayName = displayName,
     primaryColor = primaryColor,
@@ -79,14 +79,14 @@ fun ParticipantInMatchDto.toEntity(matchId: String): ParticipantInMatchEntity = 
     isWinner = isWinner,
     isRetired = isRetired,
     servingPlayerId = when (this) {
-        is ParticipantInDoublesMatchDto -> servingPlayerId
+        is ParticipantInDoublesMatchDto -> servingPlayerId?.toInt()
         else -> null
     },
 )
 
 fun MatchDto.toParticipantInMatchEntities(): List<ParticipantInMatchEntity> {
     return listOf(
-        firstParticipant.toEntity(matchId = id),
-        secondParticipant.toEntity(matchId = id),
+        firstParticipant.toEntity(matchId = id.toInt()),
+        secondParticipant.toEntity(matchId = id.toInt()),
     )
 }

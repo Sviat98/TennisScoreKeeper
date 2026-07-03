@@ -34,7 +34,7 @@ class TournamentViewModel(
     private val participantRepository: ParticipantRepository
 ) : BaseViewModel<TournamentState, TournamentUiEvent, TournamentAction>() {
 
-    private val tournamentId: String = savedStateHandle.toRoute<TournamentRoute>().tournamentId
+    private val tournamentId: Int = savedStateHandle.toRoute<TournamentRoute>().tournamentId
 
     init {
         println("tournamentId = $tournamentId")

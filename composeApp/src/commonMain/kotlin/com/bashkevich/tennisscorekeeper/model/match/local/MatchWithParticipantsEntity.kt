@@ -132,7 +132,7 @@ private fun ParticipantInMatchWithDetails.toMatchParticipantDomain(): TennisPart
     val secondaryColor = participantInMatch.secondaryColor?.toColorOrDefault()
 
     return if (participant.secondPlayer != null) {
-        val servingState: (String) -> Pair<Boolean, Boolean> = { playerId ->
+        val servingState: (Int) -> Pair<Boolean, Boolean> = { playerId ->
             val isServingNow = participantInMatch.isServing && participantInMatch.servingPlayerId == playerId
             val isServingNext = participantInMatch.servingPlayerId != null &&
                 ((participantInMatch.isServing && participantInMatch.servingPlayerId != playerId) ||
