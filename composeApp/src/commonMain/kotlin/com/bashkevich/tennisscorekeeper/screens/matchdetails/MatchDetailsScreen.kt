@@ -42,8 +42,7 @@ import com.bashkevich.tennisscorekeeper.components.showUnauthorizedActionSnackba
 import com.bashkevich.tennisscorekeeper.model.match.remote.body.MatchStatus
 import com.bashkevich.tennisscorekeeper.model.match.remote.body.convertToString
 import com.bashkevich.tennisscorekeeper.mvi.LaunchedUiEffectHandler
-import com.bashkevich.tennisscorekeeper.navigation.LoginRoute
-import com.bashkevich.tennisscorekeeper.navigation.ProfileRoute
+import com.bashkevich.tennisscorekeeper.navigation.SettingsRoute
 import kotlinx.coroutines.launch
 
 @Composable
@@ -124,14 +123,7 @@ fun MatchDetailsCommonContent(
                         clipboard.setText(link)
                     }
                 },
-                isAuthorized = isAuthorized,
-                onNavigateToLoginOrProfile = {
-                    if (isAuthorized) {
-                        navController.navigate(ProfileRoute)
-                    } else {
-                        navController.navigate(LoginRoute)
-                    }
-                }
+                onNavigateToSettings = { navController.navigate(SettingsRoute) }
             )
         }
     ) { paddingValues ->

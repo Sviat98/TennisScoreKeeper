@@ -31,7 +31,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.bashkevich.tennisscorekeeper.LocalAuthorization
 import com.bashkevich.tennisscorekeeper.LocalNavHostController
 import com.bashkevich.tennisscorekeeper.components.TournamentDetailsAppBar
 import com.bashkevich.tennisscorekeeper.components.modifier.refreshByKeyboard
@@ -43,9 +42,8 @@ import com.bashkevich.tennisscorekeeper.components.tournament.TournamentDetailsL
 import com.bashkevich.tennisscorekeeper.model.match.remote.body.convertToString
 import com.bashkevich.tennisscorekeeper.model.tournament.remote.TournamentStatus
 import com.bashkevich.tennisscorekeeper.navigation.AddMatchRoute
-import com.bashkevich.tennisscorekeeper.navigation.LoginRoute
 import com.bashkevich.tennisscorekeeper.navigation.MatchDetailsRoute
-import com.bashkevich.tennisscorekeeper.navigation.ProfileRoute
+import com.bashkevich.tennisscorekeeper.navigation.SettingsRoute
 import com.bashkevich.tennisscorekeeper.navigation.TournamentTab
 import com.bashkevich.tennisscorekeeper.navigation.toDisplayString
 import com.bashkevich.tennisscorekeeper.screens.matchlist.MatchListScreen
@@ -81,7 +79,6 @@ private fun TournamentContent(
     onConsumeAction: () -> Unit,
 ) {
     val navController = LocalNavHostController.current
-    val isAuthorized = LocalAuthorization.current
     val snackbarHostState = remember { SnackbarHostState() }
 
     LaunchedUiEffectHandler(
@@ -103,14 +100,7 @@ private fun TournamentContent(
         topBar = {
             TournamentDetailsAppBar(
                 onBack = { navController.navigateUp() },
-                isAuthorized = isAuthorized,
-                onNavigateToLoginOrProfile = {
-                    if (isAuthorized) {
-                        navController.navigate(ProfileRoute)
-                    } else {
-                        navController.navigate(LoginRoute)
-                    }
-                }
+                onNavigateToSettings = { navController.navigate(SettingsRoute) }
             )
         },
         floatingActionButton = {

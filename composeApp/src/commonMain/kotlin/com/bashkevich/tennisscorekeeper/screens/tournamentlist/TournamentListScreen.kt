@@ -25,7 +25,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.bashkevich.tennisscorekeeper.LocalAuthorization
 import com.bashkevich.tennisscorekeeper.LocalNavHostController
 import com.bashkevich.tennisscorekeeper.components.TournamentListAppBar
 import com.bashkevich.tennisscorekeeper.components.TournamentListAppBarWithButton
@@ -36,8 +35,7 @@ import com.bashkevich.tennisscorekeeper.mvi.LaunchedUiEffectHandler
 import com.bashkevich.tennisscorekeeper.components.icons.default_icons.Add
 import com.bashkevich.tennisscorekeeper.components.tournament.TournamentListItem
 import com.bashkevich.tennisscorekeeper.navigation.AddTournamentRoute
-import com.bashkevich.tennisscorekeeper.navigation.LoginRoute
-import com.bashkevich.tennisscorekeeper.navigation.ProfileRoute
+import com.bashkevich.tennisscorekeeper.navigation.SettingsRoute
 import com.bashkevich.tennisscorekeeper.navigation.TournamentRoute
 
 @Composable
@@ -83,7 +81,6 @@ private fun TournamentListContent(
     onConsumeAction: () -> Unit,
 ) {
     val navController = LocalNavHostController.current
-    val isAuthorized = LocalAuthorization.current
     val snackbarHostState = remember { SnackbarHostState() }
 
     LaunchedUiEffectHandler(
@@ -101,14 +98,7 @@ private fun TournamentListContent(
         modifier = Modifier.then(modifier).refreshByKeyboard(onRefresh),
         topBar = {
             TournamentListAppBarWithButton(
-                isAuthorized = isAuthorized,
-                onNavigateToLoginOrProfile = {
-                    if (isAuthorized) {
-                        navController.navigate(ProfileRoute)
-                    } else {
-                        navController.navigate(LoginRoute)
-                    }
-                }
+                onNavigateToSettings = { navController.navigate(SettingsRoute) }
             )
         },
         floatingActionButton = {

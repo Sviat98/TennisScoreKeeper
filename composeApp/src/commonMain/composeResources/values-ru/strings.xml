@@ -10,4 +10,5 @@
     <string name="confirm">Подтвердить</string>
     <string name="search">Поиск</string>
     <string name="ok">ОК</string>
+    <string name="wrong_login_or_password">Неверный логин или пароль</string>
 </resources>

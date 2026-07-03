@@ -5,18 +5,23 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
-
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
-
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.bashkevich.tennisscorekeeper.LocalAuthorization
 import com.bashkevich.tennisscorekeeper.LocalNavHostController
 import com.bashkevich.tennisscorekeeper.components.LoginAppBar
 import com.bashkevich.tennisscorekeeper.components.auth.LoginComponent
+import com.bashkevich.tennisscorekeeper.mvi.LaunchedUiEffectHandler
+import org.jetbrains.compose.resources.getString
+import tennisscorekeeper.composeapp.generated.resources.Res
+import tennisscorekeeper.composeapp.generated.resources.wrong_login_or_password
 
 @Composable
 fun LoginScreen(
@@ -28,7 +33,10 @@ fun LoginScreen(
     LoginScreenContent(
         modifier = Modifier.then(modifier),
         state = state,
-        onEvent = { viewModel.onEvent(it) }
+        loginTextFieldState = viewModel.loginTextFieldState,
+        passwordTextFieldState = viewModel.passwordTextFieldState,
+        onLoginClick = { viewModel.onEvent(LoginUiEvent.Login) },
+        onConsumeAction = { viewModel.consumeAction() },
     )
 }
 
@@ -36,11 +44,27 @@ fun LoginScreen(
 fun LoginScreenContent(
     modifier: Modifier = Modifier,
     state: LoginState,
-    onEvent: (LoginUiEvent) -> Unit
+    loginTextFieldState: androidx.compose.foundation.text.input.TextFieldState,
+    passwordTextFieldState: androidx.compose.foundation.text.input.TextFieldState,
+    onLoginClick: () -> Unit,
+    onConsumeAction: () -> Unit,
 ) {
     val navController = LocalNavHostController.current
 
     val authorization = LocalAuthorization.current
+
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    LaunchedUiEffectHandler(
+        effect = state.action,
+        onDismissSnackbar = { snackbarHostState.currentSnackbarData?.dismiss() },
+        onConsume = onConsumeAction
+    ) { currentAction ->
+        when (currentAction) {
+            is LoginAction.ShowLoginError ->
+                snackbarHostState.showSnackbar(message = getString(Res.string.wrong_login_or_password))
+        }
+    }
 
     LaunchedEffect(authorization){
         if (authorization){
@@ -50,7 +74,8 @@ fun LoginScreenContent(
 
     Scaffold(
         modifier = Modifier.then(modifier),
-        topBar = { LoginAppBar(onBack = { navController.navigateUp() }) }
+        topBar = { LoginAppBar(onBack = { navController.navigateUp() }) },
+        snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { paddingValues ->
         Column(
             modifier = Modifier.fillMaxSize().padding(paddingValues),
@@ -58,11 +83,10 @@ fun LoginScreenContent(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             LoginComponent(
-                onLoginChange = { onEvent(LoginUiEvent.ChangeLogin(it)) },
-                onPasswordChange = { onEvent(LoginUiEvent.ChangePassword(it)) },
-                onLoginClick = {
-                    onEvent(LoginUiEvent.Login)
-                }
+                loginTextFieldState = loginTextFieldState,
+                passwordTextFieldState = passwordTextFieldState,
+                enabled = !state.isLoggingIn,
+                onLoginClick = onLoginClick
             )
         }
     }

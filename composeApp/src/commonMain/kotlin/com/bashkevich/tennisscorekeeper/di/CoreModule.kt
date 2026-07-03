@@ -7,6 +7,7 @@ import com.bashkevich.tennisscorekeeper.core.local.KeyValueStorage
 import com.bashkevich.tennisscorekeeper.core.PlatformConfiguration
 import com.bashkevich.tennisscorekeeper.core.local.getDatabaseBuilder
 import com.bashkevich.tennisscorekeeper.core.remote.ResponseMessage
+import com.bashkevich.tennisscorekeeper.core.remote.NotFoundException
 import com.bashkevich.tennisscorekeeper.core.remote.UnauthorizedActionException
 import com.bashkevich.tennisscorekeeper.core.remote.UnauthorizedException
 import com.bashkevich.tennisscorekeeper.core.remote.doOnError
@@ -95,6 +96,11 @@ val coreModule = module {
                         } else {
                             throw UnauthorizedActionException()
                         }
+                    }
+                    if (exceptionResponse.status == HttpStatusCode.NotFound) {
+                        val exceptionResponseText =
+                            exceptionResponse.body<ResponseMessage>().message
+                        throw NotFoundException(exceptionResponseText)
                     }
                 }
             }

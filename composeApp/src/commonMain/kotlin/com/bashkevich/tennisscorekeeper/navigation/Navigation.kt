@@ -33,4 +33,8 @@ data object ProfileRoute
 //@SerialName("matches/add") распознает как MatchDetailsRoute(id=add) на НЕ-Андроид
 data class AddMatchRoute(val tournamentId: String = "")
 
+@Serializable
+@SerialName("settings")
+data object SettingsRoute
+
 expect fun NavGraphBuilder.platformSpecificRoutes()
