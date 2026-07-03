@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -44,8 +45,8 @@ fun LoginScreen(
 fun LoginScreenContent(
     modifier: Modifier = Modifier,
     state: LoginState,
-    loginTextFieldState: androidx.compose.foundation.text.input.TextFieldState,
-    passwordTextFieldState: androidx.compose.foundation.text.input.TextFieldState,
+    loginTextFieldState: TextFieldState,
+    passwordTextFieldState: TextFieldState,
     onLoginClick: () -> Unit,
     onConsumeAction: () -> Unit,
 ) {
@@ -66,11 +67,15 @@ fun LoginScreenContent(
         }
     }
 
-    LaunchedEffect(authorization){
-        if (authorization){
+    LaunchedEffect(authorization) {
+        if (authorization) {
             navController.navigateUp()
         }
     }
+
+    val isLoginButtonEnabled =
+        loginTextFieldState.text.isNotEmpty() && passwordTextFieldState.text.isNotEmpty() &&
+                !state.isLoggingIn
 
     Scaffold(
         modifier = Modifier.then(modifier),
@@ -85,7 +90,7 @@ fun LoginScreenContent(
             LoginComponent(
                 loginTextFieldState = loginTextFieldState,
                 passwordTextFieldState = passwordTextFieldState,
-                enabled = !state.isLoggingIn,
+                enabled = isLoginButtonEnabled,
                 onLoginClick = onLoginClick
             )
         }
