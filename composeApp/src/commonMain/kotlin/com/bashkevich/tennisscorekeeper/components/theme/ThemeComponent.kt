@@ -1,7 +1,10 @@
 package com.bashkevich.tennisscorekeeper.components.theme
 
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -25,25 +28,39 @@ fun ThemeComponent(
     onRetrySelectedTheme: (Int) -> Unit,
     onPreviewClick: () -> Unit = {},
 ) {
-    Row(
-        modifier = modifier
-            .widthIn(max = 300.dp)
-            .fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically,
+    Column(
+        modifier = Modifier.then(modifier),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        ThemeCombobox(
-            modifier = Modifier.weight(1f),
-            themeComponentState = themeComponentState,
-            onThemeSelected = onThemeSelected,
-            onThemesFetch = onThemesFetch,
-            onRetrySelectedTheme = onRetrySelectedTheme,
-        )
-
-        IconButton(onClick = onPreviewClick) {
-            Icon(
-                imageVector = IconGroup.Default.Preview,
-                contentDescription = stringResource(Res.string.preview),
+        Row(
+            modifier = Modifier
+                .widthIn(max = 300.dp)
+                .fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            ThemeCombobox(
+                modifier = Modifier.fillMaxWidth(0.9f),
+                themeComponentState = themeComponentState,
+                onThemeSelected = onThemeSelected,
+                onThemesFetch = onThemesFetch,
+                onRetrySelectedTheme = onRetrySelectedTheme,
             )
+
+            val isPreviewButtonEnabled =
+                themeComponentState.selectedTheme is ThemeComponentState.SelectedThemeState.Idle
+                        && themeComponentState.selectedTheme.theme != null
+
+            IconButton(
+                onClick = onPreviewClick,
+                enabled = isPreviewButtonEnabled
+            ) {
+                Icon(
+                    modifier = Modifier.size(24.dp),
+                    imageVector = IconGroup.Default.Preview,
+                    contentDescription = stringResource(Res.string.preview),
+                )
+            }
         }
     }
 }

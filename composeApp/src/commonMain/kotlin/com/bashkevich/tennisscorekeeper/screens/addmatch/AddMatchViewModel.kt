@@ -63,7 +63,7 @@ class AddMatchViewModel(
     // --- Tournament from DB (no fetchTournamentById, tournament is already cached) ---
     private val tournamentFromDb: StateFlow<Tournament> =
         tournamentRepository.observeTournamentById(tournamentId)
-            .filter { it!= TOURNAMENT_DEFAULT }
+            .filter { it != TOURNAMENT_DEFAULT }
             .onEach { tournament ->
                     _regularSetId.value = tournament.regularSetTemplateId
                     _decidingSetId.value = tournament.decidingSetTemplateId
