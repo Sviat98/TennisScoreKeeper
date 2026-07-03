@@ -2,14 +2,12 @@ package com.bashkevich.tennisscorekeeper.components.set_template
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.input.TextFieldLineLimits
 import androidx.compose.foundation.text.input.TextFieldState
-import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -29,7 +27,15 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.bashkevich.tennisscorekeeper.components.icons.IconGroup
 import com.bashkevich.tennisscorekeeper.components.icons.default_icons.ArrowDropDown
+import com.bashkevich.tennisscorekeeper.components.icons.default_icons.Autorenew
 import com.bashkevich.tennisscorekeeper.model.set_template.domain.SetTemplate
+import org.jetbrains.compose.resources.stringResource
+import tennisscorekeeper.composeapp.generated.resources.Res
+import tennisscorekeeper.composeapp.generated.resources.error_loading_set_template
+import tennisscorekeeper.composeapp.generated.resources.loading
+import tennisscorekeeper.composeapp.generated.resources.open_dropdown
+import tennisscorekeeper.composeapp.generated.resources.retry
+import tennisscorekeeper.composeapp.generated.resources.select_set_template
 
 @Composable
 fun SetTemplateCombobox(
@@ -38,110 +44,67 @@ fun SetTemplateCombobox(
     setComponentState: SetComponentState,
     onSetTemplatesFetch: () -> Unit,
     onSetTemplateChange: (SetTemplate) -> Unit,
-    onRetrySelectedSet: () -> Unit = {},
+    onRetrySelectedSet: (Int) -> Unit,
 ) {
     var expanded by remember { mutableStateOf(false) }
 
     val isIdle = setComponentState.selectedSetState is SetComponentState.SelectedSetState.Idle
     val dropdownEnabled = enabled && isIdle
 
-    Box(
-        modifier = Modifier.then(modifier)
-    ) {
-        when (val selectedState = setComponentState.selectedSetState) {
-            is SetComponentState.SelectedSetState.Idle -> {
-                val textFieldState = TextFieldState(selectedState.setTemplate?.name ?: "")
+    val text = when (val state = setComponentState.selectedSetState) {
+        is SetComponentState.SelectedSetState.Idle -> state.setTemplate?.name ?: ""
+        is SetComponentState.SelectedSetState.Loading -> stringResource(Res.string.loading)
+        is SetComponentState.SelectedSetState.Error -> stringResource(Res.string.error_loading_set_template)
+    }
 
-                TextField(
-                    modifier = Modifier.fillMaxWidth(),
-                    state = textFieldState,
-                    placeholder = { Text("Set Template") },
-                    readOnly = true,
-                    enabled = enabled,
-                    trailingIcon = {
-                        IconButton(
-                            onClick = {
-                                expanded = true
-                                onSetTemplatesFetch()
-                            },
-                            enabled = dropdownEnabled
-                        ) {
-                            Icon(
-                                imageVector = IconGroup.Default.ArrowDropDown,
-                                contentDescription = "Open dropdown",
-                            )
-                        }
+    val trailingIcon: (@Composable () -> Unit)? = when (val state = setComponentState.selectedSetState) {
+        is SetComponentState.SelectedSetState.Idle -> {
+            {
+                IconButton(
+                    onClick = {
+                        expanded = true
+                        onSetTemplatesFetch()
                     },
-                    lineLimits = TextFieldLineLimits.MultiLine(minHeightInLines = 2, maxHeightInLines = 3),
-                    colors = TextFieldDefaults.colors(
-                        disabledIndicatorColor = Color.Transparent,
-                        disabledTextColor = Color.Black,
-                        disabledLabelColor = Color.Gray,
-                        disabledTrailingIconColor = Color.Gray
+                    enabled = dropdownEnabled
+                ) {
+                    Icon(
+                        imageVector = IconGroup.Default.ArrowDropDown,
+                        contentDescription = stringResource(Res.string.open_dropdown),
                     )
-                )
-            }
-
-            is SetComponentState.SelectedSetState.Loading -> {
-                val textFieldState = TextFieldState("Loading...")
-
-                TextField(
-                    modifier = Modifier.fillMaxWidth(),
-                    state = textFieldState,
-                    readOnly = true,
-                    enabled = false,
-                    lineLimits = TextFieldLineLimits.MultiLine(minHeightInLines = 2, maxHeightInLines = 3),
-                    colors = TextFieldDefaults.colors(
-                        disabledIndicatorColor = Color.Transparent,
-                        disabledTextColor = Color.Black,
-                        disabledLabelColor = Color.Gray,
-                        disabledTrailingIconColor = Color.Gray
-                    )
-                )
-            }
-
-            is SetComponentState.SelectedSetState.Error -> {
-                Column {
-                    val textFieldState = TextFieldState("Error loading set template")
-
-                    TextField(
-                        modifier = Modifier.fillMaxWidth(),
-                        state = textFieldState,
-                        readOnly = true,
-                        enabled = false,
-                        trailingIcon = {
-                            IconButton(
-                                onClick = {},
-                                enabled = false
-                            ) {
-                                Icon(
-                                    imageVector = IconGroup.Default.ArrowDropDown,
-                                    contentDescription = "Open dropdown",
-                                )
-                            }
-                        },
-                        lineLimits = TextFieldLineLimits.MultiLine(minHeightInLines = 2, maxHeightInLines = 3),
-                        colors = TextFieldDefaults.colors(
-                            disabledIndicatorColor = Color.Transparent,
-                            disabledTextColor = Color.Black,
-                            disabledLabelColor = Color.Gray,
-                            disabledTrailingIconColor = Color.Gray
-                        )
-                    )
-
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(top = 4.dp),
-                        horizontalArrangement = Arrangement.End,
-                    ) {
-                        Button(onClick = onRetrySelectedSet) {
-                            Text("Retry")
-                        }
-                    }
                 }
             }
         }
+        is SetComponentState.SelectedSetState.Loading -> null
+        is SetComponentState.SelectedSetState.Error -> {
+            {
+                IconButton(onClick = { onRetrySelectedSet(state.initialSetTemplateId) }) {
+                    Icon(
+                        imageVector = IconGroup.Default.Autorenew,
+                        contentDescription = stringResource(Res.string.retry),
+                    )
+                }
+            }
+        }
+    }
+
+    Box(
+        modifier = Modifier.then(modifier)
+    ) {
+        TextField(
+            modifier = Modifier.fillMaxWidth(),
+            state = TextFieldState(text),
+            placeholder = { Text(stringResource(Res.string.select_set_template)) },
+            readOnly = true,
+            enabled = isIdle,
+            trailingIcon = trailingIcon,
+            lineLimits = TextFieldLineLimits.MultiLine(minHeightInLines = 2, maxHeightInLines = 3),
+            colors = TextFieldDefaults.colors(
+                disabledIndicatorColor = Color.Transparent,
+                disabledTextColor = Color.Black,
+                disabledLabelColor = Color.Gray,
+                disabledTrailingIconColor = Color.Gray
+            )
+        )
 
         if (dropdownEnabled) {
             DropdownMenu(

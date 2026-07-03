@@ -17,7 +17,6 @@ import com.bashkevich.tennisscorekeeper.model.match.remote.ParticipantInMatchBod
 import com.bashkevich.tennisscorekeeper.model.match.remote.convertToRgbString
 import com.bashkevich.tennisscorekeeper.model.match.repository.MatchRepository
 import com.bashkevich.tennisscorekeeper.model.participant.domain.DoublesParticipant
-import com.bashkevich.tennisscorekeeper.model.participant.domain.PARTICIPANT_IN_DOUBLES_MATCH_DEFAULT
 import com.bashkevich.tennisscorekeeper.model.participant.domain.ParticipantInDoublesMatch
 import com.bashkevich.tennisscorekeeper.model.participant.domain.ParticipantInSinglesMatch
 import com.bashkevich.tennisscorekeeper.model.participant.domain.PARTICIPANT_IN_SINGLES_MATCH_DEFAULT
@@ -44,9 +43,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
@@ -65,8 +62,8 @@ class AddMatchViewModel(
     // --- Tournament from DB (no fetchTournamentById, tournament is already cached) ---
     private val tournamentFromDb: StateFlow<Tournament> =
         tournamentRepository.observeTournamentById(tournamentId)
-            .onEach { tournament->
-                if ( tournament != TOURNAMENT_DEFAULT) {
+            .onEach { tournament ->
+                if (tournament != TOURNAMENT_DEFAULT) {
                     _regularSetId.value = tournament.regularSetTemplateId
                     _decidingSetId.value = tournament.decidingSetTemplateId.takeIf { it != 0 }
                     _themeId.value = tournament.themeId.takeIf { it != 0 }
@@ -81,33 +78,21 @@ class AddMatchViewModel(
     private val _themeId = MutableStateFlow<Int?>(null)
     private val _setsToWin = MutableStateFlow(1)
 
-    // --- Fetch results as Flows with onStart (triggered on subscription, NOT in init) ---
-    private val regularSetFetchResult: StateFlow<LoadResult<Unit, Throwable>?> =
-        tournamentFromDb.flatMapLatest { tournament: Tournament ->
-            val id = tournament.regularSetTemplateId
-            if (id == null) flowOf(null as LoadResult<Unit, Throwable>?)
-            else flow<LoadResult<Unit, Throwable>?> {
-                emit(setTemplateRepository.fetchSetTemplateById(id))
-            }.onStart { emit(null) }
-        }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
+    // --- Fetch helper ---
+    private val fetchHelper = AddMatchFetchHelper(themeRepository, setTemplateRepository)
 
-    private val decidingSetFetchResult: StateFlow<LoadResult<Unit, Throwable>?> =
-        tournamentFromDb.flatMapLatest { tournament: Tournament ->
-            val id = tournament.decidingSetTemplateId
-            if (id == 0) flowOf(null as LoadResult<Unit, Throwable>?)
-            else flow<LoadResult<Unit, Throwable>?> {
-                emit(setTemplateRepository.fetchSetTemplateById(id))
-            }.onStart { emit(null) }
-        }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
+    // --- Fetch results via helper ---
+    private val regularSetFetchResult = tournamentFromDb.flatMapLatest { tournament ->
+        fetchHelper.observeRegularSetByIdFromNetwork(tournament.regularSetTemplateId)
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
 
-    private val themeFetchResult: StateFlow<LoadResult<Unit, Throwable>?> =
-        tournamentFromDb.flatMapLatest { tournament: Tournament ->
-            val id = tournament.themeId
-            if (id == 0) flowOf(null as LoadResult<Unit, Throwable>?)
-            else flow<LoadResult<Unit, Throwable>?> {
-                emit(themeRepository.fetchThemeById(id))
-            }.onStart { emit(null) }
-        }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
+    private val decidingSetFetchResult = tournamentFromDb.flatMapLatest { tournament ->
+        fetchHelper.observeDecidingSetByIdFromNetwork(tournament.decidingSetTemplateId)
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
+
+    private val themeFetchResult = tournamentFromDb.flatMapLatest { tournament ->
+        fetchHelper.observeThemeByIdFromNetwork(tournament.themeId)
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
 
     // --- DB observations by selected IDs (reactive to user selection changes) ---
     private val regularSetFromDb: StateFlow<SetTemplate> =
@@ -141,7 +126,11 @@ class AddMatchViewModel(
             fetchResult is LoadResult.Error -> SetComponentState.SelectedSetState.Error(id)
             else -> SetComponentState.SelectedSetState.Idle(dbValue)
         }
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), SetComponentState.SelectedSetState.Idle(null))
+    }.stateIn(
+        viewModelScope,
+        SharingStarted.WhileSubscribed(5_000),
+        SetComponentState.SelectedSetState.Idle(null)
+    )
 
     private val decidingSelectedState = combine(
         _decidingSetId,
@@ -155,7 +144,11 @@ class AddMatchViewModel(
             fetchResult is LoadResult.Error -> SetComponentState.SelectedSetState.Error(id)
             else -> SetComponentState.SelectedSetState.Idle(dbValue)
         }
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), SetComponentState.SelectedSetState.Idle(null))
+    }.stateIn(
+        viewModelScope,
+        SharingStarted.WhileSubscribed(5_000),
+        SetComponentState.SelectedSetState.Idle(null)
+    )
 
     private val themeSelectedState = combine(
         _themeId,
@@ -164,16 +157,24 @@ class AddMatchViewModel(
     ) { id: Int?, fetchResult: LoadResult<Unit, Throwable>?, dbValue: ScoreboardTheme ->
         when {
             id == null -> ThemeComponentState.SelectedThemeState.Idle(null)
-            dbValue != ScoreboardTheme.DEFAULT -> ThemeComponentState.SelectedThemeState.Idle(dbValue)
+            dbValue != ScoreboardTheme.DEFAULT -> ThemeComponentState.SelectedThemeState.Idle(
+                dbValue
+            )
+
             fetchResult == null -> ThemeComponentState.SelectedThemeState.Loading(id)
             fetchResult is LoadResult.Error -> ThemeComponentState.SelectedThemeState.Error(id)
             else -> ThemeComponentState.SelectedThemeState.Idle(dbValue)
         }
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), ThemeComponentState.SelectedThemeState.Idle(null))
+    }.stateIn(
+        viewModelScope,
+        SharingStarted.WhileSubscribed(5_000),
+        ThemeComponentState.SelectedThemeState.Idle(null)
+    )
 
     // --- Options fetch results (on-demand via FetchSetTemplates/FetchThemes) ---
     private val _regularSetOptionsFetchResult = MutableStateFlow<LoadResult<Unit, Throwable>?>(null)
-    private val _decidingSetOptionsFetchResult = MutableStateFlow<LoadResult<Unit, Throwable>?>(null)
+    private val _decidingSetOptionsFetchResult =
+        MutableStateFlow<LoadResult<Unit, Throwable>?>(null)
     private val _themesFetchResult = MutableStateFlow<LoadResult<Unit, Throwable>?>(null)
 
     // --- DB observations for options ---
@@ -196,10 +197,17 @@ class AddMatchViewModel(
     ) { result: LoadResult<Unit, Throwable>?, dbData: List<SetTemplate> ->
         when {
             result == null && dbData.isEmpty() -> SetComponentState.SetTemplateOptionsState.Loading
-            result is LoadResult.Error && dbData.isEmpty() -> SetComponentState.SetTemplateOptionsState.Error("Error")
+            result is LoadResult.Error && dbData.isEmpty() -> SetComponentState.SetTemplateOptionsState.Error(
+                "Error"
+            )
+
             else -> SetComponentState.SetTemplateOptionsState.Idle(dbData)
         }
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), SetComponentState.SetTemplateOptionsState.Idle(emptyList()))
+    }.stateIn(
+        viewModelScope,
+        SharingStarted.WhileSubscribed(5_000),
+        SetComponentState.SetTemplateOptionsState.Idle(emptyList())
+    )
 
     private val decidingSetOptionsState = combine(
         _decidingSetOptionsFetchResult,
@@ -207,10 +215,17 @@ class AddMatchViewModel(
     ) { result: LoadResult<Unit, Throwable>?, dbData: List<SetTemplate> ->
         when {
             result == null && dbData.isEmpty() -> SetComponentState.SetTemplateOptionsState.Loading
-            result is LoadResult.Error && dbData.isEmpty() -> SetComponentState.SetTemplateOptionsState.Error("Error")
+            result is LoadResult.Error && dbData.isEmpty() -> SetComponentState.SetTemplateOptionsState.Error(
+                "Error"
+            )
+
             else -> SetComponentState.SetTemplateOptionsState.Idle(dbData)
         }
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), SetComponentState.SetTemplateOptionsState.Idle(emptyList()))
+    }.stateIn(
+        viewModelScope,
+        SharingStarted.WhileSubscribed(5_000),
+        SetComponentState.SetTemplateOptionsState.Idle(emptyList())
+    )
 
     private val themeOptionsState = combine(
         _themesFetchResult,
@@ -218,41 +233,60 @@ class AddMatchViewModel(
     ) { result: LoadResult<Unit, Throwable>?, dbData: List<ScoreboardTheme> ->
         when {
             result == null && dbData.isEmpty() -> ThemeComponentState.ThemeOptionsState.Loading
-            result is LoadResult.Error && dbData.isEmpty() -> ThemeComponentState.ThemeOptionsState.Error("Error")
+            result is LoadResult.Error && dbData.isEmpty() -> ThemeComponentState.ThemeOptionsState.Error(
+                "Error"
+            )
+
             else -> ThemeComponentState.ThemeOptionsState.Idle(dbData)
         }
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), ThemeComponentState.ThemeOptionsState.Idle(emptyList()))
+    }.stateIn(
+        viewModelScope,
+        SharingStarted.WhileSubscribed(5_000),
+        ThemeComponentState.ThemeOptionsState.Idle(emptyList())
+    )
 
     // --- Component states (combine selected + options) ---
     private val regularSetComponentState = combine(
         regularSelectedState, regularSetOptionsState
     ) { selected: SetComponentState.SelectedSetState, options: SetComponentState.SetTemplateOptionsState ->
         SetComponentState(selected, options)
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), SetComponentState(
-        SetComponentState.SelectedSetState.Idle(null), SetComponentState.SetTemplateOptionsState.Idle(emptyList())
-    ))
+    }.stateIn(
+        viewModelScope, SharingStarted.WhileSubscribed(5_000), SetComponentState(
+            SetComponentState.SelectedSetState.Idle(null),
+            SetComponentState.SetTemplateOptionsState.Idle(emptyList())
+        )
+    )
 
     private val decidingSetComponentState = combine(
         decidingSelectedState, decidingSetOptionsState
     ) { selected: SetComponentState.SelectedSetState, options: SetComponentState.SetTemplateOptionsState ->
         SetComponentState(selected, options)
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), SetComponentState(
-        SetComponentState.SelectedSetState.Idle(null), SetComponentState.SetTemplateOptionsState.Idle(emptyList())
-    ))
+    }.stateIn(
+        viewModelScope, SharingStarted.WhileSubscribed(5_000), SetComponentState(
+            SetComponentState.SelectedSetState.Idle(null),
+            SetComponentState.SetTemplateOptionsState.Idle(emptyList())
+        )
+    )
 
     private val themeComponentState = combine(
         themeSelectedState, themeOptionsState
     ) { selected: ThemeComponentState.SelectedThemeState, options: ThemeComponentState.ThemeOptionsState ->
         ThemeComponentState(selected, options)
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), ThemeComponentState(
-        ThemeComponentState.SelectedThemeState.Idle(null), ThemeComponentState.ThemeOptionsState.Idle(emptyList())
-    ))
+    }.stateIn(
+        viewModelScope, SharingStarted.WhileSubscribed(5_000), ThemeComponentState(
+            ThemeComponentState.SelectedThemeState.Idle(null),
+            ThemeComponentState.ThemeOptionsState.Idle(emptyList())
+        )
+    )
 
     // --- User input ---
-    private val _firstParticipant = MutableStateFlow<TennisParticipantInMatch>(PARTICIPANT_IN_SINGLES_MATCH_DEFAULT)
-    private val _secondParticipant = MutableStateFlow<TennisParticipantInMatch>(PARTICIPANT_IN_SINGLES_MATCH_DEFAULT)
+    private val _firstParticipant =
+        MutableStateFlow<TennisParticipantInMatch>(PARTICIPANT_IN_SINGLES_MATCH_DEFAULT)
+    private val _secondParticipant =
+        MutableStateFlow<TennisParticipantInMatch>(PARTICIPANT_IN_SINGLES_MATCH_DEFAULT)
     private val _isAdding = MutableStateFlow(false)
-    private val _dialogState = MutableStateFlow<OpenColorPickerDialogState>(OpenColorPickerDialogState.None)
+    private val _dialogState =
+        MutableStateFlow<OpenColorPickerDialogState>(OpenColorPickerDialogState.None)
 
     // --- DB observations for participants ---
     private val participantsFromDb: StateFlow<List<TennisParticipant>> =
@@ -266,9 +300,11 @@ class AddMatchViewModel(
         _secondParticipant,
     ) { options: List<TennisParticipant>, first: TennisParticipantInMatch, second: TennisParticipantInMatch ->
         ParticipantComponentState(options, first, second)
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), ParticipantComponentState(
-        emptyList(), PARTICIPANT_IN_SINGLES_MATCH_DEFAULT, PARTICIPANT_IN_SINGLES_MATCH_DEFAULT
-    ))
+    }.stateIn(
+        viewModelScope, SharingStarted.WhileSubscribed(5_000), ParticipantComponentState(
+            emptyList(), PARTICIPANT_IN_SINGLES_MATCH_DEFAULT, PARTICIPANT_IN_SINGLES_MATCH_DEFAULT
+        )
+    )
 
     // --- Final state (9 params — within core.combine limit of 10) ---
     override val state: StateFlow<AddMatchState> = combine(
@@ -281,16 +317,17 @@ class AddMatchViewModel(
         _isAdding,
         _dialogState,
         _action,
-    ) { tournament: Tournament,
-        regularComp: SetComponentState,
-        decidingComp: SetComponentState,
-        themeComp: ThemeComponentState,
-        participantState: ParticipantComponentState,
-        setsToWin: Int,
-        isAdding: Boolean,
-        dialogState: OpenColorPickerDialogState,
-        action: AddMatchAction?,
-    ->
+    ) {
+            tournament: Tournament,
+            regularComp: SetComponentState,
+            decidingComp: SetComponentState,
+            themeComp: ThemeComponentState,
+            participantState: ParticipantComponentState,
+            setsToWin: Int,
+            isAdding: Boolean,
+            dialogState: OpenColorPickerDialogState,
+            action: AddMatchAction?,
+        ->
         if (tournament == TOURNAMENT_DEFAULT) {
             AddMatchState(loadingState = AddMatchLoadingState.Loading, action = action)
         } else {
@@ -321,27 +358,33 @@ class AddMatchViewModel(
                 participantNumber = uiEvent.participantNumber,
                 participant = uiEvent.participant
             )
+
             is AddMatchUiEvent.ChangeDisplayName -> changeDisplayName(
                 participantNumber = uiEvent.participantNumber,
                 displayName = uiEvent.displayName
             )
+
             is AddMatchUiEvent.SelectPrimaryColor -> selectPrimaryColor(
                 participantNumber = uiEvent.participantNumber,
                 color = uiEvent.color
             )
+
             is AddMatchUiEvent.SelectSecondaryColor -> selectSecondaryColor(
                 participantNumber = uiEvent.participantNumber,
                 color = uiEvent.color
             )
+
             is AddMatchUiEvent.OpenColorPickerDialog -> {
                 _dialogState.value = OpenColorPickerDialogState.OpenColorPicker(
                     participantNumber = uiEvent.participantNumber,
                     colorNumber = uiEvent.colorNumber
                 )
             }
+
             AddMatchUiEvent.CloseColorPickerDialog -> {
                 _dialogState.value = OpenColorPickerDialogState.None
             }
+
             is AddMatchUiEvent.ChangeSetsToWin -> {
                 val new = _setsToWin.value + uiEvent.delta
                 if (new < 1) return
@@ -350,10 +393,16 @@ class AddMatchViewModel(
                     _regularSetId.value = null
                 }
             }
+
             is AddMatchUiEvent.FetchThemes -> fetchThemes()
             is AddMatchUiEvent.SelectTheme -> {
                 _themeId.value = uiEvent.theme.id
             }
+
+            is AddMatchUiEvent.RetrySelectedTheme -> {
+                fetchHelper.retryTheme(uiEvent.themeId)
+            }
+
             is AddMatchUiEvent.FetchSetTemplates -> fetchSetTemplates(uiEvent.setTemplateTypeFilter)
             is AddMatchUiEvent.SelectSetTemplate -> {
                 when (uiEvent.setTemplateTypeFilter) {
@@ -362,6 +411,15 @@ class AddMatchViewModel(
                     else -> Unit
                 }
             }
+
+            is AddMatchUiEvent.RetrySelectedRegularSet -> {
+                fetchHelper.retryRegularSet(uiEvent.setId)
+            }
+
+            is AddMatchUiEvent.RetrySelectedDecidingSet -> {
+                fetchHelper.retryDecidingSet(uiEvent.setId)
+            }
+
             is AddMatchUiEvent.AddMatch -> addMatch()
         }
     }
@@ -374,6 +432,7 @@ class AddMatchViewModel(
                     is ParticipantInDoublesMatch -> p.copy(displayName = displayName)
                 }
             }
+
             2 -> _secondParticipant.value = _secondParticipant.value.let { p ->
                 when (p) {
                     is ParticipantInSinglesMatch -> p.copy(displayName = displayName)
@@ -391,6 +450,7 @@ class AddMatchViewModel(
                     is ParticipantInDoublesMatch -> p.copy(primaryColor = color)
                 }
             }
+
             2 -> _secondParticipant.value = _secondParticipant.value.let { p ->
                 when (p) {
                     is ParticipantInSinglesMatch -> p.copy(primaryColor = color)
@@ -409,6 +469,7 @@ class AddMatchViewModel(
                     is ParticipantInDoublesMatch -> p.copy(secondaryColor = color)
                 }
             }
+
             2 -> _secondParticipant.value = _secondParticipant.value.let { p ->
                 when (p) {
                     is ParticipantInSinglesMatch -> p.copy(secondaryColor = color)
@@ -424,14 +485,18 @@ class AddMatchViewModel(
             when (filter) {
                 SetTemplateTypeFilter.REGULAR -> {
                     _regularSetOptionsFetchResult.value = null
-                    val result = setTemplateRepository.fetchSetTemplates(SetTemplateTypeFilter.REGULAR)
+                    val result =
+                        setTemplateRepository.fetchSetTemplates(SetTemplateTypeFilter.REGULAR)
                     _regularSetOptionsFetchResult.value = result
                 }
+
                 SetTemplateTypeFilter.DECIDER -> {
                     _decidingSetOptionsFetchResult.value = null
-                    val result = setTemplateRepository.fetchSetTemplates(SetTemplateTypeFilter.DECIDER)
+                    val result =
+                        setTemplateRepository.fetchSetTemplates(SetTemplateTypeFilter.DECIDER)
                     _decidingSetOptionsFetchResult.value = result
                 }
+
                 SetTemplateTypeFilter.ALL -> {
                     _regularSetOptionsFetchResult.value = null
                     _decidingSetOptionsFetchResult.value = null
@@ -476,6 +541,7 @@ class AddMatchViewModel(
                             )
                         )
                     }
+
                     2 -> {
                         val current = _secondParticipant.value as ParticipantInSinglesMatch
                         val player = current.player as PlayerInSinglesMatch
@@ -492,8 +558,10 @@ class AddMatchViewModel(
                     }
                 }
             }
+
             is DoublesParticipant -> {
-                val displayName = "${participant.firstPlayer.surname}/${participant.secondPlayer.surname}".uppercase()
+                val displayName =
+                    "${participant.firstPlayer.surname}/${participant.secondPlayer.surname}".uppercase()
                 when (participantNumber) {
                     1 -> {
                         val current = _firstParticipant.value as ParticipantInDoublesMatch
@@ -515,6 +583,7 @@ class AddMatchViewModel(
                             ),
                         )
                     }
+
                     2 -> {
                         val current = _secondParticipant.value as ParticipantInDoublesMatch
                         val fp = current.firstPlayer as PlayerInDoublesMatch
@@ -585,6 +654,7 @@ class AddMatchViewModel(
         when (e) {
             is UnauthorizedActionException ->
                 sendAction(AddMatchAction.ShowUnauthorizedActionError)
+
             else ->
                 sendAction(AddMatchAction.ShowAddError(e.message ?: "Error"))
         }

@@ -51,12 +51,15 @@ sealed class AddMatchUiEvent : UiEvent {
 
     data object FetchThemes : AddMatchUiEvent()
     class SelectTheme(val theme: com.bashkevich.tennisscorekeeper.model.theme.domain.ScoreboardTheme) : AddMatchUiEvent()
+    class RetrySelectedTheme(val themeId: Int) : AddMatchUiEvent()
 
     class FetchSetTemplates(val setTemplateTypeFilter: SetTemplateTypeFilter) : AddMatchUiEvent()
     class SelectSetTemplate(
         val setTemplateTypeFilter: SetTemplateTypeFilter,
         val setTemplate: com.bashkevich.tennisscorekeeper.model.set_template.domain.SetTemplate
     ) : AddMatchUiEvent()
+    class RetrySelectedRegularSet(val setId: Int) : AddMatchUiEvent()
+    class RetrySelectedDecidingSet(val setId: Int) : AddMatchUiEvent()
 
     data object AddMatch : AddMatchUiEvent()
 }

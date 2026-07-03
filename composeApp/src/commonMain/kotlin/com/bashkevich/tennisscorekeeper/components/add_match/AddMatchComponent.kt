@@ -110,6 +110,15 @@ fun AddMatchComponent(
             onThemesFetch = {
                 onEvent(AddMatchUiEvent.FetchThemes)
             },
+            onRetrySelectedTheme = { themeId ->
+                onEvent(AddMatchUiEvent.RetrySelectedTheme(themeId))
+            },
+            onRetrySelectedRegularSet = { setId ->
+                onEvent(AddMatchUiEvent.RetrySelectedRegularSet(setId))
+            },
+            onRetrySelectedDecidingSet = { setId ->
+                onEvent(AddMatchUiEvent.RetrySelectedDecidingSet(setId))
+            },
         )
 
         Spacer(modifier = Modifier.height(8.dp))
