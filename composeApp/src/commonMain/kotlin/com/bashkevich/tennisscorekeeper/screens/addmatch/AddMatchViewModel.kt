@@ -41,8 +41,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -62,21 +63,20 @@ class AddMatchViewModel(
     // --- Tournament from DB (no fetchTournamentById, tournament is already cached) ---
     private val tournamentFromDb: StateFlow<Tournament> =
         tournamentRepository.observeTournamentById(tournamentId)
+            .filter { it!= TOURNAMENT_DEFAULT }
             .onEach { tournament ->
-                if (tournament != TOURNAMENT_DEFAULT) {
                     _regularSetId.value = tournament.regularSetTemplateId
-                    _decidingSetId.value = tournament.decidingSetTemplateId.takeIf { it != 0 }
-                    _themeId.value = tournament.themeId.takeIf { it != 0 }
+                    _decidingSetId.value = tournament.decidingSetTemplateId
+                    _themeId.value = tournament.themeId
                     _setsToWin.value = tournament.setsToWin
-                }
             }
             .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), TOURNAMENT_DEFAULT)
 
     // --- Selected IDs (single source of truth) ---
-    private val _regularSetId = MutableStateFlow<Int?>(null)
-    private val _decidingSetId = MutableStateFlow<Int?>(null)
-    private val _themeId = MutableStateFlow<Int?>(null)
-    private val _setsToWin = MutableStateFlow(1)
+    private val _regularSetId = MutableStateFlow(tournamentFromDb.value.regularSetTemplateId)
+    private val _decidingSetId = MutableStateFlow(tournamentFromDb.value.decidingSetTemplateId)
+    private val _themeId = MutableStateFlow(tournamentFromDb.value.themeId)
+    private val _setsToWin = MutableStateFlow(tournamentFromDb.value.setsToWin)
 
     // --- Fetch helper ---
     private val fetchHelper = AddMatchFetchHelper(themeRepository, setTemplateRepository)
@@ -95,22 +95,19 @@ class AddMatchViewModel(
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
 
     // --- DB observations by selected IDs (reactive to user selection changes) ---
-    private val regularSetFromDb: StateFlow<SetTemplate> =
-        _regularSetId.flatMapLatest { id ->
-            if (id == null) flowOf(SET_TEMPLATE_DEFAULT)
-            else setTemplateRepository.observeSetTemplateById(id)
+    private val regularSetFromDb: StateFlow<SetTemplate?> =
+        _regularSetId.filterNotNull().flatMapLatest { id ->
+             setTemplateRepository.observeSetTemplateById(id)
         }.stateIn(viewModelScope, SharingStarted.Lazily, SET_TEMPLATE_DEFAULT)
 
     private val decidingSetFromDb: StateFlow<SetTemplate> =
         _decidingSetId.flatMapLatest { id ->
-            if (id == null) flowOf(SET_TEMPLATE_DEFAULT)
-            else setTemplateRepository.observeSetTemplateById(id)
+            setTemplateRepository.observeSetTemplateById(id)
         }.stateIn(viewModelScope, SharingStarted.Lazily, SET_TEMPLATE_DEFAULT)
 
     private val themeFromDb: StateFlow<ScoreboardTheme> =
         _themeId.flatMapLatest { id ->
-            if (id == null) flowOf(ScoreboardTheme.DEFAULT)
-            else themeRepository.observeThemeByIdFromDatabase(id)
+            themeRepository.observeThemeByIdFromDatabase(id)
         }.stateIn(viewModelScope, SharingStarted.Lazily, ScoreboardTheme.DEFAULT)
 
     // --- Selected states: Loading/Error/Idle based on fetch result + DB value ---
@@ -118,10 +115,9 @@ class AddMatchViewModel(
         _regularSetId,
         regularSetFetchResult,
         regularSetFromDb,
-    ) { id: Int?, fetchResult: LoadResult<Unit, Throwable>?, dbValue: SetTemplate ->
+    ) { id: Int?, fetchResult: LoadResult<Unit, Throwable>?, dbValue: SetTemplate? ->
         when {
             id == null -> SetComponentState.SelectedSetState.Idle(null)
-            dbValue != SET_TEMPLATE_DEFAULT -> SetComponentState.SelectedSetState.Idle(dbValue)
             fetchResult == null -> SetComponentState.SelectedSetState.Loading(id)
             fetchResult is LoadResult.Error -> SetComponentState.SelectedSetState.Error(id)
             else -> SetComponentState.SelectedSetState.Idle(dbValue)
@@ -136,12 +132,10 @@ class AddMatchViewModel(
         _decidingSetId,
         decidingSetFetchResult,
         decidingSetFromDb,
-    ) { id: Int?, fetchResult: LoadResult<Unit, Throwable>?, dbValue: SetTemplate ->
-        when {
-            id == null -> SetComponentState.SelectedSetState.Idle(null)
-            dbValue != SET_TEMPLATE_DEFAULT -> SetComponentState.SelectedSetState.Idle(dbValue)
-            fetchResult == null -> SetComponentState.SelectedSetState.Loading(id)
-            fetchResult is LoadResult.Error -> SetComponentState.SelectedSetState.Error(id)
+    ) { id: Int, fetchResult: LoadResult<Unit, Throwable>?, dbValue: SetTemplate ->
+        when (fetchResult) {
+            null -> SetComponentState.SelectedSetState.Loading(id)
+            is LoadResult.Error -> SetComponentState.SelectedSetState.Error(id)
             else -> SetComponentState.SelectedSetState.Idle(dbValue)
         }
     }.stateIn(
@@ -154,15 +148,10 @@ class AddMatchViewModel(
         _themeId,
         themeFetchResult,
         themeFromDb,
-    ) { id: Int?, fetchResult: LoadResult<Unit, Throwable>?, dbValue: ScoreboardTheme ->
-        when {
-            id == null -> ThemeComponentState.SelectedThemeState.Idle(null)
-            dbValue != ScoreboardTheme.DEFAULT -> ThemeComponentState.SelectedThemeState.Idle(
-                dbValue
-            )
-
-            fetchResult == null -> ThemeComponentState.SelectedThemeState.Loading(id)
-            fetchResult is LoadResult.Error -> ThemeComponentState.SelectedThemeState.Error(id)
+    ) { id: Int, fetchResult: LoadResult<Unit, Throwable>?, dbValue: ScoreboardTheme ->
+        when (fetchResult) {
+            null -> ThemeComponentState.SelectedThemeState.Loading(id)
+            is LoadResult.Error -> ThemeComponentState.SelectedThemeState.Error(id)
             else -> ThemeComponentState.SelectedThemeState.Idle(dbValue)
         }
     }.stateIn(
@@ -634,8 +623,8 @@ class AddMatchViewModel(
                 secondParticipant = secondParticipantBody,
                 setsToWin = _setsToWin.value,
                 regularSet = _regularSetId.value?.toString(),
-                decidingSet = _decidingSetId.value?.toString() ?: "",
-                themeId = _themeId.value?.toString() ?: "",
+                decidingSet = _decidingSetId.value.toString(),
+                themeId = _themeId.value.toString(),
             )
 
             matchRepository.addNewMatch(tournamentId = tournamentId, matchBody = matchBody)
