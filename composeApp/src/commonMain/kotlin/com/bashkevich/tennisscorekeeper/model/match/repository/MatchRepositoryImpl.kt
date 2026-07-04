@@ -8,7 +8,6 @@ import com.bashkevich.tennisscorekeeper.model.match.domain.Match
 import com.bashkevich.tennisscorekeeper.model.match.domain.ShortMatch
 import com.bashkevich.tennisscorekeeper.model.match.domain.toDomain
 import com.bashkevich.tennisscorekeeper.model.match.local.MatchLocalDataSource
-import com.bashkevich.tennisscorekeeper.model.match.local.MatchWithParticipantsEntity
 import com.bashkevich.tennisscorekeeper.model.match.local.toDomain
 import com.bashkevich.tennisscorekeeper.model.match.local.toMatchDomain
 import com.bashkevich.tennisscorekeeper.model.match.local.toMatchGameEntity
@@ -26,9 +25,9 @@ import com.bashkevich.tennisscorekeeper.model.match.remote.body.ServeBody
 import com.bashkevich.tennisscorekeeper.model.match.remote.body.ServeInPairBody
 import com.bashkevich.tennisscorekeeper.model.match.remote.body.VideoLinkBody
 import com.bashkevich.tennisscorekeeper.model.tournament.local.TournamentLocalDataSource
+import com.bashkevich.tennisscorekeeper.screens.matchdetails.ConnectionState
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
@@ -90,6 +89,9 @@ class MatchRepositoryImpl(
                 }
             }
             .map { result -> result.mapSuccess { matchDto -> matchDto.toDomain() } }
+
+    override fun observeConnectionState(): StateFlow<ConnectionState> =
+        matchRemoteDataSource.observeConnectionState()
 
     private suspend fun saveMatchDetailsToDb(matchDto: MatchDto) {
         val existingMatch = matchLocalDataSource.getMatchById(matchDto.id.toInt()) ?: return
