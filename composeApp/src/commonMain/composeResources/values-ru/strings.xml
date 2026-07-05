@@ -41,14 +41,14 @@
     <string name="finish_match">Завершить матч</string>
     <string name="pause_match">Пауза</string>
     <string name="resume_match">Продолжить матч</string>
-    <string name="player_1_point">Очко игрока 1</string>
-    <string name="player_2_point">Очко игрока 2</string>
+    <string name="player_1_point">Розыгрыш игрока 1</string>
+    <string name="player_2_point">Розыгрыш игрока 2</string>
     <string name="player_1_game">Гейм игрока 1</string>
     <string name="player_2_game">Гейм игрока 2</string>
-    <string name="undo_point">Отменить очко</string>
-    <string name="redo_point">Вернуть очко</string>
-    <string name="player_1_retire">Снять игрока 1</string>
-    <string name="player_2_retire">Снять игрока 2</string>
+    <string name="undo_point">Отменить розыгрыш</string>
+    <string name="redo_point">Вернуть розыгрыш</string>
+    <string name="player_1_retire">Снятие игрока 1</string>
+    <string name="player_2_retire">Снятие игрока 2</string>
     <string name="logout">Выйти</string>
 
     <!-- Auth -->
@@ -72,13 +72,13 @@
     <string name="participants">Участники</string>
     <string name="status">Статус</string>
     <string name="match_status_not_started">Не начат</string>
-    <string name="match_status_in_progress">В процессе</string>
-    <string name="match_status_paused">На паузе</string>
+    <string name="match_status_in_progress">Идёт</string>
+    <string name="match_status_paused">Остановлен</string>
     <string name="match_status_completed">Завершён</string>
     <string name="tournament_type_singles">Одиночный</string>
     <string name="tournament_type_doubles">Парный</string>
     <string name="tournament_status_not_started">Не начат</string>
-    <string name="tournament_status_in_progress">В процессе</string>
+    <string name="tournament_status_in_progress">Идёт</string>
     <string name="tournament_status_completed">Завершён</string>
 
     <!-- Placeholders & Labels -->
@@ -111,6 +111,6 @@
     <string name="upload_file">Загрузить файл</string>
 
     <!-- Set Template -->
-    <string name="regular_set_template">Шаблон обычного сета</string>
-    <string name="deciding_set_template">Шаблон решающего сета</string>
+    <string name="regular_set_template">Формат обычного сета</string>
+    <string name="deciding_set_template">Формат решающего сета</string>
 </resources>

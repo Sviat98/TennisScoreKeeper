@@ -111,6 +111,6 @@
     <string name="upload_file">Upload file</string>
 
     <!-- Set Template -->
-    <string name="regular_set_template">Regular Set Template</string>
-    <string name="deciding_set_template">Deciding Set Template</string>
+    <string name="regular_set_template">Regular Set Format</string>
+    <string name="deciding_set_template">Deciding Set Format</string>
 </resources>

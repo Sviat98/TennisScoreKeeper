@@ -26,7 +26,7 @@ import com.bashkevich.tennisscorekeeper.screens.addmatch.AddMatchUiEvent
 import com.bashkevich.tennisscorekeeper.screens.addmatch.OpenColorPickerDialogState
 import org.jetbrains.compose.resources.stringResource
 import tennisscorekeeper.composeapp.generated.resources.Res
-import tennisscorekeeper.composeapp.generated.resources.add_match
+import tennisscorekeeper.composeapp.generated.resources.add
 
 @Composable
 fun AddMatchComponent(
@@ -156,7 +156,7 @@ fun AddMatchComponent(
             if (contentState.isAdding) {
                 CircularProgressIndicator(modifier = Modifier.size(24.dp))
             } else {
-                Text(stringResource(Res.string.add_match))
+                Text(stringResource(Res.string.add))
             }
         }
 
