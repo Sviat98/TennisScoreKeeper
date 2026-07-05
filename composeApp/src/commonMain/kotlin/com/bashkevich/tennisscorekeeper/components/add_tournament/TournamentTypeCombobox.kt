@@ -21,7 +21,7 @@ import androidx.compose.ui.graphics.Color
 import com.bashkevich.tennisscorekeeper.components.icons.IconGroup
 import com.bashkevich.tennisscorekeeper.components.icons.default_icons.ArrowDropDown
 import com.bashkevich.tennisscorekeeper.model.tournament.remote.TournamentType
-import com.bashkevich.tennisscorekeeper.model.tournament.remote.mapToDisplayedString
+import com.bashkevich.tennisscorekeeper.model.tournament.remote.toResource
 import org.jetbrains.compose.resources.stringResource
 import tennisscorekeeper.composeapp.generated.resources.Res
 import tennisscorekeeper.composeapp.generated.resources.open_dropdown
@@ -37,7 +37,7 @@ fun TournamentTypeCombobox(
     var expanded by remember { mutableStateOf(false) }
     val options = TournamentType.entries
 
-    val tournamentTypeText = currentTournamentType?.mapToDisplayedString() ?: ""
+    val tournamentTypeText = currentTournamentType?.let { stringResource(it.toResource()) } ?: ""
 
     val tournamentTypeState = TextFieldState(tournamentTypeText)
 
@@ -71,7 +71,7 @@ fun TournamentTypeCombobox(
         ) {
             options.forEach { option ->
                 DropdownMenuItem(
-                    text = { Text(text = option.mapToDisplayedString()) },
+                    text = { Text(text = stringResource(option.toResource())) },
                     onClick = {
                         onTournamentTypeChange(option)
                         expanded = false

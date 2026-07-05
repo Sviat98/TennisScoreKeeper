@@ -71,6 +71,15 @@
     <string name="matches">Матчи</string>
     <string name="participants">Участники</string>
     <string name="status">Статус</string>
+    <string name="match_status_not_started">Не начат</string>
+    <string name="match_status_in_progress">В процессе</string>
+    <string name="match_status_paused">На паузе</string>
+    <string name="match_status_completed">Завершён</string>
+    <string name="tournament_type_singles">Одиночный</string>
+    <string name="tournament_type_doubles">Парный</string>
+    <string name="tournament_status_not_started">Не начат</string>
+    <string name="tournament_status_in_progress">В процессе</string>
+    <string name="tournament_status_completed">Завершён</string>
 
     <!-- Placeholders & Labels -->
     <string name="tournament_name">Название турнира</string>

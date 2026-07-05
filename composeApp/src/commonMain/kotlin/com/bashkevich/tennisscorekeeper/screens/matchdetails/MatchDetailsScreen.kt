@@ -40,7 +40,7 @@ import com.bashkevich.tennisscorekeeper.components.match_details.serve.ChooseSer
 import com.bashkevich.tennisscorekeeper.components.scoreboard.match_details.MatchDetailsScoreboardView
 import com.bashkevich.tennisscorekeeper.components.showUnauthorizedActionSnackbar
 import com.bashkevich.tennisscorekeeper.model.match.remote.body.MatchStatus
-import com.bashkevich.tennisscorekeeper.model.match.remote.body.convertToString
+import com.bashkevich.tennisscorekeeper.model.match.remote.body.toResource
 import com.bashkevich.tennisscorekeeper.mvi.LaunchedUiEffectHandler
 import com.bashkevich.tennisscorekeeper.navigation.SettingsRoute
 import kotlinx.coroutines.launch
@@ -149,7 +149,8 @@ fun MatchDetailsCommonContent(
                     match = match,
                 )
 
-                Text("${stringResource(Res.string.status)}: ${match.status.convertToString()}")
+                val statusText = stringResource(match.status.toResource())
+                Text("${stringResource(Res.string.status)}: $statusText")
 
                 MatchStatusButton(
                     match = match,

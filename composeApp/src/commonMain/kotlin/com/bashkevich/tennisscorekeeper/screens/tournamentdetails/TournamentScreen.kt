@@ -39,7 +39,7 @@ import com.bashkevich.tennisscorekeeper.components.icons.IconGroup
 import com.bashkevich.tennisscorekeeper.mvi.LaunchedUiEffectHandler
 import com.bashkevich.tennisscorekeeper.components.icons.default_icons.Add
 import com.bashkevich.tennisscorekeeper.components.tournament.TournamentDetailsLoading
-import com.bashkevich.tennisscorekeeper.model.match.remote.body.convertToString
+import com.bashkevich.tennisscorekeeper.model.tournament.remote.toResource
 import com.bashkevich.tennisscorekeeper.model.tournament.remote.TournamentStatus
 import com.bashkevich.tennisscorekeeper.navigation.AddMatchRoute
 import com.bashkevich.tennisscorekeeper.navigation.MatchDetailsRoute
@@ -151,7 +151,8 @@ private fun TournamentContent(
                                 modifier = Modifier.weight(1f)
                             ) {
                                 Text(tournament.name, fontSize = 28.sp)
-                                Text("${stringResource(Res.string.status)}: ${tournament.status.convertToString()}")
+                                val statusText = stringResource(tournament.status.toResource())
+                                Text("${stringResource(Res.string.status)}: $statusText")
                             }
                             ChangeTournamentStatusButton(
                                 modifier = Modifier.weight(1f),
