@@ -66,6 +66,10 @@ fun MatchDetailsScreen(
             is MatchDetailsAction.ShowUnauthorizedError ->
                 snackbarHostState.showUnauthorizedActionSnackbar(
                     navController = navController)
+            is MatchDetailsAction.ShowError ->
+                snackbarHostState.showSnackbar(
+                    message = currentAction.message
+                )
     }
 }
 

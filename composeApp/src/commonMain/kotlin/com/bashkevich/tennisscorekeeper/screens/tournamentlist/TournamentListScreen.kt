@@ -89,7 +89,7 @@ private fun TournamentListContent(
         onConsume = onConsumeAction
     ) { currentAction ->
         when (currentAction) {
-            is TournamentListAction.ShowRefreshError ->
+            is TournamentListAction.ShowError ->
                 snackbarHostState.showSnackbar(message = currentAction.message)
         }
     }

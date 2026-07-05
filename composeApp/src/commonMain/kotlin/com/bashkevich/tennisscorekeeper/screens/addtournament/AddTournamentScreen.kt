@@ -57,7 +57,7 @@ fun AddTournamentScreen(
                 )
             }
 
-            is AddTournamentAction.ShowAddError -> {
+            is AddTournamentAction.ShowError -> {
                 snackbarHostState.showSnackbar(message = action.message)
             }
         }

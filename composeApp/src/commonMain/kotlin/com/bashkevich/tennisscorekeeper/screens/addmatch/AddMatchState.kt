@@ -84,6 +84,6 @@ data class AddMatchState(
 @Immutable
 sealed class AddMatchAction : UiAction {
     data object MatchAdded : AddMatchAction()
-    data class ShowAddError(val message: String) : AddMatchAction()
+    data class ShowError(val message: String) : AddMatchAction()
     data object ShowUnauthorizedActionError : AddMatchAction()
 }

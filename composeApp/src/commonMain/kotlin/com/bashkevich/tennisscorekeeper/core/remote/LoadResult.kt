@@ -48,6 +48,6 @@ inline fun <S, R> S.runOperationCatching(block: S.() -> R): LoadResult<R, Throwa
     } catch (e: CancellationException) {
         throw e
     } catch (e: Throwable) {
-        LoadResult.Error(e)
+        LoadResult.Error(e.toNetworkException() ?: e)
     }
 }

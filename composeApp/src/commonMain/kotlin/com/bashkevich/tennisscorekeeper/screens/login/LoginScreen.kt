@@ -62,8 +62,8 @@ fun LoginScreenContent(
         onConsume = onConsumeAction
     ) { currentAction ->
         when (currentAction) {
-            is LoginAction.ShowLoginError ->
-                snackbarHostState.showSnackbar(message = getString(Res.string.wrong_login_or_password))
+            is LoginAction.ShowError ->
+                snackbarHostState.showSnackbar(message = currentAction.message)
         }
     }
 

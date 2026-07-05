@@ -8,6 +8,10 @@ import com.bashkevich.tennisscorekeeper.components.set_template.SetComponentStat
 import com.bashkevich.tennisscorekeeper.components.theme.ThemeComponentState
 import com.bashkevich.tennisscorekeeper.core.combine
 import com.bashkevich.tennisscorekeeper.core.remote.LoadResult
+import com.bashkevich.tennisscorekeeper.core.remote.NetworkException
+import org.jetbrains.compose.resources.getString
+import tennisscorekeeper.composeapp.generated.resources.Res
+import tennisscorekeeper.composeapp.generated.resources.check_internet_connection
 import com.bashkevich.tennisscorekeeper.core.remote.UnauthorizedActionException
 import com.bashkevich.tennisscorekeeper.core.remote.doOnError
 import com.bashkevich.tennisscorekeeper.core.remote.doOnSuccess
@@ -639,13 +643,15 @@ class AddMatchViewModel(
         }
     }
 
-    private fun handleError(e: Throwable) {
+    private suspend fun handleError(e: Throwable) {
         when (e) {
+            is NetworkException ->
+                sendAction(AddMatchAction.ShowError(getString(Res.string.check_internet_connection)))
             is UnauthorizedActionException ->
                 sendAction(AddMatchAction.ShowUnauthorizedActionError)
 
             else ->
-                sendAction(AddMatchAction.ShowAddError(e.message ?: "Error"))
+                sendAction(AddMatchAction.ShowError(e.message ?: "Error"))
         }
     }
 }

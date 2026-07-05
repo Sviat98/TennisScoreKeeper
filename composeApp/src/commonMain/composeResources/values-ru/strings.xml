@@ -19,4 +19,5 @@
     <string name="retry">Повторить</string>
     <string name="open_dropdown">Открыть выпадающий список</string>
     <string name="preview">Превью</string>
+    <string name="check_internet_connection">Проверьте подключение к интернету</string>
 </resources>

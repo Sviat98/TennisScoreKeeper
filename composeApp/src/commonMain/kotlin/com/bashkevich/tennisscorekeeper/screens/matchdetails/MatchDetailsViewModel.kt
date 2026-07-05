@@ -4,6 +4,10 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import com.bashkevich.tennisscorekeeper.core.remote.doOnError
+import com.bashkevich.tennisscorekeeper.core.remote.NetworkException
+import org.jetbrains.compose.resources.getString
+import tennisscorekeeper.composeapp.generated.resources.Res
+import tennisscorekeeper.composeapp.generated.resources.check_internet_connection
 import com.bashkevich.tennisscorekeeper.core.remote.UnauthorizedActionException
 import com.bashkevich.tennisscorekeeper.model.match.domain.SAMPLE_MATCH
 import com.bashkevich.tennisscorekeeper.model.match.remote.body.MatchStatus
@@ -175,10 +179,13 @@ class MatchDetailsViewModel(
         }
     }
 
-    private fun handleError(e: Throwable){
+    private suspend fun handleError(e: Throwable){
         println("e = $e")
-        if (e is UnauthorizedActionException) {
-            sendAction(MatchDetailsAction.ShowUnauthorizedError)
+        when (e) {
+            is NetworkException ->
+                sendAction(MatchDetailsAction.ShowError(getString(Res.string.check_internet_connection)))
+            is UnauthorizedActionException ->
+                sendAction(MatchDetailsAction.ShowUnauthorizedError)
         }
     }
 
