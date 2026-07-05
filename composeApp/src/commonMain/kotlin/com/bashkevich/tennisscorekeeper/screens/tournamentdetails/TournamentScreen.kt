@@ -45,10 +45,15 @@ import com.bashkevich.tennisscorekeeper.navigation.AddMatchRoute
 import com.bashkevich.tennisscorekeeper.navigation.MatchDetailsRoute
 import com.bashkevich.tennisscorekeeper.navigation.SettingsRoute
 import com.bashkevich.tennisscorekeeper.navigation.TournamentTab
-import com.bashkevich.tennisscorekeeper.navigation.toDisplayString
 import com.bashkevich.tennisscorekeeper.screens.matchlist.MatchListScreen
 import com.bashkevich.tennisscorekeeper.screens.participantlist.ParticipantListScreen
 import kotlinx.coroutines.launch
+import org.jetbrains.compose.resources.stringResource
+import tennisscorekeeper.composeapp.generated.resources.Res
+import tennisscorekeeper.composeapp.generated.resources.add_match
+import tennisscorekeeper.composeapp.generated.resources.matches
+import tennisscorekeeper.composeapp.generated.resources.participants
+import tennisscorekeeper.composeapp.generated.resources.status
 
 @Composable
 fun TournamentScreen(
@@ -111,7 +116,7 @@ private fun TournamentContent(
                         navController.navigate(AddMatchRoute(tournament.id))
                     }
                 ) {
-                    Icon(IconGroup.Default.Add, contentDescription = "Add match")
+                    Icon(IconGroup.Default.Add, contentDescription = stringResource(Res.string.add_match))
                 }
             }
         },
@@ -146,7 +151,7 @@ private fun TournamentContent(
                                 modifier = Modifier.weight(1f)
                             ) {
                                 Text(tournament.name, fontSize = 28.sp)
-                                Text("Status: ${tournament.status.convertToString()}")
+                                Text("${stringResource(Res.string.status)}: ${tournament.status.convertToString()}")
                             }
                             ChangeTournamentStatusButton(
                                 modifier = Modifier.weight(1f),
@@ -177,7 +182,7 @@ private fun TournamentContent(
                         horizontalArrangement = Arrangement.SpaceEvenly
                     ) {
                         Text(
-                            text = TournamentTab.MATCHES.toDisplayString(),
+                            text = stringResource(Res.string.matches),
                             modifier = Modifier.clickable {
                                 scope.launch {
                                     pagerState.animateScrollToPage(TournamentTab.MATCHES.ordinal)
@@ -188,7 +193,7 @@ private fun TournamentContent(
                                 MaterialTheme.colorScheme.primary else Color.DarkGray
                         )
                         Text(
-                            text = TournamentTab.PARTICIPANTS.toDisplayString(),
+                            text = stringResource(Res.string.participants),
                             modifier = Modifier.clickable {
                                 scope.launch {
                                     pagerState.animateScrollToPage(TournamentTab.PARTICIPANTS.ordinal)

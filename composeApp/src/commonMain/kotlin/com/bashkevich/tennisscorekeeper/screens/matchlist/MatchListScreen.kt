@@ -21,6 +21,11 @@ import com.bashkevich.tennisscorekeeper.components.modifier.hoverScaleEffect
 import com.bashkevich.tennisscorekeeper.components.scoreboard.short.ShortMatchScoreboardCard
 import com.bashkevich.tennisscorekeeper.model.match.domain.ShortMatch
 import com.bashkevich.tennisscorekeeper.screens.tournamentdetails.MatchListLoadingState
+import org.jetbrains.compose.resources.stringResource
+import tennisscorekeeper.composeapp.generated.resources.Res
+import tennisscorekeeper.composeapp.generated.resources.couldnt_load_data
+import tennisscorekeeper.composeapp.generated.resources.match_list_empty
+import tennisscorekeeper.composeapp.generated.resources.pull_down_to_update
 
 @Composable
 fun MatchListScreen(
@@ -49,9 +54,9 @@ fun MatchListScreen(
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.CenterVertically)
                     ) {
-                        Text("Couldn't load data", color = MaterialTheme.colorScheme.onSurface)
+                        Text(stringResource(Res.string.couldnt_load_data), color = MaterialTheme.colorScheme.onSurface)
                         Text(
-                            "Pull down to update",
+                            stringResource(Res.string.pull_down_to_update),
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
@@ -65,7 +70,7 @@ fun MatchListScreen(
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
-                            "Match list is empty",
+                            stringResource(Res.string.match_list_empty),
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }

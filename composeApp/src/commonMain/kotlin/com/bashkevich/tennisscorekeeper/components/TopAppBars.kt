@@ -18,12 +18,25 @@ import com.bashkevich.tennisscorekeeper.components.icons.IconGroup
 import com.bashkevich.tennisscorekeeper.components.icons.default_icons.ArrowBack
 import com.bashkevich.tennisscorekeeper.components.icons.default_icons.Settings
 import com.bashkevich.tennisscorekeeper.components.icons.default_icons.Share
+import org.jetbrains.compose.resources.stringResource
+import tennisscorekeeper.composeapp.generated.resources.Res
+import tennisscorekeeper.composeapp.generated.resources.add_match
+import tennisscorekeeper.composeapp.generated.resources.add_tournament
+import tennisscorekeeper.composeapp.generated.resources.copy_link
+import tennisscorekeeper.composeapp.generated.resources.copy_link_to_panel
+import tennisscorekeeper.composeapp.generated.resources.copy_link_to_scoreboard
+import tennisscorekeeper.composeapp.generated.resources.login
+import tennisscorekeeper.composeapp.generated.resources.match
+import tennisscorekeeper.composeapp.generated.resources.navigate_back
+import tennisscorekeeper.composeapp.generated.resources.navigate_to_settings
+import tennisscorekeeper.composeapp.generated.resources.tournament
+import tennisscorekeeper.composeapp.generated.resources.tournaments
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TournamentListAppBar() {
     TopAppBar(
-        title = { Text("Tournaments") },
+        title = { Text(stringResource(Res.string.tournaments)) },
     )
 }
 @OptIn(ExperimentalMaterial3Api::class)
@@ -32,10 +45,10 @@ fun TournamentListAppBarWithButton(
     onNavigateToSettings: () -> Unit
 ) {
     TopAppBar(
-        title = { Text("Tournaments") },
+        title = { Text(stringResource(Res.string.tournaments)) },
         actions = {
             IconButton(onClick = onNavigateToSettings) {
-                Icon(IconGroup.Default.Settings, contentDescription = "Navigate to settings")
+                Icon(IconGroup.Default.Settings, contentDescription = stringResource(Res.string.navigate_to_settings))
             }
         }
     )
@@ -48,20 +61,20 @@ fun TournamentDetailsAppBar(
     onNavigateToSettings: () -> Unit
 ) {
     TopAppBar(
-        title = { Text("Tournament") },
+        title = { Text(stringResource(Res.string.tournament)) },
         navigationIcon = {
             IconButton(
                 onClick = onBack
             ) {
                 Icon(
                     imageVector = IconGroup.Default.ArrowBack,
-                    contentDescription = "Navigate back"
+                    contentDescription = stringResource(Res.string.navigate_back)
                 )
             }
         },
         actions = {
             IconButton(onClick = onNavigateToSettings) {
-                Icon(IconGroup.Default.Settings, contentDescription = "Navigate to settings")
+                Icon(IconGroup.Default.Settings, contentDescription = stringResource(Res.string.navigate_to_settings))
             }
         }
     )
@@ -74,20 +87,20 @@ fun AddMatchAppBar(
     onNavigateToSettings: () -> Unit
 ) {
     TopAppBar(
-        title = { Text("Add Match") },
+        title = { Text(stringResource(Res.string.add_match)) },
         navigationIcon = {
             IconButton(
                 onClick = onBack
             ) {
                 Icon(
                     imageVector = IconGroup.Default.ArrowBack,
-                    contentDescription = "Navigate back"
+                    contentDescription = stringResource(Res.string.navigate_back)
                 )
             }
         },
         actions = {
             IconButton(onClick = onNavigateToSettings) {
-                Icon(IconGroup.Default.Settings, contentDescription = "Navigate to settings")
+                Icon(IconGroup.Default.Settings, contentDescription = stringResource(Res.string.navigate_to_settings))
             }
         }
     )
@@ -100,20 +113,20 @@ fun AddTournamentAppBar(
     onNavigateToSettings: () -> Unit,
 ) {
     TopAppBar(
-        title = { Text("Add Tournament") },
+        title = { Text(stringResource(Res.string.add_tournament)) },
         navigationIcon = {
             IconButton(
                 onClick = onBack
             ) {
                 Icon(
                     imageVector = IconGroup.Default.ArrowBack,
-                    contentDescription = "Navigate back"
+                    contentDescription = stringResource(Res.string.navigate_back)
                 )
             }
         },
         actions = {
             IconButton(onClick = onNavigateToSettings) {
-                Icon(IconGroup.Default.Settings, contentDescription = "Navigate to settings")
+                Icon(IconGroup.Default.Settings, contentDescription = stringResource(Res.string.navigate_to_settings))
             }
         }
     )
@@ -125,14 +138,14 @@ fun LoginAppBar(
     onBack: () -> Unit
 ) {
     TopAppBar(
-        title = { Text("Login") },
+        title = { Text(stringResource(Res.string.login)) },
         navigationIcon = {
             IconButton(
                 onClick = onBack
             ) {
                 Icon(
                     imageVector = IconGroup.Default.ArrowBack,
-                    contentDescription = "Navigate back"
+                    contentDescription = stringResource(Res.string.navigate_back)
                 )
             }
         }
@@ -153,31 +166,31 @@ fun MatchDetailsAppBar(
 
     val baseUrlFrontend = appConfig.baseUrlFrontend
     TopAppBar(
-        title = { Text("Match") },
+        title = { Text(stringResource(Res.string.match)) },
         navigationIcon = {
             IconButton(
                 onClick = onBack
             ) {
                 Icon(
                     imageVector = IconGroup.Default.ArrowBack,
-                    contentDescription = "Navigate back"
+                    contentDescription = stringResource(Res.string.navigate_back)
                 )
             }
         },
         actions = {
             Box {
                 IconButton(onClick = { expanded = true }) {
-                    Icon(IconGroup.Default.Share, contentDescription = "Copy link")
+                    Icon(IconGroup.Default.Share, contentDescription = stringResource(Res.string.copy_link))
                 }
                 DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
                     DropdownMenuItem(
-                        text = { Text("Copy link to scoreboard") },
+                        text = { Text(stringResource(Res.string.copy_link_to_scoreboard)) },
                         onClick = {
                         onCopyLink("$baseUrlFrontend/#matches/${matchId}/scoreboard")
                         expanded = false
                     })
                     DropdownMenuItem(
-                        text = { Text("Copy link to panel") },
+                        text = { Text(stringResource(Res.string.copy_link_to_panel)) },
                         onClick = {
                         onCopyLink("$baseUrlFrontend/#matches/${matchId}")
                         expanded = false
@@ -185,7 +198,7 @@ fun MatchDetailsAppBar(
                 }
             }
             IconButton(onClick = onNavigateToSettings) {
-                Icon(IconGroup.Default.Settings, contentDescription = "Navigate to settings")
+                Icon(IconGroup.Default.Settings, contentDescription = stringResource(Res.string.navigate_to_settings))
             }
         }
     )

@@ -10,6 +10,10 @@ import androidx.compose.ui.unit.dp
 import com.bashkevich.tennisscorekeeper.model.match.domain.Match
 import com.bashkevich.tennisscorekeeper.model.participant.domain.PARTICIPANT_IN_SINGLES_MATCH_DEFAULT
 import com.bashkevich.tennisscorekeeper.model.participant.domain.ParticipantInDoublesMatch
+import org.jetbrains.compose.resources.stringResource
+import tennisscorekeeper.composeapp.generated.resources.Res
+import tennisscorekeeper.composeapp.generated.resources.first_pair_to_serve
+import tennisscorekeeper.composeapp.generated.resources.first_player_to_serve
 
 @Composable
 fun ChooseServePanel(
@@ -34,7 +38,7 @@ fun ChooseServePanel(
             verticalArrangement = Arrangement.spacedBy(16.dp),
             horizontalAlignment = Alignment.End
         ) {
-            val firstParticipantToServeLabel = if (isDoublesMatch) "First pair to serve" else "First player to serve"
+            val firstParticipantToServeLabel = if (isDoublesMatch) stringResource(Res.string.first_pair_to_serve) else stringResource(Res.string.first_player_to_serve)
             FirstServeParticipantComponent(
                 label = firstParticipantToServeLabel,
                 participantOptions = participantOptions,

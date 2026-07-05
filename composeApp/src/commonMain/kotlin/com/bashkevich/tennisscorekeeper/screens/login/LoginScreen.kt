@@ -20,9 +20,6 @@ import com.bashkevich.tennisscorekeeper.LocalNavHostController
 import com.bashkevich.tennisscorekeeper.components.LoginAppBar
 import com.bashkevich.tennisscorekeeper.components.auth.LoginComponent
 import com.bashkevich.tennisscorekeeper.mvi.LaunchedUiEffectHandler
-import org.jetbrains.compose.resources.getString
-import tennisscorekeeper.composeapp.generated.resources.Res
-import tennisscorekeeper.composeapp.generated.resources.wrong_login_or_password
 
 @Composable
 fun LoginScreen(

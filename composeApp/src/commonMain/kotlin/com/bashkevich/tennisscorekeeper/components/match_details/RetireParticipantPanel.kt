@@ -8,6 +8,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.bashkevich.tennisscorekeeper.model.match.domain.Match
+import org.jetbrains.compose.resources.stringResource
+import tennisscorekeeper.composeapp.generated.resources.Res
+import tennisscorekeeper.composeapp.generated.resources.player_1_retire
+import tennisscorekeeper.composeapp.generated.resources.player_2_retire
 
 @Composable
 fun RetireParticipantPanel(
@@ -24,11 +28,11 @@ fun RetireParticipantPanel(
         verticalAlignment = Alignment.CenterVertically
     ) {
         Button(onClick = {onParticipantRetire(firstParticipant.id)}){
-            Text("Player 1 retire")
+            Text(stringResource(Res.string.player_1_retire))
         }
 
         Button(onClick = {onParticipantRetire(secondParticipant.id)}){
-            Text("Player 2 retire")
+            Text(stringResource(Res.string.player_2_retire))
         }
     }
 }

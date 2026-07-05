@@ -24,6 +24,9 @@ import chaintech.videoplayer.ui.video.VideoPlayerComposable
 import com.bashkevich.tennisscorekeeper.components.expect.LocalFullScreenState
 import com.bashkevich.tennisscorekeeper.model.match.domain.Match
 import com.bashkevich.tennisscorekeeper.model.match.remote.body.MatchStatus
+import org.jetbrains.compose.resources.stringResource
+import tennisscorekeeper.composeapp.generated.resources.Res
+import tennisscorekeeper.composeapp.generated.resources.load
 
 @Composable
 fun MediaPlayerComponent(
@@ -62,7 +65,7 @@ fun MediaPlayerComponent(
                     state = videoLinkState
                 )
                 Button(onClick = {onLoadVideoLink(videoLinkState.text.toString().trim()) }) {
-                    Text("Load")
+                    Text(stringResource(Res.string.load))
                 }
             }
         }

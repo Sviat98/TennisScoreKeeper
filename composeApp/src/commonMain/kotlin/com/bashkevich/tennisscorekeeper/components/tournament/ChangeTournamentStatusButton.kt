@@ -7,6 +7,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.bashkevich.tennisscorekeeper.model.tournament.remote.TournamentStatus
+import org.jetbrains.compose.resources.stringResource
+import tennisscorekeeper.composeapp.generated.resources.Res
+import tennisscorekeeper.composeapp.generated.resources.finish_tournament
+import tennisscorekeeper.composeapp.generated.resources.start_tournament
 
 @Composable
 fun ChangeTournamentStatusButton(
@@ -25,7 +29,7 @@ fun ChangeTournamentStatusButton(
                     },
                     modifier = Modifier.align(Alignment.Center)
                 ) {
-                    Text("Start tournament")
+                    Text(stringResource(Res.string.start_tournament))
                 }
             }
 
@@ -36,7 +40,7 @@ fun ChangeTournamentStatusButton(
                     },
                     modifier = Modifier.align(Alignment.Center)
                 ) {
-                    Text("Finish tournament")
+                    Text(stringResource(Res.string.finish_tournament))
                 }
             }
         }

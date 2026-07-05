@@ -17,6 +17,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.bashkevich.tennisscorekeeper.components.scoreboard.overlay.MatchScoreboardView
 import com.bashkevich.tennisscorekeeper.model.match.domain.Match
 import com.bashkevich.tennisscorekeeper.screens.matchdetails.ConnectionState
+import org.jetbrains.compose.resources.stringResource
+import tennisscorekeeper.composeapp.generated.resources.Res
+import tennisscorekeeper.composeapp.generated.resources.connection_with_scoreboard_lost
 
 @Composable
 fun ScoreboardScreen(
@@ -45,7 +48,7 @@ fun ScoreboardScreen(
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = "Connection with scoreboard lost",
+                        text = stringResource(Res.string.connection_with_scoreboard_lost),
                         color = MaterialTheme.colorScheme.error,
                         style = MaterialTheme.typography.titleMedium
                     )

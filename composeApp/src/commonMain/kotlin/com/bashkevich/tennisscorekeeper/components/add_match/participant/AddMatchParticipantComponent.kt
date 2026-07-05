@@ -29,6 +29,11 @@ import com.bashkevich.tennisscorekeeper.components.icons.default_icons.Add
 import com.bashkevich.tennisscorekeeper.components.icons.default_icons.Close
 import com.bashkevich.tennisscorekeeper.model.participant.domain.TennisParticipant
 import com.bashkevich.tennisscorekeeper.model.participant.domain.TennisParticipantInMatch
+import org.jetbrains.compose.resources.stringResource
+import tennisscorekeeper.composeapp.generated.resources.Res
+import tennisscorekeeper.composeapp.generated.resources.add_secondary_color
+import tennisscorekeeper.composeapp.generated.resources.close
+import tennisscorekeeper.composeapp.generated.resources.colors
 
 @Composable
 fun AddMatchParticipantComponent(
@@ -82,7 +87,7 @@ fun ParticipantColorPickerBlock(
         horizontalArrangement = Arrangement.spacedBy(32.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text("Colors")
+        Text(stringResource(Res.string.colors))
         PrimaryColorPicker(color = primaryColor, onColorPickerOpen = onColorPickerOpen)
         SecondaryColorPicker(
             color = secondaryColor,
@@ -131,7 +136,7 @@ fun SecondaryColorPicker(
                             onToggleSecondaryColor(null)
                         },
                     imageVector = IconGroup.Default.Close,
-                    contentDescription = "Close",
+                    contentDescription = stringResource(Res.string.close),
                     tint = Color.White
                 )
             }
@@ -164,7 +169,7 @@ fun AddSecondaryColorButton(
                 onAddSecondaryColor(Color.White)
             },
             imageVector = IconGroup.Default.Add,
-            contentDescription = "Add secondary color",
+            contentDescription = stringResource(Res.string.add_secondary_color),
             tint = Color.Black
         )
     }

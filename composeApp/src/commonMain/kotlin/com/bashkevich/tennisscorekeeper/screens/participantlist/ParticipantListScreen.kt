@@ -29,6 +29,11 @@ import com.mohamedrejeb.calf.picker.FilePickerFileType
 import com.mohamedrejeb.calf.picker.FilePickerSelectionMode
 import com.mohamedrejeb.calf.picker.rememberFilePickerLauncher
 import kotlinx.coroutines.launch
+import org.jetbrains.compose.resources.stringResource
+import tennisscorekeeper.composeapp.generated.resources.Res
+import tennisscorekeeper.composeapp.generated.resources.couldnt_load_data
+import tennisscorekeeper.composeapp.generated.resources.participant_list_empty
+import tennisscorekeeper.composeapp.generated.resources.pull_down_to_update
 
 @Composable
 fun ParticipantListScreen(
@@ -59,9 +64,9 @@ fun ParticipantListScreen(
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.CenterVertically)
                     ) {
-                        Text("Couldn't load data", color = MaterialTheme.colorScheme.onSurface)
+                        Text(stringResource(Res.string.couldnt_load_data), color = MaterialTheme.colorScheme.onSurface)
                         Text(
-                            "Pull down to update",
+                            stringResource(Res.string.pull_down_to_update),
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
@@ -133,7 +138,7 @@ private fun ParticipantListContent(
                 }
 
                 Text(
-                    "Participant list is empty",
+                    stringResource(Res.string.participant_list_empty),
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }

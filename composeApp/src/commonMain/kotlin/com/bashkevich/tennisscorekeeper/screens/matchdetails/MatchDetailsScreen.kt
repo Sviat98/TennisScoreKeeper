@@ -44,6 +44,10 @@ import com.bashkevich.tennisscorekeeper.model.match.remote.body.convertToString
 import com.bashkevich.tennisscorekeeper.mvi.LaunchedUiEffectHandler
 import com.bashkevich.tennisscorekeeper.navigation.SettingsRoute
 import kotlinx.coroutines.launch
+import org.jetbrains.compose.resources.stringResource
+import tennisscorekeeper.composeapp.generated.resources.Res
+import tennisscorekeeper.composeapp.generated.resources.connection_with_scoreboard_lost
+import tennisscorekeeper.composeapp.generated.resources.status
 
 @Composable
 fun MatchDetailsScreen(
@@ -90,7 +94,7 @@ Box(modifier = Modifier.then(modifier).fillMaxSize()) {
             contentAlignment = Alignment.Center
         ) {
             Text(
-                text = "Connection with scoreboard lost",
+                text = stringResource(Res.string.connection_with_scoreboard_lost),
                 color = MaterialTheme.colorScheme.error,
                 style = MaterialTheme.typography.titleLarge
             )
@@ -145,7 +149,7 @@ fun MatchDetailsCommonContent(
                     match = match,
                 )
 
-                Text("Status: ${match.status.convertToString()}")
+                Text("${stringResource(Res.string.status)}: ${match.status.convertToString()}")
 
                 MatchStatusButton(
                     match = match,

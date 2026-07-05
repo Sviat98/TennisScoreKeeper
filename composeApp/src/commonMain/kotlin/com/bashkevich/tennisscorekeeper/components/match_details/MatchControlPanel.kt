@@ -18,6 +18,14 @@ import com.bashkevich.tennisscorekeeper.components.icons.default_icons.ArrowForw
 import com.bashkevich.tennisscorekeeper.model.match.domain.Match
 import com.bashkevich.tennisscorekeeper.model.match.remote.SpecialSetMode
 import com.bashkevich.tennisscorekeeper.model.match.remote.body.ScoreType
+import org.jetbrains.compose.resources.stringResource
+import tennisscorekeeper.composeapp.generated.resources.Res
+import tennisscorekeeper.composeapp.generated.resources.player_1_game
+import tennisscorekeeper.composeapp.generated.resources.player_1_point
+import tennisscorekeeper.composeapp.generated.resources.player_2_game
+import tennisscorekeeper.composeapp.generated.resources.player_2_point
+import tennisscorekeeper.composeapp.generated.resources.redo_point
+import tennisscorekeeper.composeapp.generated.resources.undo_point
 
 @Composable
 fun ParticipantsPointsControlPanel(
@@ -55,7 +63,7 @@ fun ParticipantsPointsControlPanel(
                 onClick = { onUpdateScore(firstParticipantId, ScoreType.POINT) },
                 enabled = !isWinnerInMatch
             ) {
-                Text("Player 1 Point")
+                Text(stringResource(Res.string.player_1_point))
             }
             Button(
                 onClick = {
@@ -63,7 +71,7 @@ fun ParticipantsPointsControlPanel(
                 },
                 enabled = !isWinnerInMatch
             ) {
-                Text("Player 2 Point")
+                Text(stringResource(Res.string.player_2_point))
             }
         }
         Row(
@@ -75,14 +83,14 @@ fun ParticipantsPointsControlPanel(
                 // нужно залочить, когда начался гейм, когда определился победитель и во время супер-тайбрейка
                 enabled = !isGameStarted && !isWinnerInMatch && !isSuperTiebreak
             ) {
-                Text("Player 1 Game")
+                Text(stringResource(Res.string.player_1_game))
             }
             Button(
                 onClick = { onUpdateScore(secondParticipantId, ScoreType.GAME) },
                 // нужно залочить, когда начался гейм, когда определился победитель и во время супер-тайбрейка
                 enabled = !isGameStarted && !isWinnerInMatch && !isSuperTiebreak
             ) {
-                Text("Player 2 Game")
+                Text(stringResource(Res.string.player_2_game))
             }
         }
         Row(
@@ -95,7 +103,7 @@ fun ParticipantsPointsControlPanel(
             ) {
                 Icon(
                     imageVector = IconGroup.Default.ArrowBack,
-                    contentDescription = "Undo point"
+                    contentDescription = stringResource(Res.string.undo_point)
                 )
             }
             IconButton(
@@ -104,7 +112,7 @@ fun ParticipantsPointsControlPanel(
             ) {
                 Icon(
                     imageVector = IconGroup.Default.ArrowForward,
-                    contentDescription = "Redo point"
+                    contentDescription = stringResource(Res.string.redo_point)
                 )
             }
         }

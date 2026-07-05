@@ -30,6 +30,13 @@ import androidx.compose.ui.unit.dp
 import com.bashkevich.tennisscorekeeper.components.icons.IconGroup
 import com.bashkevich.tennisscorekeeper.components.icons.default_icons.Visibility
 import com.bashkevich.tennisscorekeeper.components.icons.default_icons.VisibilityOff
+import org.jetbrains.compose.resources.stringResource
+import tennisscorekeeper.composeapp.generated.resources.Res
+import tennisscorekeeper.composeapp.generated.resources.hide_password
+import tennisscorekeeper.composeapp.generated.resources.log_in
+import tennisscorekeeper.composeapp.generated.resources.login
+import tennisscorekeeper.composeapp.generated.resources.password
+import tennisscorekeeper.composeapp.generated.resources.show_password
 
 @Composable
 fun LoginComponent(
@@ -46,7 +53,7 @@ fun LoginComponent(
     ) {
         TextField(
             state = loginTextFieldState,
-            label = { Text("Login") }
+            label = { Text(stringResource(Res.string.login)) }
         )
 
         PasswordTextField(
@@ -57,7 +64,7 @@ fun LoginComponent(
             onClick = onLoginClick,
             enabled = enabled
         ) {
-            Text("Login")
+            Text(stringResource(Res.string.log_in))
         }
     }
 }
@@ -84,12 +91,12 @@ fun PasswordTextField(
     SecureTextField(
         modifier = Modifier.then(modifier),
         state = textFieldState,
-        label = { Text("Password") },
+        label = { Text(stringResource(Res.string.password)) },
         textObfuscationMode =
             if (passwordHidden) TextObfuscationMode.RevealLastTyped
             else TextObfuscationMode.Visible,
         trailingIcon = {
-            val description = if (passwordHidden) "Show password" else "Hide password"
+            val description = if (passwordHidden) stringResource(Res.string.show_password) else stringResource(Res.string.hide_password)
             TooltipBox(
                 positionProvider =
                     TooltipDefaults.rememberTooltipPositionProvider(TooltipAnchorPosition.Above),

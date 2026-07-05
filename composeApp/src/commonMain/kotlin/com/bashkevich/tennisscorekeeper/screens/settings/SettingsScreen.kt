@@ -27,6 +27,13 @@ import com.bashkevich.tennisscorekeeper.navigation.LoginRoute
 import com.bashkevich.tennisscorekeeper.navigation.ProfileRoute
 import com.bashkevich.tennisscorekeeper.components.icons.IconGroup
 import com.bashkevich.tennisscorekeeper.components.icons.default_icons.ArrowBack
+import org.jetbrains.compose.resources.stringResource
+import tennisscorekeeper.composeapp.generated.resources.Res
+import tennisscorekeeper.composeapp.generated.resources.guest
+import tennisscorekeeper.composeapp.generated.resources.log_in
+import tennisscorekeeper.composeapp.generated.resources.navigate_back
+import tennisscorekeeper.composeapp.generated.resources.profile
+import tennisscorekeeper.composeapp.generated.resources.settings
 
 @Composable
 fun SettingsScreen(
@@ -53,10 +60,10 @@ private fun SettingsScreenContent(
         modifier = modifier,
         topBar = {
             TopAppBar(
-                title = { Text("Settings") },
+                title = { Text(stringResource(Res.string.settings)) },
                 navigationIcon = {
                     IconButton(onClick = { navController.navigateUp() }) {
-                        Icon(IconGroup.Default.ArrowBack, contentDescription = "Navigate back")
+                        Icon(IconGroup.Default.ArrowBack, contentDescription = stringResource(Res.string.navigate_back))
                     }
                 }
             )
@@ -82,16 +89,16 @@ private fun SettingsScreenContent(
                     verticalArrangement = Arrangement.Center
                 ) {
                     if (playerId.isEmpty()) {
-                        Text("Guest")
+                        Text(stringResource(Res.string.guest))
                         Spacer(modifier = Modifier.height(16.dp))
                         Button(onClick = { navController.navigate(LoginRoute) }) {
-                            Text("Login")
+                            Text(stringResource(Res.string.log_in))
                         }
                     } else {
                         Text(playerId)
                         Spacer(modifier = Modifier.height(16.dp))
                         Button(onClick = { navController.navigate(ProfileRoute) }) {
-                            Text("Profile")
+                            Text(stringResource(Res.string.profile))
                         }
                     }
                 }

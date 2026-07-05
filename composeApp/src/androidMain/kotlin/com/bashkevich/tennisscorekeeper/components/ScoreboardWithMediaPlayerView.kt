@@ -18,6 +18,10 @@ import com.bashkevich.tennisscorekeeper.components.expect.LocalFullScreenState
 import com.bashkevich.tennisscorekeeper.components.scoreboard.match_details.MatchDetailsScoreboardView
 import com.bashkevich.tennisscorekeeper.model.match.domain.Match
 import com.bashkevich.tennisscorekeeper.screens.matchdetails.MatchDetailsUiEvent
+import org.jetbrains.compose.resources.stringResource
+import tennisscorekeeper.composeapp.generated.resources.Res
+import tennisscorekeeper.composeapp.generated.resources.live_stream
+import tennisscorekeeper.composeapp.generated.resources.scoreboard
 
 @Composable
 fun ScoreboardWithMediaPlayerView(
@@ -40,12 +44,12 @@ fun ScoreboardWithMediaPlayerView(
                 horizontalArrangement = Arrangement.spacedBy(4.dp, Alignment.CenterHorizontally),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text("Scoreboard")
+                Text(stringResource(Res.string.scoreboard))
                 Switch(
                     checked = isMediaPlayerEnabled,
                     onCheckedChange = {isMediaPlayerEnabled = !isMediaPlayerEnabled}
                 )
-                Text("Live Stream")
+                Text(stringResource(Res.string.live_stream))
             }
         }
     }
