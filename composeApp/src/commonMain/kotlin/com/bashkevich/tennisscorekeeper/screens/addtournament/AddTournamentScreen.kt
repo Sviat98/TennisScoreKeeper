@@ -21,7 +21,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.bashkevich.tennisscorekeeper.LocalAuthorization
 import com.bashkevich.tennisscorekeeper.LocalNavHostController
 import com.bashkevich.tennisscorekeeper.components.AddTournamentAppBar
 import com.bashkevich.tennisscorekeeper.components.add_match.MatchScoringAndThemeSettingsBlock
@@ -31,6 +30,9 @@ import com.bashkevich.tennisscorekeeper.components.showUnauthorizedActionSnackba
 import com.bashkevich.tennisscorekeeper.components.theme.ThemeComponentState
 import com.bashkevich.tennisscorekeeper.mvi.LaunchedUiEffectHandler
 import com.bashkevich.tennisscorekeeper.navigation.SettingsRoute
+import org.jetbrains.compose.resources.stringResource
+import tennisscorekeeper.composeapp.generated.resources.Res
+import tennisscorekeeper.composeapp.generated.resources.add
 
 @Composable
 fun AddTournamentScreen(
@@ -57,7 +59,7 @@ fun AddTournamentScreen(
                 )
             }
 
-            is AddTournamentAction.ShowAddError -> {
+            is AddTournamentAction.ShowError -> {
                 snackbarHostState.showSnackbar(message = action.message)
             }
         }
@@ -175,7 +177,7 @@ fun AddTournamentContent(
                 },
                 enabled = isButtonEnabled
             ) {
-                Text("Add")
+                Text(stringResource(Res.string.add))
             }
         }
     }

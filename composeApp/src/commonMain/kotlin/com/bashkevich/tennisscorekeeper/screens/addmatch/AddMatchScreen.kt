@@ -45,7 +45,7 @@ fun AddMatchScreen(
                     navController = navController
                 )
             }
-            is AddMatchAction.ShowAddError -> {
+            is AddMatchAction.ShowError -> {
                 snackbarHostState.showSnackbar(message = action.message)
             }
         }

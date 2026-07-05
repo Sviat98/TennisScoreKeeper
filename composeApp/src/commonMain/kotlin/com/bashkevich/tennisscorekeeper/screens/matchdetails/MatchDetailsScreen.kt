@@ -40,10 +40,14 @@ import com.bashkevich.tennisscorekeeper.components.match_details.serve.ChooseSer
 import com.bashkevich.tennisscorekeeper.components.scoreboard.match_details.MatchDetailsScoreboardView
 import com.bashkevich.tennisscorekeeper.components.showUnauthorizedActionSnackbar
 import com.bashkevich.tennisscorekeeper.model.match.remote.body.MatchStatus
-import com.bashkevich.tennisscorekeeper.model.match.remote.body.convertToString
+import com.bashkevich.tennisscorekeeper.model.match.remote.body.toResource
 import com.bashkevich.tennisscorekeeper.mvi.LaunchedUiEffectHandler
 import com.bashkevich.tennisscorekeeper.navigation.SettingsRoute
 import kotlinx.coroutines.launch
+import org.jetbrains.compose.resources.stringResource
+import tennisscorekeeper.composeapp.generated.resources.Res
+import tennisscorekeeper.composeapp.generated.resources.connection_with_scoreboard_lost
+import tennisscorekeeper.composeapp.generated.resources.status
 
 @Composable
 fun MatchDetailsScreen(
@@ -66,6 +70,10 @@ fun MatchDetailsScreen(
             is MatchDetailsAction.ShowUnauthorizedError ->
                 snackbarHostState.showUnauthorizedActionSnackbar(
                     navController = navController)
+            is MatchDetailsAction.ShowError ->
+                snackbarHostState.showSnackbar(
+                    message = currentAction.message
+                )
     }
 }
 
@@ -86,7 +94,7 @@ Box(modifier = Modifier.then(modifier).fillMaxSize()) {
             contentAlignment = Alignment.Center
         ) {
             Text(
-                text = "Connection with scoreboard lost",
+                text = stringResource(Res.string.connection_with_scoreboard_lost),
                 color = MaterialTheme.colorScheme.error,
                 style = MaterialTheme.typography.titleLarge
             )
@@ -141,7 +149,8 @@ fun MatchDetailsCommonContent(
                     match = match,
                 )
 
-                Text("Status: ${match.status.convertToString()}")
+                val statusText = stringResource(match.status.toResource())
+                Text("${stringResource(Res.string.status)}: $statusText")
 
                 MatchStatusButton(
                     match = match,

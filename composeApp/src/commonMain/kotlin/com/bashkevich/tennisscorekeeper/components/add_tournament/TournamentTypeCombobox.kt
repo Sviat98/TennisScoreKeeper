@@ -21,7 +21,11 @@ import androidx.compose.ui.graphics.Color
 import com.bashkevich.tennisscorekeeper.components.icons.IconGroup
 import com.bashkevich.tennisscorekeeper.components.icons.default_icons.ArrowDropDown
 import com.bashkevich.tennisscorekeeper.model.tournament.remote.TournamentType
-import com.bashkevich.tennisscorekeeper.model.tournament.remote.mapToDisplayedString
+import com.bashkevich.tennisscorekeeper.model.tournament.remote.toResource
+import org.jetbrains.compose.resources.stringResource
+import tennisscorekeeper.composeapp.generated.resources.Res
+import tennisscorekeeper.composeapp.generated.resources.open_dropdown
+import tennisscorekeeper.composeapp.generated.resources.tournament_type
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -33,7 +37,7 @@ fun TournamentTypeCombobox(
     var expanded by remember { mutableStateOf(false) }
     val options = TournamentType.entries
 
-    val tournamentTypeText = currentTournamentType?.mapToDisplayedString() ?: ""
+    val tournamentTypeText = currentTournamentType?.let { stringResource(it.toResource()) } ?: ""
 
     val tournamentTypeState = TextFieldState(tournamentTypeText)
 
@@ -41,7 +45,7 @@ fun TournamentTypeCombobox(
         TextField(
             modifier = Modifier.fillMaxWidth(),
             state = tournamentTypeState,
-            placeholder = { Text("Tournament type") },
+            placeholder = { Text(stringResource(Res.string.tournament_type)) },
             readOnly = true,
             trailingIcon = {
                 IconButton(
@@ -49,7 +53,7 @@ fun TournamentTypeCombobox(
                 ) {
                     Icon(
                         imageVector = IconGroup.Default.ArrowDropDown,
-                        contentDescription = "Open dropdown",
+                        contentDescription = stringResource(Res.string.open_dropdown),
                     )
                 }
             },
@@ -67,7 +71,7 @@ fun TournamentTypeCombobox(
         ) {
             options.forEach { option ->
                 DropdownMenuItem(
-                    text = { Text(text = option.mapToDisplayedString()) },
+                    text = { Text(text = stringResource(option.toResource())) },
                     onClick = {
                         onTournamentTypeChange(option)
                         expanded = false

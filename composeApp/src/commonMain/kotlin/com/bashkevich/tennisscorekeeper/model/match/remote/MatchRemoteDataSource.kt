@@ -11,6 +11,7 @@ import com.bashkevich.tennisscorekeeper.model.match.remote.body.RetiredParticipa
 import com.bashkevich.tennisscorekeeper.model.match.remote.body.ServeBody
 import com.bashkevich.tennisscorekeeper.model.match.remote.body.ServeInPairBody
 import com.bashkevich.tennisscorekeeper.model.match.remote.body.VideoLinkBody
+import com.bashkevich.tennisscorekeeper.screens.matchdetails.ConnectionState
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.plugins.websocket.DefaultClientWebSocketSession
@@ -30,8 +31,11 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 import kotlin.time.Duration.Companion.milliseconds
@@ -42,11 +46,15 @@ class MatchRemoteDataSource(
     private var webSocketSession: DefaultClientWebSocketSession? = null
     private val scope = CoroutineScope(SupervisorJob() + webSocketDispatcher)
 
+    private val _connectionStateFlow = MutableStateFlow(ConnectionState.Loading)
 
     private val _matchFlow = MutableSharedFlow<LoadResult<MatchDto, Throwable>>(
-        replay = 1, // Always emit the latest counter update
+        replay = 1,
         extraBufferCapacity = 5
     )
+
+    fun observeConnectionState(): StateFlow<ConnectionState> =
+        _connectionStateFlow.asStateFlow()
 
     suspend fun addNewMatch(
         tournamentId: String,
@@ -95,12 +103,13 @@ class MatchRemoteDataSource(
             message
         }
     }
+
     suspend fun attachVideoLink(
         matchId: String,
         videoLinkBody: VideoLinkBody
     ): LoadResult<ResponseMessage, Throwable> {
         return runOperationCatching {
-            val message = httpClient.patch("/matches/$matchId/video"){
+            val message = httpClient.patch("/matches/$matchId/video") {
                 setBody(videoLinkBody)
             }.body<ResponseMessage>()
 
@@ -113,7 +122,7 @@ class MatchRemoteDataSource(
         serveBody: ServeBody
     ): LoadResult<ResponseMessage, Throwable> {
         return runOperationCatching {
-            val message = httpClient.patch("/matches/$matchId/firstServe"){
+            val message = httpClient.patch("/matches/$matchId/firstServe") {
                 setBody(serveBody)
             }.body<ResponseMessage>()
 
@@ -126,7 +135,7 @@ class MatchRemoteDataSource(
         serveInPairBody: ServeInPairBody
     ): LoadResult<ResponseMessage, Throwable> {
         return runOperationCatching {
-            val message = httpClient.patch("/matches/$matchId/firstServeInPair"){
+            val message = httpClient.patch("/matches/$matchId/firstServeInPair") {
                 setBody(serveInPairBody)
             }.body<ResponseMessage>()
 
@@ -139,7 +148,7 @@ class MatchRemoteDataSource(
         retiredParticipantBody: RetiredParticipantBody
     ): LoadResult<ResponseMessage, Throwable> {
         return runOperationCatching {
-            val message = httpClient.patch("/matches/$matchId/retire"){
+            val message = httpClient.patch("/matches/$matchId/retire") {
                 setBody(retiredParticipantBody)
             }.body<ResponseMessage>()
 
@@ -175,12 +184,13 @@ class MatchRemoteDataSource(
         _matchFlow.asSharedFlow() // Expose as read-only flow
 
     fun connectToMatchUpdates(matchId: String) {
-        var reconnectionTime = 5000L
+        val reconnectionTime = 5000L
 
         val appConfig = AppConfig.current
         scope.launch {
             while (true) {
                 try {
+                    _connectionStateFlow.value = ConnectionState.Loading
 
                     webSocketSession =
                         httpClient.webSocketSession {
@@ -193,9 +203,12 @@ class MatchRemoteDataSource(
                         }
 
                     println("Connected to WebSocket")
-                    innerloop@ while (true) { // Внутренний цикл для чтения сообщений
+                    _connectionStateFlow.value = ConnectionState.Connected
+
+                    innerLoop@ while (true) { // Внутренний цикл для чтения сообщений
                         try {
                             for (frame in webSocketSession!!.incoming) {
+                                println("frame from innerLoop = $frame")
                                 when (frame) {
                                     is Frame.Text -> {
                                         println(frame.readText())
@@ -207,7 +220,7 @@ class MatchRemoteDataSource(
                                     is Frame.Close -> {
                                         println("Connection closed: ${frame.readReason()}")
                                         webSocketSession?.close()
-                                        break@innerloop
+                                        break@innerLoop
                                     }
 
                                     else -> Unit
@@ -216,11 +229,13 @@ class MatchRemoteDataSource(
                         } catch (e: Exception) {
                             println("Error reading frame: ${e.message}")
                             _matchFlow.emit(LoadResult.Error(e))
-                            reconnectionTime = 1000L
+                            _connectionStateFlow.value = ConnectionState.Disconnected
+                            break@innerLoop
                         }
                     }
                 } catch (e: Exception) {
                     _matchFlow.emit(LoadResult.Error(e))
+                    _connectionStateFlow.value = ConnectionState.Disconnected
                 }
                 delay(reconnectionTime.milliseconds)
             }
@@ -228,6 +243,7 @@ class MatchRemoteDataSource(
     }
 
     suspend fun closeSession() {
+        _connectionStateFlow.value = ConnectionState.Disconnected
         scope.cancel()
         webSocketSession?.close()
     }

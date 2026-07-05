@@ -4,18 +4,19 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import com.bashkevich.tennisscorekeeper.core.remote.doOnError
-import com.bashkevich.tennisscorekeeper.core.remote.doOnSuccess
+import com.bashkevich.tennisscorekeeper.core.remote.NetworkException
+import org.jetbrains.compose.resources.getString
+import tennisscorekeeper.composeapp.generated.resources.Res
+import tennisscorekeeper.composeapp.generated.resources.check_internet_connection
 import com.bashkevich.tennisscorekeeper.core.remote.UnauthorizedActionException
 import com.bashkevich.tennisscorekeeper.model.match.domain.SAMPLE_MATCH
 import com.bashkevich.tennisscorekeeper.model.match.remote.body.MatchStatus
 import com.bashkevich.tennisscorekeeper.model.match.remote.body.ScoreType
 import com.bashkevich.tennisscorekeeper.model.match.repository.MatchRepository
 import com.bashkevich.tennisscorekeeper.model.theme.repository.ThemeRepository
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
@@ -30,8 +31,6 @@ class MatchDetailsViewModel(
     BaseViewModel<MatchDetailsState, MatchDetailsUiEvent, MatchDetailsAction>() {
     private val matchId: Int = savedStateHandle.toRoute<MatchDetailsRoute>().id
 
-    private val _connectionState = MutableStateFlow(ConnectionState.Loading)
-
     init {
         viewModelScope.launch {
             themeRepository.observeThemeByIdFromDatabase(1).collect {
@@ -41,16 +40,11 @@ class MatchDetailsViewModel(
     }
 
     private val networkUpdates = matchRepository.observeMatchUpdatesFromNetwork(matchId)
-        .onEach { result ->
-            result
-                .doOnSuccess { _connectionState.value = ConnectionState.Connected }
-                .doOnError { _connectionState.value = ConnectionState.Disconnected }
-        }
 
     override val state: StateFlow<MatchDetailsState> = combine(
         networkUpdates,
         matchRepository.observeMatchById(matchId),
-        _connectionState,
+        matchRepository.observeConnectionState(),
         _action
     ) { _, match, connectionState, action ->
         MatchDetailsState(
@@ -185,10 +179,13 @@ class MatchDetailsViewModel(
         }
     }
 
-    private fun handleError(e: Throwable){
+    private suspend fun handleError(e: Throwable){
         println("e = $e")
-        if (e is UnauthorizedActionException) {
-            sendAction(MatchDetailsAction.ShowUnauthorizedError)
+        when (e) {
+            is NetworkException ->
+                sendAction(MatchDetailsAction.ShowError(getString(Res.string.check_internet_connection)))
+            is UnauthorizedActionException ->
+                sendAction(MatchDetailsAction.ShowUnauthorizedError)
         }
     }
 

@@ -5,6 +5,10 @@ import androidx.lifecycle.viewModelScope
 import com.bashkevich.tennisscorekeeper.components.set_template.SetComponentState
 import com.bashkevich.tennisscorekeeper.components.theme.ThemeComponentState
 import com.bashkevich.tennisscorekeeper.core.remote.LoadResult
+import com.bashkevich.tennisscorekeeper.core.remote.NetworkException
+import org.jetbrains.compose.resources.getString
+import tennisscorekeeper.composeapp.generated.resources.Res
+import tennisscorekeeper.composeapp.generated.resources.check_internet_connection
 import com.bashkevich.tennisscorekeeper.core.remote.UnauthorizedActionException
 import com.bashkevich.tennisscorekeeper.core.remote.doOnError
 import com.bashkevich.tennisscorekeeper.core.remote.doOnSuccess
@@ -239,12 +243,14 @@ class AddTournamentViewModel(
         }
     }
 
-    private fun handleError(e: Throwable) {
+    private suspend fun handleError(e: Throwable) {
         when (e) {
+            is NetworkException ->
+                sendAction(AddTournamentAction.ShowError(getString(Res.string.check_internet_connection)))
             is UnauthorizedActionException ->
                 sendAction(AddTournamentAction.ShowUnauthorizedActionError)
             else ->
-                sendAction(AddTournamentAction.ShowAddError(e.message ?: "Не удалось добавить турнир"))
+                sendAction(AddTournamentAction.ShowError(e.message ?: "Не удалось добавить турнир"))
         }
     }
 }

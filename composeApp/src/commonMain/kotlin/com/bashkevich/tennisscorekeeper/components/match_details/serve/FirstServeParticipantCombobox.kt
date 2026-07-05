@@ -21,6 +21,10 @@ import com.bashkevich.tennisscorekeeper.components.icons.default_icons.ArrowDrop
 import com.bashkevich.tennisscorekeeper.components.icons.IconGroup
 import com.bashkevich.tennisscorekeeper.components.updateTextField
 import com.bashkevich.tennisscorekeeper.model.participant.domain.TennisParticipantInMatch
+import org.jetbrains.compose.resources.stringResource
+import tennisscorekeeper.composeapp.generated.resources.Res
+import tennisscorekeeper.composeapp.generated.resources.open_dropdown
+import tennisscorekeeper.composeapp.generated.resources.participant
 import com.bashkevich.tennisscorekeeper.model.participant.domain.toDisplayFormat
 
 @Composable
@@ -45,12 +49,12 @@ fun FirstServeParticipantCombobox(
         TextField(
             modifier = Modifier.then(modifier),
             state = participantState,
-            placeholder = { Text("Participant") },
+            placeholder = { Text(stringResource(Res.string.participant)) },
             readOnly = true,
             trailingIcon = {
                 Icon(
                     imageVector = IconGroup.Default.ArrowDropDown,
-                    contentDescription = "Open dropdown",
+                    contentDescription = stringResource(Res.string.open_dropdown),
                     modifier = Modifier.clickable {
                         expanded = true
                     }

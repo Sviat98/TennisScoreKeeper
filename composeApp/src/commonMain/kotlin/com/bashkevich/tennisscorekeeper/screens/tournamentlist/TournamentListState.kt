@@ -39,5 +39,5 @@ sealed class TournamentListUiEvent : UiEvent {
 
 @Immutable
 sealed class TournamentListAction : UiAction {
-    data class ShowRefreshError(val message: String) : TournamentListAction()
+    data class ShowError(val message: String) : TournamentListAction()
 }

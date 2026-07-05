@@ -18,6 +18,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.bashkevich.tennisscorekeeper.components.icons.IconGroup
 import com.bashkevich.tennisscorekeeper.components.icons.default_icons.Check
+import org.jetbrains.compose.resources.stringResource
+import tennisscorekeeper.composeapp.generated.resources.Res
+import tennisscorekeeper.composeapp.generated.resources.first_participant_won
+import tennisscorekeeper.composeapp.generated.resources.ret
+import tennisscorekeeper.composeapp.generated.resources.second_participant_won
 
 @Composable
 fun WinnerAndRetiredParticipantComponent(
@@ -76,7 +81,7 @@ fun WinnerRetiredContainer(
     retiredLabelFontSize: TextUnit
 ) {
     val contentDescription =
-        if (winnerParticipantNumber == 1) "First participant won" else "Second participant won"
+        if (winnerParticipantNumber == 1) stringResource(Res.string.first_participant_won) else stringResource(Res.string.second_participant_won)
     Box(modifier = Modifier.then(modifier)) {
         if (participantNumber == winnerParticipantNumber) {
             WinnerSign(
@@ -106,7 +111,7 @@ fun RetiredSign(
     Box(modifier = Modifier.then(modifier)) {
         Text(
             modifier = Modifier.align(Alignment.Center),
-            text = "Ret.",
+            text = stringResource(Res.string.ret),
             fontSize = fontSize,
             color = Color.White
         )

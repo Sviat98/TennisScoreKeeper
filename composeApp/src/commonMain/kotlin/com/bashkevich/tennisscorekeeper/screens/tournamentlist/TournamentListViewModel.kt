@@ -2,6 +2,10 @@ package com.bashkevich.tennisscorekeeper.screens.tournamentlist
 
 import androidx.lifecycle.viewModelScope
 import com.bashkevich.tennisscorekeeper.core.remote.LoadResult
+import com.bashkevich.tennisscorekeeper.core.remote.NetworkException
+import org.jetbrains.compose.resources.getString
+import tennisscorekeeper.composeapp.generated.resources.Res
+import tennisscorekeeper.composeapp.generated.resources.check_internet_connection
 import com.bashkevich.tennisscorekeeper.model.tournament.repository.TournamentRepository
 import com.bashkevich.tennisscorekeeper.mvi.BaseViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -31,9 +35,7 @@ class TournamentListViewModel(
         .onEach { (networkState, tournaments) ->
             println("networkState = $networkState")
             if (networkState is LoadResult.Error && tournaments.isNotEmpty()) {
-                sendAction(TournamentListAction.ShowRefreshError(
-                    networkState.result.message ?: "Error"
-                ))
+                handleError(networkState.result)
             }
             if (networkState != null) {
                 _isRefreshing.value = false
@@ -75,5 +77,12 @@ class TournamentListViewModel(
             is TournamentListUiEvent.RefreshTournaments -> refresh()
             is TournamentListUiEvent.Retry -> retry()
         }
+    }
+
+    private suspend fun handleError(e: Throwable) {
+        val message = if (e is NetworkException)
+            getString(Res.string.check_internet_connection)
+        else e.message ?: "Error"
+        sendAction(TournamentListAction.ShowError(message))
     }
 }

@@ -2,6 +2,13 @@ package com.bashkevich.tennisscorekeeper.model.tournament.remote
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import org.jetbrains.compose.resources.StringResource
+import tennisscorekeeper.composeapp.generated.resources.Res
+import tennisscorekeeper.composeapp.generated.resources.tournament_status_completed
+import tennisscorekeeper.composeapp.generated.resources.tournament_status_in_progress
+import tennisscorekeeper.composeapp.generated.resources.tournament_status_not_started
+import tennisscorekeeper.composeapp.generated.resources.tournament_type_doubles
+import tennisscorekeeper.composeapp.generated.resources.tournament_type_singles
 
 @Serializable
 data class TournamentDto(
@@ -33,11 +40,17 @@ enum class TournamentType {
     SINGLES, DOUBLES
 }
 
-fun TournamentType.mapToDisplayedString() = when (this) {
-    TournamentType.SINGLES -> "Singles"
-    TournamentType.DOUBLES -> "Doubles"
+fun TournamentType.toResource(): StringResource = when (this) {
+    TournamentType.SINGLES -> Res.string.tournament_type_singles
+    TournamentType.DOUBLES -> Res.string.tournament_type_doubles
 }
 
 enum class TournamentStatus {
     NOT_STARTED, IN_PROGRESS, COMPLETED
+}
+
+fun TournamentStatus.toResource(): StringResource = when (this) {
+    TournamentStatus.NOT_STARTED -> Res.string.tournament_status_not_started
+    TournamentStatus.IN_PROGRESS -> Res.string.tournament_status_in_progress
+    TournamentStatus.COMPLETED -> Res.string.tournament_status_completed
 }

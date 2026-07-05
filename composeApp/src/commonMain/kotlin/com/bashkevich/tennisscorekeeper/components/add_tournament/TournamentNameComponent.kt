@@ -11,6 +11,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import org.jetbrains.compose.resources.stringResource
+import tennisscorekeeper.composeapp.generated.resources.Res
+import tennisscorekeeper.composeapp.generated.resources.tournament_name
 
 @Composable
 fun TournamentNameComponent(
@@ -29,7 +32,7 @@ fun TournamentNameComponent(
             TextField(
                 modifier = Modifier.fillMaxWidth(),
                 state = tournamentNameState,
-                placeholder = { Text("Tournament name") },
+                placeholder = { Text(stringResource(Res.string.tournament_name)) },
             )
         }
     }

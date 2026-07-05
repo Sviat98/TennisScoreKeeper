@@ -1,6 +1,6 @@
 <resources>
-    <string name="login">Login</string>
-    <string name="you_need_to_login">You need to login for this action</string>
+    <string name="log_in">Login</string>
+    <string name="you_need_to_log_in">You need to login for this action</string>
     <string name="add">Add</string>
     <string name="save">Save</string>
     <string name="cancel">Cancel</string>
@@ -19,4 +19,98 @@
     <string name="retry">Retry</string>
     <string name="open_dropdown">Open dropdown</string>
     <string name="preview">Preview</string>
+    <string name="check_internet_connection">Check your internet connection</string>
+
+    <!-- Navigation & Top Bars -->
+    <string name="tournaments">Tournaments</string>
+    <string name="tournament">Tournament</string>
+    <string name="match">Match</string>
+    <string name="add_match">Add Match</string>
+    <string name="add_tournament">Add Tournament</string>
+    <string name="navigate_back">Navigate back</string>
+    <string name="navigate_to_settings">Navigate to settings</string>
+    <string name="copy_link">Copy link</string>
+    <string name="copy_link_to_scoreboard">Copy link to scoreboard</string>
+    <string name="copy_link_to_panel">Copy link to panel</string>
+    <string name="settings">Settings</string>
+
+    <!-- Buttons & Actions -->
+    <string name="start_tournament">Start tournament</string>
+    <string name="finish_tournament">Finish tournament</string>
+    <string name="start_match">Start match</string>
+    <string name="finish_match">Finish match</string>
+    <string name="pause_match">Pause match</string>
+    <string name="resume_match">Resume match</string>
+    <string name="player_1_point">Player 1 Point</string>
+    <string name="player_2_point">Player 2 Point</string>
+    <string name="player_1_game">Player 1 Game</string>
+    <string name="player_2_game">Player 2 Game</string>
+    <string name="undo_point">Undo point</string>
+    <string name="redo_point">Redo point</string>
+    <string name="player_1_retire">Player 1 retire</string>
+    <string name="player_2_retire">Player 2 retire</string>
+    <string name="logout">Logout</string>
+
+    <!-- Auth -->
+    <string name="login">Login</string>
+    <string name="password">Password</string>
+    <string name="show_password">Show password</string>
+    <string name="hide_password">Hide password</string>
+    <string name="profile">Profile</string>
+    <string name="guest">Guest</string>
+
+    <!-- Errors & Empty States -->
+    <string name="couldnt_load_data">Couldn\'t load data</string>
+    <string name="pull_down_to_update">Pull down to update</string>
+    <string name="match_list_empty">Match list is empty</string>
+    <string name="participant_list_empty">Participant list is empty</string>
+    <string name="connection_with_scoreboard_lost">Connection with scoreboard lost</string>
+    <string name="try_again">Try Again</string>
+
+    <!-- Tabs & Status -->
+    <string name="matches">Matches</string>
+    <string name="participants">Participants</string>
+    <string name="status">Status</string>
+    <string name="match_status_not_started">Not started</string>
+    <string name="match_status_in_progress">In progress</string>
+    <string name="match_status_paused">Paused</string>
+    <string name="match_status_completed">Completed</string>
+    <string name="tournament_type_singles">Singles</string>
+    <string name="tournament_type_doubles">Doubles</string>
+    <string name="tournament_status_not_started">Not started</string>
+    <string name="tournament_status_in_progress">In progress</string>
+    <string name="tournament_status_completed">Completed</string>
+
+    <!-- Placeholders & Labels -->
+    <string name="tournament_name">Tournament name</string>
+    <string name="tournament_type">Tournament type</string>
+    <string name="participant">Participant</string>
+    <string name="player">Player</string>
+    <string name="sets_to_win">Sets to win</string>
+    <string name="colors">Colors</string>
+    <string name="add_secondary_color">Add secondary color</string>
+    <string name="player_id">Player id</string>
+    <string name="select">Select</string>
+
+    <!-- Serve -->
+    <string name="first_player_to_serve">First player to serve</string>
+    <string name="first_pair_to_serve">First pair to serve</string>
+    <string name="next_player_to_serve">Next player to serve</string>
+
+    <!-- Scoreboard -->
+    <string name="first_participant_won">First participant won</string>
+    <string name="second_participant_won">Second participant won</string>
+    <string name="ret">Ret.</string>
+    <string name="scoreboard">Scoreboard</string>
+    <string name="live_stream">Live Stream</string>
+    <string name="load">Load</string>
+    <string name="text_copied">Text copied</string>
+
+    <!-- File Upload -->
+    <string name="open_file_storage">Open file storage</string>
+    <string name="upload_file">Upload file</string>
+
+    <!-- Set Template -->
+    <string name="regular_set_template">Regular Set Format</string>
+    <string name="deciding_set_template">Deciding Set Format</string>
 </resources>

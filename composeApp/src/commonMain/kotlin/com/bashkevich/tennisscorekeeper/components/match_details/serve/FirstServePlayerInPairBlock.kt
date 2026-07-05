@@ -10,6 +10,10 @@ import com.bashkevich.tennisscorekeeper.model.participant.domain.ParticipantInDo
 import com.bashkevich.tennisscorekeeper.model.participant.domain.TennisParticipantInMatch
 import com.bashkevich.tennisscorekeeper.model.player.domain.PLAYER_IN_DOUBLES_MATCH_DEFAULT
 import com.bashkevich.tennisscorekeeper.model.player.domain.PlayerInDoublesMatch
+import org.jetbrains.compose.resources.stringResource
+import tennisscorekeeper.composeapp.generated.resources.Res
+import tennisscorekeeper.composeapp.generated.resources.first_player_to_serve
+import tennisscorekeeper.composeapp.generated.resources.next_player_to_serve
 
 @Composable
 fun FirstServePlayerInPairBlock(
@@ -59,7 +63,7 @@ fun FirstServePlayerInPairBlock(
         horizontalAlignment = Alignment.End
     ) {
         FirstServePlayerInPairComponent(
-            label = "First player to serve",
+            label = stringResource(Res.string.first_player_to_serve),
             playerOptions = firstServePlayerOptions,
             currentPlayer = firstServePlayer,
             onPlayerChange = { player -> onFirstPlayerInPairToServeChoose(player.id) },
@@ -67,7 +71,7 @@ fun FirstServePlayerInPairBlock(
         )
 
         FirstServePlayerInPairComponent(
-            label = "Next player to serve",
+            label = stringResource(Res.string.next_player_to_serve),
             playerOptions = nextServePlayerOptions,
             currentPlayer = nextServePlayer,
             onPlayerChange = { player -> onFirstPlayerInPairToServeChoose(player.id) },

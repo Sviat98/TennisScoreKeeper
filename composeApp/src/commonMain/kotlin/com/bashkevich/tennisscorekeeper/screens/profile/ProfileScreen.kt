@@ -17,6 +17,10 @@ import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.bashkevich.tennisscorekeeper.LocalNavHostController
 import com.bashkevich.tennisscorekeeper.components.LoginAppBar
+import org.jetbrains.compose.resources.stringResource
+import tennisscorekeeper.composeapp.generated.resources.Res
+import tennisscorekeeper.composeapp.generated.resources.logout
+import tennisscorekeeper.composeapp.generated.resources.player_id
 
 @Composable
 fun ProfileScreen(
@@ -53,12 +57,12 @@ fun ProfileScreenContent(
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text("Player id  = ${state.playerId}")
+                Text("${stringResource(Res.string.player_id)}  = ${state.playerId}")
                 Button(onClick = {
                     onEvent(ProfileUiEvent.Logout)
                     navController.navigateUp()
                 }) {
-                    Text("Logout")
+                    Text(stringResource(Res.string.logout))
                 }
             }
         }

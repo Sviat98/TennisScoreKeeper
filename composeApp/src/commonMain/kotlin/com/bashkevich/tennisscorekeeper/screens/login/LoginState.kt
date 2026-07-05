@@ -25,5 +25,5 @@ data class LoginState(
 
 @Immutable
 sealed class LoginAction : UiAction {
-    data object ShowLoginError : LoginAction()
+    data class ShowError(val message: String) : LoginAction()
 }

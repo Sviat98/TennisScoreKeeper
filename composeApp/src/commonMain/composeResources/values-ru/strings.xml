@@ -1,6 +1,6 @@
 <resources>
-    <string name="login">Войти</string>
-    <string name="you_need_to_login">Войдите, чтобы выполнить это действие</string>
+    <string name="log_in">Войти</string>
+    <string name="you_need_to_log_in">Войдите, чтобы выполнить это действие</string>
     <string name="add">Добавить</string>
     <string name="save">Сохранить</string>
     <string name="cancel">Отмена</string>
@@ -19,4 +19,98 @@
     <string name="retry">Повторить</string>
     <string name="open_dropdown">Открыть выпадающий список</string>
     <string name="preview">Превью</string>
+    <string name="check_internet_connection">Проверьте подключение к интернету</string>
+
+    <!-- Navigation & Top Bars -->
+    <string name="tournaments">Турниры</string>
+    <string name="tournament">Турнир</string>
+    <string name="match">Матч</string>
+    <string name="add_match">Добавить матч</string>
+    <string name="add_tournament">Добавить турнир</string>
+    <string name="navigate_back">Перейти назад</string>
+    <string name="navigate_to_settings">Перейти в настройки</string>
+    <string name="copy_link">Скопировать ссылку</string>
+    <string name="copy_link_to_scoreboard">Скопировать ссылку на табло</string>
+    <string name="copy_link_to_panel">Скопировать ссылку на панель</string>
+    <string name="settings">Настройки</string>
+
+    <!-- Buttons & Actions -->
+    <string name="start_tournament">Начать турнир</string>
+    <string name="finish_tournament">Завершить турнир</string>
+    <string name="start_match">Начать матч</string>
+    <string name="finish_match">Завершить матч</string>
+    <string name="pause_match">Пауза</string>
+    <string name="resume_match">Продолжить матч</string>
+    <string name="player_1_point">Розыгрыш игрока 1</string>
+    <string name="player_2_point">Розыгрыш игрока 2</string>
+    <string name="player_1_game">Гейм игрока 1</string>
+    <string name="player_2_game">Гейм игрока 2</string>
+    <string name="undo_point">Отменить розыгрыш</string>
+    <string name="redo_point">Вернуть розыгрыш</string>
+    <string name="player_1_retire">Снятие игрока 1</string>
+    <string name="player_2_retire">Снятие игрока 2</string>
+    <string name="logout">Выйти</string>
+
+    <!-- Auth -->
+    <string name="login">Логин</string>
+    <string name="password">Пароль</string>
+    <string name="show_password">Показать пароль</string>
+    <string name="hide_password">Скрыть пароль</string>
+    <string name="profile">Профиль</string>
+    <string name="guest">Гость</string>
+
+    <!-- Errors & Empty States -->
+    <string name="couldnt_load_data">Не удалось загрузить данные</string>
+    <string name="pull_down_to_update">Потяните вниз для обновления</string>
+    <string name="match_list_empty">Список матчей пуст</string>
+    <string name="participant_list_empty">Список участников пуст</string>
+    <string name="connection_with_scoreboard_lost">Связь с табло потеряна</string>
+    <string name="try_again">Попробовать снова</string>
+
+    <!-- Tabs & Status -->
+    <string name="matches">Матчи</string>
+    <string name="participants">Участники</string>
+    <string name="status">Статус</string>
+    <string name="match_status_not_started">Не начат</string>
+    <string name="match_status_in_progress">Идёт</string>
+    <string name="match_status_paused">Остановлен</string>
+    <string name="match_status_completed">Завершён</string>
+    <string name="tournament_type_singles">Одиночный</string>
+    <string name="tournament_type_doubles">Парный</string>
+    <string name="tournament_status_not_started">Не начат</string>
+    <string name="tournament_status_in_progress">Идёт</string>
+    <string name="tournament_status_completed">Завершён</string>
+
+    <!-- Placeholders & Labels -->
+    <string name="tournament_name">Название турнира</string>
+    <string name="tournament_type">Тип турнира</string>
+    <string name="participant">Участник</string>
+    <string name="player">Игрок</string>
+    <string name="sets_to_win">Сетов для победы</string>
+    <string name="colors">Цвета</string>
+    <string name="add_secondary_color">Добавить второй цвет</string>
+    <string name="player_id">ID игрока</string>
+    <string name="select">Выбрать</string>
+
+    <!-- Serve -->
+    <string name="first_player_to_serve">Первый подающий</string>
+    <string name="first_pair_to_serve">Первая подающая пара</string>
+    <string name="next_player_to_serve">Следующий подающий</string>
+
+    <!-- Scoreboard -->
+    <string name="first_participant_won">Первый участник победил</string>
+    <string name="second_participant_won">Второй участник победил</string>
+    <string name="ret">Ret.</string>
+    <string name="scoreboard">Табло</string>
+    <string name="live_stream">Прямая трансляция</string>
+    <string name="load">Загрузить</string>
+    <string name="text_copied">Текст скопирован</string>
+
+    <!-- File Upload -->
+    <string name="open_file_storage">Открыть хранилище файлов</string>
+    <string name="upload_file">Загрузить файл</string>
+
+    <!-- Set Template -->
+    <string name="regular_set_template">Формат обычного сета</string>
+    <string name="deciding_set_template">Формат решающего сета</string>
 </resources>

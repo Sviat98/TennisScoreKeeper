@@ -7,7 +7,9 @@ import com.bashkevich.tennisscorekeeper.model.match.domain.ShortMatch
 import com.bashkevich.tennisscorekeeper.model.match.remote.MatchBody
 import com.bashkevich.tennisscorekeeper.model.match.remote.body.MatchStatus
 import com.bashkevich.tennisscorekeeper.model.match.remote.body.ScoreType
+import com.bashkevich.tennisscorekeeper.screens.matchdetails.ConnectionState
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.StateFlow
 
 interface MatchRepository {
     suspend fun fetchMatchesForTournament(tournamentId: Int): LoadResult<Unit, Throwable>
@@ -17,6 +19,7 @@ interface MatchRepository {
     suspend fun closeSession()
     fun observeMatchById(matchId: Int): Flow<Match?>
     fun observeMatchUpdatesFromNetwork(matchId: Int): Flow<LoadResult<Match, Throwable>>
+    fun observeConnectionState(): StateFlow<ConnectionState>
 
     suspend fun updateMatchScore(matchId: Int, participantId: Int, scoreType: ScoreType): LoadResult<ResponseMessage, Throwable>
     suspend fun undoPoint(matchId: Int): LoadResult<ResponseMessage, Throwable>

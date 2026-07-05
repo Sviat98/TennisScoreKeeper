@@ -26,6 +26,9 @@ import com.github.skydoves.colorpicker.compose.AlphaTile
 import com.github.skydoves.colorpicker.compose.BrightnessSlider
 import com.github.skydoves.colorpicker.compose.HsvColorPicker
 import com.github.skydoves.colorpicker.compose.rememberColorPickerController
+import org.jetbrains.compose.resources.stringResource
+import tennisscorekeeper.composeapp.generated.resources.Res
+import tennisscorekeeper.composeapp.generated.resources.select
 
 @Composable
 fun ColorPickerDialog(
@@ -63,7 +66,7 @@ fun ColorPickerDialog(
                 controller = controller
             )
             Button(onClick = { onColorSelected(selectedColor) }) {
-                Text("Select")
+                Text(stringResource(Res.string.select))
             }
         }
 

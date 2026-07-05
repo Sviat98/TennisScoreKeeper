@@ -20,9 +20,6 @@ import com.bashkevich.tennisscorekeeper.LocalNavHostController
 import com.bashkevich.tennisscorekeeper.components.LoginAppBar
 import com.bashkevich.tennisscorekeeper.components.auth.LoginComponent
 import com.bashkevich.tennisscorekeeper.mvi.LaunchedUiEffectHandler
-import org.jetbrains.compose.resources.getString
-import tennisscorekeeper.composeapp.generated.resources.Res
-import tennisscorekeeper.composeapp.generated.resources.wrong_login_or_password
 
 @Composable
 fun LoginScreen(
@@ -62,8 +59,8 @@ fun LoginScreenContent(
         onConsume = onConsumeAction
     ) { currentAction ->
         when (currentAction) {
-            is LoginAction.ShowLoginError ->
-                snackbarHostState.showSnackbar(message = getString(Res.string.wrong_login_or_password))
+            is LoginAction.ShowError ->
+                snackbarHostState.showSnackbar(message = currentAction.message)
         }
     }
 

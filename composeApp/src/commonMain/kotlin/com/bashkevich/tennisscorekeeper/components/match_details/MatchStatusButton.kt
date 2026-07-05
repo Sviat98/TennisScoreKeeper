@@ -7,6 +7,12 @@ import com.bashkevich.tennisscorekeeper.model.match.domain.Match
 import com.bashkevich.tennisscorekeeper.model.match.remote.body.MatchStatus
 import com.bashkevich.tennisscorekeeper.model.participant.domain.ParticipantInDoublesMatch
 import com.bashkevich.tennisscorekeeper.model.player.domain.PlayerInDoublesMatch
+import org.jetbrains.compose.resources.stringResource
+import tennisscorekeeper.composeapp.generated.resources.Res
+import tennisscorekeeper.composeapp.generated.resources.finish_match
+import tennisscorekeeper.composeapp.generated.resources.pause_match
+import tennisscorekeeper.composeapp.generated.resources.resume_match
+import tennisscorekeeper.composeapp.generated.resources.start_match
 
 @Composable
 fun MatchStatusButton(
@@ -54,7 +60,7 @@ fun MatchStatusButton(
                 },
                 enabled = enableStartMatchButton
             ) {
-                Text("Start match")
+                Text(stringResource(Res.string.start_match))
             }
         }
 
@@ -65,7 +71,7 @@ fun MatchStatusButton(
                         onStatusChange(MatchStatus.COMPLETED)
                     },
                 ) {
-                    Text("Finish match")
+                    Text(stringResource(Res.string.finish_match))
                 }
             } else {
                 Button(
@@ -73,7 +79,7 @@ fun MatchStatusButton(
                         onStatusChange(MatchStatus.PAUSED)
                     },
                 ) {
-                    Text("Pause match")
+                    Text(stringResource(Res.string.pause_match))
                 }
             }
         }
@@ -82,7 +88,7 @@ fun MatchStatusButton(
             Button(
                 onClick = { onStatusChange(MatchStatus.IN_PROGRESS) },
             ) {
-                Text("Resume match")
+                Text(stringResource(Res.string.resume_match))
             }
         }
 

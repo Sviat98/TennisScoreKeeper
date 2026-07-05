@@ -4,6 +4,10 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import com.bashkevich.tennisscorekeeper.core.remote.LoadResult
+import com.bashkevich.tennisscorekeeper.core.remote.NetworkException
+import org.jetbrains.compose.resources.getString
+import tennisscorekeeper.composeapp.generated.resources.Res
+import tennisscorekeeper.composeapp.generated.resources.check_internet_connection
 import com.bashkevich.tennisscorekeeper.model.file.domain.EMPTY_EXCEL_FILE
 import com.bashkevich.tennisscorekeeper.model.match.domain.ShortMatch
 import com.bashkevich.tennisscorekeeper.model.participant.domain.TennisParticipant
@@ -84,11 +88,7 @@ class TournamentViewModel(
                 TournamentTab.PARTICIPANTS -> participants.second.isNotEmpty()
             }
             if (hasData) {
-                sendAction(
-                    TournamentAction.ShowRefreshError(
-                        tabNetworkState.result.message ?: "Error"
-                    )
-                )
+                handleError(tabNetworkState.result)
             }
         }
 
@@ -233,6 +233,13 @@ class TournamentViewModel(
             }
         }
         super.onCleared()
+    }
+
+    private suspend fun handleError(e: Throwable) {
+        val message = if (e is NetworkException)
+            getString(Res.string.check_internet_connection)
+        else e.message ?: "Error"
+        sendAction(TournamentAction.ShowError(message))
     }
 
     private data class TournamentDetailsData(

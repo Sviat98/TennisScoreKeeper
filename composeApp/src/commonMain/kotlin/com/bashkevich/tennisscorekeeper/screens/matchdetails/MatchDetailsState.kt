@@ -54,4 +54,5 @@ data class MatchDetailsState(
 @Immutable
 sealed class MatchDetailsAction : UiAction {
     data object ShowUnauthorizedError : MatchDetailsAction()
+    data class ShowError(val message: String) : MatchDetailsAction()
 }

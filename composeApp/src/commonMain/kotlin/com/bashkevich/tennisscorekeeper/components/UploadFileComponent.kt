@@ -9,6 +9,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.bashkevich.tennisscorekeeper.model.file.domain.ExcelFile
+import org.jetbrains.compose.resources.stringResource
+import tennisscorekeeper.composeapp.generated.resources.Res
+import tennisscorekeeper.composeapp.generated.resources.open_file_storage
+import tennisscorekeeper.composeapp.generated.resources.upload_file
 
 @Composable
 fun UploadFileComponent(
@@ -24,14 +28,14 @@ fun UploadFileComponent(
         verticalAlignment = Alignment.CenterVertically
     ) {
         Button(onClick = onFileStorageOpen) {
-            Text("Open file storage")
+            Text(stringResource(Res.string.open_file_storage))
         }
         if(fileName.isNotBlank()){
             Text(fileName)
             Button(
                 onClick = onUploadFile,
             ) {
-                Text("Upload file")
+                Text(stringResource(Res.string.upload_file))
             }
         }
     }

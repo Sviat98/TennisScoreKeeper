@@ -37,6 +37,10 @@ import com.bashkevich.tennisscorekeeper.components.tournament.TournamentListItem
 import com.bashkevich.tennisscorekeeper.navigation.AddTournamentRoute
 import com.bashkevich.tennisscorekeeper.navigation.SettingsRoute
 import com.bashkevich.tennisscorekeeper.navigation.TournamentRoute
+import org.jetbrains.compose.resources.stringResource
+import tennisscorekeeper.composeapp.generated.resources.Res
+import tennisscorekeeper.composeapp.generated.resources.add_tournament
+import tennisscorekeeper.composeapp.generated.resources.try_again
 
 @Composable
 fun TournamentListScreen(
@@ -89,7 +93,7 @@ private fun TournamentListContent(
         onConsume = onConsumeAction
     ) { currentAction ->
         when (currentAction) {
-            is TournamentListAction.ShowRefreshError ->
+            is TournamentListAction.ShowError ->
                 snackbarHostState.showSnackbar(message = currentAction.message)
         }
     }
@@ -103,7 +107,7 @@ private fun TournamentListContent(
         },
         floatingActionButton = {
             FloatingActionButton(onClick = { navController.navigate(AddTournamentRoute) }) {
-                Icon(IconGroup.Default.Add, contentDescription = "Add Tournament")
+                Icon(IconGroup.Default.Add, contentDescription = stringResource(Res.string.add_tournament))
             }
         },
         snackbarHost = { SnackbarHost(snackbarHostState) }
@@ -171,7 +175,7 @@ private fun TournamentListError(
         ) {
             Text(loadingState.message)
             Button(onClick = onRetry) {
-                Text("Try Again")
+                Text(stringResource(Res.string.try_again))
             }
         }
     }

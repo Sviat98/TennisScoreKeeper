@@ -19,6 +19,10 @@ import com.bashkevich.tennisscorekeeper.components.theme.ThemeComponentState
 import com.bashkevich.tennisscorekeeper.model.set_template.domain.SetTemplate
 import com.bashkevich.tennisscorekeeper.model.set_template.domain.SetTemplateTypeFilter
 import com.bashkevich.tennisscorekeeper.model.theme.domain.ScoreboardTheme
+import org.jetbrains.compose.resources.stringResource
+import tennisscorekeeper.composeapp.generated.resources.Res
+import tennisscorekeeper.composeapp.generated.resources.deciding_set_template
+import tennisscorekeeper.composeapp.generated.resources.regular_set_template
 
 @Composable
 fun MatchScoringAndThemeSettingsBlock(
@@ -74,7 +78,7 @@ fun MatchScoringAndThemeSettingsBlock(
                 ) {
                     SetTemplateComponent(
                         modifier = Modifier.weight(1f),
-                        label = "Regular Set Template",
+                        label = stringResource(Res.string.regular_set_template),
                         enabled = setsToWin > 1,
                         setComponentState = regularSetComponentState,
                         onSetTemplatesFetch = { onSetTemplatesFetch(SetTemplateTypeFilter.REGULAR) },
@@ -83,7 +87,7 @@ fun MatchScoringAndThemeSettingsBlock(
                     )
                     SetTemplateComponent(
                         modifier = Modifier.weight(1f),
-                        label = "Deciding Set Template",
+                        label = stringResource(Res.string.deciding_set_template),
                         enabled = true,
                         setComponentState = decidingSetComponentState,
                         onSetTemplatesFetch = { onSetTemplatesFetch(SetTemplateTypeFilter.DECIDER) },

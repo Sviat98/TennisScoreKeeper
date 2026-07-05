@@ -50,13 +50,16 @@ import com.bashkevich.tennisscorekeeper.components.match_details.ParticipantsPoi
 import com.bashkevich.tennisscorekeeper.components.match_details.RetireParticipantPanel
 import com.bashkevich.tennisscorekeeper.components.match_details.serve.ChooseServePanel
 import com.bashkevich.tennisscorekeeper.model.match.remote.body.MatchStatus
-import com.bashkevich.tennisscorekeeper.model.match.remote.body.convertToString
+import com.bashkevich.tennisscorekeeper.model.match.remote.body.toResource
 import com.bashkevich.tennisscorekeeper.navigation.LoginRoute
 import com.bashkevich.tennisscorekeeper.navigation.ProfileRoute
 import com.bashkevich.tennisscorekeeper.navigation.SettingsRoute
 import com.bashkevich.tennisscorekeeper.screens.matchdetails.MatchDetailsState
 import com.bashkevich.tennisscorekeeper.screens.matchdetails.MatchDetailsUiEvent
 import kotlinx.coroutines.launch
+import org.jetbrains.compose.resources.stringResource
+import tennisscorekeeper.composeapp.generated.resources.Res
+import tennisscorekeeper.composeapp.generated.resources.status
 
 // Класс состояния с значением и функцией обновления
 class FullScreenState(
@@ -205,7 +208,7 @@ actual fun MatchDetailsContentWrapper(
                         onEvent = onEvent
                     )
                     if (!isFullScreen) { // показываем, ТОЛЬКО если видео не на полный экран
-                        Text("Status: ${match.status.convertToString()}")
+                        Text("${stringResource(Res.string.status)}: ${stringResource(match.status.toResource())}")
 
                         MatchStatusButton(
                             match = match,
