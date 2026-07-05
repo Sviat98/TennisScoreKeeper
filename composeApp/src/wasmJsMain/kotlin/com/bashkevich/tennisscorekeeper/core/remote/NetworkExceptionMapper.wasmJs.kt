@@ -2,5 +2,12 @@ package com.bashkevich.tennisscorekeeper.core.remote
 
 import io.ktor.client.engine.js.JsError
 
-actual fun Throwable.toNetworkException(): NetworkException? =
-    if (this is JsError) NetworkException(this) else null
+@OptIn(ExperimentalWasmJsInterop::class)
+actual fun Throwable.toNetworkException(): NetworkException? {
+    val exception = this.cause
+
+    return if (exception is JsError
+        && exception.origin.asJsException().message == "Failed to fetch"){
+        NetworkException(exception)
+    } else null
+}
