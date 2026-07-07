@@ -109,14 +109,28 @@ private fun TournamentContent(
             )
         },
         floatingActionButton = {
-            val tournament = (tournamentDetailsState as? TournamentDetailsLoadingState.Content)?.tournament
-            if (tournament?.status == TournamentStatus.IN_PROGRESS) {
-                FloatingActionButton(
-                    onClick = {
-                        navController.navigate(AddMatchRoute(tournament.id))
+            if (tournamentDetailsState is TournamentDetailsLoadingState.Content) {
+                val tournament = tournamentDetailsState.tournament
+
+                if (tournament.status == TournamentStatus.IN_PROGRESS) {
+                    FloatingActionButton(
+                        onClick = {
+                            when (state.activeTab) {
+                                TournamentTab.MATCHES -> {
+                                    navController.navigate(AddMatchRoute(tournament.id))
+                                }
+
+                                TournamentTab.PARTICIPANTS -> {
+
+                                }
+                            }
+                        }
+                    ) {
+                        Icon(
+                            IconGroup.Default.Add,
+                            contentDescription = stringResource(Res.string.add_match)
+                        )
                     }
-                ) {
-                    Icon(IconGroup.Default.Add, contentDescription = stringResource(Res.string.add_match))
                 }
             }
         },
@@ -221,7 +235,8 @@ private fun TournamentContent(
                         TournamentTab.PARTICIPANTS.ordinal -> ParticipantListScreen(
                             modifier = Modifier.fillMaxSize(),
                             participantListLoadingState = state.participantListLoadingState,
-                            tournamentStatus = (tournamentDetailsState as? TournamentDetailsLoadingState.Content)?.tournament?.status ?: TournamentStatus.NOT_STARTED,
+                            tournamentStatus = (tournamentDetailsState as? TournamentDetailsLoadingState.Content)?.tournament?.status
+                                ?: TournamentStatus.NOT_STARTED,
                             onUploadFile = { onEvent(TournamentUiEvent.UploadFile) },
                             onSelectFile = { file -> onEvent(TournamentUiEvent.SelectFile(file)) }
                         )

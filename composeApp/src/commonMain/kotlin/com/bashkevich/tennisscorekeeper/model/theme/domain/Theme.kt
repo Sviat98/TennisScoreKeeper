@@ -10,11 +10,30 @@ import kotlinx.serialization.json.Json
 data class ScoreboardTheme(
     val id: Int,
     val name: String,
-    val backgroundColor: Color,
-    val textColor: Color,
+    val mainBackgroundColor: Color,
+    val mainTextColor: Color,
+    val serveColor: Color,
+    val previousSetWinTextColor: Color,
+    val previousSetLoseTextColor: Color,
+    val currentSetBackgroundColor: Color,
+    val currentSetTextColor: Color,
+    val currentGameBackgroundColor: Color,
+    val currentGameTextColor: Color,
 ) {
     companion object {
-        val DEFAULT = ScoreboardTheme(0, "", Color.Blue, Color.White)
+        val DEFAULT = ScoreboardTheme(
+            id = 0,
+            name = "",
+            mainBackgroundColor = Color.Blue,
+            mainTextColor = Color.White,
+            serveColor = Color.White,
+            previousSetWinTextColor = Color.White,
+            previousSetLoseTextColor = Color.White,
+            currentSetBackgroundColor = Color.White,
+            currentSetTextColor = Color.White,
+            currentGameBackgroundColor = Color.White,
+            currentGameTextColor = Color.White,
+        )
     }
 }
 
@@ -25,8 +44,15 @@ fun ThemeColor.toColor() = Color(color.removePrefix("#").convertColor()).copy(al
 fun ThemeDto.toDomain() = ScoreboardTheme(
     id = id.toInt(),
     name = name,
-    backgroundColor = content.backgroundColor.toColor(),
-    textColor = content.textColor.toColor(),
+    mainBackgroundColor = content.mainBackgroundColor.toColor(),
+    mainTextColor = content.mainTextColor.toColor(),
+    serveColor = content.serveColor.toColor(),
+    previousSetWinTextColor = content.previousSetWinTextColor.toColor(),
+    previousSetLoseTextColor = content.previousSetLoseTextColor.toColor(),
+    currentSetBackgroundColor = content.currentSetBackgroundColor.toColor(),
+    currentSetTextColor = content.currentSetTextColor.toColor(),
+    currentGameBackgroundColor = content.currentGameBackgroundColor.toColor(),
+    currentGameTextColor = content.currentGameTextColor.toColor(),
 )
 
 fun ThemeEntity.toDomain(): ScoreboardTheme {
@@ -34,7 +60,14 @@ fun ThemeEntity.toDomain(): ScoreboardTheme {
     return ScoreboardTheme(
         id = id,
         name = name,
-        backgroundColor = content.backgroundColor.toColor(),
-        textColor = content.textColor.toColor(),
+        mainBackgroundColor = content.mainBackgroundColor.toColor(),
+        mainTextColor = content.mainTextColor.toColor(),
+        serveColor = content.serveColor.toColor(),
+        previousSetWinTextColor = content.previousSetWinTextColor.toColor(),
+        previousSetLoseTextColor = content.previousSetLoseTextColor.toColor(),
+        currentSetBackgroundColor = content.currentSetBackgroundColor.toColor(),
+        currentSetTextColor = content.currentSetTextColor.toColor(),
+        currentGameBackgroundColor = content.currentGameBackgroundColor.toColor(),
+        currentGameTextColor = content.currentGameTextColor.toColor(),
     )
 }

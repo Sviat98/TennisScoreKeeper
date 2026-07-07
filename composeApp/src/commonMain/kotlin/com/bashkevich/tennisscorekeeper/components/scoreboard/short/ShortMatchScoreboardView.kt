@@ -32,10 +32,8 @@ import com.bashkevich.tennisscorekeeper.components.scoreboard.components.WinnerA
 import com.bashkevich.tennisscorekeeper.model.match.domain.ShortMatch
 import com.bashkevich.tennisscorekeeper.model.match.remote.body.toResource
 import org.jetbrains.compose.resources.stringResource
-import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
-@Preview
 fun ShortMatchScoreboardCard(
     modifier: Modifier = Modifier,
     match: ShortMatch,
