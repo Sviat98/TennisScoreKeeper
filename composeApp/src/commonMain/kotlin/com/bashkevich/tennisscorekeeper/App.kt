@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
@@ -43,7 +44,6 @@ import com.bashkevich.tennisscorekeeper.screens.tournamentdetails.TournamentScre
 import com.bashkevich.tennisscorekeeper.screens.tournamentdetails.TournamentViewModel
 import com.bashkevich.tennisscorekeeper.screens.tournamentlist.TournamentListScreen
 import com.bashkevich.tennisscorekeeper.screens.tournamentlist.TournamentListViewModel
-import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.KoinApplication
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.annotation.KoinExperimentalAPI

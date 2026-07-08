@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
@@ -36,6 +37,7 @@ import com.bashkevich.tennisscorekeeper.components.expect.setText
 import com.bashkevich.tennisscorekeeper.components.match_details.MatchStatusButton
 import com.bashkevich.tennisscorekeeper.components.match_details.ParticipantsPointsControlPanel
 import com.bashkevich.tennisscorekeeper.components.match_details.RetireParticipantPanel
+import com.bashkevich.tennisscorekeeper.components.match_details.ScoreboardControlPanel
 import com.bashkevich.tennisscorekeeper.components.match_details.serve.ChooseServePanel
 import com.bashkevich.tennisscorekeeper.components.scoreboard.match_details.MatchDetailsScoreboardView
 import com.bashkevich.tennisscorekeeper.components.showUnauthorizedActionSnackbar
@@ -69,38 +71,31 @@ fun MatchDetailsScreen(
         when (currentAction) {
             is MatchDetailsAction.ShowUnauthorizedError ->
                 snackbarHostState.showUnauthorizedActionSnackbar(
-                    navController = navController)
+                    navController = navController
+                )
+
             is MatchDetailsAction.ShowError ->
                 snackbarHostState.showSnackbar(
                     message = currentAction.message
                 )
-    }
-}
-
-Box(modifier = Modifier.then(modifier).fillMaxSize()) {
-    MatchDetailsContentWrapper(
-        modifier = Modifier.fillMaxSize(),
-        state = state,
-        snackbarHostState = snackbarHostState,
-        onEvent = { viewModel.onEvent(it) }
-    )
-
-    if (state.connectionState == ConnectionState.Disconnected) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .clickable(enabled = true, onClick = { })
-                .alpha(0.7f),
-            contentAlignment = Alignment.Center
-        ) {
-            Text(
-                text = stringResource(Res.string.connection_with_scoreboard_lost),
-                color = MaterialTheme.colorScheme.error,
-                style = MaterialTheme.typography.titleLarge
-            )
         }
     }
-}
+
+    if (state.connectionState == ConnectionState.Loading) {
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            CircularProgressIndicator()
+        }
+    } else {
+        MatchDetailsContentWrapper(
+            modifier = Modifier.fillMaxSize(),
+            state = state,
+            snackbarHostState = snackbarHostState,
+            onEvent = { viewModel.onEvent(it) }
+        )
+    }
 }
 
 // вызывается из MatchDetailsContentWrapper (Desktop/WasmJS)
@@ -115,8 +110,6 @@ fun MatchDetailsCommonContent(
     val match = state.match
 
     val clipboard = LocalClipboard.current
-
-    val isAuthorized = LocalAuthorization.current
 
     val scope = rememberCoroutineScope()
     Scaffold(
@@ -152,73 +145,11 @@ fun MatchDetailsCommonContent(
                 val statusText = stringResource(match.status.toResource())
                 Text("${stringResource(Res.string.status)}: $statusText")
 
-                MatchStatusButton(
+                ScoreboardControlPanel(
+                    connectionState = state.connectionState,
                     match = match,
-                    onStatusChange = { status ->
-                        onEvent(
-                            MatchDetailsUiEvent.ChangeMatchStatus(
-                                status = status
-                            )
-                        )
-                    }
+                    onEvent = onEvent,
                 )
-
-                when (match.status) {
-                    MatchStatus.NOT_STARTED -> {
-                        Spacer(modifier = Modifier.height(16.dp))
-                        ChooseServePanel(
-                            modifier = Modifier.fillMaxWidth(),
-                            match = match,
-                            onFirstParticipantToServeChoose = { participantId ->
-                                onEvent(
-                                    MatchDetailsUiEvent.SetFirstParticipantToServe(
-                                        participantId = participantId
-                                    )
-                                )
-                            },
-                            onFirstPlayerInPairToServeChoose = { playerId ->
-                                onEvent(
-                                    MatchDetailsUiEvent.SetFirstPlayerInPairToServe(
-                                        playerId = playerId
-                                    )
-                                )
-                            }
-                        )
-                    }
-
-                    MatchStatus.IN_PROGRESS -> {
-                        ParticipantsPointsControlPanel(
-                            modifier = Modifier.fillMaxWidth(),
-                            match = match,
-                            onUpdateScore = { participantId, scoreType ->
-                                onEvent(
-                                    MatchDetailsUiEvent.UpdateScore(
-                                        participantId = participantId,
-                                        scoreType = scoreType
-                                    )
-                                )
-                            },
-                            onUndoPoint = { onEvent(MatchDetailsUiEvent.UndoPoint) },
-                            onRedoPoint = { onEvent(MatchDetailsUiEvent.RedoPoint) }
-                        )
-                    }
-
-                    MatchStatus.PAUSED -> {
-                        RetireParticipantPanel(
-                            modifier = Modifier.fillMaxWidth(),
-                            match = match,
-                            onParticipantRetire = { participantId ->
-                                onEvent(
-                                    MatchDetailsUiEvent.SetParticipantRetired(
-                                        participantId = participantId
-                                    )
-                                )
-                            }
-                        )
-                    }
-
-                    else -> {}
-                }
             }
         }
 

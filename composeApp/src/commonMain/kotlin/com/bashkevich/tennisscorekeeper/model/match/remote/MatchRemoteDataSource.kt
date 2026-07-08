@@ -188,10 +188,9 @@ class MatchRemoteDataSource(
 
         val appConfig = AppConfig.current
         scope.launch {
+            _connectionStateFlow.value = ConnectionState.Loading
             while (true) {
                 try {
-                    _connectionStateFlow.value = ConnectionState.Loading
-
                     webSocketSession =
                         httpClient.webSocketSession {
                             url {

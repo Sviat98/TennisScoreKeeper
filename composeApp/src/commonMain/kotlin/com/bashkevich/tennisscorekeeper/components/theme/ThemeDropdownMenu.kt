@@ -89,8 +89,8 @@ fun ThemeCombobox(
     val leadingIcon: (@Composable () -> Unit)? = when (val state = themeComponentState.selectedTheme) {
         is ThemeComponentState.SelectedThemeState.Idle -> state.theme?.let { theme -> {
             ThemeColorCircle(
-                backgroundColor = theme.backgroundColor,
-                textColor = theme.textColor,
+                backgroundColor = theme.mainBackgroundColor,
+                textColor = theme.mainTextColor,
             )
         } }
         is ThemeComponentState.SelectedThemeState.Loading -> null
@@ -151,8 +151,8 @@ fun ThemeCombobox(
                                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                                     ) {
                                         ThemeColorCircle(
-                                            backgroundColor = theme.backgroundColor,
-                                            textColor = theme.textColor,
+                                            backgroundColor = theme.mainBackgroundColor,
+                                            textColor = theme.mainTextColor,
                                         )
                                         Text(
                                             text = theme.name,

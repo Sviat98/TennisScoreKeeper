@@ -11,6 +11,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.bashkevich.tennisscorekeeper.components.icons.IconGroup
 import com.bashkevich.tennisscorekeeper.components.icons.default_icons.ArrowBack
@@ -54,43 +55,60 @@ fun ParticipantsPointsControlPanel(
 
     Column(
         modifier = Modifier.then(modifier)
-    ) {
+    ){
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Button(
-                onClick = { onUpdateScore(firstParticipantId, ScoreType.POINT) },
-                enabled = !isWinnerInMatch
+            Column(
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-                Text(stringResource(Res.string.player_1_point))
+                Button(
+                    onClick = { onUpdateScore(firstParticipantId, ScoreType.POINT) },
+                    enabled = !isWinnerInMatch
+                ) {
+                    Text(
+                        text = stringResource(Res.string.player_1_point),
+                        textAlign = TextAlign.Center
+                    )
+                }
+                Button(
+                    onClick = { onUpdateScore(firstParticipantId, ScoreType.GAME) },
+                    // нужно залочить, когда начался гейм, когда определился победитель и во время супер-тайбрейка
+                    enabled = !isGameStarted && !isWinnerInMatch && !isSuperTiebreak
+                ) {
+                    Text(
+                        text = stringResource(Res.string.player_1_game),
+                        textAlign = TextAlign.Center
+                    )
+                }
             }
-            Button(
-                onClick = {
-                    onUpdateScore(secondParticipantId, ScoreType.POINT)
-                },
-                enabled = !isWinnerInMatch
+            Column(
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-                Text(stringResource(Res.string.player_2_point))
-            }
-        }
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Button(
-                onClick = { onUpdateScore(firstParticipantId, ScoreType.GAME) },
-                // нужно залочить, когда начался гейм, когда определился победитель и во время супер-тайбрейка
-                enabled = !isGameStarted && !isWinnerInMatch && !isSuperTiebreak
-            ) {
-                Text(stringResource(Res.string.player_1_game))
-            }
-            Button(
-                onClick = { onUpdateScore(secondParticipantId, ScoreType.GAME) },
-                // нужно залочить, когда начался гейм, когда определился победитель и во время супер-тайбрейка
-                enabled = !isGameStarted && !isWinnerInMatch && !isSuperTiebreak
-            ) {
-                Text(stringResource(Res.string.player_2_game))
+                Button(
+                    onClick = {
+                        onUpdateScore(secondParticipantId, ScoreType.POINT)
+                    },
+                    enabled = !isWinnerInMatch
+                ) {
+                    Text(
+                        text = stringResource(Res.string.player_2_point),
+                        textAlign = TextAlign.Center
+                    )
+                }
+                Button(
+                    onClick = { onUpdateScore(secondParticipantId, ScoreType.GAME) },
+                    // нужно залочить, когда начался гейм, когда определился победитель и во время супер-тайбрейка
+                    enabled = !isGameStarted && !isWinnerInMatch && !isSuperTiebreak
+                ) {
+                    Text(
+                        text = stringResource(Res.string.player_2_game),
+                        textAlign = TextAlign.Center
+                    )
+                }
             }
         }
         Row(
