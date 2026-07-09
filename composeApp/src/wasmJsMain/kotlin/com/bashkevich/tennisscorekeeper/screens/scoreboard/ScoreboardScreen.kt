@@ -1,8 +1,13 @@
 package com.bashkevich.tennisscorekeeper.screens.scoreboard
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -12,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.SubcomposeLayout
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.bashkevich.tennisscorekeeper.components.scoreboard.overlay.MatchScoreboardView
@@ -28,41 +34,59 @@ fun ScoreboardScreen(
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 
-    Box(modifier = Modifier.then(modifier)
-        .drawBehind {
-            drawRect(
-                color = Color.Transparent,
-                size = this.size,
-                blendMode = BlendMode.Clear
-            )
-        }
-        .fillMaxSize()) {
+    Column(
+        modifier = Modifier.then(modifier)
+            .drawBehind {
+                drawRect(
+                    color = Color.Transparent,
+                    size = this.size,
+                    blendMode = BlendMode.Clear
+                )
+            }
+            .fillMaxSize(),
+        verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.CenterVertically)
+    ) {
+        val connectionState = state.connectionState
+        if (connectionState == ConnectionState.Loading) {
+            CircularProgressIndicator()
+        } else {
             ScoreboardContent(
-                modifier = Modifier.align(Alignment.Center),
                 match = state.match
             )
-
-            if (state.connectionState == ConnectionState.Disconnected) {
-                Box(
-                    modifier = Modifier.align(Alignment.BottomCenter),
-                    contentAlignment = Alignment.Center
-                ) {
+            SubcomposeLayout { constraints ->
+                val textPlaceable = subcompose("text") {
                     Text(
                         text = stringResource(Res.string.connection_with_scoreboard_lost),
                         color = MaterialTheme.colorScheme.error,
-                        style = MaterialTheme.typography.titleMedium
                     )
+                }.first().measure(constraints)
+
+                val placeable = if (state.connectionState == ConnectionState.Disconnected) {
+                    textPlaceable
+                } else {
+                    val spacerConstraints = constraints.copy(
+                        minHeight = textPlaceable.height,
+                        maxHeight = textPlaceable.height
+                    )
+                    subcompose("spacer") {
+                        Spacer(modifier = Modifier.fillMaxWidth())
+                    }.first().measure(spacerConstraints)
+                }
+
+                layout(placeable.width, placeable.height) {
+                    placeable.place(0, 0)
                 }
             }
         }
+    }
 }
 
 @Composable
 fun ScoreboardContent(
     modifier: Modifier = Modifier,
     match: Match
-){
-    Box(modifier = Modifier.then(modifier).size(1024.dp)){
+) {
+    Box(modifier = Modifier.then(modifier).size(1024.dp)) {
         MatchScoreboardView(
             modifier = Modifier.align(Alignment.CenterStart),
             match = match

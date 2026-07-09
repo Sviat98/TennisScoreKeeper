@@ -1,12 +1,15 @@
 package com.bashkevich.tennisscorekeeper.components.match_details
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -33,7 +36,7 @@ fun ScoreboardControlPanel(
     match: Match,
     onEvent: (MatchDetailsUiEvent) -> Unit
 ) {
-    Box(modifier = Modifier.then(modifier)){
+    Box(modifier = Modifier.then(modifier)) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
@@ -108,9 +111,12 @@ fun ScoreboardControlPanel(
         if (connectionState == ConnectionState.Disconnected) {
             Box(
                 modifier = Modifier
-                    .fillMaxSize()
-                    .background(Color.White)
-                    .alpha(0.7f),
+                    .matchParentSize()
+                    .background(Color.White.copy(alpha = 0.7f), shape = RoundedCornerShape(32.dp))
+                    .border(
+                        border = BorderStroke(width = 1.dp, Color.Black),
+                        shape = RoundedCornerShape(32.dp)
+                    ),
                 contentAlignment = Alignment.Center
             ) {
                 Text(
