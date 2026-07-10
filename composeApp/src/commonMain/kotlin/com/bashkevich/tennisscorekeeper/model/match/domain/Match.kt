@@ -67,7 +67,7 @@ fun TennisGameDto.toDomain() = TennisGame(
 
 
 val SAMPLE_MATCH = Match(
-    id = 1,
+    id = -1,
     pointShift = 0,
     videoLink = null,
     firstParticipant = ParticipantInSinglesMatch(
@@ -105,53 +105,53 @@ val SAMPLE_MATCH = Match(
 )
 
 val DOUBLES_SAMPLE_MATCH = Match(
-    id = 2,
+    id = -2,
     pointShift = 0,
     videoLink = null,
     firstParticipant = ParticipantInDoublesMatch(
-        id = 5,
+        id = 0,
         seed = 1,
-        displayName = "DJOKOVIC/NADAL",
+        displayName = "ИВАНОВ/ПЕТРОВ",
         primaryColor = Color.White,
         secondaryColor = null,
         isServing = false,
         isWinner = false,
         isRetired = false,
         firstPlayer = PlayerInDoublesMatch(
-            id = 1,
-            surname = "Djokovic",
-            name = "Novak",
+            id = 0,
+            surname = "Иванов",
+            name = "Иван",
             isServingNow = false,
             isServingNext = true
         ),
         secondPlayer = PlayerInDoublesMatch(
-            id = 3,
-            surname = "Nadal",
-            name = "Rafael",
+            id = 0,
+            surname = "Петров",
+            name = "Петр",
             isServingNow = false,
             isServingNext = false
         )
     ),
     secondParticipant = ParticipantInDoublesMatch(
-        id = 6,
+        id = 0,
         seed = null,
-        displayName = "MURRAY/FEDERER",
+        displayName = "КУЗНЕЦОВ/СИДОРОВ",
         primaryColor = Color.White,
         secondaryColor = null,
         isServing = true,
         isWinner = false,
         isRetired = false,
         firstPlayer = PlayerInDoublesMatch(
-            id = 4,
-            surname = "Murray",
-            name = "Andy",
+            id = 0,
+            surname = "Кузнецов",
+            name = "Егор",
             isServingNow = false,
             isServingNext = false
         ),
         secondPlayer = PlayerInDoublesMatch(
-            id = 5,
-            surname = "Federer",
-            name = "Roger",
+            id = 0,
+            surname = "Сидоров",
+            name = "Андрей",
             isServingNow = true,
             isServingNext = false
         ),

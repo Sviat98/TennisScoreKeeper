@@ -8,8 +8,8 @@ import androidx.compose.material3.Divider
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
+import com.bashkevich.tennisscorekeeper.model.theme.domain.LocalScoreboardTheme
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.sp
 import com.bashkevich.tennisscorekeeper.model.match.domain.TennisGame
@@ -20,14 +20,15 @@ fun CurrentGameInProgressComponent(
     currentGame: TennisGame,
     fontSize: TextUnit = 20.sp
 ) {
+    val theme = LocalScoreboardTheme.current
     Box(modifier = Modifier.then(modifier)){
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(color = Color.White),
+                .background(color = theme.currentGameBackgroundColor),
             horizontalAlignment = Alignment.CenterHorizontally, // Выравнивание по центру
         ) {
-            val textColor = Color.Black
+            val textColor = theme.currentGameTextColor
             ScoreboardNumber(
                 modifier = Modifier.weight(1f),
                 scoreNumber = currentGame.firstParticipantPointsWon,
@@ -41,9 +42,9 @@ fun CurrentGameInProgressComponent(
                 textFontSize = fontSize
             )
         }
-        HorizontalDivider(modifier = Modifier.fillMaxWidth().align(Alignment.TopStart), color = Color(0xFF142c6c))
-        HorizontalDivider(modifier = Modifier.fillMaxWidth().align(Alignment.Center), color = Color(0xFF142c6c))
-        HorizontalDivider(modifier = Modifier.fillMaxWidth().align(Alignment.BottomCenter), color = Color(0xFF142c6c))
+        HorizontalDivider(modifier = Modifier.fillMaxWidth().align(Alignment.TopStart), color = theme.mainBackgroundColor)
+        HorizontalDivider(modifier = Modifier.fillMaxWidth().align(Alignment.Center), color = theme.mainBackgroundColor)
+        HorizontalDivider(modifier = Modifier.fillMaxWidth().align(Alignment.BottomCenter), color = theme.mainBackgroundColor)
     }
 
 }

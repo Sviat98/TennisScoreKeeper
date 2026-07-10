@@ -11,8 +11,8 @@ import androidx.compose.foundation.text.TextAutoSize
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
+import com.bashkevich.tennisscorekeeper.model.theme.domain.LocalScoreboardTheme
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.rememberTextMeasurer
@@ -111,11 +111,12 @@ fun SinglesPlayerOnShortScoreboardView(
             style = textStyle
         ).size.height.toDp()
     }
+    val mainTextColor = LocalScoreboardTheme.current.mainTextColor
     Box(modifier = Modifier.then(modifier).height(playerTextHeight)) {
         BasicText(
             modifier = Modifier.align(Alignment.Center),
             text = playerDisplayFormat,
-            color = { Color.White },
+            color = { mainTextColor },
             maxLines = 1,
             autoSize = TextAutoSize.StepBased(
                 maxFontSize = 16.sp,
@@ -132,10 +133,11 @@ fun DoublesPlayerOnShortScoreboardView(
     modifier: Modifier = Modifier,
     player: PlayerInParticipant,
 ) {
+    val theme = LocalScoreboardTheme.current
     Text(
         modifier = Modifier.then(modifier),
         text = player.toShortMatchDisplayFormat(),
-        color = Color.White,
+        color = theme.mainTextColor,
         fontSize = 12.sp,
         lineHeight = 12.sp
     )

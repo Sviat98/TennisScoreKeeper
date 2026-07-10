@@ -10,8 +10,8 @@ import androidx.compose.foundation.text.TextAutoSize
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
+import com.bashkevich.tennisscorekeeper.model.theme.domain.LocalScoreboardTheme
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
@@ -91,11 +91,12 @@ fun SinglesPlayerOnScoreboardDetailsView(
             style = textStyle
         ).size.height.toDp()
     }
+    val mainTextColor = LocalScoreboardTheme.current.mainTextColor
     Box(modifier = Modifier.then(modifier).height(playerTextHeight)) {
         BasicText(
             modifier = Modifier.align(Alignment.Center),
             text = participantDisplayFormat,
-            color = { Color.White },
+            color = { mainTextColor },
             maxLines = 1,
             autoSize = TextAutoSize.StepBased(
                 maxFontSize = 16.sp,
@@ -118,22 +119,23 @@ fun DoublesParticipantOnScoreboardDetails(
     val firstPlayer = participant.firstPlayer as PlayerInDoublesMatch
 
     val secondPlayer = participant.secondPlayer as PlayerInDoublesMatch
+    val theme = LocalScoreboardTheme.current
     Text(
         text = buildAnnotatedString {
             val firstPlayerColor =
-                if (firstPlayer.isServingNow) Color.Yellow else Color.White
+                if (firstPlayer.isServingNow) theme.serveColor else theme.mainTextColor
             withStyle(SpanStyle(color = firstPlayerColor)) {
                 append(firstPlayerDisplayName)
             }
             append(" /\n")
             val secondPlayerColor =
-                if (secondPlayer.isServingNow) Color.Yellow else Color.White
+                if (secondPlayer.isServingNow) theme.serveColor else theme.mainTextColor
             withStyle(SpanStyle(color = secondPlayerColor)) {
                 append(secondPlayerDisplayName)
             }
         },
         fontSize = 12.sp,
-        color = Color.White,
+        color = theme.mainTextColor,
         lineHeight = 12.sp
     )
 }

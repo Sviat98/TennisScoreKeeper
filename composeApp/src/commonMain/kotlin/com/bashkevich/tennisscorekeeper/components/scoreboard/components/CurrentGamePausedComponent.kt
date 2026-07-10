@@ -6,11 +6,11 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
+import com.bashkevich.tennisscorekeeper.model.theme.domain.LocalScoreboardTheme
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.RoundRect
 import androidx.compose.ui.geometry.toRect
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.unit.dp
@@ -22,6 +22,7 @@ fun CurrentGamePausedComponent(
     modifier: Modifier = Modifier,
     currentGame: TennisGame
 ) {
+    val theme = LocalScoreboardTheme.current
     Box(
         modifier = Modifier.then(modifier)
     ) {
@@ -36,7 +37,7 @@ fun CurrentGamePausedComponent(
             }
             drawPath(
                 path = path,
-                color = Color.White,
+                color = theme.currentGameBackgroundColor,
                 style = Stroke(width = 1.dp.toPx())
             )
         }
@@ -45,7 +46,7 @@ fun CurrentGamePausedComponent(
                 .padding(horizontal = 4.dp).align(Alignment.Center),
             horizontalAlignment = Alignment.CenterHorizontally, // Выравнивание по центру
         ) {
-            val textColor = Color.White
+            val textColor = theme.currentGameTextColor
             ScoreboardNumber(
                 modifier = Modifier.weight(1f),
                 scoreNumber = currentGame.firstParticipantPointsWon,

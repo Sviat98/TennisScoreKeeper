@@ -9,8 +9,8 @@ import androidx.compose.material3.Divider
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
+import com.bashkevich.tennisscorekeeper.model.theme.domain.LocalScoreboardTheme
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.sp
 import com.bashkevich.tennisscorekeeper.model.match.domain.TennisSet
@@ -21,12 +21,13 @@ fun CurrentSetComponent(
     currentSet: TennisSet,
     numberFontSize: TextUnit = 20.sp,
 ) {
-    val mainBackgroundColor = Color(0xFF142c6c)
+    val theme = LocalScoreboardTheme.current
+    val mainBackgroundColor = theme.mainBackgroundColor
     Box(modifier = Modifier.then(modifier)) {
         CurrentSetNumbersContainer(
             modifier = Modifier
                 .fillMaxSize()
-                .background(color = Color.Yellow)
+                .background(color = theme.currentSetBackgroundColor)
             ,
             currentSet = currentSet,
             numberFontSize = numberFontSize
@@ -57,7 +58,8 @@ fun CurrentSetNumbersContainer(
         modifier = Modifier.then(modifier),
         horizontalAlignment = Alignment.CenterHorizontally, // Выравнивание по центру
     ) {
-        val textColor = Color.Black
+        val theme = LocalScoreboardTheme.current
+        val textColor = theme.currentSetTextColor
         ScoreboardNumber(
             modifier = Modifier.weight(1f),
             scoreNumber = currentSet.firstParticipantGamesWon.toString(),

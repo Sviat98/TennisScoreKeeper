@@ -98,6 +98,7 @@
     <string name="next_player_to_serve">Next player to serve</string>
 
     <!-- Scoreboard -->
+    <string name="theme_preview">Theme Preview</string>
     <string name="first_participant_won">First participant won</string>
     <string name="second_participant_won">Second participant won</string>
     <string name="ret">Ret.</string>

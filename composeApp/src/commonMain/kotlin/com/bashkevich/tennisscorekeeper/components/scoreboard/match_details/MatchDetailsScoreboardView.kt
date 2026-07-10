@@ -1,6 +1,7 @@
 package com.bashkevich.tennisscorekeeper.components.scoreboard.match_details
 
 import androidx.compose.foundation.background
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -12,7 +13,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
@@ -26,11 +26,14 @@ import com.bashkevich.tennisscorekeeper.components.scoreboard.components.SeedSco
 import com.bashkevich.tennisscorekeeper.components.scoreboard.components.ServeScoreboardComponent
 import com.bashkevich.tennisscorekeeper.components.scoreboard.components.WinnerAndRetiredParticipantComponent
 import com.bashkevich.tennisscorekeeper.model.match.domain.Match
+import com.bashkevich.tennisscorekeeper.model.theme.domain.LocalScoreboardTheme
+import com.bashkevich.tennisscorekeeper.model.theme.domain.ScoreboardTheme
 
 @Composable
 fun MatchDetailsScoreboardView(
     modifier: Modifier = Modifier,
     match: Match,
+    theme: ScoreboardTheme,
 ) {
     var columnHeight by remember { mutableStateOf(0.dp) }
 
@@ -45,6 +48,7 @@ fun MatchDetailsScoreboardView(
 
     val spaceBetweenParticipants = 2 * (verticalPadding+extraPaddingFromCenter)
 
+    CompositionLocalProvider(LocalScoreboardTheme provides theme) {
     Row(
         modifier = Modifier.then(modifier)
     ) {
@@ -53,7 +57,7 @@ fun MatchDetailsScoreboardView(
             match = match
         )
         Row(
-            modifier = Modifier.background(color = Color(0xFF142c6c))
+            modifier = Modifier.background(color = theme.mainBackgroundColor)
         ) {
             val density = LocalDensity.current
 
@@ -141,5 +145,6 @@ fun MatchDetailsScoreboardView(
                 )
             }
         }
+    }
     }
 }

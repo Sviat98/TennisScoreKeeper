@@ -13,11 +13,16 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.bashkevich.tennisscorekeeper.components.ColorPickerDialog
 import com.bashkevich.tennisscorekeeper.components.add_match.participant.AddMatchParticipantsBlock
+import com.bashkevich.tennisscorekeeper.components.dialog.ScoreboardThemePreviewDialog
 import com.bashkevich.tennisscorekeeper.components.set_template.SetComponentState
 import com.bashkevich.tennisscorekeeper.components.theme.ThemeComponentState
 import com.bashkevich.tennisscorekeeper.model.set_template.domain.SetTemplateTypeFilter
@@ -35,6 +40,7 @@ fun AddMatchComponent(
     onEvent: (AddMatchUiEvent) -> Unit,
 ) {
     val participantState = contentState.participantComponentState
+    var isPreviewDialogOpen by remember { mutableStateOf(false) }
 
     Column(
         modifier = Modifier.then(modifier).padding(16.dp)
@@ -122,6 +128,7 @@ fun AddMatchComponent(
             onRetrySelectedDecidingSet = { setId ->
                 onEvent(AddMatchUiEvent.RetrySelectedDecidingSet(setId))
             },
+            onPreviewClick = { isPreviewDialogOpen = true },
         )
 
         Spacer(modifier = Modifier.height(8.dp))
@@ -197,6 +204,13 @@ fun AddMatchComponent(
                         )
                     }
                 })
+        }
+
+        if (isPreviewDialogOpen) {
+            ScoreboardThemePreviewDialog(
+                onDismissRequest = { isPreviewDialogOpen = false },
+                theme = selectedTheme!!
+            )
         }
     }
 }

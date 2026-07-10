@@ -4,8 +4,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
+import com.bashkevich.tennisscorekeeper.model.theme.domain.LocalScoreboardTheme
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
@@ -41,7 +41,7 @@ fun PrevSetScoreboardComponent(
         firstParticipantAlpha = 0.5f
     }
 
-    val textColor = Color.White
+    val textColor = LocalScoreboardTheme.current.previousSetWinTextColor
 
     Column(
         modifier = Modifier.then(modifier),

@@ -51,7 +51,7 @@ class MatchLocalDataSource(
         }
     }
 
-    suspend fun insertMatch(tournamentId: Int, dto: ShortMatchDto) {
+    suspend fun insertShortMatch(tournamentId: Int, dto: ShortMatchDto) {
         val participantWithPlayers = listOf(
             dto.firstParticipant.toEntity(tournamentId),
             dto.secondParticipant.toEntity(tournamentId),
@@ -67,7 +67,7 @@ class MatchLocalDataSource(
 
                 matchDao.insertMatch(dto.toMatchEntity(tournamentId))
                 matchDao.insertMatchSets(dto.toMatchSetEntities())
-                dto.toMatchGameEntity()?.let { matchDao.insertMatchGames(listOf(it)) }
+                dto.toMatchGameEntity()?.let { matchDao.insertMatchGame(it) }
                 matchDao.insertParticipantsInMatch(dto.toParticipantInMatchEntities())
             }
         }
@@ -103,9 +103,11 @@ class MatchLocalDataSource(
         db.useWriterConnection {
             it.withTransaction(Transactor.SQLiteTransactionType.IMMEDIATE) {
                 matchDao.updateMatch(match)
-                matchDao.insertMatchSets(sets)
+                matchDao.replaceSetsForMatch(matchId = match.id, sets = sets)
                 if (game != null) {
-                    matchDao.insertMatchGames(listOf(game))
+                    matchDao.insertMatchGame(game)
+                } else{
+                    matchDao.deleteMatchGame(match.id)
                 }
                 matchDao.insertParticipantsInMatch(participants)
             }

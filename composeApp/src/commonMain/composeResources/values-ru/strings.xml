@@ -98,6 +98,7 @@
     <string name="next_player_to_serve">Следующий подающий</string>
 
     <!-- Scoreboard -->
+    <string name="theme_preview">Предпросмотр темы</string>
     <string name="first_participant_won">Первый участник победил</string>
     <string name="second_participant_won">Второй участник победил</string>
     <string name="ret">Ret.</string>

@@ -10,8 +10,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
+import com.bashkevich.tennisscorekeeper.model.theme.domain.LocalScoreboardTheme
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
@@ -108,12 +108,13 @@ fun RetiredSign(
     modifier: Modifier = Modifier,
     fontSize: TextUnit
 ) {
+    val theme = LocalScoreboardTheme.current
     Box(modifier = Modifier.then(modifier)) {
         Text(
             modifier = Modifier.align(Alignment.Center),
             text = stringResource(Res.string.ret),
             fontSize = fontSize,
-            color = Color.White
+            color = theme.mainTextColor
         )
     }
 }
@@ -124,11 +125,12 @@ fun WinnerSign(
     winnerIconSize: Dp,
     contentDescription: String? = null
 ) {
+    val theme = LocalScoreboardTheme.current
     Box(modifier = Modifier.then(modifier)) {
         Icon(
             modifier = Modifier.size(winnerIconSize).align(Alignment.Center),
             imageVector = IconGroup.Default.Check,
-            tint = Color.White,
+            tint = theme.mainTextColor,
             contentDescription = contentDescription
         )
     }

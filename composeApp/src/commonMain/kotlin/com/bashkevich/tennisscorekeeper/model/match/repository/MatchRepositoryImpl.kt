@@ -44,7 +44,7 @@ class MatchRepositoryImpl(
     ): LoadResult<Unit, Throwable> {
         return matchRemoteDataSource.addNewMatch(tournamentId = tournamentId.toString(), matchBody = matchBody)
             .doOnSuccess { shortMatchDto ->
-                matchLocalDataSource.insertMatch(tournamentId, shortMatchDto)
+                matchLocalDataSource.insertShortMatch(tournamentId, shortMatchDto)
                 tournamentLocalDataSource.incrementUncompletedMatches(tournamentId)
             }
             .mapSuccess {  }

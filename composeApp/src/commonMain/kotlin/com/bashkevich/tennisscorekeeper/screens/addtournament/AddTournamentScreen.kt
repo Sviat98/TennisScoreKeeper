@@ -17,7 +17,9 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -25,6 +27,7 @@ import com.bashkevich.tennisscorekeeper.LocalNavHostController
 import com.bashkevich.tennisscorekeeper.components.AddTournamentAppBar
 import com.bashkevich.tennisscorekeeper.components.add_match.MatchScoringAndThemeSettingsBlock
 import com.bashkevich.tennisscorekeeper.components.add_tournament.TournamentNameAndTypeComponent
+import com.bashkevich.tennisscorekeeper.components.dialog.ScoreboardThemePreviewDialog
 import com.bashkevich.tennisscorekeeper.components.set_template.SetComponentState
 import com.bashkevich.tennisscorekeeper.components.showUnauthorizedActionSnackbar
 import com.bashkevich.tennisscorekeeper.components.theme.ThemeComponentState
@@ -88,6 +91,7 @@ fun AddTournamentContent(
     onNavigateToSettings: () -> Unit = {},
 ) {
     val tournamentType = state.tournamentType
+    var isPreviewDialogOpen by remember { mutableStateOf(false) }
 
     val regularSetTemplate =
         (state.regularSetComponentState.selectedSetState as? SetComponentState.SelectedSetState.Idle)?.setTemplate
@@ -148,6 +152,7 @@ fun AddTournamentContent(
                 onThemesFetch = {
                     onEvent(AddTournamentUiEvent.FetchThemes)
                 },
+                onPreviewClick = { isPreviewDialogOpen = true },
             )
 
             Spacer(modifier = Modifier.height(8.dp))
@@ -178,6 +183,13 @@ fun AddTournamentContent(
                 enabled = isButtonEnabled
             ) {
                 Text(stringResource(Res.string.add))
+            }
+
+            if (isPreviewDialogOpen) {
+                ScoreboardThemePreviewDialog(
+                    onDismissRequest = { isPreviewDialogOpen = false },
+                    theme = selectedTheme!!
+                )
             }
         }
     }

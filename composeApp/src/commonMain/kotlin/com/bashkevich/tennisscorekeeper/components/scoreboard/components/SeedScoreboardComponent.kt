@@ -11,8 +11,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onGloballyPositioned
+import com.bashkevich.tennisscorekeeper.model.theme.domain.LocalScoreboardTheme
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
@@ -68,12 +68,13 @@ fun SeedNumber(
     seedNumber: Int,
     fontSize: TextUnit
 ) {
+    val theme = LocalScoreboardTheme.current
     Box(modifier = Modifier.then(modifier)) {
         Text(
             modifier = Modifier.align(Alignment.Center),
             text = if (seedNumber == 0) "" else seedNumber.toString(),
             fontSize = fontSize,
-            color = Color.White.copy(alpha = 0.7f),
+            color = theme.mainTextColor.copy(alpha = 0.7f),
             textAlign = TextAlign.Center
         )
     }

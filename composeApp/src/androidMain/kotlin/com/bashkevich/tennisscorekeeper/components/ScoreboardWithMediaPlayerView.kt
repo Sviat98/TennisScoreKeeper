@@ -13,6 +13,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.bashkevich.tennisscorekeeper.model.theme.domain.ScoreboardTheme
 import chaintech.videoplayer.host.MediaPlayerHost
 import com.bashkevich.tennisscorekeeper.components.expect.LocalFullScreenState
 import com.bashkevich.tennisscorekeeper.components.scoreboard.match_details.MatchDetailsScoreboardView
@@ -63,6 +64,7 @@ fun ScoreboardWithMediaPlayerView(
    else{
        MatchDetailsScoreboardView(
            match = match,
+           theme = ScoreboardTheme.DEFAULT,
        )
    }
 

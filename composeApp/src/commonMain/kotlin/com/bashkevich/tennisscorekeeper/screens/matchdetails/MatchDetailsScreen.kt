@@ -1,20 +1,16 @@
 package com.bashkevich.tennisscorekeeper.screens.matchdetails
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -25,30 +21,23 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.platform.LocalClipboard
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.bashkevich.tennisscorekeeper.LocalAuthorization
 import com.bashkevich.tennisscorekeeper.LocalNavHostController
 import com.bashkevich.tennisscorekeeper.components.MatchDetailsAppBar
 import com.bashkevich.tennisscorekeeper.components.expect.MatchDetailsContentWrapper
 import com.bashkevich.tennisscorekeeper.components.expect.setText
-import com.bashkevich.tennisscorekeeper.components.match_details.MatchStatusButton
-import com.bashkevich.tennisscorekeeper.components.match_details.ParticipantsPointsControlPanel
-import com.bashkevich.tennisscorekeeper.components.match_details.RetireParticipantPanel
 import com.bashkevich.tennisscorekeeper.components.match_details.ScoreboardControlPanel
-import com.bashkevich.tennisscorekeeper.components.match_details.serve.ChooseServePanel
 import com.bashkevich.tennisscorekeeper.components.scoreboard.match_details.MatchDetailsScoreboardView
 import com.bashkevich.tennisscorekeeper.components.showUnauthorizedActionSnackbar
-import com.bashkevich.tennisscorekeeper.model.match.remote.body.MatchStatus
 import com.bashkevich.tennisscorekeeper.model.match.remote.body.toResource
+import com.bashkevich.tennisscorekeeper.model.theme.domain.ScoreboardTheme
 import com.bashkevich.tennisscorekeeper.mvi.LaunchedUiEffectHandler
 import com.bashkevich.tennisscorekeeper.navigation.SettingsRoute
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 import tennisscorekeeper.composeapp.generated.resources.Res
-import tennisscorekeeper.composeapp.generated.resources.connection_with_scoreboard_lost
 import tennisscorekeeper.composeapp.generated.resources.status
 
 @Composable
@@ -140,6 +129,7 @@ fun MatchDetailsCommonContent(
                 MatchDetailsScoreboardView(
                     modifier = Modifier.horizontalScroll(state = rememberScrollState()),
                     match = match,
+                    theme = ScoreboardTheme.DEFAULT,
                 )
 
                 val statusText = stringResource(match.status.toResource())

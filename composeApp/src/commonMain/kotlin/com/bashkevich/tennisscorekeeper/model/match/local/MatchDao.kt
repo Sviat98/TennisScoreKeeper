@@ -36,6 +36,8 @@ interface MatchDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertMatchGames(entities: List<MatchGameEntity>)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertMatchGame(entity: MatchGameEntity)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertParticipantsInMatch(entities: List<ParticipantInMatchEntity>)
@@ -43,8 +45,19 @@ interface MatchDao {
     @Query("DELETE FROM matches WHERE tournament_id = :tournamentId")
     suspend fun deleteMatchesByTournament(tournamentId: Int)
 
+    @Query("DELETE FROM match_sets WHERE match_id = :matchId")
+    suspend fun deleteMatchSets(matchId: Int)
+    @Query("DELETE FROM match_games WHERE match_id = :matchId")
+    suspend fun deleteMatchGame(matchId: Int)
+
     @Query("DELETE FROM matches")
     suspend fun deleteAllMatches()
+
+    @Transaction
+    suspend fun replaceSetsForMatch(matchId: Int, sets: List<MatchSetEntity>){
+        deleteMatchSets(matchId)
+        insertMatchSets(sets)
+    }
 
     @Transaction
     suspend fun replaceAllMatchesForTournament(

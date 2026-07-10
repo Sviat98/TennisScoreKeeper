@@ -10,11 +10,9 @@ import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.widthIn
@@ -45,15 +43,8 @@ import com.bashkevich.tennisscorekeeper.LocalAuthorization
 import com.bashkevich.tennisscorekeeper.LocalNavHostController
 import com.bashkevich.tennisscorekeeper.components.MatchDetailsAppBar
 import com.bashkevich.tennisscorekeeper.components.ScoreboardWithMediaPlayerView
-import com.bashkevich.tennisscorekeeper.components.match_details.MatchStatusButton
-import com.bashkevich.tennisscorekeeper.components.match_details.ParticipantsPointsControlPanel
-import com.bashkevich.tennisscorekeeper.components.match_details.RetireParticipantPanel
 import com.bashkevich.tennisscorekeeper.components.match_details.ScoreboardControlPanel
-import com.bashkevich.tennisscorekeeper.components.match_details.serve.ChooseServePanel
-import com.bashkevich.tennisscorekeeper.model.match.remote.body.MatchStatus
 import com.bashkevich.tennisscorekeeper.model.match.remote.body.toResource
-import com.bashkevich.tennisscorekeeper.navigation.LoginRoute
-import com.bashkevich.tennisscorekeeper.navigation.ProfileRoute
 import com.bashkevich.tennisscorekeeper.navigation.SettingsRoute
 import com.bashkevich.tennisscorekeeper.screens.matchdetails.MatchDetailsState
 import com.bashkevich.tennisscorekeeper.screens.matchdetails.MatchDetailsUiEvent
