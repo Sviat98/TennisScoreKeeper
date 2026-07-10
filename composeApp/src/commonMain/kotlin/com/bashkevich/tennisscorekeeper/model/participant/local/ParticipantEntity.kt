@@ -7,9 +7,12 @@ import androidx.room3.Index
 import androidx.room3.PrimaryKey
 import com.bashkevich.tennisscorekeeper.model.participant.remote.DoublesParticipantDto
 import com.bashkevich.tennisscorekeeper.model.participant.remote.ParticipantDto
+import com.bashkevich.tennisscorekeeper.model.participant.remote.ParticipantInDoublesMatchDto
+import com.bashkevich.tennisscorekeeper.model.participant.remote.ParticipantInMatchDto
 import com.bashkevich.tennisscorekeeper.model.participant.remote.ParticipantInShortDoublesMatchDto
 import com.bashkevich.tennisscorekeeper.model.participant.remote.ParticipantInShortMatchDto
 import com.bashkevich.tennisscorekeeper.model.participant.remote.ParticipantInShortSinglesMatchDto
+import com.bashkevich.tennisscorekeeper.model.participant.remote.ParticipantInSinglesMatchDto
 import com.bashkevich.tennisscorekeeper.model.participant.remote.SinglesParticipantDto
 import com.bashkevich.tennisscorekeeper.model.player.local.PlayerEntity
 import com.bashkevich.tennisscorekeeper.model.player.local.toEntity
@@ -88,6 +91,31 @@ fun ParticipantInShortMatchDto.toEntity(tournamentId: Int) = when (this) {
         secondPlayer = null,
     )
     is ParticipantInShortDoublesMatchDto -> ParticipantWithPlayersEntity(
+        participant = ParticipantEntity(
+            id = id.toInt(),
+            tournamentId = tournamentId,
+            seed = seed,
+            playerId = firstPlayer.id.toInt(),
+            secondPlayerId = secondPlayer.id.toInt(),
+        ),
+        player = firstPlayer.toEntity(),
+        secondPlayer = secondPlayer.toEntity(),
+    )
+}
+
+fun ParticipantInMatchDto.toEntity(tournamentId: Int) = when (this) {
+    is ParticipantInSinglesMatchDto -> ParticipantWithPlayersEntity(
+        participant = ParticipantEntity(
+            id = id.toInt(),
+            tournamentId = tournamentId,
+            seed = seed,
+            playerId = player.id.toInt(),
+            secondPlayerId = null,
+        ),
+        player = player.toEntity(),
+        secondPlayer = null,
+    )
+    is ParticipantInDoublesMatchDto -> ParticipantWithPlayersEntity(
         participant = ParticipantEntity(
             id = id.toInt(),
             tournamentId = tournamentId,
