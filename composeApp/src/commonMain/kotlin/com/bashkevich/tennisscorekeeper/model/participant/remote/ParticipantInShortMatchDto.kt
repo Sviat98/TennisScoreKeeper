@@ -1,6 +1,6 @@
 package com.bashkevich.tennisscorekeeper.model.participant.remote
 
-import com.bashkevich.tennisscorekeeper.model.player.remote.PlayerInParticipantDto
+import com.bashkevich.tennisscorekeeper.model.player.remote.PlayerDto
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerialName
 
@@ -28,7 +28,7 @@ data class ParticipantInShortSinglesMatchDto(
     @SerialName("is_retired")
     override val isRetired: Boolean,
     @SerialName("player")
-    val player: PlayerInParticipantDto
+    val player: PlayerDto
 ) : ParticipantInShortMatchDto()
 
 @Serializable
@@ -43,7 +43,7 @@ data class ParticipantInShortDoublesMatchDto(
     @SerialName("is_retired")
     override val isRetired: Boolean,
     @SerialName("first_player")
-    val firstPlayer: PlayerInParticipantDto,
+    val firstPlayer: PlayerDto,
     @SerialName("second_player")
-    val secondPlayer: PlayerInParticipantDto,
+    val secondPlayer: PlayerDto,
 ) : ParticipantInShortMatchDto()

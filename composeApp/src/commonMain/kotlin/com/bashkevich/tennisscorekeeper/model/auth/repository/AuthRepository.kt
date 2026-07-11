@@ -9,6 +9,8 @@ import kotlinx.coroutines.flow.Flow
 interface AuthRepository {
     fun observePlayerId(): Flow<String>
     suspend fun savePlayerId(playerId: String)
+    suspend fun savePlayerName(name: String)
+    suspend fun savePlayerSurname(surname: String)
     suspend fun saveTokens(accessToken: String, refreshToken: String)
 
     suspend fun login(loginBody: LoginBody): LoadResult<LoginResponseDto, Throwable>

@@ -14,7 +14,7 @@ import com.bashkevich.tennisscorekeeper.core.remote.doOnError
 import com.bashkevich.tennisscorekeeper.core.remote.doOnSuccess
 import com.bashkevich.tennisscorekeeper.core.remote.httpClient
 import com.bashkevich.tennisscorekeeper.core.remote.runOperationCatching
-import com.bashkevich.tennisscorekeeper.model.auth.remote.LoginResponseDto
+import com.bashkevich.tennisscorekeeper.model.auth.remote.RefreshTokensResponseDto
 import com.russhwolf.settings.ExperimentalSettingsApi
 import io.ktor.client.call.body
 import io.ktor.client.plugins.ClientRequestException
@@ -147,10 +147,10 @@ val coreModule = module {
                                         append("refreshToken", refreshToken)
                                     }) {
                                     markAsRefreshTokenRequest()
-                                }.body<LoginResponseDto>()
-                            }.doOnSuccess { loginResponseDto ->
-                                val accessToken = loginResponseDto.accessToken
-                                val refreshToken = loginResponseDto.refreshToken
+                                }.body<RefreshTokensResponseDto>()
+                            }.doOnSuccess { refreshTokenResponseDto ->
+                                val accessToken = refreshTokenResponseDto.accessToken
+                                val refreshToken = refreshTokenResponseDto.refreshToken
 
                                 keyValueStorage.saveTokens(accessToken, refreshToken)
                                 bearerTokens = BearerTokens(accessToken, refreshToken)

@@ -20,13 +20,23 @@ class AuthRepositoryImpl(
         authLocalDataSource.savePlayerId(playerId)
     }
 
+    override suspend fun savePlayerName(name: String) {
+        authLocalDataSource.savePlayerName(name)
+    }
+
+    override suspend fun savePlayerSurname(surname: String) {
+        authLocalDataSource.savePlayerSurname(surname)
+    }
+
     override suspend fun saveTokens(accessToken: String, refreshToken: String) {
         authLocalDataSource.saveTokens(accessToken = accessToken, refreshToken = refreshToken)
     }
 
     override suspend fun login(loginBody: LoginBody): LoadResult<LoginResponseDto, Throwable> {
         return authRemoteDataSource.login(loginBody).doOnSuccess { loginResponseDto ->
-            authLocalDataSource.savePlayerId(loginResponseDto.playerId)
+            authLocalDataSource.savePlayerId(loginResponseDto.player.id)
+            authLocalDataSource.savePlayerName(loginResponseDto.player.name)
+            authLocalDataSource.savePlayerSurname(loginResponseDto.player.surname)
             authLocalDataSource.saveTokens(
                 loginResponseDto.accessToken,
                 loginResponseDto.refreshToken
@@ -55,6 +65,8 @@ class AuthRepositoryImpl(
         val refreshToken = authLocalDataSource.getRefreshToken()
         // удаляем данные в ЛЮБОМ случае
         authLocalDataSource.savePlayerId("")
+        authLocalDataSource.savePlayerName("")
+        authLocalDataSource.savePlayerSurname("")
         authLocalDataSource.saveTokens(accessToken = "", refreshToken = "")
         authRemoteDataSource.clearAuthTokens()
         authRemoteDataSource.logout(refreshToken)

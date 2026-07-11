@@ -13,6 +13,14 @@ class AuthLocalDataSource(
         keyValueStorage.savePlayerId(playerId)
     }
 
+    suspend fun savePlayerName(name: String) {
+        keyValueStorage.savePlayerName(name)
+    }
+
+    suspend fun savePlayerSurname(surname: String) {
+        keyValueStorage.savePlayerSurname(surname)
+    }
+
     suspend fun saveTokens(accessToken: String, refreshToken: String) {
         keyValueStorage.saveTokens(accessToken = accessToken, refreshToken = refreshToken)
     }

@@ -1,6 +1,6 @@
 package com.bashkevich.tennisscorekeeper.model.player.domain
 
-import com.bashkevich.tennisscorekeeper.model.player.remote.PlayerInParticipantDto
+import com.bashkevich.tennisscorekeeper.model.player.remote.PlayerDto
 
 data class PlayerInParticipant(
     val id: Int,
@@ -8,7 +8,7 @@ data class PlayerInParticipant(
     val name: String,
 )
 
-fun PlayerInParticipantDto.toDomain() = PlayerInParticipant(
+fun PlayerDto.toDomain() = PlayerInParticipant(
     id = this.id.toInt(),
     surname = this.surname,
     name = this.name
