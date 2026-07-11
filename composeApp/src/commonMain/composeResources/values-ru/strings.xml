@@ -114,4 +114,9 @@
     <!-- Set Template -->
     <string name="regular_set_template">Формат обычного сета</string>
     <string name="deciding_set_template">Формат решающего сета</string>
+
+    <!-- Settings -->
+    <string name="general_settings">Общие настройки</string>
+    <string name="scoreboard_appearance">Оформление табло</string>
+    <string name="set_templates">Шаблоны сетов</string>
 </resources>

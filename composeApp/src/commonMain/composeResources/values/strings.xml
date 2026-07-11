@@ -114,4 +114,9 @@
     <!-- Set Template -->
     <string name="regular_set_template">Regular Set Format</string>
     <string name="deciding_set_template">Deciding Set Format</string>
+
+    <!-- Settings -->
+    <string name="general_settings">General Settings</string>
+    <string name="scoreboard_appearance">Scoreboard Appearance</string>
+    <string name="set_templates">Set Templates</string>
 </resources>

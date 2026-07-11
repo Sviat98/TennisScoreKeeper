@@ -1,33 +1,32 @@
-package com.bashkevich.tennisscorekeeper.screens.profile
+package com.bashkevich.tennisscorekeeper.screens.settings.main
 
 import androidx.lifecycle.viewModelScope
 import com.bashkevich.tennisscorekeeper.model.auth.repository.AuthRepository
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.stateIn
 import com.bashkevich.tennisscorekeeper.mvi.BaseViewModel
 import kotlinx.coroutines.launch
 
-class ProfileViewModel(
+class SettingsViewModel(
     private val authRepository: AuthRepository
-) : BaseViewModel<ProfileState, ProfileUiEvent, ProfileAction>() {
+) : BaseViewModel<SettingsState, SettingsUiEvent, SettingsAction>() {
 
-    override val state: StateFlow<ProfileState> = combine(
-        authRepository.observePlayerId().distinctUntilChanged(),
+    override val state: StateFlow<SettingsState> = combine(
+        authRepository.observeLoggedInPlayer(),
         _action
-    ) { playerId, action ->
-        ProfileState(playerId = playerId, action = action)
+    ) { loggedInPlayer, action ->
+        SettingsState(loggedInPlayer = loggedInPlayer, action = action)
     }.stateIn(
         viewModelScope,
         SharingStarted.WhileSubscribed(5_000),
-        ProfileState.initial()
+        SettingsState.initial()
     )
 
-    fun onEvent(uiEvent: ProfileUiEvent) {
+    fun onEvent(uiEvent: SettingsUiEvent) {
         when (uiEvent) {
-            ProfileUiEvent.Logout -> logout()
+            SettingsUiEvent.Logout -> logout()
         }
     }
 
