@@ -1,49 +1,30 @@
 package com.bashkevich.tennisscorekeeper.components.scoreboard.components
 
-import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import com.bashkevich.tennisscorekeeper.model.theme.domain.LocalScoreboardTheme
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.CornerRadius
-import androidx.compose.ui.geometry.RoundRect
-import androidx.compose.ui.geometry.toRect
-import androidx.compose.ui.graphics.Path
-import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.sp
 import com.bashkevich.tennisscorekeeper.model.match.domain.TennisGame
 
 @Composable
-fun CurrentGamePausedComponent(
+fun MatchDetailsCurrentGameComponent(
     modifier: Modifier = Modifier,
-    currentGame: TennisGame
+    currentGame: TennisGame,
+    fontSize: TextUnit = 20.sp
 ) {
     val theme = LocalScoreboardTheme.current
-    Box(
-        modifier = Modifier.then(modifier)
-    ) {
-        Canvas(modifier = Modifier.matchParentSize().padding(2.dp)) {
-            val path = Path().apply {
-                addRoundRect(
-                    RoundRect(
-                        rect = size.toRect(),
-                        cornerRadius = CornerRadius(4.dp.toPx())
-                    )
-                )
-            }
-            drawPath(
-                path = path,
-                color = theme.currentGameBackgroundColor,
-                style = Stroke(width = 1.dp.toPx())
-            )
-        }
+    Box(modifier = Modifier.then(modifier)){
         Column(
             modifier = Modifier
-                .padding(horizontal = 4.dp).align(Alignment.Center),
+                .fillMaxWidth()
+                .background(color = theme.currentGameBackgroundColor),
             horizontalAlignment = Alignment.CenterHorizontally, // Выравнивание по центру
         ) {
             val textColor = theme.currentGameTextColor
@@ -51,16 +32,18 @@ fun CurrentGamePausedComponent(
                 modifier = Modifier.weight(1f),
                 scoreNumber = currentGame.firstParticipantPointsWon,
                 textColor = textColor,
-                textFontSize = 16.sp
+                textFontSize = fontSize
             )
             ScoreboardNumber(
                 modifier = Modifier.weight(1f),
                 scoreNumber = currentGame.secondParticipantPointsWon,
                 textColor = textColor,
-                textFontSize = 16.sp
+                textFontSize = fontSize
             )
         }
+        HorizontalDivider(modifier = Modifier.fillMaxWidth().align(Alignment.TopStart), color = theme.mainBackgroundColor)
+        HorizontalDivider(modifier = Modifier.fillMaxWidth().align(Alignment.Center), color = theme.mainBackgroundColor)
+        HorizontalDivider(modifier = Modifier.fillMaxWidth().align(Alignment.BottomCenter), color = theme.mainBackgroundColor)
     }
-
 
 }

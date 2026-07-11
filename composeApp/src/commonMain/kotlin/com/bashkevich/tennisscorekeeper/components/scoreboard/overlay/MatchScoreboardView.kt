@@ -18,7 +18,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.times
 import com.bashkevich.tennisscorekeeper.components.scoreboard.components.ColorScoreboardComponent
-import com.bashkevich.tennisscorekeeper.components.scoreboard.components.CurrentGameInProgressComponent
+import com.bashkevich.tennisscorekeeper.components.scoreboard.components.MatchDetailsCurrentGameComponent
 import com.bashkevich.tennisscorekeeper.components.scoreboard.components.CurrentSetComponent
 import com.bashkevich.tennisscorekeeper.components.scoreboard.components.PrevSetScoreboardComponent
 import com.bashkevich.tennisscorekeeper.components.scoreboard.components.SeedScoreboardComponent
@@ -156,7 +156,7 @@ fun MatchScoreboardView(
 //                        currentGame = match.currentGame
 //                    )
 //                } else {
-                CurrentGameInProgressComponent(
+                MatchDetailsCurrentGameComponent(
                     modifier = Modifier.height(columnHeight).width(columnHeight / 2),
                     currentGame = match.currentGame
                 )

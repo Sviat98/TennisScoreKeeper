@@ -16,6 +16,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.Dp
@@ -120,17 +121,24 @@ fun DoublesParticipantOnScoreboardDetails(
 
     val secondPlayer = participant.secondPlayer as PlayerInDoublesMatch
     val theme = LocalScoreboardTheme.current
+    val isServeColorSameAsMain = theme.serveColor == theme.mainTextColor
     Text(
         text = buildAnnotatedString {
             val firstPlayerColor =
                 if (firstPlayer.isServingNow) theme.serveColor else theme.mainTextColor
-            withStyle(SpanStyle(color = firstPlayerColor)) {
+            withStyle(SpanStyle(
+                color = firstPlayerColor,
+                fontWeight = if (firstPlayer.isServingNow && isServeColorSameAsMain) FontWeight.Bold else FontWeight.Normal
+            )) {
                 append(firstPlayerDisplayName)
             }
             append(" /\n")
             val secondPlayerColor =
                 if (secondPlayer.isServingNow) theme.serveColor else theme.mainTextColor
-            withStyle(SpanStyle(color = secondPlayerColor)) {
+            withStyle(SpanStyle(
+                color = secondPlayerColor,
+                fontWeight = if (secondPlayer.isServingNow && isServeColorSameAsMain) FontWeight.Bold else FontWeight.Normal
+            )) {
                 append(secondPlayerDisplayName)
             }
         },

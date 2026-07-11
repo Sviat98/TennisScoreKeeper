@@ -33,6 +33,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.bashkevich.tennisscorekeeper.LocalNavHostController
 import com.bashkevich.tennisscorekeeper.components.TournamentDetailsAppBar
+import com.bashkevich.tennisscorekeeper.components.showUnauthorizedActionSnackbar
 import com.bashkevich.tennisscorekeeper.components.modifier.refreshByKeyboard
 import com.bashkevich.tennisscorekeeper.components.tournament.ChangeTournamentStatusButton
 import com.bashkevich.tennisscorekeeper.components.icons.IconGroup
@@ -94,6 +95,8 @@ private fun TournamentContent(
         when (currentAction) {
             is TournamentAction.ShowError ->
                 snackbarHostState.showSnackbar(message = currentAction.message)
+            is TournamentAction.ShowUnauthorizedError ->
+                snackbarHostState.showUnauthorizedActionSnackbar(navController = navController)
         }
     }
 

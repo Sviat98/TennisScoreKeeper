@@ -6,9 +6,9 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -19,6 +19,7 @@ import com.bashkevich.tennisscorekeeper.model.match.domain.Match
 import com.bashkevich.tennisscorekeeper.model.match.remote.body.MatchStatus
 import com.bashkevich.tennisscorekeeper.model.participant.domain.ParticipantInSinglesMatch
 import com.bashkevich.tennisscorekeeper.model.participant.domain.TennisParticipantInMatch
+import com.bashkevich.tennisscorekeeper.model.theme.domain.LocalScoreboardTheme
 
 @Composable
 fun ParticipantOnScoreboardView(
@@ -57,22 +58,30 @@ fun DoublesParticipantOnScoreboard(
     val firstPlayer = participant.firstPlayer as PlayerInDoublesMatch
 
     val secondPlayer = participant.secondPlayer as PlayerInDoublesMatch
+    val theme = LocalScoreboardTheme.current
+    val isServeColorSameAsMain = theme.serveColor == theme.mainTextColor
     Text(
         text = buildAnnotatedString {
             val firstPlayerColor =
-                if (firstPlayer.isServingNow && showServingPlayer) Color.Yellow else Color.White
-            withStyle(SpanStyle(color = firstPlayerColor)) {
+                if (firstPlayer.isServingNow && showServingPlayer) theme.serveColor else theme.mainTextColor
+            withStyle(SpanStyle(
+                color = firstPlayerColor,
+                fontWeight = if (firstPlayer.isServingNow && showServingPlayer && isServeColorSameAsMain) FontWeight.Bold else FontWeight.Normal
+            )) {
                 append(firstPlayerDisplayName)
             }
             append(" / ")
             val secondPlayerColor =
-                if (secondPlayer.isServingNow && showServingPlayer) Color.Yellow else Color.White
-            withStyle(SpanStyle(color = secondPlayerColor)) {
+                if (secondPlayer.isServingNow && showServingPlayer) theme.serveColor else theme.mainTextColor
+            withStyle(SpanStyle(
+                color = secondPlayerColor,
+                fontWeight = if (secondPlayer.isServingNow && showServingPlayer && isServeColorSameAsMain) FontWeight.Bold else FontWeight.Normal
+            )) {
                 append(secondPlayerDisplayName)
             }
         },
         fontSize = 20.sp,
-        color = Color.White
+        color = theme.mainTextColor
     )
 }
 
@@ -88,7 +97,7 @@ fun ParticipantOnScoreboardRow(
                 Text(
                     text = participant.displayName,
                     fontSize = 20.sp,
-                    color = Color.White
+                    color = LocalScoreboardTheme.current.mainTextColor
                 )
             }
 

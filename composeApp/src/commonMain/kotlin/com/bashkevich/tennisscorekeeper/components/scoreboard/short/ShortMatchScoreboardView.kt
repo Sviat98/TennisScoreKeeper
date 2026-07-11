@@ -26,7 +26,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.times
-import com.bashkevich.tennisscorekeeper.components.scoreboard.components.CurrentGamePausedComponent
+import com.bashkevich.tennisscorekeeper.components.scoreboard.components.ShortMatchCurrentGameComponent
 import com.bashkevich.tennisscorekeeper.components.scoreboard.components.PrevSetScoreboardComponent
 import com.bashkevich.tennisscorekeeper.components.scoreboard.components.SeedScoreboardComponent
 import com.bashkevich.tennisscorekeeper.components.scoreboard.components.WinnerAndRetiredParticipantComponent
@@ -165,7 +165,7 @@ fun ShortMatchScoreboardView(
                 )
             }
             match.currentGame?.let {
-                CurrentGamePausedComponent(
+                ShortMatchCurrentGameComponent(
                     modifier = Modifier.height(columnHeight).width(48.dp),
                     currentGame = match.currentGame
                 )
