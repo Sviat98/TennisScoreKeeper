@@ -6,6 +6,7 @@ import com.bashkevich.tennisscorekeeper.model.theme.local.ThemeEntity
 import com.bashkevich.tennisscorekeeper.model.theme.remote.ThemeColor
 import com.bashkevich.tennisscorekeeper.model.theme.remote.ThemeContent
 import com.bashkevich.tennisscorekeeper.model.theme.remote.ThemeDto
+import com.bashkevich.tennisscorekeeper.model.theme.remote.ThemeBody
 import kotlinx.serialization.json.Json
 
 data class ScoreboardTheme(
@@ -60,6 +61,11 @@ fun String.convertColor() = "FF$this".toLong(16)
 
 fun ThemeColor.toColor() = Color(color.removePrefix("#").convertColor()).copy(alpha = alpha)
 
+fun Color.toThemeColor(): ThemeColor {
+    val hex = value.toHexString().substring(2, 8)
+    return ThemeColor(color = "#$hex", alpha = alpha)
+}
+
 fun ThemeDto.toDomain() = ScoreboardTheme(
     id = id.toInt(),
     name = name,
@@ -90,3 +96,18 @@ fun ThemeEntity.toDomain(): ScoreboardTheme {
         currentGameTextColor = content.currentGameTextColor.toColor(),
     )
 }
+
+fun ScoreboardTheme.toThemeBody() = ThemeBody(
+    name = name,
+    content = ThemeContent(
+        mainBackgroundColor = mainBackgroundColor.toThemeColor(),
+        mainTextColor = mainTextColor.toThemeColor(),
+        serveColor = serveColor.toThemeColor(),
+        previousSetWinTextColor = previousSetWinTextColor.toThemeColor(),
+        previousSetLoseTextColor = previousSetLoseTextColor.toThemeColor(),
+        currentSetBackgroundColor = currentSetBackgroundColor.toThemeColor(),
+        currentSetTextColor = currentSetTextColor.toThemeColor(),
+        currentGameBackgroundColor = currentGameBackgroundColor.toThemeColor(),
+        currentGameTextColor = currentGameTextColor.toThemeColor(),
+    )
+)

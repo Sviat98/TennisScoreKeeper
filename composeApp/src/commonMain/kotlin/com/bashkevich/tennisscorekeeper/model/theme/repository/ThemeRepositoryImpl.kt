@@ -7,8 +7,10 @@ import com.bashkevich.tennisscorekeeper.core.remote.mapSuccess
 import com.bashkevich.tennisscorekeeper.model.theme.domain.ScoreboardTheme
 import com.bashkevich.tennisscorekeeper.model.theme.local.ThemeLocalDataSource
 import com.bashkevich.tennisscorekeeper.model.theme.local.toEntity
+import com.bashkevich.tennisscorekeeper.model.theme.remote.ThemeBody
 import com.bashkevich.tennisscorekeeper.model.theme.remote.ThemeRemoteDataSource
 import com.bashkevich.tennisscorekeeper.model.theme.domain.toDomain
+import com.bashkevich.tennisscorekeeper.model.theme.domain.toThemeBody
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.flow
@@ -64,5 +66,11 @@ class ThemeRepositoryImpl(
         return themeLocalDataSource.getThemeById(id).map { entity ->
             entity?.toDomain() ?: ScoreboardTheme.DEFAULT
         }
+    }
+
+    override suspend fun updateTheme(id: Int, themeBody: ThemeBody): LoadResult<Unit, Throwable> {
+        return themeRemoteDataSource.updateTheme(id.toString(), themeBody).doOnSuccess { themeDto ->
+            themeLocalDataSource.insertTheme(themeDto.toEntity())
+        }.mapSuccess { }
     }
 }

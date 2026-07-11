@@ -2,16 +2,13 @@ package com.bashkevich.tennisscorekeeper.components.scoreboard.components
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.onGloballyPositioned
 import com.bashkevich.tennisscorekeeper.model.theme.domain.LocalScoreboardTheme
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
@@ -27,34 +24,20 @@ fun SeedScoreboardComponent(
     paddingFromCenter: Dp = 0.dp,
     seedNumberFontSize: TextUnit = 12.sp
 ) {
-
-    var maxSeedWidth by remember { mutableStateOf(0) }
-
     Column(
-        modifier = Modifier.then(modifier).padding(start = if (maxSeedWidth > 0) 4.dp else 0.dp),
+        modifier = Modifier
+            .width(IntrinsicSize.Max)
+            .then(modifier)
+            .padding(start = 4.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         SeedNumber(
-            modifier = Modifier.weight(1f).padding(bottom = paddingFromCenter).onGloballyPositioned { layoutCoordinates ->
-
-                val currentWidth = layoutCoordinates.size.width
-
-                if (currentWidth > maxSeedWidth) {
-                    maxSeedWidth = currentWidth
-                }
-            },
+            modifier = Modifier.weight(1f).padding(bottom = paddingFromCenter),
             seedNumber = firstParticipantSeed ?: 0,
             fontSize = seedNumberFontSize
         )
         SeedNumber(
-            modifier = Modifier.weight(1f).padding(top = paddingFromCenter).onGloballyPositioned { layoutCoordinates ->
-
-                val currentWidth = layoutCoordinates.size.width
-
-                if (currentWidth > maxSeedWidth) {
-                    maxSeedWidth = currentWidth
-                }
-            },
+            modifier = Modifier.weight(1f).padding(top = paddingFromCenter),
             seedNumber = secondParticipantSeed ?: 0,
             fontSize = seedNumberFontSize
         )

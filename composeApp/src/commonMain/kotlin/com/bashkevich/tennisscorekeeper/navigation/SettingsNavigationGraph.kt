@@ -6,7 +6,10 @@ import androidx.navigation.compose.navigation
 import com.bashkevich.tennisscorekeeper.screens.settings.general.GeneralSettingsScreen
 import com.bashkevich.tennisscorekeeper.screens.settings.main.SettingsScreen
 import com.bashkevich.tennisscorekeeper.screens.settings.main.SettingsViewModel
+import com.bashkevich.tennisscorekeeper.screens.settings.themedetails.ScoreboardThemeDetailsScreen
+import com.bashkevich.tennisscorekeeper.screens.settings.themedetails.ScoreboardThemeDetailsViewModel
 import com.bashkevich.tennisscorekeeper.screens.settings.themelist.ScoreboardThemeListScreen
+import com.bashkevich.tennisscorekeeper.screens.settings.themelist.ScoreboardThemeListViewModel
 import com.bashkevich.tennisscorekeeper.screens.settings.settemplatelist.SetTemplateListScreen
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -21,7 +24,14 @@ fun NavGraphBuilder.settingsFlow() {
             GeneralSettingsScreen()
         }
         composable<ScoreboardThemeListRoute> {
-            ScoreboardThemeListScreen()
+            val themeListViewModel = koinViewModel<ScoreboardThemeListViewModel>()
+
+            ScoreboardThemeListScreen(viewModel = themeListViewModel)
+        }
+        composable<ScoreboardThemeDetailsRoute> {
+            val themeDetailsViewModel = koinViewModel<ScoreboardThemeDetailsViewModel>()
+
+            ScoreboardThemeDetailsScreen(viewModel = themeDetailsViewModel)
         }
         composable<SetTemplateListRoute> {
             SetTemplateListScreen()
