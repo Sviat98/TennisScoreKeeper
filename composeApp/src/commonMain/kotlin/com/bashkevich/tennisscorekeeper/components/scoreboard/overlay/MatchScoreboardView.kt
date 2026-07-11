@@ -1,20 +1,17 @@
 package com.bashkevich.tennisscorekeeper.components.scoreboard.overlay
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.times
 import com.bashkevich.tennisscorekeeper.components.scoreboard.components.ColorScoreboardComponent
@@ -31,8 +28,6 @@ fun MatchScoreboardView(
     modifier: Modifier = Modifier,
     match: Match,
 ) {
-    var columnHeight by remember { mutableStateOf(0.dp) }
-
     val firstParticipant = match.firstParticipant
     val secondParticipant = match.secondParticipant
 
@@ -45,29 +40,26 @@ fun MatchScoreboardView(
     val spaceBetweenParticipants = 2 * (verticalPadding+extraPaddingFromCenter)
 
     Row(
-        modifier = Modifier.then(modifier)
+        modifier = Modifier
+            .height(IntrinsicSize.Min)
+            .then(modifier)
     ) {
         ColorScoreboardComponent(
-            modifier = Modifier.height(columnHeight).width(12.dp),
+            modifier = Modifier.fillMaxHeight().width(12.dp),
             match = match
         )
         Row(
-            modifier = Modifier.background(color = Color(0xFF142c6c))
+            modifier = Modifier
+                .height(IntrinsicSize.Min)
+                .background(color = Color(0xFF142c6c))
         ) {
-            val density = LocalDensity.current
-
             SeedScoreboardComponent(
-                modifier = Modifier.height(columnHeight),
+                modifier = Modifier.fillMaxHeight(),
                 firstParticipantSeed = match.firstParticipant.seed,
                 secondParticipantSeed = match.secondParticipant.seed,
             )
             ParticipantOnScoreboardView(
                 modifier = Modifier.widthIn(min = 80.dp)
-                    .onGloballyPositioned { layoutCoordinates ->
-                        columnHeight = with(density) {
-                            layoutCoordinates.size.height.toDp()
-                        }
-                    }
                     .padding(
                         top = verticalPadding,
                         bottom = verticalPadding,
@@ -89,14 +81,14 @@ fun MatchScoreboardView(
                 else -> null
             }
             WinnerAndRetiredParticipantComponent(
-                modifier = Modifier.height(columnHeight),
+                modifier = Modifier.fillMaxHeight(),
                 firstParticipantId = firstParticipantId,
                 secondParticipantId = secondParticipantId,
                 winnerParticipantId = winnerParticipantId,
                 retiredParticipantId = retiredParticipantId
             )
             ServeScoreboardComponent(
-                modifier = Modifier.height(columnHeight),
+                modifier = Modifier.fillMaxHeight(),
                 match = match
             )
 
@@ -117,7 +109,7 @@ fun MatchScoreboardView(
 
                 // Если сет закончился на счете 0:0 (остановка произошла в начале матча или после сыгранного сета), то его не выводим
                 PrevSetScoreboardComponent(
-                    modifier = Modifier.height(columnHeight).width(columnHeight / 2),
+                    modifier = Modifier.fillMaxHeight().aspectRatio(0.5f),
                     prevSet = prevSet,
                     retiredParticipantNumber = retiredParticipantNumber
                 )
@@ -125,42 +117,16 @@ fun MatchScoreboardView(
             val currentSet = match.currentSet
             currentSet?.let {
                 CurrentSetComponent(
-                    modifier = Modifier.height(columnHeight).width(columnHeight / 2)
+                    modifier = Modifier.fillMaxHeight().aspectRatio(0.5f)
                         .padding(horizontal = 1.dp),
                     currentSet = currentSet
                 )
-//                when (match.status) {
-//                    MatchStatus.IN_PROGRESS -> {
-//                        CurrentSetComponent(
-//                            modifier = Modifier.height(columnHeight).width(columnHeight / 2)
-//                                .padding(horizontal = 1.dp),
-//                            currentSet = currentSet
-//                        )
-//                    }
-//
-//                    MatchStatus.PAUSED -> {
-//                        PrevSetScoreboardComponent(
-//                            modifier = Modifier.height(columnHeight).width(columnHeight / 2),
-//                            prevSet = currentSet,
-//                            isSetFinished = false
-//                        )
-//                    }
-//
-//                    else -> {}
-//                }
             }
             match.currentGame?.let {
-//                if (match.status == MatchStatus.PAUSED) {
-//                    CurrentGamePausedComponent(
-//                        modifier = Modifier.height(columnHeight).wrapContentWidth(),
-//                        currentGame = match.currentGame
-//                    )
-//                } else {
                 MatchDetailsCurrentGameComponent(
-                    modifier = Modifier.height(columnHeight).width(columnHeight / 2),
+                    modifier = Modifier.fillMaxHeight().aspectRatio(0.5f),
                     currentGame = match.currentGame
                 )
-                //}
             }
         }
     }
