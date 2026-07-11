@@ -32,7 +32,7 @@ import com.bashkevich.tennisscorekeeper.components.set_template.SetComponentStat
 import com.bashkevich.tennisscorekeeper.components.showUnauthorizedActionSnackbar
 import com.bashkevich.tennisscorekeeper.components.theme.ThemeComponentState
 import com.bashkevich.tennisscorekeeper.mvi.LaunchedUiEffectHandler
-import com.bashkevich.tennisscorekeeper.navigation.SettingsRoute
+import com.bashkevich.tennisscorekeeper.navigation.SettingsFlowRoute
 import org.jetbrains.compose.resources.stringResource
 import tennisscorekeeper.composeapp.generated.resources.Res
 import tennisscorekeeper.composeapp.generated.resources.add
@@ -75,7 +75,7 @@ fun AddTournamentScreen(
         onEvent = { event -> viewModel.onEvent(event) },
         snackbarHostState = snackbarHostState,
         onBack = { navController.navigateUp() },
-        onNavigateToSettings = { navController.navigate(SettingsRoute) },
+        onNavigateToSettings = { navController.navigate(SettingsFlowRoute) },
     )
 }
 

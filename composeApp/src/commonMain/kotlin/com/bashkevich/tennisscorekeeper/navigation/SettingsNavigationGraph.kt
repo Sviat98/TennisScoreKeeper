@@ -5,14 +5,15 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import com.bashkevich.tennisscorekeeper.screens.settings.general.GeneralSettingsScreen
 import com.bashkevich.tennisscorekeeper.screens.settings.main.SettingsScreen
+import com.bashkevich.tennisscorekeeper.screens.settings.main.SettingsViewModel
 import com.bashkevich.tennisscorekeeper.screens.settings.themelist.ScoreboardThemeListScreen
 import com.bashkevich.tennisscorekeeper.screens.settings.settemplatelist.SetTemplateListScreen
 import org.koin.compose.viewmodel.koinViewModel
 
 fun NavGraphBuilder.settingsFlow() {
-    navigation<SettingsRoute>(startDestination = SettingsRoute) {
+    navigation<SettingsFlowRoute>(startDestination = SettingsRoute) {
         composable<SettingsRoute> {
-            val settingsViewModel = koinViewModel<com.bashkevich.tennisscorekeeper.screens.settings.main.SettingsViewModel>()
+            val settingsViewModel = koinViewModel<SettingsViewModel>()
 
             SettingsScreen(viewModel = settingsViewModel)
         }

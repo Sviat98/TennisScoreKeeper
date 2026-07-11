@@ -20,7 +20,7 @@ import com.bashkevich.tennisscorekeeper.components.AddMatchAppBar
 import com.bashkevich.tennisscorekeeper.components.add_match.AddMatchComponent
 import com.bashkevich.tennisscorekeeper.mvi.LaunchedUiEffectHandler
 import com.bashkevich.tennisscorekeeper.components.showUnauthorizedActionSnackbar
-import com.bashkevich.tennisscorekeeper.navigation.SettingsRoute
+import com.bashkevich.tennisscorekeeper.navigation.SettingsFlowRoute
 
 @Composable
 fun AddMatchScreen(
@@ -57,7 +57,7 @@ fun AddMatchScreen(
         onEvent = { viewModel.onEvent(it) },
         snackbarHostState = snackbarHostState,
         onBack = { navController.navigateUp() },
-        onNavigateToSettings = { navController.navigate(SettingsRoute) },
+        onNavigateToSettings = { navController.navigate(SettingsFlowRoute) },
     )
 }
 

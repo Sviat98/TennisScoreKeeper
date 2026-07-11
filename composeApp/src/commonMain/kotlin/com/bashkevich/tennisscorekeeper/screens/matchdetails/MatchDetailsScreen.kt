@@ -34,7 +34,7 @@ import com.bashkevich.tennisscorekeeper.components.showUnauthorizedActionSnackba
 import com.bashkevich.tennisscorekeeper.model.match.remote.body.toResource
 import com.bashkevich.tennisscorekeeper.model.theme.domain.ScoreboardTheme
 import com.bashkevich.tennisscorekeeper.mvi.LaunchedUiEffectHandler
-import com.bashkevich.tennisscorekeeper.navigation.SettingsRoute
+import com.bashkevich.tennisscorekeeper.navigation.SettingsFlowRoute
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 import tennisscorekeeper.composeapp.generated.resources.Res
@@ -113,7 +113,7 @@ fun MatchDetailsCommonContent(
                         clipboard.setText(link)
                     }
                 },
-                onNavigateToSettings = { navController.navigate(SettingsRoute) }
+                onNavigateToSettings = { navController.navigate(SettingsFlowRoute) }
             )
         }
     ) { paddingValues ->

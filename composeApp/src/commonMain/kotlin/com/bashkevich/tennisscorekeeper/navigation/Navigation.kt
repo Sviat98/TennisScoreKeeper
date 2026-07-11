@@ -31,6 +31,10 @@ data object LoginRoute
 data class AddMatchRoute(val tournamentId: Int = 0)
 
 @Serializable
+@SerialName("settings_flow")
+data object SettingsFlowRoute
+
+@Serializable
 @SerialName("settings")
 data object SettingsRoute
 
