@@ -34,6 +34,7 @@ import com.bashkevich.tennisscorekeeper.LocalNavHostController
 import com.bashkevich.tennisscorekeeper.components.icons.IconGroup
 import com.bashkevich.tennisscorekeeper.components.icons.default_icons.ArrowBack
 import com.bashkevich.tennisscorekeeper.components.modifier.hoverScaleEffect
+import com.bashkevich.tennisscorekeeper.components.modifier.refreshByKeyboard
 import com.bashkevich.tennisscorekeeper.components.scoreboard.match_details.MatchDetailsScoreboardView
 import com.bashkevich.tennisscorekeeper.mvi.LaunchedUiEffectHandler
 import com.bashkevich.tennisscorekeeper.model.match.domain.DOUBLES_SAMPLE_MATCH
@@ -99,7 +100,7 @@ private fun ScoreboardThemeListContent(
     }
 
     Scaffold(
-        modifier = modifier,
+        modifier = Modifier.then(modifier).refreshByKeyboard(onRefresh),
         topBar = {
             TopAppBar(
                 title = { Text(stringResource(Res.string.scoreboard_appearance)) },
@@ -158,6 +159,7 @@ private fun ThemeCard(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(12.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             Text(

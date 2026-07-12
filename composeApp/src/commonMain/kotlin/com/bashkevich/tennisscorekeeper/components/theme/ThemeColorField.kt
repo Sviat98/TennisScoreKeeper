@@ -1,4 +1,4 @@
-package com.bashkevich.tennisscorekeeper.screens.settings.themedetails
+package com.bashkevich.tennisscorekeeper.components.theme
 
 import androidx.compose.ui.graphics.Color
 import com.bashkevich.tennisscorekeeper.model.theme.domain.ScoreboardTheme

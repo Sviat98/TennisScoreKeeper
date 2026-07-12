@@ -2,6 +2,7 @@ package com.bashkevich.tennisscorekeeper.screens.settings.themedetails
 
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.graphics.Color
+import com.bashkevich.tennisscorekeeper.components.theme.ThemeColorField
 import com.bashkevich.tennisscorekeeper.mvi.UiAction
 import com.bashkevich.tennisscorekeeper.mvi.UiEvent
 import com.bashkevich.tennisscorekeeper.mvi.UiState
@@ -27,7 +28,7 @@ sealed interface ThemeDetailsLoadingState : UiState {
         val oldTheme: ScoreboardTheme,
         val editedTheme: ScoreboardTheme,
         val isSaving: Boolean = false,
-        val hasChanges: Boolean = false,
+        val isRefreshing: Boolean = false,
     ) : ThemeDetailsLoadingState
 
     data class Error(val message: String) : ThemeDetailsLoadingState
@@ -37,7 +38,6 @@ sealed interface ThemeDetailsLoadingState : UiState {
 sealed class ThemeDetailsUiEvent : UiEvent {
     data object Refresh : ThemeDetailsUiEvent()
     data object Retry : ThemeDetailsUiEvent()
-    data class UpdateName(val name: String) : ThemeDetailsUiEvent()
     data class UpdateColor(val field: ThemeColorField, val color: Color) : ThemeDetailsUiEvent()
     data object SaveTheme : ThemeDetailsUiEvent()
 }
@@ -45,5 +45,6 @@ sealed class ThemeDetailsUiEvent : UiEvent {
 @Immutable
 sealed class ThemeDetailsAction : UiAction {
     data class ShowError(val message: String) : ThemeDetailsAction()
+    data object ShowUnauthorizedActionError : ThemeDetailsAction()
     data object ThemeSaved : ThemeDetailsAction()
 }

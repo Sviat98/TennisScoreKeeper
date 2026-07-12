@@ -1,10 +1,12 @@
 package com.bashkevich.tennisscorekeeper.screens.settings.themedetails
 
+import androidx.compose.foundation.text.input.TextFieldState
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import com.bashkevich.tennisscorekeeper.core.remote.LoadResult
 import com.bashkevich.tennisscorekeeper.core.remote.NetworkException
+import com.bashkevich.tennisscorekeeper.core.remote.UnauthorizedActionException
 import com.bashkevich.tennisscorekeeper.core.remote.doOnError
 import com.bashkevich.tennisscorekeeper.core.remote.doOnSuccess
 import com.bashkevich.tennisscorekeeper.model.theme.domain.ScoreboardTheme
@@ -12,14 +14,12 @@ import com.bashkevich.tennisscorekeeper.model.theme.domain.toThemeBody
 import com.bashkevich.tennisscorekeeper.model.theme.repository.ThemeRepository
 import com.bashkevich.tennisscorekeeper.mvi.BaseViewModel
 import com.bashkevich.tennisscorekeeper.navigation.ScoreboardThemeDetailsRoute
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.getString
@@ -32,52 +32,55 @@ class ScoreboardThemeDetailsViewModel(
 ) : BaseViewModel<ScoreboardThemeDetailsState, ThemeDetailsUiEvent, ThemeDetailsAction>() {
 
     private val themeId: Int = savedStateHandle.toRoute<ScoreboardThemeDetailsRoute>().themeId
+    val themeNameState = TextFieldState()
 
-    private val _editedTheme = MutableStateFlow<ScoreboardTheme?>(null)
+    private val _editedTheme = MutableStateFlow(ScoreboardTheme.DEFAULT)
     private val _isSaving = MutableStateFlow(false)
+    private val _isRefreshing = MutableStateFlow(false)
 
-    private val refreshTrigger = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
-
-    private fun refreshTheme() {
-        refreshTrigger.tryEmit(Unit)
-    }
-
-    private fun fetchThemeByIdFlow(): Flow<LoadResult<Unit, Throwable>?> = flow {
-        refreshTrigger.onStart { emit(Unit) }.collect {
-            emit(null)
-            themeRepository.fetchThemeById(themeId)
-                .doOnSuccess { emit(LoadResult.Success(Unit)) }
-                .doOnError { emit(LoadResult.Error(it)) }
-        }
-    }
+    private val refreshUseCase = RefreshThemeDetailsUseCase(themeRepository, themeId)
 
     private val _networkAndTheme = combine(
-        fetchThemeByIdFlow(),
-        themeRepository.observeThemeByIdFromDatabase(themeId),
-        _editedTheme
-    ) { networkState, dbTheme, editedTheme ->
-        Triple(networkState, dbTheme, editedTheme)
+        refreshUseCase.fetchThemeByIdFlow(),
+        themeRepository.observeThemeByIdFromDatabase(themeId)
+            .filter { it != ScoreboardTheme.DEFAULT },
+    ) { networkState, dbTheme ->
+        networkState to dbTheme
+    }.onEach { (networkState, dbTheme) ->
+        if (_editedTheme.value == ScoreboardTheme.DEFAULT) {
+            themeNameState.edit { replace(0, length, dbTheme.name) }
+            _editedTheme.value = dbTheme
+        }
+        if (networkState != null) {
+            _isRefreshing.value = false
+            networkState.doOnError {
+                handleError(it)
+            }
+        }
     }
 
     override val state: StateFlow<ScoreboardThemeDetailsState> = combine(
         _networkAndTheme,
+        _editedTheme,
         _isSaving,
+        _isRefreshing,
         _action
-    ) { (networkState, dbTheme, editedTheme), isSaving, action ->
+    ) { (networkState, dbTheme), editedTheme, isSaving, isRefreshing, action ->
         val oldTheme = dbTheme
-        val currentEdited = editedTheme ?: oldTheme
 
         val loadingState = when {
-            networkState == null && currentEdited.id == 0 ->
+            networkState == null && editedTheme == ScoreboardTheme.DEFAULT ->
                 ThemeDetailsLoadingState.Loading
-            networkState is LoadResult.Error && currentEdited.id == 0 ->
+
+            networkState is LoadResult.Error && editedTheme == ScoreboardTheme.DEFAULT ->
                 ThemeDetailsLoadingState.Error(networkState.result.message ?: "Error")
+
             else ->
                 ThemeDetailsLoadingState.Content(
                     oldTheme = oldTheme,
-                    editedTheme = currentEdited,
+                    editedTheme = editedTheme,
                     isSaving = isSaving,
-                    hasChanges = oldTheme != currentEdited
+                    isRefreshing = isRefreshing
                 )
         }
 
@@ -90,33 +93,46 @@ class ScoreboardThemeDetailsViewModel(
 
     fun onEvent(uiEvent: ThemeDetailsUiEvent) {
         when (uiEvent) {
-            is ThemeDetailsUiEvent.Refresh -> refreshTheme()
-            is ThemeDetailsUiEvent.Retry -> refreshTheme()
-            is ThemeDetailsUiEvent.UpdateName -> {
-                _editedTheme.value = _editedTheme.value?.copy(name = uiEvent.name)
+            is ThemeDetailsUiEvent.Refresh -> {
+                _isRefreshing.value = true
+                refreshUseCase.refreshTheme()
             }
+
+            is ThemeDetailsUiEvent.Retry -> refreshUseCase.refreshTheme()
             is ThemeDetailsUiEvent.UpdateColor -> {
-                _editedTheme.value = uiEvent.field.applyTo(_editedTheme.value ?: return, uiEvent.color)
+                _editedTheme.value = uiEvent.field.applyTo(_editedTheme.value, uiEvent.color)
             }
+
             is ThemeDetailsUiEvent.SaveTheme -> saveTheme()
         }
     }
 
     private fun saveTheme() {
-        val edited = _editedTheme.value ?: return
+        val name = themeNameState.text.trim().toString()
         viewModelScope.launch {
             _isSaving.value = true
-            themeRepository.updateTheme(themeId, edited.toThemeBody())
+            themeRepository.updateTheme(themeId, _editedTheme.value.copy(name = name).toThemeBody())
                 .doOnSuccess {
+                    _isSaving.value = false
                     sendAction(ThemeDetailsAction.ThemeSaved)
                 }
-                .doOnError { e ->
-                    val message = if (e is NetworkException)
-                        getString(Res.string.check_internet_connection)
-                    else e.message ?: "Error"
-                    sendAction(ThemeDetailsAction.ShowError(message))
+                .doOnError {
+                    _isSaving.value = false
+                    handleError(it)
                 }
-            _isSaving.value = false
+        }
+    }
+
+    private suspend fun handleError(e: Throwable) {
+        when (e) {
+            is NetworkException ->
+                sendAction(ThemeDetailsAction.ShowError(getString(Res.string.check_internet_connection)))
+
+            is UnauthorizedActionException ->
+                sendAction(ThemeDetailsAction.ShowUnauthorizedActionError)
+
+            else ->
+                sendAction(ThemeDetailsAction.ShowError(e.message ?: "Не удалось сохранить тему"))
         }
     }
 }

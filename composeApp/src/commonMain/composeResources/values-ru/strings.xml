@@ -132,4 +132,5 @@
     <string name="theme_color_current_game_text">Текст текущей игры</string>
     <string name="old_value">Старое значение:</string>
     <string name="theme_name">Название темы</string>
+    <string name="edit_theme">Редактирование темы</string>
 </resources>

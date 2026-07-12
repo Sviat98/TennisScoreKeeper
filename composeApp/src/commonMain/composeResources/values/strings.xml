@@ -132,4 +132,5 @@
     <string name="theme_color_current_game_text">Current game text</string>
     <string name="old_value">Old value:</string>
     <string name="theme_name">Theme name</string>
+    <string name="edit_theme">Edit theme</string>
 </resources>

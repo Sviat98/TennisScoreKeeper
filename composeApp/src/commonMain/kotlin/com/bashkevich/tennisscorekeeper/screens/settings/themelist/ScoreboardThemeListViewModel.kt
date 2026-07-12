@@ -3,19 +3,13 @@ package com.bashkevich.tennisscorekeeper.screens.settings.themelist
 import androidx.lifecycle.viewModelScope
 import com.bashkevich.tennisscorekeeper.core.remote.LoadResult
 import com.bashkevich.tennisscorekeeper.core.remote.NetworkException
-import com.bashkevich.tennisscorekeeper.core.remote.doOnError
-import com.bashkevich.tennisscorekeeper.core.remote.doOnSuccess
 import com.bashkevich.tennisscorekeeper.model.theme.repository.ThemeRepository
 import com.bashkevich.tennisscorekeeper.mvi.BaseViewModel
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import org.jetbrains.compose.resources.getString
 import tennisscorekeeper.composeapp.generated.resources.Res
@@ -27,23 +21,10 @@ class ScoreboardThemeListViewModel(
 
     private val _isRefreshing = MutableStateFlow(false)
 
-    private val refreshTrigger = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
-
-    private fun refreshThemes() {
-        refreshTrigger.tryEmit(Unit)
-    }
-
-    private fun fetchThemesFlow(): Flow<LoadResult<Unit, Throwable>?> = flow {
-        refreshTrigger.onStart { emit(Unit) }.collect {
-            emit(null)
-            themeRepository.fetchThemes()
-                .doOnSuccess { emit(LoadResult.Success(Unit)) }
-                .doOnError { emit(LoadResult.Error(it)) }
-        }
-    }
+    private val refreshUseCase = RefreshThemeListUseCase(themeRepository)
 
     private val _networkAndThemes = combine(
-        fetchThemesFlow(),
+        refreshUseCase.fetchThemesFlow(),
         themeRepository.observeThemesFromDatabase()
     ) { networkState, themes ->
         networkState to themes
@@ -78,11 +59,11 @@ class ScoreboardThemeListViewModel(
 
     fun refresh() {
         _isRefreshing.value = true
-        refreshThemes()
+        refreshUseCase.refreshThemes()
     }
 
     fun retry() {
-        refreshThemes()
+        refreshUseCase.refreshThemes()
     }
 
     fun onEvent(uiEvent: ScoreboardThemeListUiEvent) {
