@@ -8,9 +8,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
+import com.bashkevich.tennisscorekeeper.model.theme.domain.LocalScoreboardTheme
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.bashkevich.tennisscorekeeper.model.match.domain.Match
@@ -44,12 +44,13 @@ fun ServingBox(
     modifier: Modifier = Modifier,
     showServe: Boolean
 ) {
+    val theme = LocalScoreboardTheme.current
     Box(modifier = Modifier.then(modifier)) {
         if (showServe) {
             Box(
                 modifier = Modifier.size(8.dp).clip(
                     CircleShape
-                ).background(color = Color.Yellow).align(Alignment.Center)
+                ).background(color = theme.serveColor).align(Alignment.Center)
             )
         }
     }

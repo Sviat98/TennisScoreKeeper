@@ -1,4 +1,4 @@
-# ast-index RulesТ
+# ast-index Rules
 
 
 ## Mandatory Search Rules

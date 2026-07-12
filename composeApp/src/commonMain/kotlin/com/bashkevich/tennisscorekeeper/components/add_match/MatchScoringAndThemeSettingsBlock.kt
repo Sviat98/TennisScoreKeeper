@@ -40,6 +40,7 @@ fun MatchScoringAndThemeSettingsBlock(
     onRetrySelectedTheme: (Int) -> Unit = {},
     onRetrySelectedRegularSet: (Int) -> Unit = {},
     onRetrySelectedDecidingSet: (Int) -> Unit = {},
+    onPreviewClick: () -> Unit = {},
 ) {
     val windowSize = currentWindowAdaptiveInfo().windowSizeClass
     val isWideScreen = windowSize.isWidthAtLeastBreakpoint(WindowSizeClass.WIDTH_DP_MEDIUM_LOWER_BOUND)
@@ -62,6 +63,7 @@ fun MatchScoringAndThemeSettingsBlock(
                         onThemeSelected = onThemeSelected,
                         onThemesFetch = onThemesFetch,
                         onRetrySelectedTheme = onRetrySelectedTheme,
+                        onPreviewClick = onPreviewClick,
                     )
                     SetsToWinBlock(
                         modifier = Modifier.weight(1f),
@@ -108,6 +110,7 @@ fun MatchScoringAndThemeSettingsBlock(
                     onThemeSelected = onThemeSelected,
                     onThemesFetch = onThemesFetch,
                     onRetrySelectedTheme = onRetrySelectedTheme,
+                    onPreviewClick = onPreviewClick,
                 )
 
                 SetsToWinBlock(

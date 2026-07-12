@@ -35,7 +35,7 @@ import com.bashkevich.tennisscorekeeper.mvi.LaunchedUiEffectHandler
 import com.bashkevich.tennisscorekeeper.components.icons.default_icons.Add
 import com.bashkevich.tennisscorekeeper.components.tournament.TournamentListItem
 import com.bashkevich.tennisscorekeeper.navigation.AddTournamentRoute
-import com.bashkevich.tennisscorekeeper.navigation.SettingsRoute
+import com.bashkevich.tennisscorekeeper.navigation.SettingsFlowRoute
 import com.bashkevich.tennisscorekeeper.navigation.TournamentRoute
 import org.jetbrains.compose.resources.stringResource
 import tennisscorekeeper.composeapp.generated.resources.Res
@@ -102,7 +102,7 @@ private fun TournamentListContent(
         modifier = Modifier.then(modifier).refreshByKeyboard(onRefresh),
         topBar = {
             TournamentListAppBarWithButton(
-                onNavigateToSettings = { navController.navigate(SettingsRoute) }
+                onNavigateToSettings = { navController.navigate(SettingsFlowRoute) }
             )
         },
         floatingActionButton = {

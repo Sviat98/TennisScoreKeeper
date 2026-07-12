@@ -26,15 +26,32 @@ data class MatchDetailsRoute(val id: Int)
 data object LoginRoute
 
 @Serializable
-@SerialName("profile")
-data object ProfileRoute
-@Serializable
 @SerialName("addMatch")
 //@SerialName("matches/add") распознает как MatchDetailsRoute(id=add) на НЕ-Андроид
 data class AddMatchRoute(val tournamentId: Int = 0)
 
 @Serializable
+@SerialName("settings_flow")
+data object SettingsFlowRoute
+
+@Serializable
 @SerialName("settings")
 data object SettingsRoute
+
+@Serializable
+@SerialName("general_settings")
+data object GeneralSettingsRoute
+
+@Serializable
+@SerialName("themes")
+data object ScoreboardThemeListRoute
+
+@Serializable
+@SerialName("themes")
+data class ScoreboardThemeDetailsRoute(val themeId: Int)
+
+@Serializable
+@SerialName("set_templates")
+data object SetTemplateListRoute
 
 expect fun NavGraphBuilder.platformSpecificRoutes()

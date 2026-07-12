@@ -9,8 +9,10 @@ class AuthLocalDataSource(
     private val keyValueStorage: KeyValueStorage
 ) {
     fun observePlayerId(): Flow<String> = keyValueStorage.observePlayerId()
-    suspend fun savePlayerId(playerId: String) {
+    suspend fun saveLoggedInPlayer(playerId: String, name: String, surname: String) {
         keyValueStorage.savePlayerId(playerId)
+        keyValueStorage.savePlayerName(name)
+        keyValueStorage.savePlayerSurname(surname)
     }
 
     suspend fun saveTokens(accessToken: String, refreshToken: String) {
@@ -20,4 +22,8 @@ class AuthLocalDataSource(
     suspend fun getRefreshToken(): String {
        return keyValueStorage.observeRefreshToken().distinctUntilChanged().first()
     }
+
+    fun observePlayerName(): Flow<String> = keyValueStorage.observePlayerName()
+
+    fun observePlayerSurname(): Flow<String> = keyValueStorage.observePlayerSurname()
 }

@@ -5,6 +5,9 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import com.bashkevich.tennisscorekeeper.core.remote.LoadResult
 import com.bashkevich.tennisscorekeeper.core.remote.NetworkException
+import com.bashkevich.tennisscorekeeper.core.remote.UnauthorizedActionException
+import com.bashkevich.tennisscorekeeper.core.remote.doOnError
+import com.bashkevich.tennisscorekeeper.core.remote.doOnSuccess
 import org.jetbrains.compose.resources.getString
 import tennisscorekeeper.composeapp.generated.resources.Res
 import tennisscorekeeper.composeapp.generated.resources.check_internet_connection
@@ -203,6 +206,9 @@ class TournamentViewModel(
     private fun changeTournamentStatus(tournamentStatus: TournamentStatus) {
         viewModelScope.launch {
             tournamentRepository.changeTournamentStatus(tournamentId, tournamentStatus)
+                .doOnError {
+                    handleError(it)
+                }
         }
     }
 
@@ -210,17 +216,17 @@ class TournamentViewModel(
         viewModelScope.launch {
             _isUploadInProgress.value = true
 
-            val loadResult = participantRepository.uploadParticipantsFile(
+            participantRepository.uploadParticipantsFile(
                 tournamentId = tournamentId,
                 participantsFile = _participantsFile.value
-            )
-
-            if (loadResult is LoadResult.Success) {
+            ).doOnSuccess {
                 _isUploadInProgress.value = false
                 _participantsFile.value = EMPTY_EXCEL_FILE
-            } else {
+            }.doOnError {
                 _isUploadInProgress.value = false
+                handleError(it)
             }
+
         }
     }
 
@@ -236,10 +242,14 @@ class TournamentViewModel(
     }
 
     private suspend fun handleError(e: Throwable) {
-        val message = if (e is NetworkException)
-            getString(Res.string.check_internet_connection)
-        else e.message ?: "Error"
-        sendAction(TournamentAction.ShowError(message))
+        when (e) {
+            is NetworkException ->
+                sendAction(TournamentAction.ShowError(getString(Res.string.check_internet_connection)))
+            is UnauthorizedActionException ->
+                sendAction(TournamentAction.ShowUnauthorizedError)
+            else ->
+                sendAction(TournamentAction.ShowError(e.message ?: "Error"))
+        }
     }
 
     private data class TournamentDetailsData(

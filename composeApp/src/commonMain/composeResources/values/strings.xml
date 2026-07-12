@@ -98,6 +98,7 @@
     <string name="next_player_to_serve">Next player to serve</string>
 
     <!-- Scoreboard -->
+    <string name="theme_preview">Theme Preview</string>
     <string name="first_participant_won">First participant won</string>
     <string name="second_participant_won">Second participant won</string>
     <string name="ret">Ret.</string>
@@ -113,4 +114,23 @@
     <!-- Set Template -->
     <string name="regular_set_template">Regular Set Format</string>
     <string name="deciding_set_template">Deciding Set Format</string>
+
+    <!-- Settings -->
+    <string name="general_settings">General Settings</string>
+    <string name="scoreboard_appearance">Scoreboard Appearance</string>
+    <string name="set_templates">Set Templates</string>
+
+    <!-- Theme Details -->
+    <string name="theme_color_main_background">Main background color</string>
+    <string name="theme_color_main_text">Main text color</string>
+    <string name="theme_color_serve">Serve color</string>
+    <string name="theme_color_previous_set_win">Previous set win text</string>
+    <string name="theme_color_previous_set_lose">Previous set lose text</string>
+    <string name="theme_color_current_set_background">Current set background</string>
+    <string name="theme_color_current_set_text">Current set text</string>
+    <string name="theme_color_current_game_background">Current game background</string>
+    <string name="theme_color_current_game_text">Current game text</string>
+    <string name="old_value">Old value:</string>
+    <string name="theme_name">Theme name</string>
+    <string name="edit_theme">Edit theme</string>
 </resources>

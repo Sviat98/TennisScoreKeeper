@@ -1,10 +1,12 @@
 package com.bashkevich.tennisscorekeeper.model.theme.domain
 
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
 import com.bashkevich.tennisscorekeeper.model.theme.local.ThemeEntity
 import com.bashkevich.tennisscorekeeper.model.theme.remote.ThemeColor
 import com.bashkevich.tennisscorekeeper.model.theme.remote.ThemeContent
 import com.bashkevich.tennisscorekeeper.model.theme.remote.ThemeDto
+import com.bashkevich.tennisscorekeeper.model.theme.remote.ThemeBody
 import kotlinx.serialization.json.Json
 
 data class ScoreboardTheme(
@@ -23,23 +25,46 @@ data class ScoreboardTheme(
     companion object {
         val DEFAULT = ScoreboardTheme(
             id = 0,
-            name = "",
-            mainBackgroundColor = Color.Blue,
+            name = "Default",
+            mainBackgroundColor = Color.Black,
             mainTextColor = Color.White,
             serveColor = Color.White,
             previousSetWinTextColor = Color.White,
-            previousSetLoseTextColor = Color.White,
-            currentSetBackgroundColor = Color.White,
-            currentSetTextColor = Color.White,
+            previousSetLoseTextColor = Color.White.copy(alpha = 0.7f),
+            currentSetBackgroundColor = Color.Gray,
+            currentSetTextColor = Color.Black,
             currentGameBackgroundColor = Color.White,
-            currentGameTextColor = Color.White,
+            currentGameTextColor = Color.Black,
+        )
+
+        val DEFAULT_1 = ScoreboardTheme(
+            id = -1,
+            name = "Default 111",
+            mainBackgroundColor = Color(0xFF142c6c),
+            mainTextColor = Color.White,
+            serveColor = Color.Yellow,
+            previousSetWinTextColor = Color.White,
+            previousSetLoseTextColor = Color.White.copy(alpha = 0.5f),
+            currentSetBackgroundColor = Color.Yellow,
+            currentSetTextColor = Color.Black,
+            currentGameBackgroundColor = Color.White,
+            currentGameTextColor = Color.Black,
         )
     }
+}
+
+val LocalScoreboardTheme = staticCompositionLocalOf<ScoreboardTheme> {
+    error("No ScoreboardTheme provided")
 }
 
 fun String.convertColor() = "FF$this".toLong(16)
 
 fun ThemeColor.toColor() = Color(color.removePrefix("#").convertColor()).copy(alpha = alpha)
+
+fun Color.toThemeColor(): ThemeColor {
+    val hex = value.toHexString().substring(2, 8)
+    return ThemeColor(color = "#$hex", alpha = alpha)
+}
 
 fun ThemeDto.toDomain() = ScoreboardTheme(
     id = id.toInt(),
@@ -71,3 +96,18 @@ fun ThemeEntity.toDomain(): ScoreboardTheme {
         currentGameTextColor = content.currentGameTextColor.toColor(),
     )
 }
+
+fun ScoreboardTheme.toThemeBody() = ThemeBody(
+    name = name,
+    content = ThemeContent(
+        mainBackgroundColor = mainBackgroundColor.toThemeColor(),
+        mainTextColor = mainTextColor.toThemeColor(),
+        serveColor = serveColor.toThemeColor(),
+        previousSetWinTextColor = previousSetWinTextColor.toThemeColor(),
+        previousSetLoseTextColor = previousSetLoseTextColor.toThemeColor(),
+        currentSetBackgroundColor = currentSetBackgroundColor.toThemeColor(),
+        currentSetTextColor = currentSetTextColor.toThemeColor(),
+        currentGameBackgroundColor = currentGameBackgroundColor.toThemeColor(),
+        currentGameTextColor = currentGameTextColor.toThemeColor(),
+    )
+)

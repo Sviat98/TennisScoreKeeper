@@ -33,6 +33,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.bashkevich.tennisscorekeeper.LocalNavHostController
 import com.bashkevich.tennisscorekeeper.components.TournamentDetailsAppBar
+import com.bashkevich.tennisscorekeeper.components.showUnauthorizedActionSnackbar
 import com.bashkevich.tennisscorekeeper.components.modifier.refreshByKeyboard
 import com.bashkevich.tennisscorekeeper.components.tournament.ChangeTournamentStatusButton
 import com.bashkevich.tennisscorekeeper.components.icons.IconGroup
@@ -43,7 +44,7 @@ import com.bashkevich.tennisscorekeeper.model.tournament.remote.toResource
 import com.bashkevich.tennisscorekeeper.model.tournament.remote.TournamentStatus
 import com.bashkevich.tennisscorekeeper.navigation.AddMatchRoute
 import com.bashkevich.tennisscorekeeper.navigation.MatchDetailsRoute
-import com.bashkevich.tennisscorekeeper.navigation.SettingsRoute
+import com.bashkevich.tennisscorekeeper.navigation.SettingsFlowRoute
 import com.bashkevich.tennisscorekeeper.navigation.TournamentTab
 import com.bashkevich.tennisscorekeeper.screens.matchlist.MatchListScreen
 import com.bashkevich.tennisscorekeeper.screens.participantlist.ParticipantListScreen
@@ -94,6 +95,8 @@ private fun TournamentContent(
         when (currentAction) {
             is TournamentAction.ShowError ->
                 snackbarHostState.showSnackbar(message = currentAction.message)
+            is TournamentAction.ShowUnauthorizedError ->
+                snackbarHostState.showUnauthorizedActionSnackbar(navController = navController)
         }
     }
 
@@ -105,7 +108,7 @@ private fun TournamentContent(
         topBar = {
             TournamentDetailsAppBar(
                 onBack = { navController.navigateUp() },
-                onNavigateToSettings = { navController.navigate(SettingsRoute) }
+                onNavigateToSettings = { navController.navigate(SettingsFlowRoute) }
             )
         },
         floatingActionButton = {

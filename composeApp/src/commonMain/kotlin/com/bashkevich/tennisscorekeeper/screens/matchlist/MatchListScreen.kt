@@ -20,6 +20,7 @@ import androidx.compose.ui.unit.dp
 import com.bashkevich.tennisscorekeeper.components.modifier.hoverScaleEffect
 import com.bashkevich.tennisscorekeeper.components.scoreboard.short.ShortMatchScoreboardCard
 import com.bashkevich.tennisscorekeeper.model.match.domain.ShortMatch
+import com.bashkevich.tennisscorekeeper.model.theme.domain.ScoreboardTheme
 import com.bashkevich.tennisscorekeeper.screens.tournamentdetails.MatchListLoadingState
 import org.jetbrains.compose.resources.stringResource
 import tennisscorekeeper.composeapp.generated.resources.Res
@@ -87,6 +88,7 @@ fun MatchListScreen(
                             ShortMatchScoreboardCard(
                                 modifier = Modifier.widthIn(max = 400.dp).fillMaxWidth().hoverScaleEffect(),
                                 match = match,
+                                theme = ScoreboardTheme.DEFAULT,
                                 onClick = { onItemClick(match) }
                             )
                         }

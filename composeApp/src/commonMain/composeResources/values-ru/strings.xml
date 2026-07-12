@@ -98,6 +98,7 @@
     <string name="next_player_to_serve">Следующий подающий</string>
 
     <!-- Scoreboard -->
+    <string name="theme_preview">Предпросмотр темы</string>
     <string name="first_participant_won">Первый участник победил</string>
     <string name="second_participant_won">Второй участник победил</string>
     <string name="ret">Ret.</string>
@@ -113,4 +114,23 @@
     <!-- Set Template -->
     <string name="regular_set_template">Формат обычного сета</string>
     <string name="deciding_set_template">Формат решающего сета</string>
+
+    <!-- Settings -->
+    <string name="general_settings">Общие настройки</string>
+    <string name="scoreboard_appearance">Оформление табло</string>
+    <string name="set_templates">Шаблоны сетов</string>
+
+    <!-- Theme Details -->
+    <string name="theme_color_main_background">Основной цвет фона</string>
+    <string name="theme_color_main_text">Основной цвет текста</string>
+    <string name="theme_color_serve">Цвет подачи</string>
+    <string name="theme_color_previous_set_win">Текст выигранного сета</string>
+    <string name="theme_color_previous_set_lose">Текст проигранного сета</string>
+    <string name="theme_color_current_set_background">Фон текущего сета</string>
+    <string name="theme_color_current_set_text">Текст текущего сета</string>
+    <string name="theme_color_current_game_background">Фон текущей игры</string>
+    <string name="theme_color_current_game_text">Текст текущей игры</string>
+    <string name="old_value">Старое значение:</string>
+    <string name="theme_name">Название темы</string>
+    <string name="edit_theme">Редактирование темы</string>
 </resources>

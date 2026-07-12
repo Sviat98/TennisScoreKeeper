@@ -10,11 +10,8 @@ import com.bashkevich.tennisscorekeeper.model.match.domain.toDomain
 import com.bashkevich.tennisscorekeeper.model.match.local.MatchLocalDataSource
 import com.bashkevich.tennisscorekeeper.model.match.local.toDomain
 import com.bashkevich.tennisscorekeeper.model.match.local.toMatchDomain
-import com.bashkevich.tennisscorekeeper.model.match.local.toMatchGameEntity
-import com.bashkevich.tennisscorekeeper.model.match.local.toMatchSetEntities
-import com.bashkevich.tennisscorekeeper.model.match.local.toParticipantInMatchEntities
+import com.bashkevich.tennisscorekeeper.model.match.local.toMatchWithParticipantsEntity
 import com.bashkevich.tennisscorekeeper.model.match.remote.MatchBody
-import com.bashkevich.tennisscorekeeper.model.match.remote.MatchDto
 import com.bashkevich.tennisscorekeeper.model.match.remote.MatchRemoteDataSource
 import com.bashkevich.tennisscorekeeper.model.match.remote.body.ChangeScoreBody
 import com.bashkevich.tennisscorekeeper.model.match.remote.body.MatchStatus
@@ -44,7 +41,7 @@ class MatchRepositoryImpl(
     ): LoadResult<Unit, Throwable> {
         return matchRemoteDataSource.addNewMatch(tournamentId = tournamentId.toString(), matchBody = matchBody)
             .doOnSuccess { shortMatchDto ->
-                matchLocalDataSource.insertMatch(tournamentId, shortMatchDto)
+                matchLocalDataSource.insertMatch(shortMatchDto.toMatchWithParticipantsEntity())
                 tournamentLocalDataSource.incrementUncompletedMatches(tournamentId)
             }
             .mapSuccess {  }
@@ -53,7 +50,8 @@ class MatchRepositoryImpl(
     override suspend fun fetchMatchesForTournament(tournamentId: Int): LoadResult<Unit, Throwable> {
         return matchRemoteDataSource.getMatchesByTournament(tournamentId.toString())
             .doOnSuccess { shortMatchDtos ->
-                matchLocalDataSource.replaceMatchesForTournament(tournamentId, shortMatchDtos)
+                val entities = shortMatchDtos.map { it.toMatchWithParticipantsEntity() }
+                matchLocalDataSource.replaceMatchesForTournament(tournamentId, entities)
             }
             .mapSuccess { }
     }
@@ -84,32 +82,13 @@ class MatchRepositoryImpl(
             .onStart { matchRemoteDataSource.connectToMatchUpdates(matchId.toString()) }
             .onEach { result ->
                 println("observeMatchUpdatesFromNetwork = $result")
-                result.doOnSuccess {
-                    saveMatchDetailsToDb(it)
-                }
+                result.doOnSuccess { matchDto ->
+                    matchLocalDataSource.insertMatch(matchDto.toMatchWithParticipantsEntity())                }
             }
             .map { result -> result.mapSuccess { matchDto -> matchDto.toDomain() } }
 
     override fun observeConnectionState(): StateFlow<ConnectionState> =
         matchRemoteDataSource.observeConnectionState()
-
-    private suspend fun saveMatchDetailsToDb(matchDto: MatchDto) {
-        val existingMatch = matchLocalDataSource.getMatchById(matchDto.id.toInt()) ?: return
-
-        val matchEntity = existingMatch.copy(
-            status = matchDto.status.name,
-            videoLink = matchDto.videoLink,
-            pointShift = matchDto.pointShift,
-            currentSetMode = matchDto.currentSetMode?.name
-        )
-
-        matchLocalDataSource.updateMatchDetails(
-            match = matchEntity,
-            sets = matchDto.toMatchSetEntities(),
-            game = matchDto.toMatchGameEntity(),
-            participants = matchDto.toParticipantInMatchEntities()
-        )
-    }
 
     override suspend fun updateMatchScore(matchId: Int, participantId: Int, scoreType: ScoreType): LoadResult<ResponseMessage, Throwable> {
         val changeScoreBody = ChangeScoreBody(playerId = participantId.toString(), scoreType = scoreType)

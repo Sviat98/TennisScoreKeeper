@@ -63,4 +63,5 @@ data class TournamentState(
 @Immutable
 sealed class TournamentAction : UiAction {
     data class ShowError(val message: String) : TournamentAction()
+    data object ShowUnauthorizedError : TournamentAction()
 }

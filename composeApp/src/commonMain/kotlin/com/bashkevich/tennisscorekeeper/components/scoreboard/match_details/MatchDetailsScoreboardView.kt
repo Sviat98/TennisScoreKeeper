@@ -1,39 +1,37 @@
 package com.bashkevich.tennisscorekeeper.components.scoreboard.match_details
 
 import androidx.compose.foundation.background
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.times
 import com.bashkevich.tennisscorekeeper.components.scoreboard.components.ColorScoreboardComponent
-import com.bashkevich.tennisscorekeeper.components.scoreboard.components.CurrentGameInProgressComponent
+import com.bashkevich.tennisscorekeeper.components.scoreboard.components.MatchDetailsCurrentGameComponent
 import com.bashkevich.tennisscorekeeper.components.scoreboard.components.CurrentSetComponent
 import com.bashkevich.tennisscorekeeper.components.scoreboard.components.PrevSetScoreboardComponent
 import com.bashkevich.tennisscorekeeper.components.scoreboard.components.SeedScoreboardComponent
 import com.bashkevich.tennisscorekeeper.components.scoreboard.components.ServeScoreboardComponent
 import com.bashkevich.tennisscorekeeper.components.scoreboard.components.WinnerAndRetiredParticipantComponent
 import com.bashkevich.tennisscorekeeper.model.match.domain.Match
+import com.bashkevich.tennisscorekeeper.model.theme.domain.LocalScoreboardTheme
+import com.bashkevich.tennisscorekeeper.model.theme.domain.ScoreboardTheme
 
 @Composable
 fun MatchDetailsScoreboardView(
     modifier: Modifier = Modifier,
     match: Match,
+    theme: ScoreboardTheme,
 ) {
-    var columnHeight by remember { mutableStateOf(0.dp) }
-
     val firstParticipant = match.firstParticipant
     val secondParticipant = match.secondParticipant
 
@@ -45,31 +43,29 @@ fun MatchDetailsScoreboardView(
 
     val spaceBetweenParticipants = 2 * (verticalPadding+extraPaddingFromCenter)
 
+    CompositionLocalProvider(LocalScoreboardTheme provides theme) {
     Row(
-        modifier = Modifier.then(modifier)
+        modifier = Modifier
+            .height(IntrinsicSize.Min)
+            .then(modifier)
     ) {
         ColorScoreboardComponent(
-            modifier = Modifier.height(columnHeight).width(8.dp),
+            modifier = Modifier.fillMaxHeight().width(8.dp),
             match = match
         )
         Row(
-            modifier = Modifier.background(color = Color(0xFF142c6c))
+            modifier = Modifier
+                .height(IntrinsicSize.Min)
+                .background(color = theme.mainBackgroundColor)
         ) {
-            val density = LocalDensity.current
-
             SeedScoreboardComponent(
-                modifier = Modifier.height(columnHeight),
+                modifier = Modifier.fillMaxHeight(),
                 firstParticipantSeed = match.firstParticipant.seed,
                 secondParticipantSeed = match.secondParticipant.seed,
                 seedNumberFontSize = 11.sp
             )
             ParticipantOnScoreboardDetailsView(
                 modifier = Modifier.widthIn(min = 80.dp)
-                    .onGloballyPositioned { layoutCoordinates ->
-                        columnHeight = with(density) {
-                            layoutCoordinates.size.height.toDp()
-                        }
-                    }
                     .padding(top = verticalPadding, bottom = verticalPadding, start = 4.dp, end = 8.dp),
                 spaceBetweenParticipants = spaceBetweenParticipants,
                 match = match,
@@ -88,7 +84,7 @@ fun MatchDetailsScoreboardView(
 
             val defaultFontSize = 16.sp
             WinnerAndRetiredParticipantComponent(
-                modifier = Modifier.height(columnHeight),
+                modifier = Modifier.fillMaxHeight(),
                 firstParticipantId = firstParticipantId,
                 secondParticipantId = secondParticipantId,
                 winnerParticipantId = winnerParticipantId,
@@ -97,7 +93,7 @@ fun MatchDetailsScoreboardView(
                 retiredLabelFontSize = defaultFontSize
             )
             ServeScoreboardComponent(
-                modifier = Modifier.height(columnHeight),
+                modifier = Modifier.fillMaxHeight(),
                 match = match
             )
 
@@ -118,7 +114,7 @@ fun MatchDetailsScoreboardView(
 
                 // Если сет закончился на счете 0:0 (остановка произошла в начале матча или после сыгранного сета), то его не выводим
                 PrevSetScoreboardComponent(
-                    modifier = Modifier.height(columnHeight).padding(horizontal = 4.dp),
+                    modifier = Modifier.fillMaxHeight().padding(horizontal = 4.dp),
                     prevSet = prevSet,
                     retiredParticipantNumber = retiredParticipantNumber,
                     numberFontSize = defaultFontSize
@@ -127,19 +123,20 @@ fun MatchDetailsScoreboardView(
             val currentSet = match.currentSet
             currentSet?.let {
                 CurrentSetComponent(
-                    modifier = Modifier.height(columnHeight).width(columnHeight / 2)
+                    modifier = Modifier.fillMaxHeight().aspectRatio(0.5f)
                         .padding(horizontal = 1.dp),
                     currentSet = currentSet,
                     numberFontSize = defaultFontSize
                 )
             }
             match.currentGame?.let {
-                CurrentGameInProgressComponent(
-                    modifier = Modifier.height(columnHeight).width(columnHeight/2).padding(end = 1.dp),
+                MatchDetailsCurrentGameComponent(
+                    modifier = Modifier.fillMaxHeight().aspectRatio(0.5f).padding(end = 1.dp),
                     currentGame = match.currentGame,
                     fontSize = defaultFontSize
                 )
             }
         }
+    }
     }
 }

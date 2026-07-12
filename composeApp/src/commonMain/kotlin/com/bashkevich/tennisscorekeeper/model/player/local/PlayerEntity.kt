@@ -4,7 +4,7 @@ import androidx.room3.ColumnInfo
 import androidx.room3.Entity
 import androidx.room3.PrimaryKey
 import com.bashkevich.tennisscorekeeper.model.player.domain.PlayerInParticipant
-import com.bashkevich.tennisscorekeeper.model.player.remote.PlayerInParticipantDto
+import com.bashkevich.tennisscorekeeper.model.player.remote.PlayerDto
 
 @Entity(tableName = "players")
 data class PlayerEntity(
@@ -17,7 +17,7 @@ data class PlayerEntity(
     val name: String,
 )
 
-fun PlayerInParticipantDto.toEntity() = PlayerEntity(
+fun PlayerDto.toEntity() = PlayerEntity(
     id = id.toInt(),
     surname = surname,
     name = name,

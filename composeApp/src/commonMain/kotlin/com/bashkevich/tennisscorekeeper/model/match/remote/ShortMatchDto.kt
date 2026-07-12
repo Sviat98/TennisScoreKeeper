@@ -9,6 +9,8 @@ import kotlinx.serialization.SerialName
 data class ShortMatchDto(
     @SerialName("id")
     val id: String,
+    @SerialName("tournament_id")
+    val tournamentId: String,
     @SerialName("first_participant")
     val firstParticipant: ParticipantInShortMatchDto,
     @SerialName("second_participant")

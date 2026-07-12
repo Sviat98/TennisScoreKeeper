@@ -4,6 +4,7 @@ import androidx.room3.ColumnInfo
 import androidx.room3.Entity
 import androidx.room3.Index
 import androidx.room3.PrimaryKey
+import com.bashkevich.tennisscorekeeper.model.match.remote.MatchDto
 import com.bashkevich.tennisscorekeeper.model.match.remote.ShortMatchDto
 
 @Entity(
@@ -36,9 +37,9 @@ data class MatchEntity(
     val currentSetMode: String?,
 )
 
-fun ShortMatchDto.toMatchEntity(tournamentId: Int) = MatchEntity(
+fun ShortMatchDto.toMatchEntity() = MatchEntity(
     id = id.toInt(),
-    tournamentId = tournamentId,
+    tournamentId = tournamentId.toInt(),
     firstParticipantId = firstParticipant.id.toInt(),
     secondParticipantId = secondParticipant.id.toInt(),
     pointShift = 0,
@@ -46,4 +47,16 @@ fun ShortMatchDto.toMatchEntity(tournamentId: Int) = MatchEntity(
     themeId = themeId.toInt(),
     status = status.name,
     currentSetMode = null,
+)
+
+fun MatchDto.toMatchEntity() = MatchEntity(
+    id = id.toInt(),
+    tournamentId = tournamentId.toInt(),
+    firstParticipantId = firstParticipant.id.toInt(),
+    secondParticipantId = secondParticipant.id.toInt(),
+    pointShift = pointShift,
+    videoLink = videoLink,
+    themeId = themeId.toInt(),
+    status = status.name,
+    currentSetMode = currentSetMode?.name,
 )

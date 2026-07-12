@@ -2,6 +2,7 @@ package com.bashkevich.tennisscorekeeper.model.theme.repository
 
 import com.bashkevich.tennisscorekeeper.core.remote.LoadResult
 import com.bashkevich.tennisscorekeeper.model.theme.domain.ScoreboardTheme
+import com.bashkevich.tennisscorekeeper.model.theme.remote.ThemeBody
 import kotlinx.coroutines.flow.Flow
 
 interface ThemeRepository {
@@ -11,4 +12,5 @@ interface ThemeRepository {
     suspend fun fetchThemeById(id: Int): LoadResult<Unit, Throwable>
     fun observeThemesFromDatabase(): Flow<List<ScoreboardTheme>>
     fun observeThemeByIdFromDatabase(id: Int): Flow<ScoreboardTheme>
+    suspend fun updateTheme(id: Int, themeBody: ThemeBody): LoadResult<Unit, Throwable>
 }

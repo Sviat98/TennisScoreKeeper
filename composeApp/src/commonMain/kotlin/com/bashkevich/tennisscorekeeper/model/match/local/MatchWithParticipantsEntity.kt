@@ -15,8 +15,11 @@ import com.bashkevich.tennisscorekeeper.model.participant.domain.ParticipantInSh
 import com.bashkevich.tennisscorekeeper.model.participant.domain.ParticipantInShortSinglesMatch
 import com.bashkevich.tennisscorekeeper.model.participant.domain.ParticipantInSinglesMatch
 import com.bashkevich.tennisscorekeeper.model.participant.domain.TennisParticipantInMatch
+import com.bashkevich.tennisscorekeeper.model.match.remote.MatchDto
+import com.bashkevich.tennisscorekeeper.model.match.remote.ShortMatchDto
 import com.bashkevich.tennisscorekeeper.model.participant.local.ParticipantEntity
 import com.bashkevich.tennisscorekeeper.model.participant.local.ParticipantWithPlayersEntity
+import com.bashkevich.tennisscorekeeper.model.participant.local.toEntity
 import com.bashkevich.tennisscorekeeper.model.player.domain.PlayerInDoublesMatch
 import com.bashkevich.tennisscorekeeper.model.player.domain.PlayerInSinglesMatch
 import com.bashkevich.tennisscorekeeper.model.player.local.toDomain
@@ -189,4 +192,38 @@ private fun String.toColorOrDefault(): Color {
     return if (this.isEmpty()) Color.White
     else try { Color("FF$this".toLong(16)) }
     catch (_: Exception) { Color.White }
+}
+
+fun ShortMatchDto.toMatchWithParticipantsEntity(): MatchWithParticipantsEntity {
+    val match = toMatchEntity()
+    return MatchWithParticipantsEntity(
+        match = match,
+        sets = toMatchSetEntities(),
+        game = toMatchGameEntity(),
+        firstParticipant = ParticipantInMatchWithDetails(
+            participantInMatch = firstParticipant.toEntity(matchId = match.id),
+            participant = firstParticipant.toEntity(tournamentId = match.tournamentId),
+        ),
+        secondParticipant = ParticipantInMatchWithDetails(
+            participantInMatch = secondParticipant.toEntity(matchId = match.id),
+            participant = secondParticipant.toEntity(tournamentId = match.tournamentId),
+        ),
+    )
+}
+
+fun MatchDto.toMatchWithParticipantsEntity(): MatchWithParticipantsEntity {
+    val match = toMatchEntity()
+    return MatchWithParticipantsEntity(
+        match = match,
+        sets = toMatchSetEntities(),
+        game = toMatchGameEntity(),
+        firstParticipant = ParticipantInMatchWithDetails(
+            participantInMatch = firstParticipant.toEntity(matchId = match.id),
+            participant = firstParticipant.toEntity(tournamentId = match.tournamentId),
+        ),
+        secondParticipant = ParticipantInMatchWithDetails(
+            participantInMatch = secondParticipant.toEntity(matchId = match.id),
+            participant = secondParticipant.toEntity(tournamentId = match.tournamentId),
+        ),
+    )
 }
