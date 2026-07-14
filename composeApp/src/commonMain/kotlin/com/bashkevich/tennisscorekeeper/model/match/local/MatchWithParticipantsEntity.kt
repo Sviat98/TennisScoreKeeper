@@ -73,6 +73,7 @@ fun MatchWithParticipantsEntity.toDomain(): ShortMatch {
         previousSets = previousSets,
         currentSet = currentSet,
         currentGame = game?.toDomain(),
+        themeId = match.themeId,
     )
 }
 

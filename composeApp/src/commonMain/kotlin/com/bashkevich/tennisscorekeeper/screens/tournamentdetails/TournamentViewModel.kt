@@ -20,6 +20,8 @@ import com.bashkevich.tennisscorekeeper.model.tournament.domain.Tournament
 import com.bashkevich.tennisscorekeeper.model.tournament.remote.TournamentStatus
 import com.bashkevich.tennisscorekeeper.model.tournament.repository.TournamentRepository
 import com.bashkevich.tennisscorekeeper.model.match.repository.MatchRepository
+import com.bashkevich.tennisscorekeeper.model.theme.domain.ScoreboardTheme
+import com.bashkevich.tennisscorekeeper.model.theme.repository.ThemeRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -27,6 +29,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
@@ -38,7 +41,8 @@ class TournamentViewModel(
     private val savedStateHandle: SavedStateHandle,
     private val tournamentRepository: TournamentRepository,
     private val matchRepository: MatchRepository,
-    private val participantRepository: ParticipantRepository
+    private val participantRepository: ParticipantRepository,
+    private val themeRepository: ThemeRepository
 ) : BaseViewModel<TournamentState, TournamentUiEvent, TournamentAction>() {
 
     private val tournamentId: Int = savedStateHandle.toRoute<TournamentRoute>().tournamentId
@@ -50,7 +54,8 @@ class TournamentViewModel(
     private val refreshTournamentDetails = RefreshTournamentDetailsUseCase(
         tournamentRepository = tournamentRepository,
         matchRepository = matchRepository,
-        participantRepository = participantRepository
+        participantRepository = participantRepository,
+        themeRepository = themeRepository
     )
 
     private val _isRefreshing = MutableStateFlow(false)
@@ -74,12 +79,20 @@ class TournamentViewModel(
         participantRepository.observeParticipantsForTournament(tournamentId)
     ) { network, db -> network to db }
 
+    // Темы матчей из локальной БД (ключ — themeId). Подгружаются параллельно в
+    // RefreshTournamentDetailsUseCase.ensureMatchThemesLoaded вместе со списком матчей.
+    private val themesData =
+        themeRepository.observeThemesFromDatabase().map { themes ->
+            themes.associateBy { it.id }
+        }
+
     private val _data = combine(
         tournamentDetailsData,
         matchesData,
         participantsData,
+        themesData,
         _currentTab
-    ) { tournamentDetails, matches, participants, tab ->
+    ) { tournamentDetails, matches, participants, themes, tab ->
         val tabNetworkState = when (tab) {
             TournamentTab.MATCHES -> matches.first
             TournamentTab.PARTICIPANTS -> participants.first
@@ -107,7 +120,7 @@ class TournamentViewModel(
             hasTabOpened[TournamentTab.PARTICIPANTS] = true
         }
 
-        TournamentDetailsData(tournamentDetails, matches, participants, tab)
+        TournamentDetailsData(tournamentDetails, matches, participants, themes, tab)
     }
 
     override val state: StateFlow<TournamentState> = combine(
@@ -137,7 +150,7 @@ class TournamentViewModel(
                 MatchListLoadingState.InitialError
 
             else ->
-                MatchListLoadingState.Content(matchesList)
+                MatchListLoadingState.Content(matchesList, data.themes)
         }
 
         val participantListLoadingState = when {
@@ -256,6 +269,7 @@ class TournamentViewModel(
         val tournamentDetails: Pair<LoadResult<Unit, Throwable>?, Tournament>,
         val matches: Pair<LoadResult<Unit, Throwable>?, List<ShortMatch>>,
         val participants: Pair<LoadResult<Unit, Throwable>?, List<TennisParticipant>>,
+        val themes: Map<Int, ScoreboardTheme>,
         val tab: TournamentTab
     )
 }

@@ -63,6 +63,7 @@
     <string name="couldnt_load_data">Couldn\'t load data</string>
     <string name="pull_down_to_update">Pull down to update</string>
     <string name="match_list_empty">Match list is empty</string>
+    <string name="theme_load_error">Couldn\'t load theme</string>
     <string name="participant_list_empty">Participant list is empty</string>
     <string name="connection_with_scoreboard_lost">Connection with scoreboard lost</string>
     <string name="try_again">Try Again</string>
