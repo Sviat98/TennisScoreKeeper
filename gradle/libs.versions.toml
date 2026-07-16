@@ -19,6 +19,7 @@ kotlin = "2.4.0"
 ksp = "2.3.5"
 kotlinx-serialization = "1.11.0"
 koinBom = "4.2.2"
+koinPlugin = "1.0.1"
 ktor = "3.5.1"
 logback = "1.5.37"
 slf4j = "1.7.36"
@@ -113,3 +114,4 @@ ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 build-konfig = {id = "com.codingfeline.buildkonfig" , version.ref = "build-konfig" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 androidx-room3 = { id = "androidx.room3", version.ref = "room" }
+koin-compiler = { id = "io.insert-koin.compiler.plugin", version.ref = "koinPlugin" }

@@ -11,6 +11,7 @@ plugins {
     alias(libs.plugins.kotlinx.serialization)
     alias(libs.plugins.build.konfig)
     alias(libs.plugins.androidx.room3)
+    alias(libs.plugins.koin.compiler)
 }
 
 kotlin {
