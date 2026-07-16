@@ -6,17 +6,13 @@ import com.bashkevich.tennisscorekeeper.model.auth.repository.AuthRepository
 import com.bashkevich.tennisscorekeeper.model.auth.repository.AuthRepositoryImpl
 import com.bashkevich.tennisscorekeeper.screens.login.LoginViewModel
 import com.bashkevich.tennisscorekeeper.screens.settings.main.SettingsViewModel
-import org.koin.core.module.dsl.bind
-import org.koin.core.module.dsl.singleOf
-import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
+import org.koin.plugin.module.dsl.*
 
 val authModule = module {
-    singleOf(::AuthRemoteDataSource)
-    singleOf(::AuthLocalDataSource)
-    singleOf(::AuthRepositoryImpl){
-        bind<AuthRepository>()
-    }
-    viewModelOf(::LoginViewModel)
-    viewModelOf(::SettingsViewModel)
+    single<AuthRemoteDataSource>()
+    single<AuthLocalDataSource>()
+    single<AuthRepositoryImpl>().bind(AuthRepository::class)
+    viewModel<LoginViewModel>()
+    viewModel<SettingsViewModel>()
 }

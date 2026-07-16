@@ -46,8 +46,8 @@ import kotlinx.coroutines.flow.first
 import kotlinx.serialization.json.Json
 import org.koin.core.module.dsl.createdAtStart
 import org.koin.core.module.dsl.singleOf
-import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
+import org.koin.plugin.module.dsl.viewModel
 
 @OptIn(ExperimentalSettingsApi::class)
 val coreModule = module {
@@ -194,5 +194,5 @@ val coreModule = module {
         }
         client
     }
-    viewModelOf(::AppViewModel)
+    viewModel<AppViewModel>()
 }
