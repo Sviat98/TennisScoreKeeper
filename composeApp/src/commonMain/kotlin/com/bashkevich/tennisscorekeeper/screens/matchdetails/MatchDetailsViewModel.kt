@@ -22,6 +22,7 @@ import kotlinx.coroutines.launch
 
 import com.bashkevich.tennisscorekeeper.mvi.BaseViewModel
 import com.bashkevich.tennisscorekeeper.navigation.MatchDetailsRoute
+import kotlinx.coroutines.isActive
 
 class MatchDetailsViewModel(
     savedStateHandle: SavedStateHandle,
@@ -191,8 +192,6 @@ class MatchDetailsViewModel(
 
     override fun onCleared() {
         super.onCleared()
-        viewModelScope.launch {
-            matchRepository.closeSession()
-        }
+        matchRepository.closeSession()
     }
 }

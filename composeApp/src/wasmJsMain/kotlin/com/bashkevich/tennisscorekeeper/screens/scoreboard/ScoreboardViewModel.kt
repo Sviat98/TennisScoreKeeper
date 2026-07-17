@@ -9,7 +9,6 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.launch
 import com.bashkevich.tennisscorekeeper.mvi.BaseViewModel
 import com.bashkevich.tennisscorekeeper.navigation.ScoreboardRoute
 
@@ -39,8 +38,6 @@ class ScoreboardViewModel(
 
     override fun onCleared() {
         super.onCleared()
-        viewModelScope.launch {
-            matchRepository.closeSession()
-        }
+        matchRepository.closeSession()
     }
 }

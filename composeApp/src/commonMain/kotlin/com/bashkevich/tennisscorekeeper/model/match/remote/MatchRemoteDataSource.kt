@@ -27,8 +27,8 @@ import io.ktor.websocket.close
 import io.ktor.websocket.readReason
 import io.ktor.websocket.readText
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -45,6 +45,7 @@ class MatchRemoteDataSource(
 ) {
     private var webSocketSession: DefaultClientWebSocketSession? = null
     private val scope = CoroutineScope(SupervisorJob() + webSocketDispatcher)
+    private var connectionJob: Job? = null
 
     private val _connectionStateFlow = MutableStateFlow(ConnectionState.Loading)
 
@@ -187,7 +188,8 @@ class MatchRemoteDataSource(
         val reconnectionTime = 5000L
 
         val appConfig = AppConfig.current
-        scope.launch {
+        connectionJob?.cancel()
+        connectionJob = scope.launch {
             _connectionStateFlow.value = ConnectionState.Loading
             while (true) {
                 try {
@@ -241,9 +243,9 @@ class MatchRemoteDataSource(
         }
     }
 
-    suspend fun closeSession() {
+    fun closeSession() {
         _connectionStateFlow.value = ConnectionState.Disconnected
-        scope.cancel()
-        webSocketSession?.close()
+        connectionJob?.cancel()
+        scope.launch { webSocketSession?.close() }
     }
 }
