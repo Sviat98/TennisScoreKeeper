@@ -34,8 +34,20 @@ fun PrevSetScoreboardComponent(
     val loseColor = theme.previousSetLoseTextColor
     val colorsAreEqual = winColor == loseColor
 
-    val firstParticipantColor = if (isFirstParticipantWon) winColor else loseColor
-    val secondParticipantColor = if (isSecondParticipantWon) winColor else loseColor
+    //если победитель НЕ опеределен, то ставим mainTextColor, точно будет хорошо смотреть на фоне
+    val currentSetColor = theme.mainTextColor
+
+    val firstParticipantColor = when{
+        isFirstParticipantWon -> winColor
+        isSecondParticipantWon -> loseColor
+        else -> currentSetColor
+    }
+
+    val secondParticipantColor = when{
+        isSecondParticipantWon-> winColor
+        isFirstParticipantWon -> loseColor
+        else -> currentSetColor
+    }
 
     var firstParticipantAlpha = 1f
     var secondParticipantAlpha = 1f

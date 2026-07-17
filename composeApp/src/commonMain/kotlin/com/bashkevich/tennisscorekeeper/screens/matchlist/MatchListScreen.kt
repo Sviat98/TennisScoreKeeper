@@ -53,7 +53,7 @@ fun MatchListScreen(
                     modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()),
                     contentAlignment = Alignment.Center
                 ) {
-                    androidx.compose.foundation.layout.Column(
+                    Column(
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.CenterVertically)
                     ) {
