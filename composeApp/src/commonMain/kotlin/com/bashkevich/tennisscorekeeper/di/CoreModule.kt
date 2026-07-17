@@ -1,9 +1,12 @@
 package com.bashkevich.tennisscorekeeper.di
 
+import androidx.datastore.core.DataStore
+import androidx.datastore.core.DataStoreFactory
+import androidx.datastore.preferences.core.Preferences
 import com.bashkevich.tennisscorekeeper.AppConfig
 import com.bashkevich.tennisscorekeeper.AppViewModel
-import com.bashkevich.tennisscorekeeper.core.local.FlowSettingsFactory
 import com.bashkevich.tennisscorekeeper.core.local.KeyValueStorage
+import com.bashkevich.tennisscorekeeper.core.local.createPreferencesStorage
 import com.bashkevich.tennisscorekeeper.core.PlatformConfiguration
 import com.bashkevich.tennisscorekeeper.core.local.getDatabaseBuilder
 import com.bashkevich.tennisscorekeeper.core.remote.ResponseMessage
@@ -15,7 +18,6 @@ import com.bashkevich.tennisscorekeeper.core.remote.doOnSuccess
 import com.bashkevich.tennisscorekeeper.core.remote.httpClient
 import com.bashkevich.tennisscorekeeper.core.remote.runOperationCatching
 import com.bashkevich.tennisscorekeeper.model.auth.remote.RefreshTokensResponseDto
-import com.russhwolf.settings.ExperimentalSettingsApi
 import io.ktor.client.call.body
 import io.ktor.client.plugins.ClientRequestException
 import io.ktor.client.plugins.HttpResponseValidator
@@ -49,12 +51,10 @@ import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.module
 import org.koin.plugin.module.dsl.viewModel
 
-@OptIn(ExperimentalSettingsApi::class)
 val coreModule = module {
 
-    single {
-        val platformConfiguration = get<PlatformConfiguration>()
-        FlowSettingsFactory(platformConfiguration).createSettings()
+    single<DataStore<Preferences>> {
+        DataStoreFactory.create(storage = createPreferencesStorage(get<PlatformConfiguration>()))
     }
     singleOf(::KeyValueStorage) {
         createdAtStart()
