@@ -10,6 +10,7 @@ interface ThemeRepository {
     fun fetchThemesFlow(): Flow<LoadResult<Unit, Throwable>?>
     fun refreshThemes()
     suspend fun fetchThemeById(id: Int): LoadResult<Unit, Throwable>
+    suspend fun fetchThemeByIdFromNetwork(id: Int): LoadResult<ScoreboardTheme, Throwable>
     fun observeThemesFromDatabase(): Flow<List<ScoreboardTheme>>
     fun observeThemeByIdFromDatabase(id: Int): Flow<ScoreboardTheme>
     suspend fun updateTheme(id: Int, themeBody: ThemeBody): LoadResult<Unit, Throwable>

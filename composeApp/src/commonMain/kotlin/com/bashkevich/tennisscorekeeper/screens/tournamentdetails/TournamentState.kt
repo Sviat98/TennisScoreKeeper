@@ -5,6 +5,7 @@ import com.bashkevich.tennisscorekeeper.model.file.domain.EMPTY_EXCEL_FILE
 import com.bashkevich.tennisscorekeeper.model.file.domain.ExcelFile
 import com.bashkevich.tennisscorekeeper.model.match.domain.ShortMatch
 import com.bashkevich.tennisscorekeeper.model.participant.domain.TennisParticipant
+import com.bashkevich.tennisscorekeeper.model.theme.domain.ScoreboardTheme
 import com.bashkevich.tennisscorekeeper.model.tournament.domain.Tournament
 import com.bashkevich.tennisscorekeeper.model.tournament.remote.TournamentStatus
 
@@ -23,7 +24,10 @@ sealed interface TournamentDetailsLoadingState {
 sealed interface MatchListLoadingState {
     data object Loading : MatchListLoadingState
     data object InitialError : MatchListLoadingState
-    data class Content(val matches: List<ShortMatch>) : MatchListLoadingState
+    data class Content(
+        val matches: List<ShortMatch>,
+        val themes: Map<Int, ScoreboardTheme> = emptyMap()
+    ) : MatchListLoadingState
 }
 
 @Immutable

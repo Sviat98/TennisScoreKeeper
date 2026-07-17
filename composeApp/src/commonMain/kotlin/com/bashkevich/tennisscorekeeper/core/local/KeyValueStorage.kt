@@ -1,62 +1,57 @@
 package com.bashkevich.tennisscorekeeper.core.local
 
-import com.russhwolf.settings.ExperimentalSettingsApi
-import com.russhwolf.settings.coroutines.FlowSettings
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.stringPreferencesKey
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.map
 
-class KeyValueStorage @OptIn(ExperimentalSettingsApi::class) constructor(
-    private val flowSettings: FlowSettings
+class KeyValueStorage(
+    private val dataStore: DataStore<Preferences>
 ) {
-    private val PLAYER_ID_KEY = "playerId"
-    private val PLAYER_NAME_KEY = "playerName"
-    private val PLAYER_SURNAME_KEY = "playerSurname"
-    private val ACCESS_TOKEN_KEY = "accessToken"
-    private val REFRESH_TOKEN_KEY = "refreshToken"
+    private val PLAYER_ID_KEY = stringPreferencesKey("playerId")
+    private val PLAYER_NAME_KEY = stringPreferencesKey("playerName")
+    private val PLAYER_SURNAME_KEY = stringPreferencesKey("playerSurname")
+    private val ACCESS_TOKEN_KEY = stringPreferencesKey("accessToken")
+    private val REFRESH_TOKEN_KEY = stringPreferencesKey("refreshToken")
 
 
     private val STRING_DEFAULT = ""
 
-    @OptIn(ExperimentalSettingsApi::class)
     suspend fun saveTokens(accessToken: String, refreshToken: String) {
-        flowSettings.putString(ACCESS_TOKEN_KEY, accessToken)
-        flowSettings.putString(REFRESH_TOKEN_KEY, refreshToken)
-    }
-
-    @OptIn(ExperimentalSettingsApi::class)
-    fun observeTokens(): Flow<Pair<String, String>> {
-        val accessTokenFlow = flowSettings.getStringFlow(ACCESS_TOKEN_KEY, STRING_DEFAULT)
-        val refreshTokenFlow = flowSettings.getStringFlow(REFRESH_TOKEN_KEY, STRING_DEFAULT)
-
-        return accessTokenFlow.combine(refreshTokenFlow) { accessToken, refreshToken->
-            Pair(accessToken,refreshToken)
+        dataStore.edit {
+            it[ACCESS_TOKEN_KEY] = accessToken
+            it[REFRESH_TOKEN_KEY] = refreshToken
         }
     }
 
-    @OptIn(ExperimentalSettingsApi::class)
+    fun observeTokens(): Flow<Pair<String, String>> =
+        dataStore.data.map {
+            Pair(it[ACCESS_TOKEN_KEY] ?: STRING_DEFAULT, it[REFRESH_TOKEN_KEY] ?: STRING_DEFAULT)
+        }
+
     suspend fun savePlayerId(playerId: String) {
-        flowSettings.putString(PLAYER_ID_KEY, playerId)
+        dataStore.edit { it[PLAYER_ID_KEY] = playerId }
     }
 
-    @OptIn(ExperimentalSettingsApi::class)
-    fun observePlayerId() = flowSettings.getStringFlow(PLAYER_ID_KEY, STRING_DEFAULT)
+    fun observePlayerId(): Flow<String> =
+        dataStore.data.map { it[PLAYER_ID_KEY] ?: STRING_DEFAULT }
 
-    @OptIn(ExperimentalSettingsApi::class)
     suspend fun savePlayerName(name: String) {
-        flowSettings.putString(PLAYER_NAME_KEY, name)
+        dataStore.edit { it[PLAYER_NAME_KEY] = name }
     }
 
-    @OptIn(ExperimentalSettingsApi::class)
-    fun observePlayerName() = flowSettings.getStringFlow(PLAYER_NAME_KEY, STRING_DEFAULT)
+    fun observePlayerName(): Flow<String> =
+        dataStore.data.map { it[PLAYER_NAME_KEY] ?: STRING_DEFAULT }
 
-    @OptIn(ExperimentalSettingsApi::class)
     suspend fun savePlayerSurname(surname: String) {
-        flowSettings.putString(PLAYER_SURNAME_KEY, surname)
+        dataStore.edit { it[PLAYER_SURNAME_KEY] = surname }
     }
 
-    @OptIn(ExperimentalSettingsApi::class)
-    fun observePlayerSurname() = flowSettings.getStringFlow(PLAYER_SURNAME_KEY, STRING_DEFAULT)
+    fun observePlayerSurname(): Flow<String> =
+        dataStore.data.map { it[PLAYER_SURNAME_KEY] ?: STRING_DEFAULT }
 
-    @OptIn(ExperimentalSettingsApi::class)
-    fun observeRefreshToken() = flowSettings.getStringFlow(REFRESH_TOKEN_KEY, STRING_DEFAULT)
+    fun observeRefreshToken(): Flow<String> =
+        dataStore.data.map { it[REFRESH_TOKEN_KEY] ?: STRING_DEFAULT }
 }

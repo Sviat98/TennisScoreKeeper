@@ -63,6 +63,7 @@
     <string name="couldnt_load_data">Не удалось загрузить данные</string>
     <string name="pull_down_to_update">Потяните вниз для обновления</string>
     <string name="match_list_empty">Список матчей пуст</string>
+    <string name="theme_load_error">Ошибка загрузки темы</string>
     <string name="participant_list_empty">Список участников пуст</string>
     <string name="connection_with_scoreboard_lost">Связь с табло потеряна</string>
     <string name="try_again">Попробовать снова</string>
@@ -131,6 +132,8 @@
     <string name="theme_color_current_game_background">Фон текущей игры</string>
     <string name="theme_color_current_game_text">Текст текущей игры</string>
     <string name="old_value">Старое значение:</string>
+    <string name="selected_color">Выбранный цвет:</string>
+    <string name="undo">Отменить</string>
     <string name="theme_name">Название темы</string>
     <string name="edit_theme">Редактирование темы</string>
 </resources>

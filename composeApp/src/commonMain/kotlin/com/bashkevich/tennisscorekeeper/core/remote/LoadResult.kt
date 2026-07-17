@@ -42,6 +42,11 @@ inline fun <S, E> LoadResult<S, E>.doOnError(block: (E) -> Unit): LoadResult<S, 
     return this
 }
 
+fun <S, E> LoadResult<S, E>.getOrDefault(default: S): S = when (this) {
+    is LoadResult.Success -> this.result
+    is LoadResult.Error -> default
+}
+
 inline fun <S, R> S.runOperationCatching(block: S.() -> R): LoadResult<R, Throwable> {
     return try {
         LoadResult.Success(block())

@@ -31,8 +31,10 @@ import com.bashkevich.tennisscorekeeper.components.expect.setText
 import com.bashkevich.tennisscorekeeper.components.match_details.ScoreboardControlPanel
 import com.bashkevich.tennisscorekeeper.components.scoreboard.match_details.MatchDetailsScoreboardView
 import com.bashkevich.tennisscorekeeper.components.showUnauthorizedActionSnackbar
+import com.bashkevich.tennisscorekeeper.components.theme.ThemeLoadErrorRow
 import com.bashkevich.tennisscorekeeper.model.match.remote.body.toResource
-import com.bashkevich.tennisscorekeeper.model.theme.domain.ScoreboardTheme
+import com.bashkevich.tennisscorekeeper.model.theme.domain.ScoreboardThemeState
+import com.bashkevich.tennisscorekeeper.model.theme.domain.themeOrDefault
 import com.bashkevich.tennisscorekeeper.mvi.LaunchedUiEffectHandler
 import com.bashkevich.tennisscorekeeper.navigation.SettingsFlowRoute
 import kotlinx.coroutines.launch
@@ -129,8 +131,12 @@ fun MatchDetailsCommonContent(
                 MatchDetailsScoreboardView(
                     modifier = Modifier.horizontalScroll(state = rememberScrollState()),
                     match = match,
-                    theme = ScoreboardTheme.DEFAULT,
+                    theme = state.themeState.themeOrDefault(),
                 )
+
+                if (state.themeState is ScoreboardThemeState.Error) {
+                    ThemeLoadErrorRow(onRetry = { onEvent(MatchDetailsUiEvent.RetryThemeLoad) })
+                }
 
                 val statusText = stringResource(match.status.toResource())
                 Text("${stringResource(Res.string.status)}: $statusText")

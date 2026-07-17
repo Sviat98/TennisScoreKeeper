@@ -73,6 +73,7 @@ fun MatchWithParticipantsEntity.toDomain(): ShortMatch {
         previousSets = previousSets,
         currentSet = currentSet,
         currentGame = game?.toDomain(),
+        themeId = match.themeId,
     )
 }
 
@@ -125,6 +126,7 @@ fun MatchWithParticipantsEntity.toMatchDomain(): Match {
             try { SpecialSetMode.valueOf(it) } catch (_: Exception) { null }
         },
         currentGame = game?.toDomain(),
+        themeId = match.themeId,
     )
 }
 

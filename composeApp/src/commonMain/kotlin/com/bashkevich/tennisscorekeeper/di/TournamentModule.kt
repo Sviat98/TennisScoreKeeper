@@ -8,20 +8,16 @@ import com.bashkevich.tennisscorekeeper.screens.addtournament.AddTournamentViewM
 import com.bashkevich.tennisscorekeeper.screens.tournamentdetails.TournamentViewModel
 import com.bashkevich.tennisscorekeeper.screens.tournamentlist.RefreshTournamentListScreenUseCase
 import com.bashkevich.tennisscorekeeper.screens.tournamentlist.TournamentListViewModel
-import org.koin.core.module.dsl.bind
-import org.koin.core.module.dsl.singleOf
-import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
+import org.koin.plugin.module.dsl.*
 
 val tournamentModule = module {
-    viewModelOf(::TournamentListViewModel)
-    singleOf(::RefreshTournamentListScreenUseCase)
-    viewModelOf(::TournamentViewModel)
-    viewModelOf(::AddTournamentViewModel)
+    viewModel<TournamentListViewModel>()
+    single<RefreshTournamentListScreenUseCase>()
+    viewModel<TournamentViewModel>()
+    viewModel<AddTournamentViewModel>()
 
-    singleOf(::TournamentRepositoryImpl){
-        bind<TournamentRepository>()
-    }
-    singleOf(::TournamentRemoteDataSource)
-    singleOf(::TournamentLocalDataSource)
+    single<TournamentRepositoryImpl>().bind(TournamentRepository::class)
+    single<TournamentRemoteDataSource>()
+    single<TournamentLocalDataSource>()
 }

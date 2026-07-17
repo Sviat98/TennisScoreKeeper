@@ -16,6 +16,7 @@ data class ShortMatch(
     val previousSets: List<TennisSet>,
     val currentSet: TennisSet? = null,
     val currentGame: TennisGame? = null,
+    val themeId: Int = 0,
 )
 
 fun ShortMatchDto.toDomain() = ShortMatch(
@@ -25,7 +26,8 @@ fun ShortMatchDto.toDomain() = ShortMatch(
     status = this.status,
     previousSets = this.previousSets.map { it.toDomain() },
     currentSet = this.currentSet?.toDomain(),
-    currentGame = this.currentGame?.toDomain()
+    currentGame = this.currentGame?.toDomain(),
+    themeId = this.themeId.toInt(),
 )
 
 val SAMPLE_SINGLES_SHORT_MATCH = ShortMatch(

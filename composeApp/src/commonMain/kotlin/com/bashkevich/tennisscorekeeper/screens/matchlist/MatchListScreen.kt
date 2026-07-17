@@ -2,6 +2,7 @@ package com.bashkevich.tennisscorekeeper.screens.matchlist
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -27,6 +28,7 @@ import tennisscorekeeper.composeapp.generated.resources.Res
 import tennisscorekeeper.composeapp.generated.resources.couldnt_load_data
 import tennisscorekeeper.composeapp.generated.resources.match_list_empty
 import tennisscorekeeper.composeapp.generated.resources.pull_down_to_update
+import tennisscorekeeper.composeapp.generated.resources.theme_load_error
 
 @Composable
 fun MatchListScreen(
@@ -51,7 +53,7 @@ fun MatchListScreen(
                     modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()),
                     contentAlignment = Alignment.Center
                 ) {
-                    androidx.compose.foundation.layout.Column(
+                    Column(
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.CenterVertically)
                     ) {
@@ -85,12 +87,25 @@ fun MatchListScreen(
                         items(
                             matchListLoadingState.matches,
                             key = { it.id }) { match ->
-                            ShortMatchScoreboardCard(
-                                modifier = Modifier.widthIn(max = 400.dp).fillMaxWidth().hoverScaleEffect(),
-                                match = match,
-                                theme = ScoreboardTheme.DEFAULT,
-                                onClick = { onItemClick(match) }
-                            )
+                            Column(
+                                modifier = Modifier.widthIn(max = 400.dp).fillMaxWidth(),
+                                verticalArrangement = Arrangement.spacedBy(4.dp)
+                            ) {
+                                ShortMatchScoreboardCard(
+                                    modifier = Modifier.fillMaxWidth().hoverScaleEffect(),
+                                    match = match,
+                                    theme = matchListLoadingState.themes[match.themeId]
+                                        ?: ScoreboardTheme.DEFAULT,
+                                    onClick = { onItemClick(match) }
+                                )
+                                if (match.themeId != 0 && match.themeId !in matchListLoadingState.themes) {
+                                    Text(
+                                        stringResource(Res.string.theme_load_error),
+                                        color = MaterialTheme.colorScheme.error,
+                                        style = MaterialTheme.typography.bodySmall
+                                    )
+                                }
+                            }
                         }
                     }
                 }

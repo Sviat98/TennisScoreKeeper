@@ -1,3 +1,5 @@
+@file:OptIn(kotlin.js.ExperimentalWasmJsInterop::class)
+
 package com.bashkevich.tennisscorekeeper
 
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -15,9 +17,12 @@ import com.bashkevich.tennisscorekeeper.navigation.AddTournamentRoute
 import com.bashkevich.tennisscorekeeper.navigation.MatchDetailsRoute
 import kotlinx.browser.document
 import kotlinx.browser.window
+import kotlin.js.JsAny
 
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalBrowserHistoryApi::class)
 fun main() {
+
+    requestPersistentStorage()
 
     ComposeViewport(document.body!!) {
         App(onNavHostReady = { navController ->
@@ -81,3 +86,10 @@ fun main() {
     }
 
 }
+
+// best-effort: запрашивает постоянное хранилище (navigator.storage.persist()),
+// чтобы браузер не вытеснял (eviction) данные OPFS/localStorage.
+// На Kotlin/Wasm js() должен быть единственным выражением в теле top-level функции
+// с явным типом возврата, поэтому guard от отсутствия Storage API живёт внутри JS-выражения.
+private fun requestPersistentStorage(): JsAny =
+    js("(navigator.storage && navigator.storage.persist) ? navigator.storage.persist() : Promise.resolve(false)")

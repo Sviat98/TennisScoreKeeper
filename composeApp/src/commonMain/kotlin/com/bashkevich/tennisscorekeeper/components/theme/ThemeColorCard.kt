@@ -5,19 +5,17 @@ import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -27,10 +25,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import com.bashkevich.tennisscorekeeper.components.ColorBox
 import com.bashkevich.tennisscorekeeper.components.ColorPickerDialog
+import com.bashkevich.tennisscorekeeper.components.icons.IconGroup
+import com.bashkevich.tennisscorekeeper.components.icons.default_icons.Undo
 import com.bashkevich.tennisscorekeeper.model.theme.domain.ScoreboardTheme
 import org.jetbrains.compose.resources.stringResource
 import tennisscorekeeper.composeapp.generated.resources.Res
@@ -44,6 +44,7 @@ import tennisscorekeeper.composeapp.generated.resources.theme_color_main_text
 import tennisscorekeeper.composeapp.generated.resources.theme_color_previous_set_lose
 import tennisscorekeeper.composeapp.generated.resources.theme_color_previous_set_win
 import tennisscorekeeper.composeapp.generated.resources.theme_color_serve
+import tennisscorekeeper.composeapp.generated.resources.undo
 
 @Composable
 fun ThemeColorCard(
@@ -75,8 +76,8 @@ fun ThemeColorCard(
                     modifier = Modifier.weight(1f)
                 )
                 ColorBox(
-                    modifier = Modifier.clickable { showColorPicker = true },
-                    color = currentColor
+                    color = currentColor,
+                    modifier = Modifier.clickable { showColorPicker = true }
                 )
             }
             AnimatedVisibility(
@@ -94,6 +95,13 @@ fun ThemeColorCard(
                     )
                     Spacer(modifier = Modifier.size(8.dp))
                     ColorBox(color = oldColor)
+                    Spacer(modifier = Modifier.weight(1f))
+                    IconButton(onClick = { onColorSelected(field, oldColor) }) {
+                        Icon(
+                            imageVector = IconGroup.Default.Undo,
+                            contentDescription = stringResource(Res.string.undo)
+                        )
+                    }
                 }
             }
         }
@@ -109,20 +117,6 @@ fun ThemeColorCard(
             }
         )
     }
-}
-
-@Composable
-private fun ColorBox(
-    modifier: Modifier = Modifier,
-    color: Color
-) {
-    Box(
-        modifier = Modifier.then(modifier)
-            .size(32.dp)
-            .clip(RoundedCornerShape(4.dp))
-            .background(color)
-            .border(1.dp, Color.Black, RoundedCornerShape(4.dp))
-    )
 }
 
 @Composable

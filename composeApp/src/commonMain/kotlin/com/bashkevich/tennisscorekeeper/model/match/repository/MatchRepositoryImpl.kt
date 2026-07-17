@@ -67,7 +67,7 @@ class MatchRepositoryImpl(
             .mapSuccess { shortMatches -> shortMatches.map { it.toDomain() } }
     }
 
-    override suspend fun closeSession() {
+    override fun closeSession() {
         matchRemoteDataSource.closeSession()
     }
 

@@ -19,6 +19,7 @@ kotlin = "2.4.0"
 ksp = "2.3.5"
 kotlinx-serialization = "1.11.0"
 koinBom = "4.2.2"
+koinPlugin = "1.0.1"
 ktor = "3.5.1"
 logback = "1.5.37"
 slf4j = "1.7.36"
@@ -26,8 +27,7 @@ coroutines = "1.11.0"
 calf-file-picker = "0.12.0"
 colorpicker = "1.2.0"
 material3-adaptive = "1.2.0"
-settings = "1.3.0"
-datastore-preferences = "1.2.1"
+datastore = "1.3.0-alpha09"
 kotlinx-datetime = "0.8.0"
 
 sdp_ssp = "1.0.7"
@@ -68,11 +68,9 @@ ktor-client-websockets = { group = "io.ktor", name = "ktor-client-websockets", v
 logback-classic = { group = "ch.qos.logback", name = "logback-classic", version.ref = "logback" }
 slf4j-android = {group = "org.slf4j", name = "slf4j-android", version.ref = "slf4j"}
 
-multiplatform-settings = {group = "com.russhwolf", name = "multiplatform-settings", version.ref = "settings" }
-multiplatform-settings-coroutines = {group = "com.russhwolf", name = "multiplatform-settings-coroutines", version.ref = "settings" }
-multiplatform-settings-datastore = {group = "com.russhwolf", name = "multiplatform-settings-datastore", version.ref = "settings" }
-multiplatform-settings-make-observable = {group = "com.russhwolf", name = "multiplatform-settings-make-observable", version.ref = "settings" }
-androidx-datastore-preferences = {group = "androidx.datastore", name = "datastore-preferences", version.ref = "datastore-preferences" }
+androidx-datastore-preferences-core = { group = "androidx.datastore", name = "datastore-preferences-core", version.ref = "datastore" }
+androidx-datastore-core-okio = { group = "androidx.datastore", name = "datastore-core-okio", version.ref = "datastore" }
+androidx-datastore = { group = "androidx.datastore", name = "datastore", version.ref = "datastore" }
 
 kotlinx-coroutines-swing = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-swing", version.ref = "coroutines" }
 calf-file-picker = { group = "com.mohamedrejeb.calf", name = "calf-file-picker", version.ref = "calf-file-picker" }
@@ -113,3 +111,4 @@ ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 build-konfig = {id = "com.codingfeline.buildkonfig" , version.ref = "build-konfig" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 androidx-room3 = { id = "androidx.room3", version.ref = "room" }
+koin-compiler = { id = "io.insert-koin.compiler.plugin", version.ref = "koinPlugin" }
