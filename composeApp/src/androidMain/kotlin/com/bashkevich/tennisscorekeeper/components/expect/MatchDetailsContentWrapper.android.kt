@@ -196,6 +196,7 @@ actual fun MatchDetailsContentWrapper(
                     ScoreboardWithMediaPlayerView(
                         modifier = Modifier.horizontalScroll(state = rememberScrollState()),
                         match = match,
+                        themeState = state.themeState,
                         mediaPlayerHost = mediaPlayerHost,
                         onEvent = onEvent
                     )

@@ -3,8 +3,9 @@ package com.bashkevich.tennisscorekeeper.screens.matchdetails
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
-import com.bashkevich.tennisscorekeeper.core.remote.doOnError
+import com.bashkevich.tennisscorekeeper.core.remote.LoadResult
 import com.bashkevich.tennisscorekeeper.core.remote.NetworkException
+import com.bashkevich.tennisscorekeeper.core.remote.doOnError
 import org.jetbrains.compose.resources.getString
 import tennisscorekeeper.composeapp.generated.resources.Res
 import tennisscorekeeper.composeapp.generated.resources.check_internet_connection
@@ -13,17 +14,24 @@ import com.bashkevich.tennisscorekeeper.model.match.domain.SAMPLE_MATCH
 import com.bashkevich.tennisscorekeeper.model.match.remote.body.MatchStatus
 import com.bashkevich.tennisscorekeeper.model.match.remote.body.ScoreType
 import com.bashkevich.tennisscorekeeper.model.match.repository.MatchRepository
+import com.bashkevich.tennisscorekeeper.model.theme.domain.ScoreboardTheme
+import com.bashkevich.tennisscorekeeper.model.theme.domain.ScoreboardThemeState
 import com.bashkevich.tennisscorekeeper.model.theme.repository.ThemeRepository
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 import com.bashkevich.tennisscorekeeper.mvi.BaseViewModel
 import com.bashkevich.tennisscorekeeper.navigation.MatchDetailsRoute
-import kotlinx.coroutines.isActive
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class MatchDetailsViewModel(
     savedStateHandle: SavedStateHandle,
     private val matchRepository: MatchRepository,
@@ -32,25 +40,47 @@ class MatchDetailsViewModel(
     BaseViewModel<MatchDetailsState, MatchDetailsUiEvent, MatchDetailsAction>() {
     private val matchId: Int = savedStateHandle.toRoute<MatchDetailsRoute>().id
 
-    init {
-        viewModelScope.launch {
-            themeRepository.observeThemeByIdFromDatabase(1).collect {
-                println(it)
-            }
+    private val networkUpdates = matchRepository.observeMatchUpdatesFromNetwork(matchId)
+
+    // --- Тема матча: /themes/{themeId} → БД, затем observe из БД ---
+    private val themeIdFlow = matchRepository.observeMatchById(matchId)
+        .map { it?.themeId ?: ScoreboardTheme.DEFAULT.id }
+        .distinctUntilChanged()
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), ScoreboardTheme.DEFAULT.id)
+
+    private val refreshThemeUseCase = MatchDetailsRefreshThemeUseCase(themeRepository, themeIdFlow)
+
+    private val themeFetchResult = refreshThemeUseCase.fetchFlow()
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
+
+    private val themeFromDb = themeIdFlow.flatMapLatest { id ->
+        themeRepository.observeThemeByIdFromDatabase(id)
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), ScoreboardTheme.DEFAULT)
+
+    private val themeLoadState: Flow<ScoreboardThemeState> = combine(
+        themeIdFlow,
+        themeFetchResult,
+        themeFromDb
+    ) { id, fetchResult, dbTheme ->
+        when {
+            id == ScoreboardTheme.DEFAULT.id -> ScoreboardThemeState.Loaded(ScoreboardTheme.DEFAULT)
+            dbTheme.id == id -> ScoreboardThemeState.Loaded(dbTheme)
+            fetchResult is LoadResult.Error -> ScoreboardThemeState.Error
+            else -> ScoreboardThemeState.Loading
         }
     }
-
-    private val networkUpdates = matchRepository.observeMatchUpdatesFromNetwork(matchId)
 
     override val state: StateFlow<MatchDetailsState> = combine(
         networkUpdates,
         matchRepository.observeMatchById(matchId),
         matchRepository.observeConnectionState(),
+        themeLoadState,
         _action
-    ) { _, match, connectionState, action ->
+    ) { _, match, connectionState, themeState, action ->
         MatchDetailsState(
             match = match ?: SAMPLE_MATCH,
             connectionState = connectionState,
+            themeState = themeState,
             action = action
         )
     }.stateIn(
@@ -82,6 +112,7 @@ class MatchDetailsViewModel(
 
             is MatchDetailsUiEvent.RedoPoint -> redoPoint()
             is MatchDetailsUiEvent.AttachVideoLink -> attachVideoLink(videoLink = uiEvent.videoLink)
+            MatchDetailsUiEvent.RetryThemeLoad -> refreshThemeUseCase.refresh()
         }
     }
 

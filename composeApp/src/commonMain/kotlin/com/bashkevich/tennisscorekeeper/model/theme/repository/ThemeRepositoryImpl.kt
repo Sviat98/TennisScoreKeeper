@@ -56,6 +56,10 @@ class ThemeRepositoryImpl(
         }.mapSuccess { }
     }
 
+    override suspend fun fetchThemeByIdFromNetwork(id: Int): LoadResult<ScoreboardTheme, Throwable> {
+        return themeRemoteDataSource.getThemeById(id.toString()).mapSuccess { it.toDomain() }
+    }
+
     override fun observeThemesFromDatabase(): Flow<List<ScoreboardTheme>> {
         return themeLocalDataSource.getThemes().map { entities ->
             entities.map { it.toDomain() }

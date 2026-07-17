@@ -21,7 +21,11 @@ import androidx.compose.ui.layout.SubcomposeLayout
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.bashkevich.tennisscorekeeper.components.scoreboard.overlay.MatchScoreboardView
+import com.bashkevich.tennisscorekeeper.components.theme.ThemeLoadErrorRow
 import com.bashkevich.tennisscorekeeper.model.match.domain.Match
+import com.bashkevich.tennisscorekeeper.model.theme.domain.ScoreboardTheme
+import com.bashkevich.tennisscorekeeper.model.theme.domain.ScoreboardThemeState
+import com.bashkevich.tennisscorekeeper.model.theme.domain.themeOrDefault
 import com.bashkevich.tennisscorekeeper.screens.matchdetails.ConnectionState
 import org.jetbrains.compose.resources.stringResource
 import tennisscorekeeper.composeapp.generated.resources.Res
@@ -51,8 +55,12 @@ fun ScoreboardScreen(
             CircularProgressIndicator()
         } else {
             ScoreboardContent(
-                match = state.match
+                match = state.match,
+                theme = state.themeState.themeOrDefault()
             )
+            if (state.themeState is ScoreboardThemeState.Error) {
+                ThemeLoadErrorRow(onRetry = { viewModel.onEvent(ScoreboardUiEvent.RetryThemeLoad) })
+            }
             SubcomposeLayout { constraints ->
                 val textPlaceable = subcompose("text") {
                     Text(
@@ -84,12 +92,14 @@ fun ScoreboardScreen(
 @Composable
 fun ScoreboardContent(
     modifier: Modifier = Modifier,
-    match: Match
+    match: Match,
+    theme: ScoreboardTheme
 ) {
     Box(modifier = Modifier.then(modifier).size(1024.dp)) {
         MatchScoreboardView(
             modifier = Modifier.align(Alignment.CenterStart),
-            match = match
+            match = match,
+            theme = theme
         )
     }
 

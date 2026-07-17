@@ -12,12 +12,13 @@ import com.bashkevich.tennisscorekeeper.components.match_details.serve.ChooseSer
 import com.bashkevich.tennisscorekeeper.components.scoreboard.overlay.MatchScoreboardView
 import com.bashkevich.tennisscorekeeper.model.match.domain.DOUBLES_SAMPLE_MATCH
 import com.bashkevich.tennisscorekeeper.model.match.domain.SAMPLE_MATCH
+import com.bashkevich.tennisscorekeeper.model.theme.domain.ScoreboardTheme
 
 
 @Composable
 @Preview
 fun MatchViewPreview() {
-    MatchScoreboardView(modifier = Modifier, match = SAMPLE_MATCH)
+    MatchScoreboardView(modifier = Modifier, match = SAMPLE_MATCH, theme = ScoreboardTheme.DEFAULT)
 }
 
 @Composable

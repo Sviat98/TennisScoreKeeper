@@ -23,7 +23,8 @@ data class Match(
     val previousSets: List<TennisSet>,
     val currentSet: TennisSet?,
     val currentSetMode: SpecialSetMode?,
-    val currentGame: TennisGame?
+    val currentGame: TennisGame?,
+    val themeId: Int
 )
 
 
@@ -51,7 +52,8 @@ fun MatchDto.toDomain() = Match(
     previousSets = this.previousSets.map { it.toDomain() },
     currentSet = this.currentSet?.toDomain(),
     currentSetMode = this.currentSetMode,
-    currentGame = this.currentGame?.toDomain()
+    currentGame = this.currentGame?.toDomain(),
+    themeId = this.themeId.toInt()
 )
 
 
@@ -100,7 +102,8 @@ val SAMPLE_MATCH = Match(
     ),
     currentSet = TennisSet(firstParticipantGamesWon = 10, secondParticipantGamesWon = 9),
     currentSetMode = null,
-    currentGame = null
+    currentGame = null,
+    themeId = 0
     //TennisGame(firstParticipantPointsWon = "30", secondParticipantPointsWon = "15")
 )
 
@@ -163,5 +166,6 @@ val DOUBLES_SAMPLE_MATCH = Match(
     ),
     currentSet = TennisSet(firstParticipantGamesWon = 10, secondParticipantGamesWon = 9),
     currentSetMode = null,
-    currentGame = TennisGame(firstParticipantPointsWon = "30", secondParticipantPointsWon = "15")
+    currentGame = TennisGame(firstParticipantPointsWon = "30", secondParticipantPointsWon = "15"),
+    themeId = 0
 )

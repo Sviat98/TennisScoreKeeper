@@ -13,11 +13,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.bashkevich.tennisscorekeeper.model.theme.domain.ScoreboardTheme
 import chaintech.videoplayer.host.MediaPlayerHost
 import com.bashkevich.tennisscorekeeper.components.expect.LocalFullScreenState
 import com.bashkevich.tennisscorekeeper.components.scoreboard.match_details.MatchDetailsScoreboardView
+import com.bashkevich.tennisscorekeeper.components.theme.ThemeLoadErrorRow
 import com.bashkevich.tennisscorekeeper.model.match.domain.Match
+import com.bashkevich.tennisscorekeeper.model.theme.domain.ScoreboardThemeState
+import com.bashkevich.tennisscorekeeper.model.theme.domain.themeOrDefault
 import com.bashkevich.tennisscorekeeper.screens.matchdetails.MatchDetailsUiEvent
 import org.jetbrains.compose.resources.stringResource
 import tennisscorekeeper.composeapp.generated.resources.Res
@@ -28,6 +30,7 @@ import tennisscorekeeper.composeapp.generated.resources.scoreboard
 fun ScoreboardWithMediaPlayerView(
     modifier: Modifier,
     match: Match,
+    themeState: ScoreboardThemeState,
     mediaPlayerHost: MediaPlayerHost,
     onEvent: (MatchDetailsUiEvent)->Unit
 ){
@@ -64,8 +67,11 @@ fun ScoreboardWithMediaPlayerView(
    else{
        MatchDetailsScoreboardView(
            match = match,
-           theme = ScoreboardTheme.DEFAULT,
+           theme = themeState.themeOrDefault(),
        )
+   }
+   if (themeState is ScoreboardThemeState.Error) {
+       ThemeLoadErrorRow(onRetry = { onEvent(MatchDetailsUiEvent.RetryThemeLoad) })
    }
 
 }

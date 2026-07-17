@@ -5,6 +5,7 @@ import com.bashkevich.tennisscorekeeper.model.match.domain.Match
 import com.bashkevich.tennisscorekeeper.model.match.domain.SAMPLE_MATCH
 import com.bashkevich.tennisscorekeeper.model.match.remote.body.MatchStatus
 import com.bashkevich.tennisscorekeeper.model.match.remote.body.ScoreType
+import com.bashkevich.tennisscorekeeper.model.theme.domain.ScoreboardThemeState
 
 import com.bashkevich.tennisscorekeeper.mvi.UiAction
 import com.bashkevich.tennisscorekeeper.mvi.UiEvent
@@ -36,12 +37,15 @@ sealed class MatchDetailsUiEvent : UiEvent {
     data object RedoPoint : MatchDetailsUiEvent()
 
     class AttachVideoLink(val videoLink: String) : MatchDetailsUiEvent()
+
+    data object RetryThemeLoad : MatchDetailsUiEvent()
 }
 
 @Immutable
 data class MatchDetailsState(
     val match: Match,
     val connectionState: ConnectionState = ConnectionState.Loading,
+    val themeState: ScoreboardThemeState = ScoreboardThemeState.Loading,
     val action: MatchDetailsAction? = null
 ) : UiState {
     companion object {
