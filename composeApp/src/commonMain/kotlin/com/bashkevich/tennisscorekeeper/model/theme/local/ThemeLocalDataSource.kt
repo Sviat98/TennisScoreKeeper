@@ -4,9 +4,12 @@ import com.bashkevich.tennisscorekeeper.core.local.AppDatabase
 import kotlinx.coroutines.flow.Flow
 
 class ThemeLocalDataSource(
-    private val db: AppDatabase
+    db: Lazy<AppDatabase>,
 ) {
-    private val dao: ThemeDao = db.themeDao()
+    // Ленивая БД (см. MatchLocalDataSource): на wasmJs-scoreboard БД не нужна,
+    // а её конструирование роняет OPFS-worker в WebView стриминговых приложений.
+    private val database by lazy { db.value }
+    private val dao: ThemeDao by lazy { database.themeDao() }
 
     fun getThemes(): Flow<List<ThemeEntity>> {
         return dao.getAllThemes()
