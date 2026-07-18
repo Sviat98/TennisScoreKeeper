@@ -5,6 +5,73 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TennisScoreKeeper</title>
     <link type="text/css" rel="stylesheet" href="styles.css">
+    <!-- Diagnostic overlay: disabled unless URL contains ?debug=1. Renders logs ON the page
+         (readable directly in Prism Live preview / screenshot) and, optionally, mirrors them
+         to a remote URL via ?logurl=<https://webhook.site/<uuid>> so they can be read from a
+         desktop browser. Intercepts window.WebSocket BEFORE composeApp.js loads so Ktor's
+         wss:// lifecycle is visible. Remove or keep behind ?debug=1 — production stays clean. -->
+    <script>
+    (function () {
+      if (!/[?&]debug=1([&#]|$)/.test(location.href)) return;
+
+      var m = /[?&]logurl=([^&#]*)/.exec(location.href);
+      var LOG_URL = m ? decodeURIComponent(m[1]) : null;
+
+      var box = document.createElement('pre');
+      Object.assign(box.style, {
+        position: 'fixed', left: '0', top: '0', right: '0', zIndex: '2147483647',
+        maxHeight: '70vh', overflow: 'auto', fontSize: '14px', lineHeight: '16px',
+        fontFamily: 'monospace', background: 'rgba(0,0,0,0.85)', color: '#0f0',
+        padding: '6px', margin: '0', whiteSpace: 'pre-wrap'
+      });
+      var attach = function () { document.body.appendChild(box); };
+      if (document.body) attach(); else document.addEventListener('DOMContentLoaded', attach);
+
+      var seq = 0;
+      var log = function () {
+        var line = '[' + (seq++) + '] ' + Array.prototype.map.call(arguments, function (a) {
+          return (typeof a === 'object' && a !== null) ? JSON.stringify(a) : String(a);
+        }).join(' ');
+        box.textContent += line + '\n';
+        if (LOG_URL) {
+          try { if (navigator.sendBeacon) navigator.sendBeacon(LOG_URL, line);
+                else fetch(LOG_URL, { method: 'POST', body: line }); } catch (e) {}
+        }
+        try { console.log(line); } catch (e) {}
+      };
+
+      window.addEventListener('error', function (e) {
+        log('ERR', e.message, '@', (e.filename || '') + ':' + (e.lineno || ''), e.error && e.error.stack);
+      });
+      window.addEventListener('unhandledrejection', function (e) {
+        var r = e.reason; log('REJ', r && (r.stack || r.message || String(r)));
+      });
+
+      // WebSocket interceptor — the key signal for a stuck spinner.
+      var NativeWS = window.WebSocket;
+      window.WebSocket = function (url, proto) {
+        log('WS create', url);
+        var ws = proto ? new NativeWS(url, proto) : new NativeWS(url);
+        ws.addEventListener('open',  function () { log('WS OPEN'); });
+        ws.addEventListener('error', function () { log('WS ERROR'); });
+        ws.addEventListener('close', function (ev) { log('WS CLOSE code=' + ev.code + ' reason=' + (ev.reason || '')); });
+        var states = ['CONNECTING', 'OPEN', 'CLOSING', 'CLOSED'];
+        var iv = setInterval(function () {
+          log('WS state=' + states[ws.readyState]);
+          if (ws.readyState === 3) clearInterval(iv);
+        }, 2000);
+        return ws;
+      };
+      window.WebSocket.prototype = NativeWS.prototype;
+      window.WebSocket.CONNECTING = 0; window.WebSocket.OPEN = 1;
+      window.WebSocket.CLOSING = 2; window.WebSocket.CLOSED = 3;
+
+      log('UA:', navigator.userAgent);
+      log('WasmGC:', !!(window.WebAssembly && WebAssembly.gc));
+      log('origin:', location.origin, '| LOG_URL:', LOG_URL || '(off)');
+      log('overlay ready — waiting for app…');
+    })();
+    </script>
     <script type="application/javascript" src="composeApp.js"></script>
 </head>
 <body>
