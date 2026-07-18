@@ -37,8 +37,20 @@
           try { if (navigator.sendBeacon) navigator.sendBeacon(LOG_URL, line);
                 else fetch(LOG_URL, { method: 'POST', body: line }); } catch (e) {}
         }
-        try { console.log(line); } catch (e) {}
       };
+
+      // Surface Kotlin println() (console.*) and any 3rd-party logs into the overlay.
+      ['log', 'warn', 'error', 'info'].forEach(function (fn) {
+        var orig = console[fn] ? console[fn].bind(console) : function () {};
+        console[fn] = function () {
+          try {
+            log('[' + fn + ']', Array.prototype.map.call(arguments, function (a) {
+              return (a && typeof a === 'object') ? (a.message || a.stack || JSON.stringify(a)) : String(a);
+            }).join(' '));
+          } catch (e) {}
+          orig.apply(console, arguments);
+        };
+      });
 
       window.addEventListener('error', function (e) {
         log('ERR', e.message, '@', (e.filename || '') + ':' + (e.lineno || ''), e.error && e.error.stack);

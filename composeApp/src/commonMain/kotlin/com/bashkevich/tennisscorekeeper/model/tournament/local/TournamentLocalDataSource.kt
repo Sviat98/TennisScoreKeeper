@@ -6,6 +6,7 @@ import kotlinx.coroutines.flow.Flow
 class TournamentLocalDataSource(
     private val db: AppDatabase
 ) {
+    init { println(">>> TournamentLocalDataSource created (db accessed)") }
     private val dao: TournamentDao = db.tournamentDao()
 
     fun getTournaments(): Flow<List<TournamentEntity>> {
