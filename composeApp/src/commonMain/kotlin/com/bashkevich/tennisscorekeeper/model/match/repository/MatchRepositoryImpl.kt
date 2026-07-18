@@ -81,7 +81,7 @@ class MatchRepositoryImpl(
         matchRemoteDataSource.observeMatchUpdates()
             .onStart { matchRemoteDataSource.connectToMatchUpdates(matchId.toString()) }
             .onEach { result ->
-                println("observeMatchUpdatesFromNetwork 111 = $result")
+                println("observeMatchUpdatesFromNetwork = $result")
                 result.doOnSuccess { matchDto ->
                     matchLocalDataSource.insertMatch(matchDto.toMatchWithParticipantsEntity())                }
             }
@@ -90,7 +90,6 @@ class MatchRepositoryImpl(
     override fun observeMatchUpdatesFromNetworkOnly(matchId: Int): Flow<LoadResult<Match, Throwable>> =
         matchRemoteDataSource.observeMatchUpdates()
             .onStart { matchRemoteDataSource.connectToMatchUpdates(matchId.toString()) }
-            .onEach { println("observeMatchUpdatesFromNetworkOnly 222 = $it") }
             .map { result -> result.mapSuccess { matchDto -> matchDto.toDomain() } }
 
     override fun observeConnectionState(): StateFlow<ConnectionState> =

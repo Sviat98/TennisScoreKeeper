@@ -54,7 +54,6 @@ import org.koin.plugin.module.dsl.viewModel
 val coreModule = module {
 
     single<DataStore<Preferences>> {
-        println("=== BUILDING DataStore ===\n${Exception().stackTraceToString()}")
         DataStoreFactory.create(storage = createPreferencesStorage(get<PlatformConfiguration>()))
     }
     singleOf(::KeyValueStorage) {
@@ -62,7 +61,6 @@ val coreModule = module {
     }
 
     single {
-        println("=== BUILDING AppDatabase ===\n${Exception().stackTraceToString()}")
         val platformConfiguration = get<PlatformConfiguration>()
         val builder = getDatabaseBuilder(platformConfiguration)
         builder.build()
