@@ -7,15 +7,10 @@ import com.bashkevich.tennisscorekeeper.model.participant.local.ParticipantDao
 import kotlinx.coroutines.flow.Flow
 
 class MatchLocalDataSource(
-    db: Lazy<AppDatabase>,
+    private val db: AppDatabase
 ) {
-    // БД резолвится лениво (Lazy): конструируется только при первом обращении к DAO.
-    // Это критично для wasmJs-scoreboard, который БД не использует: иначе при создании
-    // ViewModel строилась бы Room-БД → OPFS-worker → краш "OpfsDb is not a constructor"
-    // в WebView стриминговых приложений (Prism Live, Streamlabs), где OPFS недоступен.
-    private val database by lazy { db.value }
-    private val matchDao: MatchDao by lazy { database.matchDao() }
-    private val participantDao: ParticipantDao by lazy { database.participantDao() }
+    private val matchDao: MatchDao = db.matchDao()
+    private val participantDao: ParticipantDao = db.participantDao()
 
 
     fun observeMatches(tournamentId: Int): Flow<List<MatchWithParticipantsEntity>> {
@@ -41,7 +36,7 @@ class MatchLocalDataSource(
             listOf(match.firstParticipant.participantInMatch, match.secondParticipant.participantInMatch)
         }
 
-        database.useWriterConnection {
+        db.useWriterConnection {
             it.withTransaction(Transactor.SQLiteTransactionType.IMMEDIATE){
                 participantDao.insertPlayers(players)
                 participantDao.insertParticipants(participantWithPlayers.map { it.participant })
@@ -65,7 +60,7 @@ class MatchLocalDataSource(
         val players = participantWithPlayers.map { it.player } +
                 participantWithPlayers.mapNotNull { it.secondPlayer }
 
-        database.useWriterConnection {
+        db.useWriterConnection {
             it.withTransaction(Transactor.SQLiteTransactionType.IMMEDIATE){
                 participantDao.insertPlayers(players)
                 participantDao.insertParticipants(participantWithPlayers.map { it.participant })
@@ -82,7 +77,7 @@ class MatchLocalDataSource(
     }
 
     suspend fun deleteMatchesForTournament(tournamentId: Int) {
-        database.useWriterConnection {
+        db.useWriterConnection {
             it.withTransaction(Transactor.SQLiteTransactionType.IMMEDIATE) {
                 matchDao.deleteMatchesByTournament(tournamentId)
             }
@@ -90,7 +85,7 @@ class MatchLocalDataSource(
     }
 
     suspend fun deleteAllMatches(){
-        database.useWriterConnection {
+        db.useWriterConnection {
             it.withTransaction(Transactor.SQLiteTransactionType.IMMEDIATE){
                 matchDao.deleteAllMatches()
                 participantDao.deleteAllParticipantsWithPlayers()
