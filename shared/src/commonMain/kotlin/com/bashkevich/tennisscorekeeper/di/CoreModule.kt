@@ -1,0 +1,196 @@
+package com.bashkevich.tennisscorekeeper.di
+
+import androidx.datastore.core.DataStore
+import androidx.datastore.core.DataStoreFactory
+import androidx.datastore.preferences.core.Preferences
+import com.bashkevich.tennisscorekeeper.AppConfig
+import com.bashkevich.tennisscorekeeper.AppViewModel
+import com.bashkevich.tennisscorekeeper.core.local.AppDatabase
+import com.bashkevich.tennisscorekeeper.core.local.KeyValueStorage
+import com.bashkevich.tennisscorekeeper.core.local.createPreferencesStorage
+import com.bashkevich.tennisscorekeeper.core.PlatformConfiguration
+import com.bashkevich.tennisscorekeeper.core.local.getDatabaseBuilder
+import com.bashkevich.tennisscorekeeper.core.remote.ResponseMessage
+import com.bashkevich.tennisscorekeeper.core.remote.NotFoundException
+import com.bashkevich.tennisscorekeeper.core.remote.UnauthorizedActionException
+import com.bashkevich.tennisscorekeeper.core.remote.UnauthorizedException
+import com.bashkevich.tennisscorekeeper.core.remote.doOnError
+import com.bashkevich.tennisscorekeeper.core.remote.doOnSuccess
+import com.bashkevich.tennisscorekeeper.core.remote.httpClient
+import com.bashkevich.tennisscorekeeper.core.remote.runOperationCatching
+import com.bashkevich.tennisscorekeeper.model.auth.remote.RefreshTokensResponseDto
+import io.ktor.client.HttpClient
+import io.ktor.client.call.body
+import io.ktor.client.plugins.ClientRequestException
+import io.ktor.client.plugins.HttpResponseValidator
+import io.ktor.client.plugins.HttpSend
+import io.ktor.client.plugins.HttpTimeout
+import io.ktor.client.plugins.auth.Auth
+import io.ktor.client.plugins.auth.providers.BearerTokens
+import io.ktor.client.plugins.auth.providers.bearer
+import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.client.plugins.defaultRequest
+import io.ktor.client.plugins.logging.LogLevel
+import io.ktor.client.plugins.logging.Logging
+import io.ktor.client.plugins.plugin
+import io.ktor.client.plugins.websocket.WebSockets
+import io.ktor.client.request.forms.submitForm
+import io.ktor.client.request.header
+import io.ktor.http.ContentType
+import io.ktor.http.HttpHeaders
+import io.ktor.http.HttpMethod
+import io.ktor.http.HttpStatusCode
+import io.ktor.http.URLProtocol
+import io.ktor.http.contentType
+import io.ktor.http.parameters
+import io.ktor.serialization.kotlinx.KotlinxWebsocketSerializationConverter
+import io.ktor.serialization.kotlinx.json.json
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.first
+import kotlinx.serialization.json.Json
+import org.koin.dsl.module
+import org.koin.plugin.module.dsl.viewModel
+
+val coreModule = module {
+
+    single<DataStore<Preferences>> {
+        DataStoreFactory.create(storage = createPreferencesStorage(get<PlatformConfiguration>()))
+    }
+    single<KeyValueStorage>(createdAtStart = true) { KeyValueStorage(get()) }
+
+    single<AppDatabase> {
+        val platformConfiguration = get<PlatformConfiguration>()
+        val builder = getDatabaseBuilder(platformConfiguration)
+        builder.build()
+    }
+
+    val jsonSerializer = Json {
+        prettyPrint = true
+        isLenient = true
+        explicitNulls = false
+    }
+
+    single<HttpClient> {
+        val keyValueStorage = get<KeyValueStorage>()
+
+        val appConfig = AppConfig.current
+
+        val client = httpClient {
+            expectSuccess = true
+            HttpResponseValidator {
+                handleResponseExceptionWithRequest { exception, request ->
+                    val clientException =
+                        exception as? ClientRequestException ?: return@handleResponseExceptionWithRequest
+                    val exceptionResponse = clientException.response
+                    if (exceptionResponse.status == HttpStatusCode.Unauthorized) {
+                        val exceptionResponseText =
+                            exceptionResponse.body<ResponseMessage>().message
+                        val path = request.url.encodedPath
+                        val isAuthEndpoint = path in listOf(
+                            "/login", "/refreshToken", "/refreshTokenStatus", "/logout"
+                        )
+                        if (isAuthEndpoint) {
+                            throw UnauthorizedException(exceptionResponseText)
+                        } else {
+                            throw UnauthorizedActionException()
+                        }
+                    }
+                    if (exceptionResponse.status == HttpStatusCode.NotFound) {
+                        val exceptionResponseText =
+                            exceptionResponse.body<ResponseMessage>().message
+                        throw NotFoundException(exceptionResponseText)
+                    }
+                }
+            }
+            defaultRequest {
+                url {
+                    protocol = URLProtocol.HTTPS
+                    host = appConfig.baseHostBackend
+                }
+                contentType(ContentType.Application.Json)
+                header(HttpHeaders.Origin, appConfig.baseUrlFrontend)
+            }
+            install(Logging) {
+                level = LogLevel.ALL
+                sanitizeHeader { header ->
+                    header == HttpHeaders.Authorization
+                }
+            }
+            install(Auth) {
+                bearer {
+                    loadTokens {
+                        val (accessToken, refreshToken) = keyValueStorage.observeTokens()
+                            .distinctUntilChanged()
+                            .first()
+
+                        val bearerTokens =
+                            if (accessToken.isNotEmpty() && refreshToken.isNotEmpty()) BearerTokens(
+                                accessToken,
+                                refreshToken
+                            ) else null
+
+                        bearerTokens
+                    }
+                    refreshTokens {
+                        println("refreshTokens TRIGGER")
+                        val refreshToken = oldTokens?.refreshToken
+
+                        var bearerTokens: BearerTokens? = null
+
+                        refreshToken?.let {
+                            runOperationCatching {
+                                client.submitForm(
+                                    url = "/refreshToken",
+                                    formParameters = parameters {
+                                        append("refreshToken", refreshToken)
+                                    }) {
+                                    markAsRefreshTokenRequest()
+                                }.body<RefreshTokensResponseDto>()
+                            }.doOnSuccess { refreshTokenResponseDto ->
+                                val accessToken = refreshTokenResponseDto.accessToken
+                                val refreshToken = refreshTokenResponseDto.refreshToken
+
+                                keyValueStorage.saveTokens(accessToken, refreshToken)
+                                bearerTokens = BearerTokens(accessToken, refreshToken)
+                            }.doOnError { throwable ->
+                                if (throwable is UnauthorizedException) {
+                                    keyValueStorage.savePlayerId("")
+                                    keyValueStorage.saveTokens("", "")
+                                }
+                            }
+                        }
+
+                        bearerTokens
+                    }
+                }
+            }
+            install(ContentNegotiation) {
+                json(jsonSerializer)
+            }
+            install(HttpTimeout) {
+                socketTimeoutMillis = 20_000
+            }
+            install(WebSockets) {
+                pingIntervalMillis = 15_000
+                contentConverter = KotlinxWebsocketSerializationConverter(Json)
+            }
+        }
+        client.plugin(HttpSend).intercept { request ->
+            val method = request.method
+            val newRequest = when {
+                method !in listOf(HttpMethod.Post, HttpMethod.Put, HttpMethod.Patch) -> {
+                    // Для GET, DELETE и других методов не добавляем токен
+                    request.headers.remove(HttpHeaders.Authorization)
+                    request
+                }
+
+                else -> {
+                    request
+                }
+            }
+            execute(newRequest)
+        }
+        client
+    }
+    viewModel<AppViewModel>()
+}

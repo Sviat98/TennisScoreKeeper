@@ -11,27 +11,27 @@ COPY . .
 # Устанавливаем tree для визуализации структуры файлов
 RUN apt-get update && apt-get install -y tree
 
-WORKDIR /app/composeApp
+WORKDIR /app
 
 ## перед сборкой удаляем ненужные исполняемые файлы из bild-директорий
-RUN rm -rf /app/composeApp/build/dist/wasmJs/* && \
+RUN rm -rf /app/webApp/build/dist/wasmJs/* && \
     rm -rf /usr/share/nginx/html/* \
 
 RUN apt-get update && apt-get -y install libatomic1
 
 # Собираем проект в заивсимости от BUILD_MODE
 RUN if [ "$BUILD_MODE" = "RELEASE" ]; then \
-        GRADLE_TASK=wasmJsBrowserDistribution && \
+        GRADLE_TASK=:webApp:wasmJsBrowserDistribution && \
         DIST_DIR=productionExecutable; \
     else \
-        GRADLE_TASK=wasmJsBrowserDevelopmentExecutableDistribution && \
+        GRADLE_TASK=:webApp:wasmJsBrowserDevelopmentExecutableDistribution && \
         DIST_DIR=developmentExecutable; \
     fi && \
     echo ">>> BUILD_MODE=$BUILD_MODE" && \
     echo ">>> GRADLE_TASK=$GRADLE_TASK" && \
     echo ">>> DIST_DIR=$DIST_DIR" && \
     gradle $GRADLE_TASK && \
-    cp -r build/dist/wasmJs/$DIST_DIR /output
+    cp -r webApp/build/dist/wasmJs/$DIST_DIR /output
 
 ####### ОТЛАДКА!!!!!
 RUN ls -lR /output
