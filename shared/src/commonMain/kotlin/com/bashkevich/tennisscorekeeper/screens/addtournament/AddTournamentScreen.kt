@@ -171,7 +171,7 @@ fun AddTournamentContent(
                 onClick = {
                     onEvent(
                         AddTournamentUiEvent.AddTournament(
-                            tournamentName = tournamentNameState.text.toString(),
+                            tournamentName = tournamentNameState.text.toString().trim(),
                             tournamentType = tournamentType!!,
                             defaultSetTemplateId = regularSetTemplate?.id,
                             decidingSetTemplateId = decidingSetTemplate!!.id,

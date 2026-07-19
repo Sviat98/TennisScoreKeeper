@@ -58,7 +58,7 @@ class LoginViewModel(
         viewModelScope.launch {
             _isLoading.value = true
             val loginBody = LoginBody(
-                login = loginTextFieldState.text.toString(),
+                login = loginTextFieldState.text.toString().trim(),
                 password = passwordTextFieldState.text.toString()
             )
             authRepository.login(loginBody).doOnError { throwable ->
