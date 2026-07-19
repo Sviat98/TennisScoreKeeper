@@ -5,6 +5,7 @@ import androidx.datastore.core.DataStoreFactory
 import androidx.datastore.preferences.core.Preferences
 import com.bashkevich.tennisscorekeeper.AppConfig
 import com.bashkevich.tennisscorekeeper.AppViewModel
+import com.bashkevich.tennisscorekeeper.core.local.AppDatabase
 import com.bashkevich.tennisscorekeeper.core.local.KeyValueStorage
 import com.bashkevich.tennisscorekeeper.core.local.createPreferencesStorage
 import com.bashkevich.tennisscorekeeper.core.PlatformConfiguration
@@ -18,6 +19,7 @@ import com.bashkevich.tennisscorekeeper.core.remote.doOnSuccess
 import com.bashkevich.tennisscorekeeper.core.remote.httpClient
 import com.bashkevich.tennisscorekeeper.core.remote.runOperationCatching
 import com.bashkevich.tennisscorekeeper.model.auth.remote.RefreshTokensResponseDto
+import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.plugins.ClientRequestException
 import io.ktor.client.plugins.HttpResponseValidator
@@ -46,8 +48,6 @@ import io.ktor.serialization.kotlinx.json.json
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
 import kotlinx.serialization.json.Json
-import org.koin.core.module.dsl.createdAtStart
-import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.module
 import org.koin.plugin.module.dsl.viewModel
 
@@ -56,11 +56,9 @@ val coreModule = module {
     single<DataStore<Preferences>> {
         DataStoreFactory.create(storage = createPreferencesStorage(get<PlatformConfiguration>()))
     }
-    singleOf(::KeyValueStorage) {
-        createdAtStart()
-    }
+    single<KeyValueStorage>(createdAtStart = true) { KeyValueStorage(get()) }
 
-    single {
+    single<AppDatabase> {
         val platformConfiguration = get<PlatformConfiguration>()
         val builder = getDatabaseBuilder(platformConfiguration)
         builder.build()
@@ -72,7 +70,7 @@ val coreModule = module {
         explicitNulls = false
     }
 
-    single {
+    single<HttpClient> {
         val keyValueStorage = get<KeyValueStorage>()
 
         val appConfig = AppConfig.current
