@@ -40,7 +40,7 @@ class MatchDetailsViewModel(
     BaseViewModel<MatchDetailsState, MatchDetailsUiEvent, MatchDetailsAction>() {
     private val matchId: Int = savedStateHandle.toRoute<MatchDetailsRoute>().id
 
-    private val networkUpdates = matchRepository.observeMatchUpdatesFromNetwork(matchId)
+    private val networkUpdates = matchRepository.observeMatchUpdatesFromNetworkAndSaveToDb(matchId)
 
     // --- Тема матча: /themes/{themeId} → БД, затем observe из БД ---
     private val themeIdFlow = matchRepository.observeMatchById(matchId)
