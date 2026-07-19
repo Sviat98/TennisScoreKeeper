@@ -77,7 +77,7 @@ class MatchRepositoryImpl(
             .map { it?.toMatchDomain() }
     }
 
-    override fun observeMatchUpdatesFromNetwork(matchId: Int): Flow<LoadResult<Match, Throwable>> =
+    override fun observeMatchUpdatesFromNetworkAndSaveToDb(matchId: Int): Flow<LoadResult<Unit, Throwable>> =
         matchRemoteDataSource.observeMatchUpdates()
             .onStart { matchRemoteDataSource.connectToMatchUpdates(matchId.toString()) }
             .onEach { result ->
@@ -85,9 +85,9 @@ class MatchRepositoryImpl(
                 result.doOnSuccess { matchDto ->
                     matchLocalDataSource.insertMatch(matchDto.toMatchWithParticipantsEntity())                }
             }
-            .map { result -> result.mapSuccess { matchDto -> matchDto.toDomain() } }
+            .map { result -> result.mapSuccess {  } }
 
-    override fun observeMatchUpdatesFromNetworkOnly(matchId: Int): Flow<LoadResult<Match, Throwable>> =
+    override fun observeMatchUpdatesFromNetwork(matchId: Int): Flow<LoadResult<Match, Throwable>> =
         matchRemoteDataSource.observeMatchUpdates()
             .onStart { matchRemoteDataSource.connectToMatchUpdates(matchId.toString()) }
             .map { result -> result.mapSuccess { matchDto -> matchDto.toDomain() } }

@@ -29,7 +29,7 @@ class MatchDetailsRefreshThemeUseCase(
         flow {
             refreshTrigger.onStart { emit(Unit) }.collect {
                 emit(null)
-                emit(themeRepository.fetchThemeById(id))
+                emit(themeRepository.fetchThemeByIdAndSaveToDb(id))
             }
         }
     }

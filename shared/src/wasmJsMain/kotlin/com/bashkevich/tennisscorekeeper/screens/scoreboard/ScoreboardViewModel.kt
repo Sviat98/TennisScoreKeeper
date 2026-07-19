@@ -34,7 +34,7 @@ class ScoreboardViewModel(
     // Один сетевой поток на экран (shareIn): и state, и загрузка темы делят одну WS-сессию.
     // Network-only (без кэширования в БД): Scoreboard не должен касаться Room/OPFS —
     // в WebView стриминговых приложений OPFS недоступен и крашит приложение.
-    private val matchUpdates = matchRepository.observeMatchUpdatesFromNetworkOnly(matchId)
+    private val matchUpdates = matchRepository.observeMatchUpdatesFromNetwork(matchId)
         .shareIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), replay = 1)
 
     // --- Тема матча: /themes/{themeId} → оперативная память, без БД ---

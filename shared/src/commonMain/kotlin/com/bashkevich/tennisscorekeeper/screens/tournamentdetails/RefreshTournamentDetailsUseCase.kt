@@ -86,7 +86,7 @@ class RefreshTournamentDetailsUseCase(
             ?.let { ids ->
                 coroutineScope {
                     ids.forEach { themeId ->
-                        launch { themeRepository.fetchThemeById(themeId) }
+                        launch { themeRepository.fetchThemeByIdAndSaveToDb(themeId) }
                     }
                 }
             }

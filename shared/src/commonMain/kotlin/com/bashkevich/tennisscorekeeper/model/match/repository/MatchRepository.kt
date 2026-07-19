@@ -18,15 +18,15 @@ interface MatchRepository {
     suspend fun getMatchesForTournament(tournamentId: Int): LoadResult<List<ShortMatch>, Throwable>
     fun closeSession()
     fun observeMatchById(matchId: Int): Flow<Match?>
-    fun observeMatchUpdatesFromNetwork(matchId: Int): Flow<LoadResult<Match, Throwable>>
+    fun observeMatchUpdatesFromNetworkAndSaveToDb(matchId: Int): Flow<LoadResult<Unit, Throwable>>
 
     /**
      * Чистый network-поток обновлений матча БЕЗ кэширования в БД.
      * Для экранов, которым нужны только свежие данные из сети (например, Scoreboard-виджет
      * в WebView стриминговых приложений, где OPFS/Room недоступен). MatchDetails использует
-     * кэширующий [observeMatchUpdatesFromNetwork].
+     * кэширующий [observeMatchUpdatesFromNetworkAndSaveToDb].
      */
-    fun observeMatchUpdatesFromNetworkOnly(matchId: Int): Flow<LoadResult<Match, Throwable>>
+    fun observeMatchUpdatesFromNetwork(matchId: Int): Flow<LoadResult<Match, Throwable>>
     fun observeConnectionState(): StateFlow<ConnectionState>
 
     suspend fun updateMatchScore(matchId: Int, participantId: Int, scoreType: ScoreType): LoadResult<ResponseMessage, Throwable>

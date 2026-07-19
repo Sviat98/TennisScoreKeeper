@@ -6,7 +6,6 @@ import com.bashkevich.tennisscorekeeper.model.theme.repository.ThemeRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.onStart
 
 class AddMatchFetchHelper(
@@ -20,7 +19,7 @@ class AddMatchFetchHelper(
     fun observeThemeByIdFromNetwork(id: Int): Flow<LoadResult<Unit, Throwable>?> = flow {
         _themeTrigger.onStart { emit(Unit) }.collect {
             emit(null)
-            emit(themeRepository.fetchThemeById(id))
+            emit(themeRepository.fetchThemeByIdAndSaveToDb(id))
         }
     }
 

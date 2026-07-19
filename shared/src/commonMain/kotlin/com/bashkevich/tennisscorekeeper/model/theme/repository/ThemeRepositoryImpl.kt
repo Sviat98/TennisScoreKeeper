@@ -10,7 +10,6 @@ import com.bashkevich.tennisscorekeeper.model.theme.local.toEntity
 import com.bashkevich.tennisscorekeeper.model.theme.remote.ThemeBody
 import com.bashkevich.tennisscorekeeper.model.theme.remote.ThemeRemoteDataSource
 import com.bashkevich.tennisscorekeeper.model.theme.domain.toDomain
-import com.bashkevich.tennisscorekeeper.model.theme.domain.toThemeBody
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.flow
@@ -34,7 +33,7 @@ class ThemeRepositoryImpl(
     override fun fetchThemesFlow(): Flow<LoadResult<Unit, Throwable>?> = flow {
         refreshTrigger.onStart { emit(Unit) }.collect {
             emit(null)
-            val result = themeRemoteDataSource.getThemes()
+            themeRemoteDataSource.getThemes()
                 .doOnSuccess { themeDtos ->
                     val entities = themeDtos.map { it.toEntity() }
                     themeLocalDataSource.replaceAllThemes(entities)
@@ -50,7 +49,7 @@ class ThemeRepositoryImpl(
         refreshTrigger.tryEmit(Unit)
     }
 
-    override suspend fun fetchThemeById(id: Int): LoadResult<Unit, Throwable> {
+    override suspend fun fetchThemeByIdAndSaveToDb(id: Int): LoadResult<Unit, Throwable> {
         return themeRemoteDataSource.getThemeById(id.toString()).doOnSuccess { themeDto ->
             themeLocalDataSource.insertTheme(themeDto.toEntity())
         }.mapSuccess { }

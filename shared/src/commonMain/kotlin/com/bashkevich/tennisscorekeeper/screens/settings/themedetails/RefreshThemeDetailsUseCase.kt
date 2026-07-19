@@ -22,7 +22,7 @@ class RefreshThemeDetailsUseCase(
     fun fetchThemeByIdFlow(): Flow<LoadResult<Unit, Throwable>?> = flow {
         refreshTrigger.onStart { emit(Unit) }.collect {
             emit(null)
-            themeRepository.fetchThemeById(themeId)
+            themeRepository.fetchThemeByIdAndSaveToDb(themeId)
                 .doOnSuccess { emit(LoadResult.Success(Unit)) }
                 .doOnError { emit(LoadResult.Error(it)) }
         }
