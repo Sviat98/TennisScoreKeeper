@@ -1,8 +1,5 @@
 package com.bashkevich.tennisscorekeeper.components.expect
 
-import android.os.Build
-import android.view.View
-import android.view.WindowInsetsController
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.compose.LocalActivity
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
@@ -37,6 +34,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalClipboard
 import androidx.compose.ui.unit.dp
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
 import chaintech.videoplayer.host.MediaPlayerEvent
 import chaintech.videoplayer.host.MediaPlayerHost
 import com.bashkevich.tennisscorekeeper.LocalAuthorization
@@ -96,25 +96,14 @@ actual fun MatchDetailsContentWrapper(
     val window = LocalActivity.current?.window
 
     LaunchedEffect(isFullScreen) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            val insetsController = window?.insetsController
-
+        window?.let { w ->
+            val controller = WindowCompat.getInsetsController(w, w.decorView)
             if (isFullScreen) {
-                insetsController?.hide(android.view.WindowInsets.Type.systemBars()) // Hide systemBars
-                insetsController?.systemBarsBehavior =
-                    WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+                controller.systemBarsBehavior =
+                    WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+                controller.hide(WindowInsetsCompat.Type.systemBars())
             } else {
-                insetsController?.show(android.view.WindowInsets.Type.systemBars()) // Hide systemBars
-            }
-        } else {
-            if (isFullScreen) {
-                window?.decorView?.systemUiVisibility = (
-                        View.SYSTEM_UI_FLAG_FULLSCREEN
-                                or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-                                or View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
-                        )
-            } else {
-                window?.decorView?.systemUiVisibility = View.SYSTEM_UI_FLAG_VISIBLE
+                controller.show(WindowInsetsCompat.Type.systemBars())
             }
         }
     }
