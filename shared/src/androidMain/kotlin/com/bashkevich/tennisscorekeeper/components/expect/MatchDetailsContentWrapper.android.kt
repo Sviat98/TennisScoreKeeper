@@ -1,0 +1,316 @@
+package com.bashkevich.tennisscorekeeper.components.expect
+
+import android.os.Build
+import android.view.View
+import android.view.WindowInsetsController
+import androidx.activity.OnBackPressedCallback
+import androidx.activity.compose.LocalActivity
+import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.ScaffoldDefaults
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.compositionLocalOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalClipboard
+import androidx.compose.ui.unit.dp
+import chaintech.videoplayer.host.MediaPlayerEvent
+import chaintech.videoplayer.host.MediaPlayerHost
+import com.bashkevich.tennisscorekeeper.LocalAuthorization
+import com.bashkevich.tennisscorekeeper.LocalNavHostController
+import com.bashkevich.tennisscorekeeper.components.MatchDetailsAppBar
+import com.bashkevich.tennisscorekeeper.components.ScoreboardWithMediaPlayerView
+import com.bashkevich.tennisscorekeeper.components.match_details.ScoreboardControlPanel
+import com.bashkevich.tennisscorekeeper.model.match.remote.body.toResource
+import com.bashkevich.tennisscorekeeper.navigation.SettingsRoute
+import com.bashkevich.tennisscorekeeper.screens.matchdetails.MatchDetailsState
+import com.bashkevich.tennisscorekeeper.screens.matchdetails.MatchDetailsUiEvent
+import kotlinx.coroutines.launch
+import org.jetbrains.compose.resources.stringResource
+import tennisscorekeeper.shared.generated.resources.Res
+import tennisscorekeeper.shared.generated.resources.status
+
+// Класс состояния с значением и функцией обновления
+class FullScreenState(
+    val isFullScreen: Boolean,
+    val setFullScreenValue: (Boolean) -> Unit
+)
+
+//
+val LocalFullScreenState = compositionLocalOf<FullScreenState> {
+    error("FullScreenState не предоставлен")
+}
+
+@Composable
+actual fun MatchDetailsContentWrapper(
+    modifier: Modifier,
+    state: MatchDetailsState,
+    snackbarHostState: SnackbarHostState,
+    onEvent: (MatchDetailsUiEvent) -> Unit
+) {
+    val navController = LocalNavHostController.current
+    val match = state.match
+
+    val clipboard = LocalClipboard.current
+
+    val isAuthorized = LocalAuthorization.current
+
+    val backPressedDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
+
+//    // Создаем состояние
+    var isFullScreen by remember { mutableStateOf(false) }
+//
+//    // Создаем экземпляр FullScreenState
+    val fullScreenState = remember(isFullScreen) {
+        FullScreenState(
+            isFullScreen = isFullScreen,
+            setFullScreenValue = { newValue ->
+                isFullScreen = newValue
+            }
+        )
+    }
+
+    val window = LocalActivity.current?.window
+
+    LaunchedEffect(isFullScreen) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            val insetsController = window?.insetsController
+
+            if (isFullScreen) {
+                insetsController?.hide(android.view.WindowInsets.Type.systemBars()) // Hide systemBars
+                insetsController?.systemBarsBehavior =
+                    WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+            } else {
+                insetsController?.show(android.view.WindowInsets.Type.systemBars()) // Hide systemBars
+            }
+        } else {
+            if (isFullScreen) {
+                window?.decorView?.systemUiVisibility = (
+                        View.SYSTEM_UI_FLAG_FULLSCREEN
+                                or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                                or View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+                        )
+            } else {
+                window?.decorView?.systemUiVisibility = View.SYSTEM_UI_FLAG_VISIBLE
+            }
+        }
+    }
+
+    val mediaPlayerHost = remember { MediaPlayerHost() }
+
+    mediaPlayerHost.onEvent = { event ->
+        when (event) {
+            is MediaPlayerEvent.FullScreenChange -> {
+                fullScreenState.setFullScreenValue(!isFullScreen)
+            }
+
+            else -> {}
+        }
+    }
+
+    // Обработка кнопки "назад"
+    DisposableEffect(Unit) {
+        val callback = object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                if (isFullScreen) {
+                    mediaPlayerHost.setFullScreen(false)
+                    fullScreenState.setFullScreenValue(false)
+                } else {
+                    navController.navigateUp()
+                }
+            }
+        }
+        backPressedDispatcher?.addCallback(callback)
+
+        onDispose {
+            callback.remove()
+        }
+    }
+
+    val scope = rememberCoroutineScope()
+    CompositionLocalProvider(
+        LocalFullScreenState provides fullScreenState
+    ) {
+        Scaffold(
+            modifier = Modifier.then(modifier),
+            snackbarHost = { SnackbarHost(snackbarHostState) },
+            topBar = {
+                if (!isFullScreen) {
+                    MatchDetailsAppBar(
+                        matchId = match.id,
+                        onBack = { navController.navigateUp() },
+                        onCopyLink = { link ->
+                            scope.launch {
+                                clipboard.setText(link)
+                            }
+                        },
+                        onNavigateToSettings = { navController.navigate(SettingsRoute) }
+                    )
+                }
+            },
+            contentWindowInsets = if (isFullScreen) WindowInsets.statusBars else ScaffoldDefaults.contentWindowInsets
+        ) { paddingValues ->
+            val boxModifier =
+                if (isFullScreen) Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues) else Modifier
+                    .fillMaxWidth()
+                    .padding(paddingValues)
+                    .padding(all = 16.dp)
+                    .verticalScroll(state = rememberScrollState())
+            Box(
+                modifier = Modifier.then(boxModifier)
+            ) {
+                val columnModifier = if (isFullScreen) Modifier.fillMaxSize() else Modifier
+                    .widthIn(max = 600.dp)
+                    .fillMaxWidth()
+                    .align(Alignment.Center)
+                Column(
+                    modifier = Modifier.then(columnModifier),
+                    verticalArrangement = Arrangement.SpaceAround,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    ScoreboardWithMediaPlayerView(
+                        modifier = Modifier.horizontalScroll(state = rememberScrollState()),
+                        match = match,
+                        themeState = state.themeState,
+                        mediaPlayerHost = mediaPlayerHost,
+                        onEvent = onEvent
+                    )
+                    if (!isFullScreen) { // показываем, ТОЛЬКО если видео не на полный экран
+                        Text("${stringResource(Res.string.status)}: ${stringResource(match.status.toResource())}")
+
+                        ScoreboardControlPanel(
+                            modifier = Modifier.fillMaxSize(),
+                            connectionState = state.connectionState,
+                            match = match,
+                            onEvent = onEvent,
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+//@Composable
+//actual fun MatchDetailsContentWrapper(
+//    modifier: Modifier,
+//    state: MatchDetailsState,
+//    onEvent: (MatchDetailsUiEvent) -> Unit
+//) {
+//    val navController = LocalNavHostController.current
+//    val match = state.match
+//
+//    val clipboard = LocalClipboard.current
+//
+//    val isAuthorized = LocalAuthorization.current
+//
+//    // Создаем состояние
+//    var isFullScreenEnabled by remember { mutableStateOf(false) }
+//
+//    // Создаем экземпляр FullScreenState
+//    val fullScreenState = remember(isFullScreenEnabled) {
+//        FullScreenState(
+//            isFullScreenEnabled = isFullScreenEnabled,
+//            toggleValue = {
+//                !isFullScreenEnabled
+//            }
+//        )
+//    }
+//
+//    val scope = rememberCoroutineScope()
+//
+//    val mediaUrl = "https://www.youtube.com/watch?v=EVHs7jmRdXk"
+//    val mediaPlayerHost = remember { MediaPlayerHost(mediaUrl = mediaUrl) }
+//
+//    mediaPlayerHost.onEvent = { event ->
+//        when (event) {
+//            is MediaPlayerEvent.FullScreenChange -> {
+//                isFullScreenEnabled = !isFullScreenEnabled
+//            }
+//
+//            else -> {}
+//        }
+//    }
+//    CompositionLocalProvider(
+//        LocalFullScreenState provides fullScreenState
+//    ) {
+//        Scaffold(
+//            modifier = Modifier.then(modifier),
+//            topBar = {
+//                if (!isFullScreenEnabled) {
+//                    MatchDetailsAppBar(
+//                        matchId = match.id,
+//                        onBack = { navController.navigateUp() },
+//                        onCopyLink = { link ->
+//                            scope.launch {
+//                                clipboard.setText(link)
+//                            }
+//                        },
+//                        isAuthorized = isAuthorized,
+//                        onNavigateToLoginOrProfile = {
+//                            if (isAuthorized) {
+//                                navController.navigate(ProfileRoute)
+//                            } else {
+//                                navController.navigate(LoginRoute)
+//                            }
+//                        }
+//                    )
+//                }
+//            }
+//        ) { paddingValues ->
+//            Box(
+//                modifier = Modifier
+//                    .fillMaxSize()
+//                    .padding(paddingValues)
+//                    .padding(all = 16.dp)
+//                    .background(Color.Yellow)
+//                    .verticalScroll(state = rememberScrollState())
+//            ) {
+//                Column(
+//                    modifier = Modifier
+//
+//                        .align(Alignment.Center)
+//                        .background(Color.Green),
+//                    verticalArrangement = Arrangement.SpaceAround,
+//                    horizontalAlignment = Alignment.CenterHorizontally
+//                ) {
+//                    VideoPlayerComposable(
+//                        modifier = if (isFullScreenEnabled) Modifier.fillMaxSize() else Modifier.width(
+//                            300.dp
+//                        ).aspectRatio(16 / 9f)
+//                            .background(Color.Blue),
+//                        playerHost = mediaPlayerHost,
+//                        playerConfig = VideoPlayerConfig(
+//                            enableFullEdgeToEdge = false
+//                        )
+//                    )
+//                }
+//            }
+//        }
+//    }
+//}

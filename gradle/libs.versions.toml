@@ -1,5 +1,5 @@
 [versions]
-agp = "9.2.1"
+agp = "9.3.0"
 android-compileSdk = "37"
 android-minSdk = "24"
 android-targetSdk = "37"
@@ -8,20 +8,20 @@ androidx-activityCompose = "1.13.0"
 androidx-appcompat = "1.7.1"
 androidx-core-ktx = "1.19.0"
 androidx-espresso-core = "3.7.0"
-androidx-lifecycle = "2.11.0-rc01"
+androidx-lifecycle = "2.11.0"
 androidx-material = "1.13.0"
 androidx-navigation = "2.9.2"
 androidx-test-junit = "1.3.0"
 compose-multiplatform = "1.11.1"
 material3 = "1.11.0-alpha07"
 junit = "4.13.2"
-kotlin = "2.4.0"
+kotlin = "2.4.10"
 ksp = "2.3.5"
 kotlinx-serialization = "1.11.0"
 koinBom = "4.2.2"
 koinPlugin = "1.0.1"
 ktor = "3.5.1"
-logback = "1.5.37"
+logback = "1.5.38"
 slf4j = "1.7.36"
 coroutines = "1.11.0"
 calf-file-picker = "0.12.0"
@@ -106,6 +106,7 @@ androidKmpLibrary = { id = "com.android.kotlin.multiplatform.library", version.r
 composeMultiplatform = { id = "org.jetbrains.compose", version.ref = "compose-multiplatform" }
 composeCompiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
+kotlinJvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlinx-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 build-konfig = {id = "com.codingfeline.buildkonfig" , version.ref = "build-konfig" }
