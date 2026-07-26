@@ -5,6 +5,7 @@ import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -26,22 +27,22 @@ import tennisscorekeeper.shared.generated.resources.toggle_section
 
 @Composable
 fun ExpandableSection(
+    modifier: Modifier = Modifier,
     title: String,
     expanded: Boolean,
     onToggle: () -> Unit,
-    modifier: Modifier = Modifier,
     content: @Composable () -> Unit,
 ) {
-    Column(modifier = modifier) {
+    Column(modifier = Modifier.then(modifier)) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(vertical = 8.dp, horizontal = 4.dp),
             verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Text(
                 text = title,
-                modifier = Modifier.weight(1f),
                 style = MaterialTheme.typography.bodyMedium,
             )
             IconButton(onClick = onToggle) {

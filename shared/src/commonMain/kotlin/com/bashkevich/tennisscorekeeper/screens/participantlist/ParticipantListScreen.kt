@@ -136,8 +136,9 @@ private fun ParticipantListContent(
             Column(
                 modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
+                verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterVertically)
             ) {
+                Text(text = stringResource(Res.string.participant_list_empty))
                 if (tournamentStatus == TournamentStatus.NOT_STARTED) {
                     UploadFileComponent(
                         modifier = Modifier.widthIn(max = TournamentTabMaxWidth).fillMaxWidth(),
