@@ -91,7 +91,8 @@ fun ParticipantListContentPreview() {
         ),
         tournamentStatus = TournamentStatus.NOT_STARTED,
         onUploadFile = {},
-        onSelectFile = {}
+        onSelectFile = {},
+        onClearFile = {}
     )
 }
 

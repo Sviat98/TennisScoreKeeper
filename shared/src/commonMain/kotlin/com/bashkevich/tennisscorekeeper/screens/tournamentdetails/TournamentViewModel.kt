@@ -187,6 +187,9 @@ class TournamentViewModel(
             is TournamentUiEvent.Refresh -> refreshTournamentDetailsScreen()
             is TournamentUiEvent.ChangeTournamentStatus -> changeTournamentStatus(uiEvent.tournamentStatus)
             TournamentUiEvent.UploadFile -> uploadFile()
+            TournamentUiEvent.ClearFile -> {
+                _participantsFile.value = EMPTY_EXCEL_FILE
+            }
             is TournamentUiEvent.SelectFile -> {
                 _participantsFile.value = uiEvent.file
             }

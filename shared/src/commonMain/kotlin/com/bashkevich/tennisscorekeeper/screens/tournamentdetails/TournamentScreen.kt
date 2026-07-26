@@ -189,7 +189,7 @@ private fun TournamentContent(
                 ) {
                     Row(
                         modifier = Modifier
-                            .widthIn(max = 480.dp)
+                            .widthIn(max = TournamentTabMaxWidth)
                             .fillMaxWidth()
                             .background(
                                 color = Color.Gray.copy(alpha = 0.3f),
@@ -241,7 +241,8 @@ private fun TournamentContent(
                             tournamentStatus = (tournamentDetailsState as? TournamentDetailsLoadingState.Content)?.tournament?.status
                                 ?: TournamentStatus.NOT_STARTED,
                             onUploadFile = { onEvent(TournamentUiEvent.UploadFile) },
-                            onSelectFile = { file -> onEvent(TournamentUiEvent.SelectFile(file)) }
+                            onSelectFile = { file -> onEvent(TournamentUiEvent.SelectFile(file)) },
+                            onClearFile = { onEvent(TournamentUiEvent.ClearFile) }
                         )
                     }
                 }

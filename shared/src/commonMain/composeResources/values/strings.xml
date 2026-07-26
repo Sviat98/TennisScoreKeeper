@@ -18,6 +18,7 @@
     <string name="select_set_template">Select set template</string>
     <string name="retry">Retry</string>
     <string name="open_dropdown">Open dropdown</string>
+    <string name="toggle_section">Expand/collapse</string>
     <string name="preview">Preview</string>
     <string name="check_internet_connection">Check your internet connection</string>
 
@@ -106,11 +107,17 @@
     <string name="scoreboard">Scoreboard</string>
     <string name="live_stream">Live Stream</string>
     <string name="load">Load</string>
+    <string name="change_stream_link">Change stream link</string>
+    <string name="load_video">Load video</string>
     <string name="text_copied">Text copied</string>
 
     <!-- File Upload -->
     <string name="open_file_storage">Open file storage</string>
     <string name="upload_file">Upload file</string>
+    <string name="select_file_for_upload">Select file for upload</string>
+    <string name="upload">Upload</string>
+    <string name="clear_file">Clear file</string>
+    <string name="upload_new_list">Upload new list</string>
 
     <!-- Set Template -->
     <string name="regular_set_template">Regular Set Format</string>

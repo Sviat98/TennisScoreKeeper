@@ -46,6 +46,7 @@ sealed class TournamentUiEvent : UiEvent {
     class ChangeTournamentStatus(val tournamentStatus: TournamentStatus) : TournamentUiEvent()
     class SelectFile(val file: ExcelFile) : TournamentUiEvent()
     data object UploadFile : TournamentUiEvent()
+    data object ClearFile : TournamentUiEvent()
     class SwitchTab(val tab: TournamentTab) : TournamentUiEvent()
     data object Refresh : TournamentUiEvent()
 }
