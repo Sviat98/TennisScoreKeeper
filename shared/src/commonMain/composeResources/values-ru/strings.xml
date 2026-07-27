@@ -18,6 +18,7 @@
     <string name="select_set_template">Выберите шаблон</string>
     <string name="retry">Повторить</string>
     <string name="open_dropdown">Открыть выпадающий список</string>
+    <string name="toggle_section">Развернуть/свернуть</string>
     <string name="preview">Превью</string>
     <string name="check_internet_connection">Проверьте подключение к интернету</string>
 
@@ -104,13 +105,19 @@
     <string name="second_participant_won">Второй участник победил</string>
     <string name="ret">Ret.</string>
     <string name="scoreboard">Табло</string>
-    <string name="live_stream">Прямая трансляция</string>
+    <string name="live_stream">Трансляция</string>
     <string name="load">Загрузить</string>
+    <string name="change_stream_link">Изменить ссылку на трансляцию</string>
+    <string name="load_video">Загрузить видео</string>
     <string name="text_copied">Текст скопирован</string>
 
     <!-- File Upload -->
     <string name="open_file_storage">Открыть хранилище файлов</string>
     <string name="upload_file">Загрузить файл</string>
+    <string name="select_file_for_upload">Выберите файл для загрузки</string>
+    <string name="upload">Загрузить</string>
+    <string name="clear_file">Удалить файл</string>
+    <string name="upload_new_list">Загрузить новый список</string>
 
     <!-- Set Template -->
     <string name="regular_set_template">Формат обычного сета</string>
@@ -125,12 +132,12 @@
     <string name="theme_color_main_background">Основной цвет фона</string>
     <string name="theme_color_main_text">Основной цвет текста</string>
     <string name="theme_color_serve">Цвет подачи</string>
-    <string name="theme_color_previous_set_win">Текст выигранного сета</string>
-    <string name="theme_color_previous_set_lose">Текст проигранного сета</string>
-    <string name="theme_color_current_set_background">Фон текущего сета</string>
-    <string name="theme_color_current_set_text">Текст текущего сета</string>
-    <string name="theme_color_current_game_background">Фон текущей игры</string>
-    <string name="theme_color_current_game_text">Текст текущей игры</string>
+    <string name="theme_color_previous_set_win">Цвет текста выигранного сета</string>
+    <string name="theme_color_previous_set_lose">Цвет текста проигранного сета</string>
+    <string name="theme_color_current_set_background">Цвет фона текущего сета</string>
+    <string name="theme_color_current_set_text">Цвет текста текущего сета</string>
+    <string name="theme_color_current_game_background">Цвет фона текущего гейма</string>
+    <string name="theme_color_current_game_text">Цвет текста текущего гейма</string>
     <string name="old_value">Старое значение:</string>
     <string name="selected_color">Выбранный цвет:</string>
     <string name="undo">Отменить</string>
