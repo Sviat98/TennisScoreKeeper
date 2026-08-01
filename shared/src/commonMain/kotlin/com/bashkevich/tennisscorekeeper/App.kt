@@ -1,7 +1,6 @@
 package com.bashkevich.tennisscorekeeper
 
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
@@ -11,14 +10,18 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.bashkevich.tennisscorekeeper.components.environment.AppTheme
+import com.bashkevich.tennisscorekeeper.components.environment.LocalAppTheme
 import com.bashkevich.tennisscorekeeper.di.authModule
 import com.bashkevich.tennisscorekeeper.di.coreModule
 import com.bashkevich.tennisscorekeeper.di.matchModule
 import com.bashkevich.tennisscorekeeper.di.participantModule
 import com.bashkevich.tennisscorekeeper.di.platformModule
 import com.bashkevich.tennisscorekeeper.di.setTemplateModule
+import com.bashkevich.tennisscorekeeper.di.settingsModule
 import com.bashkevich.tennisscorekeeper.di.themeModule
 import com.bashkevich.tennisscorekeeper.di.tournamentModule
+import com.bashkevich.tennisscorekeeper.model.settings.domain.AppThemeMode
 import com.bashkevich.tennisscorekeeper.navigation.AddMatchRoute
 import com.bashkevich.tennisscorekeeper.navigation.AddTournamentRoute
 import com.bashkevich.tennisscorekeeper.navigation.LoginRoute
@@ -67,7 +70,8 @@ fun App(
             setTemplateModule,
             themeModule,
             participantModule,
-            authModule
+            authModule,
+            settingsModule
             //fileModule
         )
     }) {
@@ -78,11 +82,23 @@ fun App(
         val navController = rememberNavController()
 
         val isAuthorized = appState.value.isAuthorized
+        val themeOverride: Boolean? = when (appState.value.appThemeMode) {
+            AppThemeMode.SYSTEM -> null
+            AppThemeMode.LIGHT -> false
+            AppThemeMode.DARK -> true
+        }
+        // DEBUG: trace theme application (web console / logcat). Remove later.
+        println("[ThemeSettings] apply: mode=${appState.value.appThemeMode} override=$themeOverride")
+
+        // LocalAppTheme overrides isSystemInDarkTheme() for the whole subtree, so
+        // AppTheme's LocalAppTheme.current (and any third-party reader) follows the
+        // user's choice. null = follow the system theme.
         CompositionLocalProvider(
             LocalNavHostController provides navController,
-            LocalAuthorization provides isAuthorized
+            LocalAuthorization provides isAuthorized,
+            LocalAppTheme provides themeOverride
         ) {
-            MaterialTheme {
+            AppTheme {
                 NavHost(
                     modifier = Modifier
                         .fillMaxSize(),

@@ -4,6 +4,7 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import com.bashkevich.tennisscorekeeper.screens.settings.general.GeneralSettingsScreen
+import com.bashkevich.tennisscorekeeper.screens.settings.general.GeneralSettingsViewModel
 import com.bashkevich.tennisscorekeeper.screens.settings.main.SettingsScreen
 import com.bashkevich.tennisscorekeeper.screens.settings.main.SettingsViewModel
 import com.bashkevich.tennisscorekeeper.screens.settings.themedetails.ScoreboardThemeDetailsScreen
@@ -21,7 +22,9 @@ fun NavGraphBuilder.settingsFlow() {
             SettingsScreen(viewModel = settingsViewModel)
         }
         composable<GeneralSettingsRoute> {
-            GeneralSettingsScreen()
+            val generalSettingsViewModel = koinViewModel<GeneralSettingsViewModel>()
+
+            GeneralSettingsScreen(viewModel = generalSettingsViewModel)
         }
         composable<ScoreboardThemeListRoute> {
             val themeListViewModel = koinViewModel<ScoreboardThemeListViewModel>()

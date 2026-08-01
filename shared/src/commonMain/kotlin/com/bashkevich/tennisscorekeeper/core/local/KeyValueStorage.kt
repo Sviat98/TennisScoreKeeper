@@ -4,10 +4,12 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
+import com.bashkevich.tennisscorekeeper.model.settings.domain.AppThemeMode
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import kotlin.collections.get
 
-class KeyValueStorage(
+class  KeyValueStorage(
     private val dataStore: DataStore<Preferences>
 ) {
     private val PLAYER_ID_KEY = stringPreferencesKey("playerId")
@@ -15,6 +17,7 @@ class KeyValueStorage(
     private val PLAYER_SURNAME_KEY = stringPreferencesKey("playerSurname")
     private val ACCESS_TOKEN_KEY = stringPreferencesKey("accessToken")
     private val REFRESH_TOKEN_KEY = stringPreferencesKey("refreshToken")
+    private val APP_THEME_KEY = stringPreferencesKey("appTheme")
 
 
     private val STRING_DEFAULT = ""
@@ -54,4 +57,22 @@ class KeyValueStorage(
 
     fun observeRefreshToken(): Flow<String> =
         dataStore.data.map { it[REFRESH_TOKEN_KEY] ?: STRING_DEFAULT }
+
+    suspend fun saveAppThemeMode(mode: AppThemeMode) {
+        println("saveAppThemeMode $mode")
+        dataStore.edit {
+            it[APP_THEME_KEY] = mode.name
+        }
+    }
+
+    fun observeAppThemeMode(): Flow<AppThemeMode> {
+
+        return dataStore.data.map {
+            println("observeAppThemeMode value = ${it[APP_THEME_KEY]}")
+            println("observeAppThemeMode name = ${AppThemeMode.fromName(it[APP_THEME_KEY])}")
+
+            AppThemeMode.fromName(it[APP_THEME_KEY])
+        }
+    }
+
 }
