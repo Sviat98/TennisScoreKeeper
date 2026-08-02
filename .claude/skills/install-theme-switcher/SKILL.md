@@ -1,6 +1,6 @@
 ---
 name: install-theme-switcher
-description: Installs a runtime app theme switcher (System / Light / Dark) into a Kotlin Multiplatform / Compose Multiplatform project (Android + iOS + Desktop + Web/Wasm). Uses the official "LocalAppTheme" expect/actual workaround from the Kotlin docs (compose-resource-environment) so the override also applies globally to isSystemInDarkTheme() (useful for third-party libraries). Persists the choice in DataStore, adds light/dark Material 3 color schemes, and surfaces the picker on a settings screen. Run this when the user wants in-app light/dark theme switching that survives restart on the project's targets.
+description: Installs a runtime app theme switcher (System / Light / Dark) into a Kotlin Multiplatform / Compose Multiplatform project (Android + iOS + Desktop + Web/Wasm). Uses the official "LocalAppTheme" expect/actual workaround from the Kotlin docs (compose-resource-environment) so the override also applies globally to isSystemInDarkTheme() (useful for third-party libraries). Persists the choice in DataStore, adds light/dark Material 3 color schemes, surfaces the picker on a settings screen, and (on Android) pushes the chosen theme to the native system bars so status/navigation-bar icon appearance follows the app theme. Run this when the user wants in-app light/dark theme switching that survives restart on the project's targets.
 ---
 
 # Install app theme (light/dark) switcher
@@ -36,6 +36,11 @@ How it works (per the docs):
   (the user's forced choice, or the system theme when "System" is selected).
 - An `AppTheme` composable passes `lightColorScheme()` / `darkColorScheme()` to
   `MaterialTheme` based on `LocalAppTheme.current`.
+- This override lives **inside the Compose tree only**. It recolors Compose surfaces
+  and any reader of `isSystemInDarkTheme()`, but it does **not** touch native UI.
+  The Android **status bar / navigation bar icons** still follow the *system* theme
+  unless you push the theme to them explicitly — Step 6.5's `updateSystemBars(...)`
+  does that.
 
 > No `key(...)` is needed for theme (unlike locale). Providing a new
 > `LocalSystemTheme` / `LocalConfiguration` via `CompositionLocalProvider` already
@@ -99,6 +104,10 @@ the `actual` goes:
 
 > For theme, iOS / Desktop / Web share an **identical** `actual` body, so you create
 > the same file (modulo the directory) in each of those source sets the project has.
+
+> The `updateSystemBars` `expect` from **Step 6.5** is the same kind of `expect`/`actual`
+> — it needs an `actual` in **every compiled source set** too (real impl on Android,
+> NOOP on iOS / Desktop / Web). Carry the same target list from this step into Step 6.5.
 
 Carry this list into **Step 5**: create the `expect` once in `commonMain`, and one
 `actual` per source set identified above. Skip any platform the project doesn't
@@ -330,6 +339,7 @@ import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import com.example.app.components.environment.LocalAppTheme
+import com.example.app.components.environment.updateSystemBars   // Step 6.5
 
 private val LightColors = lightColorScheme(
     // defaults are fine; override only what you want, e.g.:
@@ -343,12 +353,125 @@ private val DarkColors = darkColorScheme(
 @Composable
 fun AppTheme(content: @Composable () -> Unit) {
     val darkTheme = LocalAppTheme.current   // resolves forced choice OR system
+    // Also push the resolved theme to the native system bars (Android only) so their
+    // icon appearance follows the app theme, not only the system theme. See Step 6.5.
+    updateSystemBars(darkTheme)
     MaterialTheme(
         colorScheme = if (darkTheme) DarkColors else LightColors,
         content = content,
     )
 }
 ```
+
+## Step 6.5 — Push the resolved theme to platform system bars (Android)
+
+`LocalAppTheme` recolors the **Compose** tree, but the native **status bar / navigation
+bar** icon appearance is owned by the Android `Window`, not by Compose. So when the user
+picks **Dark** in-app while the OS is in light mode, the system-bar icons stay light →
+poor contrast over dark content. `enableEdgeToEdge()` / `SystemBarStyle.auto` do **not**
+fix this: they read the *system* `Configuration`, not the Compose override (see
+<https://issuetracker.google.com/issues/278263793>). Push the resolved theme to the bars
+explicitly with a small `expect`/`actual`, called once from `AppTheme`.
+
+### 6.5.1 commonMain — the contract
+
+`shared/src/commonMain/kotlin/com/example/app/components/environment/UpdateSystemBars.kt`:
+
+```kotlin
+package com.example.app.components.environment
+
+import androidx.compose.runtime.Composable
+
+/**
+ * Applies the resolved dark/light theme to platform system bars (status + navigation bar
+ * icon appearance) so they follow the app theme, not only the system theme.
+ *
+ * Android: toggles WindowInsetsControllerCompat light/dark appearance.
+ * Desktop / Wasm: no-op. iOS (future): hook preferredStatusBarStyle here.
+ */
+@Composable
+expect fun updateSystemBars(isDark: Boolean)
+```
+
+> The lowerCamelCase name (it's a function, not a type) trips the `ComposableNaming`
+> lint, which expects PascalCase for `@Composable` callables. Either suppress it on the
+> Android `actual` (shown below) or name the function `UpdateSystemBars` to avoid the
+> suppress entirely — pick one and be consistent.
+
+### 6.5.2 androidMain — the real implementation
+
+`shared/src/androidMain/kotlin/com/example/app/components/environment/UpdateSystemBars.android.kt`:
+
+```kotlin
+package com.example.app.components.environment
+
+import android.annotation.SuppressLint
+import androidx.activity.compose.LocalActivity
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.SideEffect
+import androidx.core.view.WindowCompat
+
+@SuppressLint("ComposableNaming")
+@Composable
+actual fun updateSystemBars(isDark: Boolean) {
+    val window = LocalActivity.current?.window ?: return
+    // SideEffect re-applies after every committed recomposition, so bar appearance
+    // follows theme changes and recovers after activity/window recreation.
+    SideEffect {
+        val controller = WindowCompat.getInsetsController(window, window.decorView)
+        // Light appearance => dark icons (light theme); dark appearance => light icons.
+        controller.isAppearanceLightStatusBars = !isDark
+        controller.isAppearanceLightNavigationBars = !isDark
+    }
+}
+```
+
+> **Dependencies:** `WindowCompat` comes from `androidx.core:core-ktx`; `LocalActivity`
+> from `androidx.activity:activity-compose` (≥ 1.8.0). Both are already on `androidMain`
+> in a standard KMP + Compose project.
+
+> **Why `SideEffect`, not `LaunchedEffect(isDark)`?** Setting the appearance flag is
+> synchronous and idempotent, so no coroutine is needed. More importantly, `SideEffect`
+> fires after **every** committed recomposition, so it **self-heals after activity/window
+> recreation** (rotation, or a system theme change when `configChanges` doesn't catch
+> `uiMode`): with the same `isDark`, the fresh window still gets the correct value.
+> `LaunchedEffect(isDark)` would not restart for an unchanged key and would leave the
+> bars on the system default. `SideEffect` is also the Compose-recommended primitive for
+> "mirror Compose state into a non-Compose object" — exactly this case.
+
+### 6.5.3 iosMain / desktopMain / wasmJsMain — NOOP
+
+In every other source set the project has (see Step 0), create the same NOOP `actual`:
+
+- `shared/src/iosMain/kotlin/com/example/app/components/environment/UpdateSystemBars.ios.kt`
+- `shared/src/desktopMain/kotlin/com/example/app/components/environment/UpdateSystemBars.desktop.kt`
+- `shared/src/wasmJsMain/kotlin/com/example/app/components/environment/UpdateSystemBars.wasmJs.kt`
+
+```kotlin
+package com.example.app.components.environment
+
+import androidx.compose.runtime.Composable
+
+@Composable
+actual fun updateSystemBars(isDark: Boolean) = Unit
+```
+
+> The iOS `actual` is a deliberate NOOP: `UIStatusBarStyle` already auto-contrasts with
+> the content underneath. If you later need to *force* a style under the chosen theme,
+> implement it here via `preferredStatusBarStyle` (`UIViewController` interop).
+
+### 6.5.4 Wire it into `AppTheme`
+
+`AppTheme` from Step 6 already calls `updateSystemBars(darkTheme)` right before
+`MaterialTheme { }`. If you adapted Step 6's code, make sure that single call is present
+— that's the whole integration point.
+
+> Leave `enableEdgeToEdge()` in `MainActivity.onCreate` as-is: it owns the edge-to-edge
+> **layout** (`setDecorFitsSystemWindows(false)`), which is theme-independent. The bar
+> **icon** coloring is `updateSystemBars`'s job. They cooperate; neither replaces the
+> other.
+
+---
 
 ## Step 7 — Thread theme into the root app state / ViewModel
 
@@ -562,6 +685,10 @@ Verify on each target present:
   system dark toggle; iOS: Settings → Display; Desktop/Web: OS theme).
 - (Global override bonus) any composable reading `isSystemInDarkTheme()` directly follows the
   user's choice, not just the OS setting.
+- (Android, Step 6.5) system-bar **icons** follow the *app* theme, not the OS theme:
+  pick Dark while the OS is in light mode → status bar + navigation bar icons go light
+  over the dark content (and vice-versa). Rotate the device / toggle OS dark mode under
+  "System" → icons recover to the correct contrast without a manual theme flip.
 
 ## Notes
 

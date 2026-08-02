@@ -15,6 +15,9 @@ private val DarkColors = darkColorScheme()
 fun AppTheme(content: @Composable () -> Unit) {
     // Resolves the forced choice (LIGHT/DARK) or the system theme (SYSTEM) via LocalAppTheme.
     val darkTheme = LocalAppTheme.current
+
+    updateSystemBars(darkTheme)
+
     MaterialTheme(
         colorScheme = if (darkTheme) DarkColors else LightColors,
         content = content,
