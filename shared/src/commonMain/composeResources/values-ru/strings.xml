@@ -127,6 +127,13 @@
     <string name="general_settings">Общие настройки</string>
     <string name="scoreboard_appearance">Оформление табло</string>
     <string name="set_templates">Шаблоны сетов</string>
+    <string name="app_theme">Тема</string>
+    <string name="theme_system">Системная</string>
+    <string name="theme_light">Светлая</string>
+    <string name="theme_dark">Тёмная</string>
+    <string name="app_language">Язык</string>
+    <string name="language_english">English</string>
+    <string name="language_russian">Русский</string>
 
     <!-- Theme Details -->
     <string name="theme_color_main_background">Основной цвет фона</string>

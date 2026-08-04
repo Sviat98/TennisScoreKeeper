@@ -4,49 +4,52 @@ import androidx.compose.runtime.Immutable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.bashkevich.tennisscorekeeper.model.auth.repository.AuthRepository
-import com.bashkevich.tennisscorekeeper.model.match.repository.MatchRepository
+import com.bashkevich.tennisscorekeeper.model.settings.domain.AppLanguage
+import com.bashkevich.tennisscorekeeper.model.settings.domain.AppThemeMode
+import com.bashkevich.tennisscorekeeper.model.settings.repository.SettingsRepository
 import com.bashkevich.tennisscorekeeper.mvi.UiState
-import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.stateIn
 
 class AppViewModel(
     private val authRepository: AuthRepository,
-    private val matchRepository: MatchRepository
-): ViewModel() {
+    private val settingsRepository: SettingsRepository,
+) : ViewModel() {
 
-    private val _state = MutableStateFlow(AppState.initial())
-
-    val state: StateFlow<AppState>
-        get() = _state.asStateFlow()
-
-    init {
-        viewModelScope.launch {
-            authRepository.observePlayerId().distinctUntilChanged().collect { playerId ->
-                val isAuthorized = playerId.isNotEmpty()
-                _state.value = _state.value.copy(isAuthorized = isAuthorized)
-            }
+    // State is built reactively — NO init{} block (project rule).
+    // checkRefreshTokenStatus() runs as a one-shot startup side effect via onStart.
+    val state: StateFlow<AppState> =
+        combine(
+            authRepository.observePlayerId().distinctUntilChanged(),
+            settingsRepository.observeAppThemeMode().distinctUntilChanged(),
+            settingsRepository.observeAppLanguage().distinctUntilChanged(),
+        ) { playerId, themeMode, language ->
+            println("collected themeMode = $themeMode")
+            AppState(
+                isAuthorized = playerId.isNotEmpty(),
+                appThemeMode = themeMode,
+                appLanguage = language,
+            )
         }
-
-        viewModelScope.launch {
-            //matchRepository.deleteAllMatchesFromDb()
-        }
-
-        viewModelScope.launch {
-            authRepository.checkRefreshTokenStatus()
-        }
-    }
+            .onStart { authRepository.checkRefreshTokenStatus() }
+            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), AppState.initial())
 }
 
 @Immutable
 data class AppState(
-    val isAuthorized: Boolean
-): UiState {
-    companion object{
+    val isAuthorized: Boolean,
+    val appThemeMode: AppThemeMode,
+    val appLanguage: AppLanguage = AppLanguage.ENGLISH,
+) : UiState {
+    companion object {
         fun initial() = AppState(
-            isAuthorized = false
+            isAuthorized = false,
+            appThemeMode = AppThemeMode.SYSTEM,
+            appLanguage = AppLanguage.ENGLISH,
         )
     }
 }

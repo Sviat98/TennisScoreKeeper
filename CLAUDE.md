@@ -96,6 +96,7 @@ Base package: `com.bashkevich.tennisscorekeeper`
 - Use `expect`/`actual` for platform-specific implementations
 - Route objects are `@Serializable` data objects/classes with explicit `@SerialName` to avoid cross-platform route parsing issues (see comments in Navigation.kt)
 - ViewModels use `Flow<UiState>` for state and `Channel<UiAction>` for side effects
+- **NEVER use `init {}` blocks in ViewModels.** Build state reactively from repository Flows (`combine` / `flatMapLatest` / `map { ... }.stateIn(...)`) on the `state` property. One-shot startup side effects go in the same flow's `.onStart { }` operator — not in `init {}`. This is a hard, always-applied rule.
 - DI is Koin — register new dependencies in the appropriate feature module in `di/`
 - Use `LoadResult<S, E>` for repository return types with proper error handling
 - Room schema files go in `shared/schemas/`
