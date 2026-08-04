@@ -25,9 +25,11 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.bashkevich.tennisscorekeeper.LocalNavHostController
 import com.bashkevich.tennisscorekeeper.components.icons.IconGroup
 import com.bashkevich.tennisscorekeeper.components.icons.default_icons.ArrowBack
+import com.bashkevich.tennisscorekeeper.components.settings.LanguageCombobox
 import com.bashkevich.tennisscorekeeper.model.settings.domain.AppThemeMode
 import org.jetbrains.compose.resources.stringResource
 import tennisscorekeeper.shared.generated.resources.Res
+import tennisscorekeeper.shared.generated.resources.app_language
 import tennisscorekeeper.shared.generated.resources.app_theme
 import tennisscorekeeper.shared.generated.resources.general_settings
 import tennisscorekeeper.shared.generated.resources.navigate_back
@@ -101,6 +103,16 @@ fun GeneralSettingsScreen(
                     Text(themeLabels[index])
                 }
             }
+
+            Text(
+                text = stringResource(Res.string.app_language),
+                style = MaterialTheme.typography.titleMedium,
+            )
+            // No "System" option — English is the default. The field reflects the saved choice.
+            LanguageCombobox(
+                currentLanguage = state.appLanguage,
+                onLanguageChange = { viewModel.onEvent(GeneralSettingsUiEvent.ChangeLanguage(it)) },
+            )
         }
     }
 }

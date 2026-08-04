@@ -4,6 +4,7 @@ import androidx.compose.runtime.Immutable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.bashkevich.tennisscorekeeper.model.auth.repository.AuthRepository
+import com.bashkevich.tennisscorekeeper.model.settings.domain.AppLanguage
 import com.bashkevich.tennisscorekeeper.model.settings.domain.AppThemeMode
 import com.bashkevich.tennisscorekeeper.model.settings.repository.SettingsRepository
 import com.bashkevich.tennisscorekeeper.mvi.UiState
@@ -25,11 +26,13 @@ class AppViewModel(
         combine(
             authRepository.observePlayerId().distinctUntilChanged(),
             settingsRepository.observeAppThemeMode().distinctUntilChanged(),
-        ) { playerId, themeMode ->
+            settingsRepository.observeAppLanguage().distinctUntilChanged(),
+        ) { playerId, themeMode, language ->
             println("collected themeMode = $themeMode")
             AppState(
                 isAuthorized = playerId.isNotEmpty(),
                 appThemeMode = themeMode,
+                appLanguage = language,
             )
         }
             .onStart { authRepository.checkRefreshTokenStatus() }
@@ -40,11 +43,13 @@ class AppViewModel(
 data class AppState(
     val isAuthorized: Boolean,
     val appThemeMode: AppThemeMode,
+    val appLanguage: AppLanguage = AppLanguage.ENGLISH,
 ) : UiState {
     companion object {
         fun initial() = AppState(
             isAuthorized = false,
-            appThemeMode = AppThemeMode.SYSTEM
+            appThemeMode = AppThemeMode.SYSTEM,
+            appLanguage = AppLanguage.ENGLISH,
         )
     }
 }

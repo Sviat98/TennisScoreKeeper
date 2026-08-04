@@ -11,6 +11,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.bashkevich.tennisscorekeeper.components.environment.AppTheme
+import com.bashkevich.tennisscorekeeper.components.environment.LocalAppLocale
 import com.bashkevich.tennisscorekeeper.components.environment.LocalAppTheme
 import com.bashkevich.tennisscorekeeper.di.authModule
 import com.bashkevich.tennisscorekeeper.di.coreModule
@@ -21,6 +22,7 @@ import com.bashkevich.tennisscorekeeper.di.setTemplateModule
 import com.bashkevich.tennisscorekeeper.di.settingsModule
 import com.bashkevich.tennisscorekeeper.di.themeModule
 import com.bashkevich.tennisscorekeeper.di.tournamentModule
+import com.bashkevich.tennisscorekeeper.model.settings.domain.AppLanguage
 import com.bashkevich.tennisscorekeeper.model.settings.domain.AppThemeMode
 import com.bashkevich.tennisscorekeeper.navigation.AddMatchRoute
 import com.bashkevich.tennisscorekeeper.navigation.AddTournamentRoute
@@ -87,71 +89,82 @@ fun App(
             AppThemeMode.LIGHT -> false
             AppThemeMode.DARK -> true
         }
+        // Locale tag for the Compose resource workaround (see LocalAppLocale). Always non-null —
+        // the switcher has no "system" option, so the tag is "en" or "ru".
+        val localeTag: String = appState.value.appLanguage.tag
         // DEBUG: trace theme application (web console / logcat). Remove later.
         println("[ThemeSettings] apply: mode=${appState.value.appThemeMode} override=$themeOverride")
 
         // LocalAppTheme overrides isSystemInDarkTheme() for the whole subtree, so
         // AppTheme's LocalAppTheme.current (and any third-party reader) follows the
         // user's choice. null = follow the system theme.
+        //
+        // LocalAppLocale rewrites the platform locale so stringResource resolves from the
+        // matching values-<tag> dir. key(localeTag) recreates the subtree so every
+        // stringResource re-resolves on change (the NavHost back-stack resets — known tradeoff
+        // of the workaround; acceptable for a settings-driven change).
         CompositionLocalProvider(
             LocalNavHostController provides navController,
             LocalAuthorization provides isAuthorized,
-            LocalAppTheme provides themeOverride
+            LocalAppTheme provides themeOverride,
+            LocalAppLocale provides localeTag,
         ) {
-            AppTheme {
-                NavHost(
-                    modifier = Modifier
-                        .fillMaxSize(),
-                    navController = navController,
-                    startDestination = TournamentsRoute
-                ) {
-                    composable<TournamentsRoute> {
-                        val tournamentListViewModel = koinViewModel<TournamentListViewModel>()
+            key(localeTag) {
+                AppTheme {
+                    NavHost(
+                        modifier = Modifier
+                            .fillMaxSize(),
+                        navController = navController,
+                        startDestination = TournamentsRoute
+                    ) {
+                        composable<TournamentsRoute> {
+                            val tournamentListViewModel = koinViewModel<TournamentListViewModel>()
 
-                        TournamentListScreen(
-                            modifier = Modifier.fillMaxSize(),
-                            viewModel = tournamentListViewModel,
-                        )
-                    }
-                    composable<TournamentRoute> {
-                        val tournamentViewModel = koinViewModel<TournamentViewModel>()
+                            TournamentListScreen(
+                                modifier = Modifier.fillMaxSize(),
+                                viewModel = tournamentListViewModel,
+                            )
+                        }
+                        composable<TournamentRoute> {
+                            val tournamentViewModel = koinViewModel<TournamentViewModel>()
 
-                        TournamentScreen(
-                            modifier = Modifier.fillMaxSize(),
-                            viewModel = tournamentViewModel,
-                        )
-                    }
-                    composable<AddTournamentRoute> {
-                        val addTournamentViewModel = koinViewModel<AddTournamentViewModel>()
+                            TournamentScreen(
+                                modifier = Modifier.fillMaxSize(),
+                                viewModel = tournamentViewModel,
+                            )
+                        }
+                        composable<AddTournamentRoute> {
+                            val addTournamentViewModel = koinViewModel<AddTournamentViewModel>()
 
-                        AddTournamentScreen(
-                            modifier = Modifier.fillMaxSize(),
-                            viewModel = addTournamentViewModel,
-                        )
-                    }
-                    composable<MatchDetailsRoute> {
-                        val matchDetailsViewModel = koinViewModel<MatchDetailsViewModel>()
+                            AddTournamentScreen(
+                                modifier = Modifier.fillMaxSize(),
+                                viewModel = addTournamentViewModel,
+                            )
+                        }
+                        composable<MatchDetailsRoute> {
+                            val matchDetailsViewModel = koinViewModel<MatchDetailsViewModel>()
 
-                        MatchDetailsScreen(viewModel = matchDetailsViewModel)
-                    }
-                    composable<LoginRoute> {
-                        val loginViewModel = koinViewModel<LoginViewModel>()
+                            MatchDetailsScreen(viewModel = matchDetailsViewModel)
+                        }
+                        composable<LoginRoute> {
+                            val loginViewModel = koinViewModel<LoginViewModel>()
 
-                        LoginScreen(viewModel = loginViewModel)
-                    }
-                    settingsFlow()
-                    composable<AddMatchRoute> {
-                        val addMatchViewModel = koinViewModel<AddMatchViewModel>()
+                            LoginScreen(viewModel = loginViewModel)
+                        }
+                        settingsFlow()
+                        composable<AddMatchRoute> {
+                            val addMatchViewModel = koinViewModel<AddMatchViewModel>()
 
-                        AddMatchScreen(
-                            modifier = Modifier.fillMaxSize(),
-                            viewModel = addMatchViewModel
-                        )
+                            AddMatchScreen(
+                                modifier = Modifier.fillMaxSize(),
+                                viewModel = addMatchViewModel
+                            )
+                        }
+                        platformSpecificRoutes()
                     }
-                    platformSpecificRoutes()
-                }
-                LaunchedEffect(navController) {
-                    onNavHostReady(navController)
+                    LaunchedEffect(navController) {
+                        onNavHostReady(navController)
+                    }
                 }
             }
         }

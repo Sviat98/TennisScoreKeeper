@@ -131,6 +131,9 @@
     <string name="theme_system">System default</string>
     <string name="theme_light">Light</string>
     <string name="theme_dark">Dark</string>
+    <string name="app_language">Language</string>
+    <string name="language_english">English</string>
+    <string name="language_russian">Русский</string>
 
     <!-- Theme Details -->
     <string name="theme_color_main_background">Main background color</string>

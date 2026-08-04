@@ -4,6 +4,7 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
+import com.bashkevich.tennisscorekeeper.model.settings.domain.AppLanguage
 import com.bashkevich.tennisscorekeeper.model.settings.domain.AppThemeMode
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -18,6 +19,7 @@ class  KeyValueStorage(
     private val ACCESS_TOKEN_KEY = stringPreferencesKey("accessToken")
     private val REFRESH_TOKEN_KEY = stringPreferencesKey("refreshToken")
     private val APP_THEME_KEY = stringPreferencesKey("appTheme")
+    private val APP_LANGUAGE_KEY = stringPreferencesKey("appLocale")
 
 
     private val STRING_DEFAULT = ""
@@ -74,5 +76,14 @@ class  KeyValueStorage(
             AppThemeMode.fromName(it[APP_THEME_KEY])
         }
     }
+
+    suspend fun saveAppLanguage(language: AppLanguage) {
+        dataStore.edit {
+            it[APP_LANGUAGE_KEY] = language.name
+        }
+    }
+
+    fun observeAppLanguage(): Flow<AppLanguage> =
+        dataStore.data.map { AppLanguage.fromName(it[APP_LANGUAGE_KEY]) }
 
 }
