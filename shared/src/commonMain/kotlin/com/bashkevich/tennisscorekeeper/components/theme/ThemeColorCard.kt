@@ -54,6 +54,7 @@ fun ThemeColorCard(
     oldTheme: ScoreboardTheme,
     onColorSelected: (ThemeColorField, Color) -> Unit,
     modifier: Modifier = Modifier,
+    showOldValue: Boolean = true,
 ) {
     var showColorPicker by remember { mutableStateOf(false) }
     val currentColor = field.getColor(editedTheme)
@@ -82,7 +83,7 @@ fun ThemeColorCard(
                 )
             }
             AnimatedVisibility(
-                visible = hasChanged,
+                visible = showOldValue && hasChanged,
                 enter = expandVertically(expandFrom = Alignment.Top) + fadeIn(),
                 exit = shrinkVertically(shrinkTowards = Alignment.Top) + fadeOut(),
             ) {

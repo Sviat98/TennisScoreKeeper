@@ -30,6 +30,7 @@ fun ThemeNameField(
     themeNameState: TextFieldState,
     oldName: String,
     modifier: Modifier = Modifier,
+    showOldValue: Boolean = true,
 ) {
     val hasChanged = themeNameState.text.trim().toString() != oldName
     Column(modifier = modifier.widthIn(max = 360.dp).fillMaxWidth()) {
@@ -40,7 +41,7 @@ fun ThemeNameField(
             lineLimits = TextFieldLineLimits.SingleLine
         )
         AnimatedVisibility(
-            visible = hasChanged,
+            visible = showOldValue && hasChanged,
             enter = expandVertically(expandFrom = Alignment.Top) + fadeIn(),
             exit = shrinkVertically(shrinkTowards = Alignment.Top) + fadeOut(),
         ) {

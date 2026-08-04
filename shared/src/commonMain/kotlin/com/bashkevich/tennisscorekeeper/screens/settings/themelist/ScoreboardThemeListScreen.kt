@@ -14,6 +14,10 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.FloatingActionButtonMenu
+import androidx.compose.material3.FloatingActionButtonMenuItem
+import androidx.compose.material3.ToggleFloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -25,6 +29,8 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -32,15 +38,23 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.bashkevich.tennisscorekeeper.LocalNavHostController
 import com.bashkevich.tennisscorekeeper.components.icons.IconGroup
+import com.bashkevich.tennisscorekeeper.components.icons.default_icons.Add
 import com.bashkevich.tennisscorekeeper.components.icons.default_icons.ArrowBack
+import com.bashkevich.tennisscorekeeper.components.icons.default_icons.Close
+import com.bashkevich.tennisscorekeeper.components.icons.default_icons.Edit
+import com.bashkevich.tennisscorekeeper.components.icons.default_icons.Image
 import com.bashkevich.tennisscorekeeper.components.modifier.hoverScaleEffect
 import com.bashkevich.tennisscorekeeper.components.modifier.refreshByKeyboard
 import com.bashkevich.tennisscorekeeper.components.scoreboard.match_details.MatchDetailsScoreboardView
 import com.bashkevich.tennisscorekeeper.mvi.LaunchedUiEffectHandler
 import com.bashkevich.tennisscorekeeper.model.match.domain.DOUBLES_SAMPLE_MATCH
+import com.bashkevich.tennisscorekeeper.navigation.AddThemeRoute
+import com.bashkevich.tennisscorekeeper.navigation.GenerateThemeRoute
 import com.bashkevich.tennisscorekeeper.navigation.ScoreboardThemeDetailsRoute
 import org.jetbrains.compose.resources.stringResource
 import tennisscorekeeper.shared.generated.resources.Res
+import tennisscorekeeper.shared.generated.resources.add_theme
+import tennisscorekeeper.shared.generated.resources.generate_theme_by_image
 import tennisscorekeeper.shared.generated.resources.navigate_back
 import tennisscorekeeper.shared.generated.resources.scoreboard_appearance
 import tennisscorekeeper.shared.generated.resources.try_again
@@ -112,6 +126,12 @@ private fun ScoreboardThemeListContent(
                         )
                     }
                 }
+            )
+        },
+        floatingActionButton = {
+            AddThemeFabMenu(
+                onAddManually = { navController.navigate(AddThemeRoute) },
+                onGenerateByImage = { navController.navigate(GenerateThemeRoute) },
             )
         },
         snackbarHost = { SnackbarHost(snackbarHostState) }
@@ -245,5 +265,45 @@ private fun ScoreboardThemeListError(
                 Text(stringResource(Res.string.try_again))
             }
         }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
+@Composable
+private fun AddThemeFabMenu(
+    onAddManually: () -> Unit,
+    onGenerateByImage: () -> Unit,
+) {
+    var expanded by remember { mutableStateOf(false) }
+    FloatingActionButtonMenu(
+        expanded = expanded,
+        button = {
+            ToggleFloatingActionButton(
+                checked = expanded,
+                onCheckedChange = { expanded = !expanded }
+            ) {
+                Icon(
+                    imageVector = if (expanded) IconGroup.Default.Close else IconGroup.Default.Add,
+                    contentDescription = null
+                )
+            }
+        }
+    ) {
+        FloatingActionButtonMenuItem(
+            onClick = {
+                expanded = false
+                onAddManually()
+            },
+            text = { Text(stringResource(Res.string.add_theme)) },
+            icon = { Icon(IconGroup.Default.Edit, contentDescription = null) }
+        )
+        FloatingActionButtonMenuItem(
+            onClick = {
+                expanded = false
+                onGenerateByImage()
+            },
+            text = { Text(stringResource(Res.string.generate_theme_by_image)) },
+            icon = { Icon(IconGroup.Default.Image, contentDescription = null) }
+        )
     }
 }
