@@ -5,15 +5,12 @@ import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -23,15 +20,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.bashkevich.tennisscorekeeper.components.icons.IconGroup
-import com.bashkevich.tennisscorekeeper.components.icons.default_icons.Close
-import com.bashkevich.tennisscorekeeper.components.icons.default_icons.FolderOpen
 import com.bashkevich.tennisscorekeeper.components.icons.default_icons.Upload
 import com.bashkevich.tennisscorekeeper.model.file.domain.EMPTY_EXCEL_FILE
 import com.bashkevich.tennisscorekeeper.model.file.domain.ExcelFile
 import org.jetbrains.compose.resources.stringResource
 import tennisscorekeeper.shared.generated.resources.Res
-import tennisscorekeeper.shared.generated.resources.clear_file
-import tennisscorekeeper.shared.generated.resources.open_file_storage
 import tennisscorekeeper.shared.generated.resources.select_file_for_upload
 import tennisscorekeeper.shared.generated.resources.upload
 
@@ -50,33 +43,12 @@ fun UploadFileComponent(
         modifier = Modifier.then(modifier),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
-        ) {
-            IconButton(onClick = onFileStorageOpen) {
-                Icon(
-                    imageVector = IconGroup.Default.FolderOpen,
-                    contentDescription = stringResource(Res.string.open_file_storage),
-                )
-            }
-            if (hasFile) {
-                Text(
-                    text = fileName,
-                )
-                IconButton(onClick = onClearFile) {
-                    Icon(
-                        imageVector = IconGroup.Default.Close,
-                        contentDescription = stringResource(Res.string.clear_file),
-                    )
-                }
-            } else {
-                Text(
-                    text = stringResource(Res.string.select_file_for_upload),
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-            }
-        }
+        FileSelectionRow(
+            fileName = fileName,
+            placeholder = stringResource(Res.string.select_file_for_upload),
+            onFileStorageOpen = onFileStorageOpen,
+            onClearFile = onClearFile,
+        )
         AnimatedVisibility(
             visible = hasFile,
             enter = expandVertically(expandFrom = Alignment.Top) + fadeIn(),

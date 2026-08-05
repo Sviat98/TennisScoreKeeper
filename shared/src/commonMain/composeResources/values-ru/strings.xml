@@ -150,4 +150,11 @@
     <string name="undo">Отменить</string>
     <string name="theme_name">Название темы</string>
     <string name="edit_theme">Редактирование темы</string>
+    <string name="add_theme">Добавить тему</string>
+    <string name="generate_theme_by_image">Сгенерировать по изображению</string>
+    <string name="generate">Сгенерировать</string>
+    <string name="select_image_for_upload">Выберите изображение</string>
+    <string name="theme_save_error">Не удалось сохранить тему</string>
+    <string name="theme_generate_error">Не удалось сгенерировать тему</string>
+    <string name="theme_image_format_error">Выберите изображение PNG или JPG</string>
 </resources>

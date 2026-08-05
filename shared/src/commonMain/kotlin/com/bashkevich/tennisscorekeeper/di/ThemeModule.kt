@@ -4,6 +4,8 @@ import com.bashkevich.tennisscorekeeper.model.theme.local.ThemeLocalDataSource
 import com.bashkevich.tennisscorekeeper.model.theme.remote.ThemeRemoteDataSource
 import com.bashkevich.tennisscorekeeper.model.theme.repository.ThemeRepository
 import com.bashkevich.tennisscorekeeper.model.theme.repository.ThemeRepositoryImpl
+import com.bashkevich.tennisscorekeeper.screens.settings.addtheme.AddThemeViewModel
+import com.bashkevich.tennisscorekeeper.screens.settings.generatetheme.GenerateThemeViewModel
 import com.bashkevich.tennisscorekeeper.screens.settings.themelist.ScoreboardThemeListViewModel
 import com.bashkevich.tennisscorekeeper.screens.settings.themedetails.ScoreboardThemeDetailsViewModel
 import org.koin.dsl.module
@@ -15,4 +17,6 @@ val themeModule = module {
     single<ThemeLocalDataSource>()
     viewModel<ScoreboardThemeListViewModel>()
     viewModel<ScoreboardThemeDetailsViewModel>()
+    viewModel<AddThemeViewModel>()
+    viewModel<GenerateThemeViewModel>()
 }

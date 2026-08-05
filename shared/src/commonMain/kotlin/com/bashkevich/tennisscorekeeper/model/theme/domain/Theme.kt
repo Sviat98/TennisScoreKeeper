@@ -111,3 +111,20 @@ fun ScoreboardTheme.toThemeBody() = ThemeBody(
         currentGameTextColor = currentGameTextColor.toThemeColor(),
     )
 )
+
+fun ThemeContent.toScoreboardTheme(
+    id: Int = 0,
+    name: String = "",
+): ScoreboardTheme = ScoreboardTheme(
+    id = id,
+    name = name,
+    mainBackgroundColor = mainBackgroundColor.toColor(),
+    mainTextColor = mainTextColor.toColor(),
+    serveColor = serveColor.toColor(),
+    previousSetWinTextColor = previousSetWinTextColor.toColor(),
+    previousSetLoseTextColor = previousSetLoseTextColor.toColor(),
+    currentSetBackgroundColor = currentSetBackgroundColor.toColor(),
+    currentSetTextColor = currentSetTextColor.toColor(),
+    currentGameBackgroundColor = currentGameBackgroundColor.toColor(),
+    currentGameTextColor = currentGameTextColor.toColor(),
+)

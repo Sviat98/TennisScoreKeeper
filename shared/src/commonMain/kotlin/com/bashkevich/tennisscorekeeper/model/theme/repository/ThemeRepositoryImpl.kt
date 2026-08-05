@@ -4,10 +4,12 @@ import com.bashkevich.tennisscorekeeper.core.remote.LoadResult
 import com.bashkevich.tennisscorekeeper.core.remote.doOnError
 import com.bashkevich.tennisscorekeeper.core.remote.doOnSuccess
 import com.bashkevich.tennisscorekeeper.core.remote.mapSuccess
+import com.bashkevich.tennisscorekeeper.model.file.domain.ImageFile
 import com.bashkevich.tennisscorekeeper.model.theme.domain.ScoreboardTheme
 import com.bashkevich.tennisscorekeeper.model.theme.local.ThemeLocalDataSource
 import com.bashkevich.tennisscorekeeper.model.theme.local.toEntity
 import com.bashkevich.tennisscorekeeper.model.theme.remote.ThemeBody
+import com.bashkevich.tennisscorekeeper.model.theme.remote.ThemeContent
 import com.bashkevich.tennisscorekeeper.model.theme.remote.ThemeRemoteDataSource
 import com.bashkevich.tennisscorekeeper.model.theme.domain.toDomain
 import kotlinx.coroutines.flow.Flow
@@ -75,5 +77,15 @@ class ThemeRepositoryImpl(
         return themeRemoteDataSource.updateTheme(id.toString(), themeBody).doOnSuccess { themeDto ->
             themeLocalDataSource.insertTheme(themeDto.toEntity())
         }.mapSuccess { }
+    }
+
+    override suspend fun createTheme(themeBody: ThemeBody): LoadResult<Unit, Throwable> {
+        return themeRemoteDataSource.createTheme(themeBody).doOnSuccess { themeDto ->
+            themeLocalDataSource.insertTheme(themeDto.toEntity())
+        }.mapSuccess { }
+    }
+
+    override suspend fun generateThemeFromImage(image: ImageFile): LoadResult<ThemeContent, Throwable> {
+        return themeRemoteDataSource.generateThemeFromImage(image)
     }
 }

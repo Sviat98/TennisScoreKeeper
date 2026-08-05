@@ -150,4 +150,11 @@
     <string name="undo">Undo</string>
     <string name="theme_name">Theme name</string>
     <string name="edit_theme">Edit theme</string>
+    <string name="add_theme">Add theme</string>
+    <string name="generate_theme_by_image">Generate by image</string>
+    <string name="generate">Generate</string>
+    <string name="select_image_for_upload">Select image</string>
+    <string name="theme_save_error">Failed to save theme</string>
+    <string name="theme_generate_error">Failed to generate theme</string>
+    <string name="theme_image_format_error">Select a PNG or JPG image</string>
 </resources>

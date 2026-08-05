@@ -51,6 +51,14 @@ data object ScoreboardThemeListRoute
 data class ScoreboardThemeDetailsRoute(val themeId: Int)
 
 @Serializable
+@SerialName("add_theme")
+data object AddThemeRoute
+
+@Serializable
+@SerialName("generate_theme")
+data object GenerateThemeRoute
+
+@Serializable
 @SerialName("set_templates")
 data object SetTemplateListRoute
 

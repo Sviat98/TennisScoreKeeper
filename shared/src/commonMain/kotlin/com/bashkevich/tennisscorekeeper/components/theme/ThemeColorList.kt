@@ -16,6 +16,7 @@ fun ThemeColorList(
     oldTheme: ScoreboardTheme,
     onColorSelected: (ThemeColorField, Color) -> Unit,
     modifier: Modifier = Modifier,
+    showOldValue: Boolean = true,
 ) {
     Column(
         modifier = modifier.widthIn(max = 360.dp).fillMaxWidth(),
@@ -27,6 +28,7 @@ fun ThemeColorList(
                 editedTheme = editedTheme,
                 oldTheme = oldTheme,
                 onColorSelected = onColorSelected,
+                showOldValue = showOldValue,
             )
         }
     }
