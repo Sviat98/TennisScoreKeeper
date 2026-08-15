@@ -1,4 +1,4 @@
-package com.bashkevich.tennisscorekeeper.components
+package com.bashkevich.tennisscorekeeper.components.dialog
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -20,8 +20,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Dialog
+import com.bashkevich.tennisscorekeeper.components.ColorBox
 import com.github.skydoves.colorpicker.compose.BrightnessSlider
 import com.github.skydoves.colorpicker.compose.HsvColorPicker
 import com.github.skydoves.colorpicker.compose.rememberColorPickerController
@@ -49,59 +50,70 @@ private val DEFAULT_COLORS = listOf(
 )
 
 @Composable
-fun ColorPickerDialog(
+expect fun ColorPickerDialog(
     initialColor: Color,
     onDismissRequest: () -> Unit,
-    onColorSelected: (Color) -> Unit
+    onColorSelected: (Color) -> Unit,
+    width: Dp = 300.dp,
+    height: Dp = 500.dp
+)
+
+@Composable
+fun ColorPickerDialogContent(
+    modifier: Modifier = Modifier,
+    initialColor: Color,
+    onColorSelected: (Color) -> Unit,
 ) {
     var selectedColor by remember { mutableStateOf(initialColor) }
     val controller = rememberColorPickerController()
 
     controller.debounceDuration = 500L
-    Dialog(onDismissRequest = onDismissRequest) {
-        Column(
-            modifier = Modifier.background(Color.White).padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+
+    Column(
+        modifier = modifier
+            .background(MaterialTheme.colorScheme.surface)
+            .padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        HsvColorPicker(
+            modifier = Modifier.size(128.dp),
+            initialColor = selectedColor,
+            controller = controller,
+            onColorChanged = {
+                selectedColor = it.color
+            })
+
+        BrightnessSlider(
+            modifier = Modifier.fillMaxWidth()
+                .padding(10.dp)
+                .height(35.dp),
+            controller = controller,
+            initialColor = selectedColor
+        )
+
+        DefaultColorGrid(
+            onColorSelected = { color ->
+                selectedColor = color
+                controller.selectByColor(color, fromUser = false)
+            }
+        )
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally)
         ) {
-            HsvColorPicker(
-                modifier = Modifier.size(128.dp),
-                initialColor = selectedColor,
-                controller = controller,
-                onColorChanged = {
-                    selectedColor = it.color
-                })
-
-            BrightnessSlider(
-                modifier = Modifier.fillMaxWidth()
-                    .padding(10.dp)
-                    .height(35.dp),
-                controller = controller,
-                initialColor = selectedColor
+            Text(
+                text = stringResource(Res.string.selected_color),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurface,
             )
+            ColorBox(color = selectedColor)
+        }
 
-            DefaultColorGrid(
-                onColorSelected = { color ->
-                    selectedColor = color
-                    controller.selectByColor(color, fromUser = false)
-                }
-            )
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally)
-            ) {
-                Text(
-                    text = stringResource(Res.string.selected_color),
-                    style = MaterialTheme.typography.bodyMedium,
-                )
-                ColorBox(color = selectedColor)
-            }
-
-            Button(onClick = { onColorSelected(selectedColor) }) {
-                Text(stringResource(Res.string.select))
-            }
+        Button(onClick = { onColorSelected(selectedColor) }) {
+            Text(stringResource(Res.string.select))
         }
     }
 }

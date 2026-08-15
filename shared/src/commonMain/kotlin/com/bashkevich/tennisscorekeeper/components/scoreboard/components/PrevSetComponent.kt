@@ -1,11 +1,14 @@
 package com.bashkevich.tennisscorekeeper.components.scoreboard.components
 
+
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import com.bashkevich.tennisscorekeeper.model.theme.domain.LocalScoreboardTheme
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
@@ -19,7 +22,14 @@ fun PrevSetScoreboardComponent(
     numberFontSize: TextUnit = 20.sp,
     isSetFinished: Boolean = true,
     retiredParticipantNumber: Int? = null,
-    paddingFromCenter: Dp = 0.dp
+    paddingFromCenter: Dp = 0.dp,
+    // Цвет фона компонента; Unspecified — берём из темы (previousSetBackgroundColor).
+    // На упрощённых табло (Short) передаётся mainBackgroundColor
+    backgroundColor: Color = Color.Unspecified,
+    // Цвет текста выигравшего; Unspecified — из темы (previousSetWinTextColor)
+    winTextColor: Color = Color.Unspecified,
+    // Цвет текста проигравшего; Unspecified — из темы (previousSetLoseTextColor)
+    loseTextColor: Color = Color.Unspecified,
 ) {
     val firstParticipantGamesWon = prevSet.firstParticipantGamesWon
     val secondParticipantGamesWon = prevSet.secondParticipantGamesWon
@@ -30,12 +40,13 @@ fun PrevSetScoreboardComponent(
         (retiredParticipantNumber == 1) || (isSetFinished && (firstParticipantGamesWon < secondParticipantGamesWon))
 
     val theme = LocalScoreboardTheme.current
-    val winColor = theme.previousSetWinTextColor
-    val loseColor = theme.previousSetLoseTextColor
+    val background = if (backgroundColor == Color.Unspecified) theme.previousSetBackgroundColor else backgroundColor
+    val winColor = if (winTextColor == Color.Unspecified) theme.previousSetWinTextColor else winTextColor
+    val loseColor = if (loseTextColor == Color.Unspecified) theme.previousSetLoseTextColor else loseTextColor
     val colorsAreEqual = winColor == loseColor
 
-    //если победитель НЕ опеределен, то ставим mainTextColor, точно будет хорошо смотреть на фоне
-    val currentSetColor = theme.mainTextColor
+    //если победитель НЕ опеределен, то ставим цвет выигравшего, он гарантированно контрастен к фону
+    val currentSetColor = winColor
 
     val firstParticipantColor = when{
         isFirstParticipantWon -> winColor
@@ -63,7 +74,9 @@ fun PrevSetScoreboardComponent(
     }
 
     Column(
-        modifier = Modifier.then(modifier),
+        modifier = Modifier
+            .background(background)
+            .then(modifier),
         horizontalAlignment = Alignment.CenterHorizontally, // Выравнивание по центру
     ) {
         ScoreboardNumber(
@@ -81,4 +94,3 @@ fun PrevSetScoreboardComponent(
         )
     }
 }
-

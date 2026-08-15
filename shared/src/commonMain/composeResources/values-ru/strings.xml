@@ -139,6 +139,7 @@
     <string name="theme_color_main_background">Основной цвет фона</string>
     <string name="theme_color_main_text">Основной цвет текста</string>
     <string name="theme_color_serve">Цвет подачи</string>
+    <string name="theme_color_previous_set_background">Цвет фона предыдущего сета</string>
     <string name="theme_color_previous_set_win">Цвет текста выигранного сета</string>
     <string name="theme_color_previous_set_lose">Цвет текста проигранного сета</string>
     <string name="theme_color_current_set_background">Цвет фона текущего сета</string>
@@ -147,7 +148,10 @@
     <string name="theme_color_current_game_text">Цвет текста текущего гейма</string>
     <string name="old_value">Старое значение:</string>
     <string name="selected_color">Выбранный цвет:</string>
+    <string name="color_picker">Выбор цвета</string>
     <string name="undo">Отменить</string>
+    <string name="palette">Палитра</string>
+    <string name="theme_image_preview_error">Не удалось загрузить превью изображения</string>
     <string name="theme_name">Название темы</string>
     <string name="edit_theme">Редактирование темы</string>
     <string name="add_theme">Добавить тему</string>

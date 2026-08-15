@@ -7,6 +7,7 @@ enum class ThemeColorField {
     MAIN_BACKGROUND_COLOR,
     MAIN_TEXT_COLOR,
     SERVE_COLOR,
+    PREVIOUS_SET_BACKGROUND_COLOR,
     PREVIOUS_SET_WIN_TEXT_COLOR,
     PREVIOUS_SET_LOSE_TEXT_COLOR,
     CURRENT_SET_BACKGROUND_COLOR,
@@ -18,6 +19,7 @@ enum class ThemeColorField {
         MAIN_BACKGROUND_COLOR -> theme.mainBackgroundColor
         MAIN_TEXT_COLOR -> theme.mainTextColor
         SERVE_COLOR -> theme.serveColor
+        PREVIOUS_SET_BACKGROUND_COLOR -> theme.previousSetBackgroundColor
         PREVIOUS_SET_WIN_TEXT_COLOR -> theme.previousSetWinTextColor
         PREVIOUS_SET_LOSE_TEXT_COLOR -> theme.previousSetLoseTextColor
         CURRENT_SET_BACKGROUND_COLOR -> theme.currentSetBackgroundColor
@@ -30,6 +32,7 @@ enum class ThemeColorField {
         MAIN_BACKGROUND_COLOR -> theme.copy(mainBackgroundColor = color)
         MAIN_TEXT_COLOR -> theme.copy(mainTextColor = color)
         SERVE_COLOR -> theme.copy(serveColor = color)
+        PREVIOUS_SET_BACKGROUND_COLOR -> theme.copy(previousSetBackgroundColor = color)
         PREVIOUS_SET_WIN_TEXT_COLOR -> theme.copy(previousSetWinTextColor = color)
         PREVIOUS_SET_LOSE_TEXT_COLOR -> theme.copy(previousSetLoseTextColor = color)
         CURRENT_SET_BACKGROUND_COLOR -> theme.copy(currentSetBackgroundColor = color)

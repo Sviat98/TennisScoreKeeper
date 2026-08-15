@@ -155,8 +155,7 @@ fun ThemeCombobox(
                                             textColor = theme.mainTextColor,
                                         )
                                         Text(
-                                            text = theme.name,
-                                            color = Color.Black
+                                            text = theme.name
                                         )
                                     }
                                 },

@@ -78,6 +78,7 @@ kotlin {
             implementation(libs.androidx.datastore.core.okio)
 
             implementation(libs.calf.file.picker)
+            implementation(libs.coil3.compose)
             implementation(libs.compose.colorpicker)
 
             implementation(libs.androidx.room3.runtime)

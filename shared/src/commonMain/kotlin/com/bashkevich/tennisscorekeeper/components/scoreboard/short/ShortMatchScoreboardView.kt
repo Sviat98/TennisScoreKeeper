@@ -142,6 +142,10 @@ fun ShortMatchScoreboardView(
                     numberFontSize = defaultFontSize,
                     retiredParticipantNumber = retiredParticipantNumber,
                     paddingFromCenter = extraPaddingFromCenter,
+                    // на упрощённом табло цветовая гамма сета — из основных цветов темы
+                    backgroundColor = theme.mainBackgroundColor,
+                    winTextColor = theme.mainTextColor,
+                    loseTextColor = theme.mainTextColor.copy(alpha = 0.7f),
                 )
             }
 
@@ -151,7 +155,11 @@ fun ShortMatchScoreboardView(
                     prevSet = currentSet,
                     numberFontSize = defaultFontSize,
                     isSetFinished = false,
-                    paddingFromCenter = extraPaddingFromCenter
+                    paddingFromCenter = extraPaddingFromCenter,
+                    // на упрощённом табло цветовая гамма сета — из основных цветов темы
+                    backgroundColor = theme.mainBackgroundColor,
+                    winTextColor = theme.mainTextColor,
+                    loseTextColor = theme.mainTextColor.copy(alpha = 0.7f),
                 )
             }
             match.currentGame?.let {
