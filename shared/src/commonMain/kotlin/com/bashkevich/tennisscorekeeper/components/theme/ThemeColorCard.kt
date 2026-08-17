@@ -7,6 +7,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -15,6 +16,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Card
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -29,13 +32,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.bashkevich.tennisscorekeeper.components.ColorBox
-import com.bashkevich.tennisscorekeeper.components.ColorPickerDialog
+import com.bashkevich.tennisscorekeeper.components.dialog.ColorPickerDialog
 import com.bashkevich.tennisscorekeeper.components.icons.IconGroup
+import com.bashkevich.tennisscorekeeper.components.icons.default_icons.ArrowDropDown
 import com.bashkevich.tennisscorekeeper.components.icons.default_icons.Undo
 import com.bashkevich.tennisscorekeeper.model.theme.domain.ScoreboardTheme
 import org.jetbrains.compose.resources.stringResource
 import tennisscorekeeper.shared.generated.resources.Res
 import tennisscorekeeper.shared.generated.resources.old_value
+import tennisscorekeeper.shared.generated.resources.palette
 import tennisscorekeeper.shared.generated.resources.theme_color_current_game_background
 import tennisscorekeeper.shared.generated.resources.theme_color_current_game_text
 import tennisscorekeeper.shared.generated.resources.theme_color_current_set_background
@@ -45,6 +50,7 @@ import tennisscorekeeper.shared.generated.resources.theme_color_main_text
 import tennisscorekeeper.shared.generated.resources.theme_color_previous_set_lose
 import tennisscorekeeper.shared.generated.resources.theme_color_previous_set_win
 import tennisscorekeeper.shared.generated.resources.theme_color_serve
+import tennisscorekeeper.shared.generated.resources.theme_color_previous_set_background
 import tennisscorekeeper.shared.generated.resources.undo
 
 @Composable
@@ -55,8 +61,10 @@ fun ThemeColorCard(
     onColorSelected: (ThemeColorField, Color) -> Unit,
     modifier: Modifier = Modifier,
     showOldValue: Boolean = true,
+    paletteColors: List<Color> = emptyList(),
 ) {
     var showColorPicker by remember { mutableStateOf(false) }
+    var showPalette by remember { mutableStateOf(false) }
     val currentColor = field.getColor(editedTheme)
     val oldColor = field.getColor(oldTheme)
     val hasChanged = currentColor != oldColor
@@ -81,6 +89,30 @@ fun ThemeColorCard(
                     color = currentColor,
                     modifier = Modifier.clickable { showColorPicker = true }
                 )
+                if (paletteColors.isNotEmpty()) {
+                    Box {
+                        IconButton(onClick = { showPalette = !showPalette }) {
+                            Icon(
+                                imageVector = IconGroup.Default.ArrowDropDown,
+                                contentDescription = stringResource(Res.string.palette)
+                            )
+                        }
+                        DropdownMenu(
+                            expanded = showPalette,
+                            onDismissRequest = { showPalette = false }
+                        ) {
+                            paletteColors.forEach { color ->
+                                DropdownMenuItem(
+                                    text = { ColorBox(color = color, size = 24.dp) },
+                                    onClick = {
+                                        onColorSelected(field, color)
+                                        showPalette = false
+                                    }
+                                )
+                            }
+                        }
+                    }
+                }
             }
             AnimatedVisibility(
                 visible = showOldValue && hasChanged,
@@ -125,6 +157,7 @@ private fun ThemeColorField.displayName(): String = when (this) {
     ThemeColorField.MAIN_BACKGROUND_COLOR -> stringResource(Res.string.theme_color_main_background)
     ThemeColorField.MAIN_TEXT_COLOR -> stringResource(Res.string.theme_color_main_text)
     ThemeColorField.SERVE_COLOR -> stringResource(Res.string.theme_color_serve)
+    ThemeColorField.PREVIOUS_SET_BACKGROUND_COLOR -> stringResource(Res.string.theme_color_previous_set_background)
     ThemeColorField.PREVIOUS_SET_WIN_TEXT_COLOR -> stringResource(Res.string.theme_color_previous_set_win)
     ThemeColorField.PREVIOUS_SET_LOSE_TEXT_COLOR -> stringResource(Res.string.theme_color_previous_set_lose)
     ThemeColorField.CURRENT_SET_BACKGROUND_COLOR -> stringResource(Res.string.theme_color_current_set_background)

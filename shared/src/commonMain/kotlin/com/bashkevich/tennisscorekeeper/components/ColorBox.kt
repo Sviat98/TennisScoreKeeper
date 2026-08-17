@@ -5,6 +5,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -23,6 +24,6 @@ fun ColorBox(
             .size(size)
             .clip(RoundedCornerShape(4.dp))
             .background(color)
-            .border(1.dp, Color.Black, RoundedCornerShape(4.dp))
+            .border(1.dp, MaterialTheme.colorScheme.onSurface, RoundedCornerShape(4.dp))
     )
 }

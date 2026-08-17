@@ -20,8 +20,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.bashkevich.tennisscorekeeper.components.ColorPickerDialog
 import com.bashkevich.tennisscorekeeper.components.add_match.participant.AddMatchParticipantsBlock
+import com.bashkevich.tennisscorekeeper.components.dialog.ColorPickerDialog
 import com.bashkevich.tennisscorekeeper.components.dialog.ScoreboardThemePreviewDialog
 import com.bashkevich.tennisscorekeeper.components.set_template.SetComponentState
 import com.bashkevich.tennisscorekeeper.components.theme.ThemeComponentState

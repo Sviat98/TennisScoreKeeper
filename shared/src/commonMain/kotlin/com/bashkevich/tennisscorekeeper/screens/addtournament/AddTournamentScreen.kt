@@ -187,6 +187,7 @@ fun AddTournamentContent(
 
             if (isPreviewDialogOpen) {
                 ScoreboardThemePreviewDialog(
+                    modifier = Modifier.fillMaxSize(),
                     onDismissRequest = { isPreviewDialogOpen = false },
                     theme = selectedTheme!!
                 )

@@ -2,21 +2,22 @@ package com.bashkevich.tennisscorekeeper.screens.settings.generatetheme
 
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.lifecycle.viewModelScope
+import com.bashkevich.tennisscorekeeper.core.combine
 import com.bashkevich.tennisscorekeeper.core.remote.NetworkException
 import com.bashkevich.tennisscorekeeper.core.remote.UnauthorizedActionException
 import com.bashkevich.tennisscorekeeper.core.remote.doOnError
 import com.bashkevich.tennisscorekeeper.core.remote.doOnSuccess
 import com.bashkevich.tennisscorekeeper.model.file.domain.EMPTY_IMAGE_FILE
 import com.bashkevich.tennisscorekeeper.model.file.domain.ImageFile
+import com.bashkevich.tennisscorekeeper.model.theme.domain.ScoreboardTheme
 import com.bashkevich.tennisscorekeeper.model.theme.domain.toScoreboardTheme
-import com.bashkevich.tennisscorekeeper.model.theme.remote.ThemeBody
+import com.bashkevich.tennisscorekeeper.model.theme.domain.toThemeBody
 import com.bashkevich.tennisscorekeeper.model.theme.remote.ThemeContent
 import com.bashkevich.tennisscorekeeper.model.theme.repository.ThemeRepository
 import com.bashkevich.tennisscorekeeper.mvi.BaseViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.getString
@@ -33,20 +34,26 @@ class GenerateThemeViewModel(
     val themeNameState = TextFieldState()
 
     private val _selectedImage = MutableStateFlow(EMPTY_IMAGE_FILE)
-    private val _generatedContent = MutableStateFlow<ThemeContent?>(null)
+    // Ответ ИИ-агента в оригинальном виде
+    private val _originalContent = MutableStateFlow<ThemeContent?>(null)
+    // Тема с пользовательскими правками цветов
+    private val _editedTheme = MutableStateFlow<ScoreboardTheme?>(null)
     private val _isGenerating = MutableStateFlow(false)
     private val _isSaving = MutableStateFlow(false)
 
     override val state: StateFlow<GenerateThemeState> = combine(
         _selectedImage,
-        _generatedContent,
+        _originalContent,
+        _editedTheme,
         _isGenerating,
         _isSaving,
         _action
-    ) { image, content, isGenerating, isSaving, action ->
+    ) { image, originalContent, editedTheme, isGenerating, isSaving, action ->
         GenerateThemeState(
             selectedImageName = image.name,
-            generatedTheme = content?.toScoreboardTheme(),
+            imageFile = image,
+            originalTheme = originalContent?.toScoreboardTheme(),
+            editedTheme = editedTheme,
             isGenerating = isGenerating,
             isSaving = isSaving,
             action = action
@@ -69,15 +76,26 @@ class GenerateThemeViewModel(
                     return
                 }
                 _selectedImage.value = uiEvent.image
-                _generatedContent.value = null
+                _originalContent.value = null
+                _editedTheme.value = null
             }
 
             is GenerateThemeUiEvent.ClearImage -> {
                 _selectedImage.value = EMPTY_IMAGE_FILE
-                _generatedContent.value = null
+                _originalContent.value = null
+                _editedTheme.value = null
             }
 
             is GenerateThemeUiEvent.Generate -> generate()
+
+            is GenerateThemeUiEvent.UpdateColor -> {
+                val current = _editedTheme.value ?: return
+                _editedTheme.value = uiEvent.field.applyTo(current, uiEvent.color)
+            }
+
+            is GenerateThemeUiEvent.ResetTheme -> {
+                _originalContent.value?.toScoreboardTheme()?.let { _editedTheme.value = it }
+            }
 
             is GenerateThemeUiEvent.AddTheme -> addTheme()
         }
@@ -90,7 +108,8 @@ class GenerateThemeViewModel(
             _isGenerating.value = true
             themeRepository.generateThemeFromImage(image)
                 .doOnSuccess { content ->
-                    _generatedContent.value = content
+                    _originalContent.value = content
+                    _editedTheme.value = content.toScoreboardTheme()
                     _isGenerating.value = false
                 }
                 .doOnError {
@@ -101,12 +120,13 @@ class GenerateThemeViewModel(
     }
 
     private fun addTheme() {
-        val content = _generatedContent.value ?: return
+        val editedTheme = _editedTheme.value ?: return
         val name = themeNameState.text.trim().toString()
         if (name.isBlank()) return
         viewModelScope.launch {
             _isSaving.value = true
-            themeRepository.createTheme(ThemeBody(name = name, content = content))
+            val themeBody = editedTheme.copy(name = name).toThemeBody()
+            themeRepository.createTheme(themeBody)
                 .doOnSuccess {
                     _isSaving.value = false
                     sendAction(GenerateThemeAction.ThemeSaved)

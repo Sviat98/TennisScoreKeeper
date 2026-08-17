@@ -15,6 +15,7 @@ data class ScoreboardTheme(
     val mainBackgroundColor: Color,
     val mainTextColor: Color,
     val serveColor: Color,
+    val previousSetBackgroundColor: Color,
     val previousSetWinTextColor: Color,
     val previousSetLoseTextColor: Color,
     val currentSetBackgroundColor: Color,
@@ -29,6 +30,7 @@ data class ScoreboardTheme(
             mainBackgroundColor = Color.Black,
             mainTextColor = Color.White,
             serveColor = Color.White,
+            previousSetBackgroundColor = Color.Gray,
             previousSetWinTextColor = Color.White,
             previousSetLoseTextColor = Color.White.copy(alpha = 0.7f),
             currentSetBackgroundColor = Color.Gray,
@@ -43,6 +45,7 @@ data class ScoreboardTheme(
             mainBackgroundColor = Color(0xFF142c6c),
             mainTextColor = Color.White,
             serveColor = Color.Yellow,
+            previousSetBackgroundColor = Color(0xFF0a1a4a),
             previousSetWinTextColor = Color.White,
             previousSetLoseTextColor = Color.White.copy(alpha = 0.5f),
             currentSetBackgroundColor = Color.Yellow,
@@ -52,6 +55,20 @@ data class ScoreboardTheme(
         )
     }
 }
+
+val ScoreboardTheme.uniqueColors: List<Color>
+    get() = listOf(
+        mainBackgroundColor,
+        mainTextColor,
+        serveColor,
+        previousSetBackgroundColor,
+        previousSetWinTextColor,
+        previousSetLoseTextColor,
+        currentSetBackgroundColor,
+        currentSetTextColor,
+        currentGameBackgroundColor,
+        currentGameTextColor,
+    ).distinct()
 
 val LocalScoreboardTheme = staticCompositionLocalOf<ScoreboardTheme> {
     error("No ScoreboardTheme provided")
@@ -72,6 +89,7 @@ fun ThemeDto.toDomain() = ScoreboardTheme(
     mainBackgroundColor = content.mainBackgroundColor.toColor(),
     mainTextColor = content.mainTextColor.toColor(),
     serveColor = content.serveColor.toColor(),
+    previousSetBackgroundColor = content.previousSetBackgroundColor.toColor(),
     previousSetWinTextColor = content.previousSetWinTextColor.toColor(),
     previousSetLoseTextColor = content.previousSetLoseTextColor.toColor(),
     currentSetBackgroundColor = content.currentSetBackgroundColor.toColor(),
@@ -88,6 +106,7 @@ fun ThemeEntity.toDomain(): ScoreboardTheme {
         mainBackgroundColor = content.mainBackgroundColor.toColor(),
         mainTextColor = content.mainTextColor.toColor(),
         serveColor = content.serveColor.toColor(),
+        previousSetBackgroundColor = content.previousSetBackgroundColor.toColor(),
         previousSetWinTextColor = content.previousSetWinTextColor.toColor(),
         previousSetLoseTextColor = content.previousSetLoseTextColor.toColor(),
         currentSetBackgroundColor = content.currentSetBackgroundColor.toColor(),
@@ -103,6 +122,7 @@ fun ScoreboardTheme.toThemeBody() = ThemeBody(
         mainBackgroundColor = mainBackgroundColor.toThemeColor(),
         mainTextColor = mainTextColor.toThemeColor(),
         serveColor = serveColor.toThemeColor(),
+        previousSetBackgroundColor = previousSetBackgroundColor.toThemeColor(),
         previousSetWinTextColor = previousSetWinTextColor.toThemeColor(),
         previousSetLoseTextColor = previousSetLoseTextColor.toThemeColor(),
         currentSetBackgroundColor = currentSetBackgroundColor.toThemeColor(),
@@ -121,6 +141,7 @@ fun ThemeContent.toScoreboardTheme(
     mainBackgroundColor = mainBackgroundColor.toColor(),
     mainTextColor = mainTextColor.toColor(),
     serveColor = serveColor.toColor(),
+    previousSetBackgroundColor = previousSetBackgroundColor.toColor(),
     previousSetWinTextColor = previousSetWinTextColor.toColor(),
     previousSetLoseTextColor = previousSetLoseTextColor.toColor(),
     currentSetBackgroundColor = currentSetBackgroundColor.toColor(),

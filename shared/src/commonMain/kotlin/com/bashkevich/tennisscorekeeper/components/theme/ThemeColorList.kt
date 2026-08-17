@@ -17,6 +17,7 @@ fun ThemeColorList(
     onColorSelected: (ThemeColorField, Color) -> Unit,
     modifier: Modifier = Modifier,
     showOldValue: Boolean = true,
+    paletteColors: List<Color> = emptyList(),
 ) {
     Column(
         modifier = modifier.widthIn(max = 360.dp).fillMaxWidth(),
@@ -29,6 +30,7 @@ fun ThemeColorList(
                 oldTheme = oldTheme,
                 onColorSelected = onColorSelected,
                 showOldValue = showOldValue,
+                paletteColors = paletteColors,
             )
         }
     }
