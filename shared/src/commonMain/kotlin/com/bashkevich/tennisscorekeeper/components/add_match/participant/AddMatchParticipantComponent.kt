@@ -17,6 +17,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -158,9 +159,9 @@ fun AddSecondaryColorButton(
 ) {
     Box(
         Modifier.then(modifier)
-            .background(color = Color.White, shape = RoundedCornerShape(4.dp))
+            .background(color = Color.Black, shape = RoundedCornerShape(4.dp))
             .border(
-                border = BorderStroke(width = 1.dp, color = Color.Black),
+                border = BorderStroke(width = 1.dp, color = MaterialTheme.colorScheme.outline),
                 shape = RoundedCornerShape(4.dp)
             )
     ) {
@@ -170,7 +171,7 @@ fun AddSecondaryColorButton(
             },
             imageVector = IconGroup.Default.Add,
             contentDescription = stringResource(Res.string.add_secondary_color),
-            tint = Color.Black
+            tint = Color.White
         )
     }
 }
@@ -185,7 +186,7 @@ fun ColorPickerButton(
     Button(
         onClick = { onColorPickerOpen(colorNumber) },
         modifier = Modifier.then(modifier), // Фиксированный размер для выравнивания
-        border = BorderStroke(width = 1.dp, color = Color.Black),
+        border = BorderStroke(width = 1.dp, color = MaterialTheme.colorScheme.outline),
         shape = RoundedCornerShape(4.dp),
         colors = ButtonDefaults.buttonColors(
             containerColor = color,

@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.shape.GenericShape
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -50,7 +51,7 @@ fun ParticipantColor(
 
     Column(
         modifier = Modifier.then(modifier).clip(SemiCircleShape)
-            .border(width = 1.dp, color = Color.Black, shape = SemiCircleShape)
+            .border(width = 1.dp, color = MaterialTheme.colorScheme.outline, shape = SemiCircleShape)
     ) {
         Box(modifier = Modifier.fillMaxWidth().weight(1f).background(primaryColor))
         secondaryColor?.let {

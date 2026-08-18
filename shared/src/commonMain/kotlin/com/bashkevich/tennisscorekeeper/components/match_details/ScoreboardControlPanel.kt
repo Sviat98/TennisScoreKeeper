@@ -16,7 +16,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.bashkevich.tennisscorekeeper.components.match_details.serve.ChooseServePanel
@@ -112,9 +111,9 @@ fun ScoreboardControlPanel(
             Box(
                 modifier = Modifier
                     .matchParentSize()
-                    .background(Color.White.copy(alpha = 0.7f), shape = RoundedCornerShape(32.dp))
+                    .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.7f), shape = RoundedCornerShape(32.dp))
                     .border(
-                        border = BorderStroke(width = 1.dp, Color.Black),
+                        border = BorderStroke(width = 1.dp, MaterialTheme.colorScheme.outline),
                         shape = RoundedCornerShape(32.dp)
                     ),
                 contentAlignment = Alignment.Center

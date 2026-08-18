@@ -192,7 +192,7 @@ private fun TournamentContent(
                             .widthIn(max = TournamentTabMaxWidth)
                             .fillMaxWidth()
                             .background(
-                                color = Color.Gray.copy(alpha = 0.3f),
+                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f),
                                 shape = RoundedCornerShape(4.dp)
                             )
                             .padding(8.dp)
