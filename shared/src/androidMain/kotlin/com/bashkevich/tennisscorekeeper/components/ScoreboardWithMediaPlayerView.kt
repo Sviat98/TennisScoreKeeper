@@ -34,7 +34,7 @@ fun ScoreboardWithMediaPlayerView(
     mediaPlayerHost: MediaPlayerHost,
     onEvent: (MatchDetailsUiEvent)->Unit
 ){
-    var isMediaPlayerEnabled  by remember { mutableStateOf(match.videoLink != null)  }
+    var isMediaPlayerEnabled  by remember { mutableStateOf(false)  }
 
     val fullScreenState = LocalFullScreenState.current
 
