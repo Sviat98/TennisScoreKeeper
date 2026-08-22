@@ -27,7 +27,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -208,7 +207,7 @@ private fun TournamentContent(
                                 }
                             },
                             color = if (pagerState.currentPage == TournamentTab.MATCHES.ordinal)
-                                MaterialTheme.colorScheme.primary else Color.DarkGray
+                                MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
                         )
                         Text(
                             text = stringResource(Res.string.participants),
@@ -219,7 +218,7 @@ private fun TournamentContent(
                                 }
                             },
                             color = if (pagerState.currentPage == TournamentTab.PARTICIPANTS.ordinal)
-                                MaterialTheme.colorScheme.primary else Color.DarkGray
+                                MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
                 }

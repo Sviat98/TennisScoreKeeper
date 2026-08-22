@@ -132,13 +132,13 @@ fun SecondaryColorPicker(
                     modifier = Modifier
                         .size(12.dp)
                         .clip(CircleShape)
-                        .background(Color.Black)
+                        .background(MaterialTheme.colorScheme.onSurface)
                         .clickable {
                             onToggleSecondaryColor(null)
                         },
                     imageVector = IconGroup.Default.Close,
                     contentDescription = stringResource(Res.string.close),
-                    tint = Color.White
+                    tint = MaterialTheme.colorScheme.surface
                 )
             }
 
@@ -159,7 +159,7 @@ fun AddSecondaryColorButton(
 ) {
     Box(
         Modifier.then(modifier)
-            .background(color = Color.Black, shape = RoundedCornerShape(4.dp))
+            .background(color = MaterialTheme.colorScheme.surface, shape = RoundedCornerShape(4.dp))
             .border(
                 border = BorderStroke(width = 1.dp, color = MaterialTheme.colorScheme.outline),
                 shape = RoundedCornerShape(4.dp)
@@ -171,7 +171,7 @@ fun AddSecondaryColorButton(
             },
             imageVector = IconGroup.Default.Add,
             contentDescription = stringResource(Res.string.add_secondary_color),
-            tint = Color.White
+            tint = MaterialTheme.colorScheme.onSurface
         )
     }
 }
