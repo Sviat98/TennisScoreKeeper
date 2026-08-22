@@ -22,6 +22,7 @@ import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.http.URLProtocol
 import io.ktor.http.path
+import io.ktor.websocket.CloseReason
 import io.ktor.websocket.Frame
 import io.ktor.websocket.close
 import io.ktor.websocket.readReason
@@ -29,6 +30,7 @@ import io.ktor.websocket.readText
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -36,8 +38,13 @@ import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
+import kotlin.concurrent.atomics.AtomicLong
+import kotlin.concurrent.atomics.ExperimentalAtomicApi
+import kotlin.coroutines.cancellation.CancellationException
+import kotlin.time.Clock
 import kotlin.time.Duration.Companion.milliseconds
 
 class MatchRemoteDataSource(
@@ -53,6 +60,13 @@ class MatchRemoteDataSource(
         replay = 1,
         extraBufferCapacity = 5
     )
+
+    private val wsJson = Json {
+        ignoreUnknownKeys = true
+        isLenient = true
+    }
+
+    private fun nowMs(): Long = Clock.System.now().toEpochMilliseconds()
 
     fun observeConnectionState(): StateFlow<ConnectionState> =
         _connectionStateFlow.asStateFlow()
@@ -184,7 +198,135 @@ class MatchRemoteDataSource(
     fun observeMatchUpdates(): SharedFlow<LoadResult<MatchDto, Throwable>> =
         _matchFlow.asSharedFlow() // Expose as read-only flow
 
+    @OptIn(ExperimentalAtomicApi::class)
     fun connectToMatchUpdates(matchId: String) {
+        val appConfig = AppConfig.current
+
+        connectionJob?.cancel()
+        connectionJob = scope.launch {
+            var reconnectAttempt = 0
+
+            // Loading — только на самое первое подключение;
+            // при повторных попытках остаётся Disconnected, чтобы не мигать полноэкранным спиннером
+            _connectionStateFlow.value = ConnectionState.Loading
+
+            while (isActive) {
+                var session: DefaultClientWebSocketSession? = null
+
+                try {
+                    session = httpClient.webSocketSession {
+                        url {
+                            protocol = URLProtocol.WSS
+                            host = appConfig.baseHostBackend
+                            port = 443
+                            path("/matches/$matchId")
+                        }
+                    }
+                    val activeSession = session
+                    webSocketSession = activeSession
+
+                    println("Connected to WebSocket")
+                    _connectionStateFlow.value = ConnectionState.Connected
+                    reconnectAttempt = 0
+
+                    // Время последнего сообщения сервера — своё на каждое соединение.
+                    // Любое сообщение (MatchDto или ответ на heartbeat) означает, что соединение живо
+                    val lastServerMessageMs = AtomicLong(nowMs())
+
+                    coroutineScope {
+                        val readerJob = launch {
+                            for (frame in activeSession.incoming) {
+                                when (frame) {
+                                    is Frame.Text -> {
+                                        val text = frame.readText()
+                                        lastServerMessageMs.store(nowMs())
+
+                                        val matchDto = try {
+                                            wsJson.decodeFromString<MatchDto>(text)
+                                        } catch (e: Exception) {
+                                            // Неотдекодируемый фрейм (например, heartbeat_ack) не рвёт соединение
+                                            println("Skipping non-MatchDto frame: $text")
+                                            continue
+                                        }
+
+                                        _matchFlow.emit(LoadResult.Success(matchDto))
+                                    }
+
+                                    is Frame.Close -> println("Connection closed: ${frame.readReason()}")
+
+                                    else -> Unit // Ping/Pong/Binary — control frames, их обрабатывает движок
+                                }
+                            }
+
+                            // incoming закрылся без exception — сервер закрыл соединение
+                            throw CancellationException("WebSocket incoming channel closed")
+                        }
+
+                        // Application-level heartbeat — источник истины для ConnectionState
+                        // на всех платформах (protocol-level ping/pong остаётся делом движка)
+                        launch {
+                            while (isActive) {
+                                delay(HEARTBEAT_INTERVAL_MS.milliseconds)
+
+                                val timeSinceLastServerMessageMs = nowMs() - lastServerMessageMs.load()
+
+                                // Если сервер недавно что-то присылал, heartbeat не нужен
+                                if (timeSinceLastServerMessageMs < HEARTBEAT_INTERVAL_MS) {
+                                    continue
+                                }
+
+                                println("Sending application heartbeat")
+                                val heartbeatSentAtMs = nowMs()
+
+                                activeSession.send(Frame.Text(HEARTBEAT))
+
+                                delay(HEARTBEAT_TIMEOUT_MS.milliseconds)
+
+                                if (lastServerMessageMs.load() < heartbeatSentAtMs) {
+                                    println("Heartbeat timeout, closing connection")
+                                    readerJob.cancel() // выводит reader из зависшего incoming (важно для wasmJs)
+                                    activeSession.close(
+                                        CloseReason(CloseReason.Codes.GOING_AWAY, "Heartbeat timeout")
+                                    )
+                                    throw CancellationException("Heartbeat timeout")
+                                }
+                            }
+                        }
+                    }
+                } catch (e: CancellationException) {
+                    // connectionJob отменён извне (closeSession) — выходим из цикла полностью
+                    if (!isActive) break
+
+                    println("WebSocket connection cancelled: ${e.message}")
+                } catch (e: Exception) {
+                    println("WebSocket connection error: ${e.message}")
+                    _connectionStateFlow.value = ConnectionState.Disconnected
+                    _matchFlow.emit(LoadResult.Error(e))
+                } finally {
+                    runCatching { session?.close() }
+                    if (webSocketSession === session) {
+                        webSocketSession = null
+                    }
+                    if (isActive) {
+                        _connectionStateFlow.value = ConnectionState.Disconnected
+                    }
+                }
+
+                if (isActive) {
+                    val reconnectionDelayMs = minOf(
+                        RECONNECTION_BASE_DELAY_MS shl reconnectAttempt,
+                        RECONNECTION_MAX_DELAY_MS
+                    )
+                    println("Reconnecting in $reconnectionDelayMs ms...")
+                    delay(reconnectionDelayMs.milliseconds)
+                    reconnectAttempt++
+                }
+            }
+        }
+    }
+
+    // Легаси-реализация без application-heartbeat и бэкоффа, оставлена как запасная
+    fun connectToMatchUpdatesLegacy(matchId: String) {
         val reconnectionTime = 5000L
 
         val appConfig = AppConfig.current
@@ -247,5 +389,13 @@ class MatchRemoteDataSource(
         _connectionStateFlow.value = ConnectionState.Disconnected
         connectionJob?.cancel()
         scope.launch { webSocketSession?.close() }
+    }
+
+    private companion object {
+        const val HEARTBEAT_INTERVAL_MS = 15_000L
+        const val HEARTBEAT_TIMEOUT_MS = 10_000L
+        const val RECONNECTION_BASE_DELAY_MS = 5_000L
+        const val RECONNECTION_MAX_DELAY_MS = 60_000L
+        const val HEARTBEAT = """{"type":"heartbeat"}"""
     }
 }

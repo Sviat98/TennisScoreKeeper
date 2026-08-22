@@ -51,16 +51,38 @@ fun ScoreboardScreen(
         verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.CenterVertically)
     ) {
         val connectionState = state.connectionState
+
+        println("connectionState = $connectionState")
         if (connectionState == ConnectionState.Loading) {
             CircularProgressIndicator()
         } else {
             ScoreboardContent(
                 match = state.match,
-                theme = state.themeState.themeOrDefault()
+                theme = state.themeState.themeOrDefault(),
+                connectionState = connectionState
             )
             if (state.themeState is ScoreboardThemeState.Error) {
                 ThemeLoadErrorRow(onRetry = { viewModel.onEvent(ScoreboardUiEvent.RetryThemeLoad) })
             }
+        }
+    }
+}
+
+@Composable
+fun ScoreboardContent(
+    modifier: Modifier = Modifier,
+    match: Match,
+    theme: ScoreboardTheme,
+    connectionState: ConnectionState
+) {
+    Box(modifier = Modifier.then(modifier).size(1024.dp)) {
+        // Полоса табло центрирована по вертикали; сообщение о разрыве — сразу под ней,
+        // с зарезервированным местом (спейсер той же высоты), чтобы полоса не прыгала
+        Column(modifier = Modifier.align(Alignment.CenterStart)) {
+            MatchScoreboardView(
+                match = match,
+                theme = theme
+            )
             SubcomposeLayout { constraints ->
                 val textPlaceable = subcompose("text") {
                     Text(
@@ -69,7 +91,7 @@ fun ScoreboardScreen(
                     )
                 }.first().measure(constraints)
 
-                val placeable = if (state.connectionState == ConnectionState.Disconnected) {
+                val placeable = if (connectionState == ConnectionState.Disconnected) {
                     textPlaceable
                 } else {
                     val spacerConstraints = constraints.copy(
@@ -86,21 +108,6 @@ fun ScoreboardScreen(
                 }
             }
         }
-    }
-}
-
-@Composable
-fun ScoreboardContent(
-    modifier: Modifier = Modifier,
-    match: Match,
-    theme: ScoreboardTheme
-) {
-    Box(modifier = Modifier.then(modifier).size(1024.dp)) {
-        MatchScoreboardView(
-            modifier = Modifier.align(Alignment.CenterStart),
-            match = match,
-            theme = theme
-        )
     }
 
 }

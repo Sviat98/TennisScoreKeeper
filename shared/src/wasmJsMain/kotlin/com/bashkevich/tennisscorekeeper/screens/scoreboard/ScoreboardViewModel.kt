@@ -4,8 +4,6 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import com.bashkevich.tennisscorekeeper.core.remote.LoadResult
-import com.bashkevich.tennisscorekeeper.core.remote.getOrDefault
-import com.bashkevich.tennisscorekeeper.core.remote.mapSuccess
 import com.bashkevich.tennisscorekeeper.model.match.repository.MatchRepository
 import com.bashkevich.tennisscorekeeper.model.theme.domain.ScoreboardTheme
 import com.bashkevich.tennisscorekeeper.model.theme.domain.ScoreboardThemeState
@@ -16,7 +14,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.stateIn
 import com.bashkevich.tennisscorekeeper.mvi.BaseViewModel
@@ -38,8 +36,12 @@ class ScoreboardViewModel(
         .shareIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), replay = 1)
 
     // --- Тема матча: /themes/{themeId} → оперативная память, без БД ---
+    // themeId берём только из успешных результатов: при LoadResult.Error (разрыв сети)
+    // идентификатор не меняется, и загруженная тема остаётся в памяти вместо сброса на DEFAULT
     private val themeIdFlow: Flow<Int> = matchUpdates
-        .map { it.mapSuccess { match -> match.themeId }.getOrDefault(ScoreboardTheme.DEFAULT.id) }
+        .mapNotNull { result ->
+            if (result is LoadResult.Success) result.result.themeId else null
+        }
         .distinctUntilChanged()
 
     private val refreshThemeUseCase = ScoreboardRefreshThemeUseCase(themeRepository, themeIdFlow)

@@ -15,6 +15,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ./gradlew :desktopApp:run
 
 # Web (Wasm) dev server
+# Opens at http://localhost:8080 — use `localhost`, NOT `127.0.0.1`: the backend CORS allowlist
+# contains only `http://localhost:8080`, so a page opened via 127.0.0.1 gets 403 on every
+# WebSocket upgrade. The dev server listens on both IPv4 (127.0.0.1) and IPv6 (::1).
 ./gradlew :webApp:wasmJsBrowserDevelopmentRun
 
 # Run Android unit tests
@@ -28,6 +31,26 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ```
 
 Build mode is controlled via `BUILD_MODE` env var or Gradle property (defaults to `DEBUG`). DEBUG uses `tennisscorekeeper.onrender.com` API host, RELEASE uses `tennisscorekeeper.tech`.
+
+## Running in browser (wasmJs)
+
+```bash
+# Dev server with RELEASE API hosts (env var must be in the same command — shell state does not persist between calls)
+BUILD_MODE=RELEASE ./gradlew :webApp:wasmJsBrowserDevelopmentRun
+```
+
+- Opens at `http://localhost:8080` (use `localhost`, NOT `127.0.0.1` — backend CORS rejects the `127.0.0.1` origin on WebSocket upgrades with 403).
+- First build takes ~2–3 minutes; the wasm bundle is ~43 MiB.
+- BUILD_MODE only selects API hosts (via BuildKonfig `BuildConfig.buildMode`), it does not change binary optimization.
+- In ZCode's in-app browser the page is NOT cross-origin isolated (`crossOriginIsolated === false`) even though the dev server sends COOP/COEP headers, so sqlite OPFS fails with `sqlite3.oo1.OpfsDb is not a constructor` and webpack shows a red error overlay. The app still renders behind the overlay (dismiss via the top-right ×). In a real Chrome everything works, OPFS included. On Windows open the user's Chrome from Git Bash with `cmd //c start chrome "http://localhost:8080"` — the in-app browser automation backend cannot control an external Chrome.
+
+### WebSocket (local testing)
+
+- WS endpoint: `wss://<backend>/matches/{matchId}`. The route validates the match id — a non-existing id gets HTTP 404 on the upgrade; the client treats this as a connection error and retries with exponential backoff (5→10→20→40→60 s cap). Test only with an existing match id.
+- DEBUG backend: `tennisscorekeeperbackend.onrender.com`. Measured CORS behavior of the WS upgrade by `Origin`: `http://localhost:8080` → allowed (404 if match missing); `http://127.0.0.1:8080` → **403**; `https://tennisscorekeeper.onrender.com` → allowed; `https://tennisscorekeeper.tech` → **403** (check the server CORS config for the release frontend!).
+- The client (`MatchRemoteDataSource.connectToMatchUpdates`) sends `{"type":"heartbeat"}` after 30 s of server silence and expects ANY message back within 10 s (the server should answer — ideally by re-sending the current MatchDto snapshot); otherwise it closes the session and reconnects. Without a server reply, healthy idle connections are torn down every ~40 s.
+- `ConnectionState.Loading` (full-screen spinner on both MatchDetails and Scoreboard screens) is set only for the very first connection attempt; subsequent reconnect attempts keep `Disconnected` (overlay "connection with scoreboard lost").
+- `connectToMatchUpdatesLegacy` is the pre-heartbeat implementation kept as a fallback; the active one is `connectToMatchUpdates`.
 
 ## Project Structure
 

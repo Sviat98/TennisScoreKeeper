@@ -1,8 +1,6 @@
 package com.bashkevich.tennisscorekeeper.components.set_template
 
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -13,6 +11,7 @@ import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
@@ -24,6 +23,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.bashkevich.tennisscorekeeper.components.icons.IconGroup
 import com.bashkevich.tennisscorekeeper.components.icons.default_icons.ArrowDropDown
@@ -93,16 +93,19 @@ fun SetTemplateCombobox(
         TextField(
             modifier = Modifier.fillMaxWidth(),
             state = TextFieldState(text),
-            placeholder = { Text(stringResource(Res.string.select_set_template)) },
+            placeholder = { Text(
+               text =  stringResource(Res.string.select_set_template),
+               textAlign = TextAlign.Center
+            ) },
             readOnly = true,
-            enabled = isIdle,
+            enabled = dropdownEnabled,
             trailingIcon = trailingIcon,
             lineLimits = TextFieldLineLimits.MultiLine(minHeightInLines = 2, maxHeightInLines = 3),
             colors = TextFieldDefaults.colors(
                 disabledIndicatorColor = Color.Transparent,
-                disabledTextColor = Color.Black,
-                disabledLabelColor = Color.Gray,
-                disabledTrailingIconColor = Color.Gray
+                disabledTextColor = MaterialTheme.colorScheme.onSurface,
+                disabledLabelColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                disabledTrailingIconColor = MaterialTheme.colorScheme.onSurfaceVariant
             )
         )
 
