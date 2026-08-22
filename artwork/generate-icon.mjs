@@ -216,6 +216,23 @@ const makeIco = (entries) => {
   return Buffer.concat([header, ...dir, ...entries.map((e) => e.buf)])
 }
 
+// ---------- ICNS (PNG-entries: Apple Icon Image format) ----------
+
+// ic10=1024, ic09=512, ic08=256, ic07=128 — минимальный современный набор
+const makeIcns = (entries) => {
+  const parts = entries.map(({ type, buf }) => {
+    const head = Buffer.alloc(8)
+    head.write(type, 0, 'ascii')
+    head.writeUInt32BE(buf.length + 8, 4)
+    return [head, buf]
+  }).flat()
+  const body = Buffer.concat(parts)
+  const file = Buffer.alloc(8)
+  file.write('icns', 0, 'ascii')
+  file.writeUInt32BE(body.length + 8, 4)
+  return Buffer.concat([file, body])
+}
+
 // ---------- сборка ----------
 
 const renderPng = (svg, size) =>
@@ -226,7 +243,7 @@ writeFileSync(path.join(ROOT, 'app-icon.svg'), svgSquircle)
 writeFileSync(path.join(ROOT, 'app-icon-round.svg'), svgRound)
 writeFileSync(path.join(ROOT, 'app-icon-adaptive-foreground.xml'), vdForeground)
 
-const pngSizes = [512, 256, 192, 180, 144, 128, 96, 72, 64, 48, 32, 16]
+const pngSizes = [1024, 512, 256, 192, 180, 144, 128, 96, 72, 64, 48, 32, 16]
 for (const size of pngSizes) {
   writeFileSync(path.join(ROOT, 'png', `app-icon-${size}.png`), renderPng(svgSquircle, size))
 }
@@ -240,4 +257,11 @@ const icoEntries = [256, 128, 64, 48, 32, 16].map((size) => ({
 }))
 writeFileSync(path.join(ROOT, 'app.ico'), makeIco(icoEntries))
 
-console.log('OK: app-icon.svg, app-icon-round.svg, adaptive-foreground.xml, png/*, app.ico')
+const icnsTypes = { 1024: 'ic10', 512: 'ic09', 256: 'ic08', 128: 'ic07' }
+const icnsEntries = Object.entries(icnsTypes).map(([size, type]) => ({
+  type,
+  buf: renderPng(svgSquircle, Number(size)),
+}))
+writeFileSync(path.join(ROOT, 'app.icns'), makeIcns(icnsEntries))
+
+console.log('OK: app-icon.svg, app-icon-round.svg, adaptive-foreground.xml, png/*, app.ico, app.icns')

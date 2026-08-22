@@ -22,6 +22,16 @@ compose.desktop {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
             packageName = "com.bashkevich.tennisscorekeeper"
             packageVersion = "1.0.0"
+
+            macOS {
+                iconFile.set(project.rootProject.file("artwork/app.icns"))
+            }
+            windows {
+                iconFile.set(project.rootProject.file("artwork/app.ico"))
+            }
+            linux {
+                iconFile.set(project.rootProject.file("artwork/png/app-icon-512.png"))
+            }
         }
     }
 }
