@@ -15,9 +15,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ./gradlew :desktopApp:run
 
 # Web (Wasm) dev server
-# Opens at http://localhost:8080 — use `localhost`, NOT `127.0.0.1`: the backend CORS allowlist
-# contains only `http://localhost:8080`, so a page opened via 127.0.0.1 gets 403 on every
-# WebSocket upgrade. The dev server listens on both IPv4 (127.0.0.1) and IPv6 (::1).
+# Opens at http://127.0.0.1:8080 — use `127.0.0.1`, NOT `localhost`: the backend CORS allowlist
+# (plugins/Cors.kt) contains `127.0.0.1:8080`/`127.0.0.1:8081` and does NOT include `localhost`,
+# so a page opened via localhost gets 403 on every WebSocket upgrade.
 ./gradlew :webApp:wasmJsBrowserDevelopmentRun
 
 # Run Android unit tests
@@ -39,18 +39,19 @@ Build mode is controlled via `BUILD_MODE` env var or Gradle property (defaults t
 BUILD_MODE=RELEASE ./gradlew :webApp:wasmJsBrowserDevelopmentRun
 ```
 
-- Opens at `http://localhost:8080` (use `localhost`, NOT `127.0.0.1` — backend CORS rejects the `127.0.0.1` origin on WebSocket upgrades with 403).
+- Opens at `http://127.0.0.1:8080` (use `127.0.0.1`, NOT `localhost` — backend CORS rejects the `localhost` origin on WebSocket upgrades with 403; see `plugins/Cors.kt` in the backend).
 - First build takes ~2–3 minutes; the wasm bundle is ~43 MiB.
 - BUILD_MODE only selects API hosts (via BuildKonfig `BuildConfig.buildMode`), it does not change binary optimization.
-- In ZCode's in-app browser the page is NOT cross-origin isolated (`crossOriginIsolated === false`) even though the dev server sends COOP/COEP headers, so sqlite OPFS fails with `sqlite3.oo1.OpfsDb is not a constructor` and webpack shows a red error overlay. The app still renders behind the overlay (dismiss via the top-right ×). In a real Chrome everything works, OPFS included. On Windows open the user's Chrome from Git Bash with `cmd //c start chrome "http://localhost:8080"` — the in-app browser automation backend cannot control an external Chrome.
+- In ZCode's in-app browser the page is NOT cross-origin isolated (`crossOriginIsolated === false`) even though the dev server sends COOP/COEP headers, so sqlite OPFS fails with `sqlite3.oo1.OpfsDb is not a constructor` and webpack shows a red error overlay. The app still renders behind the overlay (dismiss via the top-right ×). In a real Chrome everything works, OPFS included. On Windows open the user's Chrome from Git Bash with `cmd //c start chrome "http://127.0.0.1:8080"` — the in-app browser automation backend cannot control an external Chrome.
 
 ### WebSocket (local testing)
 
 - WS endpoint: `wss://<backend>/matches/{matchId}`. The route validates the match id — a non-existing id gets HTTP 404 on the upgrade; the client treats this as a connection error and retries with exponential backoff (5→10→20→40→60 s cap). Test only with an existing match id.
-- DEBUG backend: `tennisscorekeeperbackend.onrender.com`. Measured CORS behavior of the WS upgrade by `Origin`: `http://localhost:8080` → allowed (404 if match missing); `http://127.0.0.1:8080` → **403**; `https://tennisscorekeeper.onrender.com` → allowed; `https://tennisscorekeeper.tech` → **403** (check the server CORS config for the release frontend!).
-- The client (`MatchRemoteDataSource.connectToMatchUpdates`) sends `{"type":"heartbeat"}` after 30 s of server silence and expects ANY message back within 10 s (the server should answer — ideally by re-sending the current MatchDto snapshot); otherwise it closes the session and reconnects. Without a server reply, healthy idle connections are torn down every ~40 s.
-- `ConnectionState.Loading` (full-screen spinner on both MatchDetails and Scoreboard screens) is set only for the very first connection attempt; subsequent reconnect attempts keep `Disconnected` (overlay "connection with scoreboard lost").
+- CORS of the WS upgrade by `Origin`, per the backend's `plugins/Cors.kt` (requires an up-to-date backend deployment): `http://127.0.0.1:8080` / `:8081` → allowed; `https://tennisscorekeeper.onrender.com` → allowed; `https://tennisscorekeeper.tech` → allowed; `http://localhost:8080` → **403** (not in the allowlist). Older deployments had the opposite list (localhost allowed, 127.0.0.1 blocked) — if you see 403, check which backend version is deployed.
+- Heartbeat protocol: the client (`MatchRemoteDataSource.connectToMatchUpdates`) sends `{"type":"heartbeat"}` after 15 s of server silence (const `HEARTBEAT_INTERVAL_MS`) and expects ANY message within 10 s; otherwise it closes the session and reconnects. The server answers by re-sending the current MatchDto snapshot (`isHeartbeatRequest` in the backend's `MatchRoutes.kt`) — so idle connections stay alive and the scoreboard gets a state refresh.
+- `ConnectionState.Loading` (full-screen spinner on both MatchDetails and Scoreboard screens) is set only for the very first connection attempt; subsequent reconnect attempts keep `Disconnected` ("connection with scoreboard lost" message under the scoreboard strip on the Scoreboard screen).
 - `connectToMatchUpdatesLegacy` is the pre-heartbeat implementation kept as a fallback; the active one is `connectToMatchUpdates`.
+- A local mock WS server for e2e testing lives at `.zcode/mock-ws-server.cjs` (Node + `ws` from the kotlin-npm cache; WS on 8090, control HTTP on 8091: `/mode?s=silent|reply|kill`, `/log`, `/reset`). Pointing the client at it requires temporarily changing the URL in `MatchRemoteDataSource.connectToMatchUpdates`.
 
 ## Project Structure
 
