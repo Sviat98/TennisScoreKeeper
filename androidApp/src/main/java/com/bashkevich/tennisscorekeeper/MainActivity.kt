@@ -12,6 +12,10 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        // Режим берётся из product flavor (dev/prod) и должен быть выставлен до создания
+        // Koin-графа в App(), иначе HttpClient уедет на дефолтный хост из BuildKonfig.
+        AppConfig.setBuildMode(BuildMode.valueOf(BuildConfig.BUILD_MODE))
+        AppConfig.logBuildMode()
         PlaybackPreference.initialize(this)
 
         setContent {

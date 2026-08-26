@@ -38,7 +38,56 @@ xcodebuild -project iosApp/iosApp.xcodeproj -scheme iosApp \
 ./gradlew :androidApp:testDebugUnitTest --tests "com.bashkevich.tennisscorekeeper.ExampleUnitTest"
 ```
 
-Build mode is controlled via `BUILD_MODE` env var or Gradle property (defaults to `DEBUG`). DEBUG uses `tennisscorekeeper.onrender.com` API host, RELEASE uses `tennisscorekeeper.tech`.
+## Backend/frontend host selection (build mode)
+
+`AppConfig.current` picks between two host pairs (`shared/.../core/remote/HttpClient.kt`):
+
+| mode | backend host | frontend origin |
+|---|---|---|
+| `DEBUG` | `tennisscorekeeperbackend.onrender.com` | `https://tennisscorekeeper.onrender.com` |
+| `RELEASE` | `api.tennisscorekeeper.tech` | `https://tennisscorekeeper.tech` |
+
+`AppConfig.getBuildMode()` resolves the mode from three layers, highest first:
+
+1. **`AppConfig.setBuildMode()`** — the host app decides. Android only: `MainActivity`
+   reads its own `BuildConfig.BUILD_MODE`, which comes from the `dev`/`prod` product flavor.
+2. **`platformBuildMode()`** (`expect`/`actual`, `shared/src/*/…/BuildMode.*.kt`):
+   - iOS — Info.plist key `BuildMode`, filled from the `BUILD_MODE` build setting;
+   - Desktop — `-DBUILD_MODE=RELEASE` JVM property, or the `BUILD_MODE` env var;
+   - Web — `?buildMode=release` query parameter;
+   - Android — always `null` (layer 1 handles it).
+3. **BuildKonfig `BuildConfig.buildMode`** — the Gradle-time `BUILD_MODE` env var / property,
+   defaulted to `DEBUG` in the root `gradle.properties`. This is the fallback for desktop and web.
+
+Per-platform switching:
+
+```bash
+# Android: 4 variants from flavor (dev/prod) x buildType (debug/release).
+# prodDebug = debuggable build against the production backend.
+./gradlew :androidApp:assembleProdDebug
+# In Android Studio just pick the variant in the Build Variants panel.
+
+# Desktop: the Gradle property is forwarded to the app JVM as -DBUILD_MODE
+./gradlew :desktopApp:run -PBUILD_MODE=RELEASE
+
+# Web: open http://localhost:8080/?buildMode=release — no rebuild needed
+./gradlew :webApp:wasmJsBrowserDevelopmentRun
+```
+
+iOS has 4 Xcode configurations; each sets the `BUILD_MODE` build setting, which reaches Kotlin
+through Info.plist. `Debug-Prod` and `Release-Dev` are the mixed ones and therefore also set
+`KOTLIN_FRAMEWORK_BUILD_TYPE` explicitly — without it the Kotlin Gradle plugin cannot infer the
+framework build type from a `$CONFIGURATION` name it doesn't recognise.
+
+| configuration | backend | Kotlin framework |
+|---|---|---|
+| `Debug` | dev | debug |
+| `Debug-Prod` | prod | debug |
+| `Release-Dev` | dev | release |
+| `Release` | prod | release |
+
+The `Compile Kotlin Framework` build phase forwards the setting:
+`./gradlew :shared:embedAndSignAppleFrameworkForXcode -PBUILD_MODE=${BUILD_MODE:-DEBUG}`.
 
 ## Running in browser (wasmJs)
 

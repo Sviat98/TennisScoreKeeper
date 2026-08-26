@@ -57,9 +57,25 @@ fun SetTemplateCombobox(
         is SetComponentState.SelectedSetState.Error -> stringResource(Res.string.error_loading_set_template)
     }
 
-    val trailingIcon: (@Composable () -> Unit)? = when (val state = setComponentState.selectedSetState) {
-        is SetComponentState.SelectedSetState.Idle -> {
-            {
+    // См. комментарий в ThemeDropdownMenu.kt: на Kotlin/Native у значения-composable-лямбды
+    // должно быть ровно ОДНО условие, иначе ветки выкидываются из кодогенерации.
+    val failedSetTemplateId =
+        (setComponentState.selectedSetState as? SetComponentState.SelectedSetState.Error)?.initialSetTemplateId
+    val isSetTemplateLoading =
+        setComponentState.selectedSetState is SetComponentState.SelectedSetState.Loading
+
+    val trailingIcon: (@Composable () -> Unit)? = if (isSetTemplateLoading) {
+        null
+    } else {
+        {
+            if (failedSetTemplateId != null) {
+                IconButton(onClick = { onRetrySelectedSet(failedSetTemplateId) }) {
+                    Icon(
+                        imageVector = IconGroup.Default.Autorenew,
+                        contentDescription = stringResource(Res.string.retry),
+                    )
+                }
+            } else {
                 IconButton(
                     onClick = {
                         expanded = true
@@ -70,17 +86,6 @@ fun SetTemplateCombobox(
                     Icon(
                         imageVector = IconGroup.Default.ArrowDropDown,
                         contentDescription = stringResource(Res.string.open_dropdown),
-                    )
-                }
-            }
-        }
-        is SetComponentState.SelectedSetState.Loading -> null
-        is SetComponentState.SelectedSetState.Error -> {
-            {
-                IconButton(onClick = { onRetrySelectedSet(state.initialSetTemplateId) }) {
-                    Icon(
-                        imageVector = IconGroup.Default.Autorenew,
-                        contentDescription = stringResource(Res.string.retry),
                     )
                 }
             }

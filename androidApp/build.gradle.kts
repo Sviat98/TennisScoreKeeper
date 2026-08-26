@@ -23,6 +23,20 @@ android {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
     }
+    flavorDimensions += "backend"
+    productFlavors {
+        // dev  -> tennisscorekeeperbackend.onrender.com / https://tennisscorekeeper.onrender.com
+        // prod -> api.tennisscorekeeper.tech           / https://tennisscorekeeper.tech
+        // Комбинируется с buildType: prodDebug = отлаживаемая сборка против прод-бэкенда.
+        create("dev") {
+            dimension = "backend"
+            buildConfigField("String", "BUILD_MODE", "\"DEBUG\"")
+        }
+        create("prod") {
+            dimension = "backend"
+            buildConfigField("String", "BUILD_MODE", "\"RELEASE\"")
+        }
+    }
     buildTypes {
         debug {
             isMinifyEnabled = false
@@ -49,6 +63,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }
 

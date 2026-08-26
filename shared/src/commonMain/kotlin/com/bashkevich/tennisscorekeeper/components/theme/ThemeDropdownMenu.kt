@@ -60,9 +60,31 @@ fun ThemeCombobox(
         is ThemeComponentState.SelectedThemeState.Error -> stringResource(Res.string.error_loading_theme)
     }
 
-    val trailingIcon: (@Composable () -> Unit)? = when (val state = themeComponentState.selectedTheme) {
-        is ThemeComponentState.SelectedThemeState.Idle -> {
-            {
+    // На Kotlin/Native ветка, создающая composable-лямбду, компилируется корректно только если
+    // условие в цепочке ОДНО: все условия, кроме последнего, схлопываются в `false` и их ветки
+    // выкидываются из кодогенерации (exhaustive `when` при этом падает с
+    // NoWhenBranchMatchedException — это и был крэш экрана добавления турнира на iOS).
+    // Поэтому: поля достаём заранее через `as?`, у lambda-значений держим ровно одно условие,
+    // а остальной выбор делаем ВНУТРИ лямбды.
+    val selectedTheme =
+        (themeComponentState.selectedTheme as? ThemeComponentState.SelectedThemeState.Idle)?.theme
+    val failedThemeId =
+        (themeComponentState.selectedTheme as? ThemeComponentState.SelectedThemeState.Error)?.initialThemeId
+    val isThemeLoading =
+        themeComponentState.selectedTheme is ThemeComponentState.SelectedThemeState.Loading
+
+    val trailingIcon: (@Composable () -> Unit)? = if (isThemeLoading) {
+        null
+    } else {
+        {
+            if (failedThemeId != null) {
+                IconButton(onClick = { onRetrySelectedTheme(failedThemeId) }) {
+                    Icon(
+                        imageVector = IconGroup.Default.Autorenew,
+                        contentDescription = stringResource(Res.string.retry),
+                    )
+                }
+            } else {
                 IconButton(onClick = {
                     expanded = true
                     onThemesFetch()
@@ -74,28 +96,17 @@ fun ThemeCombobox(
                 }
             }
         }
-        is ThemeComponentState.SelectedThemeState.Loading -> null
-        is ThemeComponentState.SelectedThemeState.Error -> {
-            {
-                IconButton(onClick = { onRetrySelectedTheme(state.initialThemeId) }) {
-                    Icon(
-                        imageVector = IconGroup.Default.Autorenew,
-                        contentDescription = stringResource(Res.string.retry),
-                    )
-                }
-            }
-        }
     }
 
-    val leadingIcon: (@Composable () -> Unit)? = when (val state = themeComponentState.selectedTheme) {
-        is ThemeComponentState.SelectedThemeState.Idle -> state.theme?.let { theme -> {
+    val leadingIcon: (@Composable () -> Unit)? = if (selectedTheme != null) {
+        {
             ThemeColorCircle(
-                backgroundColor = theme.mainBackgroundColor,
-                textColor = theme.mainTextColor,
+                backgroundColor = selectedTheme.mainBackgroundColor,
+                textColor = selectedTheme.mainTextColor,
             )
-        } }
-        is ThemeComponentState.SelectedThemeState.Loading -> null
-        is ThemeComponentState.SelectedThemeState.Error -> null
+        }
+    } else {
+        null
     }
 
     Box(modifier = modifier) {
