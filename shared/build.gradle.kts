@@ -24,6 +24,18 @@ kotlin {
 
     jvm("desktop")
 
+    // iosX64 (Intel simulator) is intentionally absent: calf-file-picker, coil3,
+    // colorpicker-compose, room3, sqlite-bundled and datastore-core-okio no longer publish it.
+    listOf(
+        iosArm64(),
+        iosSimulatorArm64()
+    ).forEach { iosTarget ->
+        iosTarget.binaries.framework {
+            baseName = "Shared"
+            isStatic = true
+        }
+    }
+
     @OptIn(ExperimentalWasmDsl::class)
     wasmJs {
         browser()
@@ -96,6 +108,12 @@ kotlin {
 
         }
 
+        iosMain.dependencies {
+            implementation(libs.ktor.client.darwin)
+
+            implementation(libs.androidx.sqlite.bundled)
+        }
+
         wasmJsMain.dependencies {
             implementation(libs.ktor.client.js)
 
@@ -116,6 +134,8 @@ dependencies {
     add("kspAndroid", libs.androidx.room3.compiler)
     add("kspDesktop", libs.androidx.room3.compiler)
     add("kspWasmJs", libs.androidx.room3.compiler)
+    add("kspIosArm64", libs.androidx.room3.compiler)
+    add("kspIosSimulatorArm64", libs.androidx.room3.compiler)
 }
 
 val buildMode  = providers.environmentVariable("BUILD_MODE")
