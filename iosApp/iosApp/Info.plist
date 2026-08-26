@@ -8,10 +8,6 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
-	<!-- Подставляется из build setting BUILD_MODE (см. конфигурации проекта).
-	     Читается в shared/src/iosMain/.../BuildMode.ios.kt -->
-	<key>BuildMode</key>
-	<string>$(BUILD_MODE)</string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleExecutable</key>
