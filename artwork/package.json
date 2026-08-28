@@ -1,0 +1,12 @@
+{
+  "name": "icon-tooling",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "icon": "node generate-icon.mjs"
+  },
+  "dependencies": {
+    "@resvg/resvg-js": "^2.6.2",
+    "pngjs": "^7.0.0"
+  }
+}
