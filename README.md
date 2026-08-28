@@ -16,4 +16,4 @@ Learn more about [Kotlin Multiplatform](https://www.jetbrains.com/help/kotlin-mu
 We would appreciate your feedback on Compose/Web and Kotlin/Wasm in the public Slack channel [#compose-web](https://slack-chats.kotlinlang.org/c/compose-web).
 If you face any issues, please report them on [GitHub](https://github.com/JetBrains/compose-multiplatform/issues).
 
-You can open the web application by running the `:webApp:wasmJsBrowserDevelopmentRun` Gradle task. It is then available at `http://localhost:8080` — use `localhost`, not `127.0.0.1`: the backend CORS allowlist only allows `http://localhost:8080`, so a page opened via `127.0.0.1` gets `403` on every WebSocket upgrade (the dev server itself listens on both IPv4 and IPv6).
+You can open the web application by running the `:webApp:wasmJsBrowserDevelopmentRun` Gradle task. It is then available at `http://127.0.0.1:8080` — use `127.0.0.1`, not `localhost`: the backend CORS allowlist contains `127.0.0.1:8080` and does not include `localhost`, so a page opened via `localhost` gets `403` on every WebSocket upgrade.
