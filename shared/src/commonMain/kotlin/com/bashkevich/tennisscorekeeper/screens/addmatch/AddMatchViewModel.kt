@@ -23,6 +23,7 @@ import com.bashkevich.tennisscorekeeper.model.match.repository.MatchRepository
 import com.bashkevich.tennisscorekeeper.model.participant.domain.DoublesParticipant
 import com.bashkevich.tennisscorekeeper.model.participant.domain.ParticipantInDoublesMatch
 import com.bashkevich.tennisscorekeeper.model.participant.domain.ParticipantInSinglesMatch
+import com.bashkevich.tennisscorekeeper.model.participant.domain.PARTICIPANT_IN_DOUBLES_MATCH_DEFAULT
 import com.bashkevich.tennisscorekeeper.model.participant.domain.PARTICIPANT_IN_SINGLES_MATCH_DEFAULT
 import com.bashkevich.tennisscorekeeper.model.participant.domain.SinglesParticipant
 import com.bashkevich.tennisscorekeeper.model.participant.domain.TennisParticipant
@@ -38,6 +39,7 @@ import com.bashkevich.tennisscorekeeper.model.theme.domain.ScoreboardTheme
 import com.bashkevich.tennisscorekeeper.model.theme.repository.ThemeRepository
 import com.bashkevich.tennisscorekeeper.model.tournament.domain.TOURNAMENT_DEFAULT
 import com.bashkevich.tennisscorekeeper.model.tournament.domain.Tournament
+import com.bashkevich.tennisscorekeeper.model.tournament.remote.TournamentType
 import com.bashkevich.tennisscorekeeper.model.tournament.repository.TournamentRepository
 import com.bashkevich.tennisscorekeeper.navigation.AddMatchRoute
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -73,6 +75,17 @@ class AddMatchViewModel(
                     _decidingSetId.value = tournament.decidingSetTemplateId
                     _themeId.value = tournament.themeId
                     _setsToWin.value = tournament.setsToWin
+
+                    val defaultParticipant = when (tournament.type) {
+                        TournamentType.SINGLES -> PARTICIPANT_IN_SINGLES_MATCH_DEFAULT
+                        TournamentType.DOUBLES -> PARTICIPANT_IN_DOUBLES_MATCH_DEFAULT
+                    }
+                    if (_firstParticipant.value == PARTICIPANT_IN_SINGLES_MATCH_DEFAULT) {
+                        _firstParticipant.value = defaultParticipant
+                    }
+                    if (_secondParticipant.value == PARTICIPANT_IN_SINGLES_MATCH_DEFAULT) {
+                        _secondParticipant.value = defaultParticipant
+                    }
             }
             .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), TOURNAMENT_DEFAULT)
 
