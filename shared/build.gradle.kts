@@ -82,6 +82,9 @@ kotlin {
             implementation(libs.compose.colorpicker)
 
             implementation(libs.androidx.room3.runtime)
+
+            implementation(libs.kmptoolkit.cmp.share)
+            implementation(libs.kmptoolkit.cmp.share.compose)
         }
 
         val desktopMain by getting

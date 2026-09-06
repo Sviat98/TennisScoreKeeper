@@ -33,6 +33,8 @@
     <string name="copy_link">Скопировать ссылку</string>
     <string name="copy_link_to_scoreboard">Скопировать ссылку на табло</string>
     <string name="copy_link_to_panel">Скопировать ссылку на панель</string>
+    <string name="share_link_to_scoreboard">Поделиться ссылкой на табло</string>
+    <string name="share_link_to_panel">Поделиться ссылкой на панель</string>
     <string name="settings">Настройки</string>
 
     <!-- Buttons & Actions -->
