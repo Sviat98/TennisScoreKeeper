@@ -52,6 +52,14 @@ android {
     }
 }
 
+androidComponents {
+    onVariants { variant ->
+        variant.outputs.forEach { output ->
+            output.outputFileName.set("${rootProject.name}-${variant.name}.apk")
+        }
+    }
+}
+
 dependencies {
     implementation(projects.shared)
 
