@@ -12,12 +12,17 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import com.bashkevich.tennisscorekeeper.AppConfig
 import com.bashkevich.tennisscorekeeper.components.icons.IconGroup
 import com.bashkevich.tennisscorekeeper.components.icons.default_icons.ArrowBack
 import com.bashkevich.tennisscorekeeper.components.icons.default_icons.Settings
 import com.bashkevich.tennisscorekeeper.components.icons.default_icons.Share
+import com.bashkevich.tennisscorekeeper.components.expect.shareLinkPayload
+import com.mobilebytelabs.kmptoolkit.share.ExperimentalShareApi
+import com.mobilebytelabs.kmptoolkit.share.compose.rememberShareLauncher
+import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 import tennisscorekeeper.shared.generated.resources.Res
 import tennisscorekeeper.shared.generated.resources.add_match
@@ -29,6 +34,8 @@ import tennisscorekeeper.shared.generated.resources.login
 import tennisscorekeeper.shared.generated.resources.match
 import tennisscorekeeper.shared.generated.resources.navigate_back
 import tennisscorekeeper.shared.generated.resources.navigate_to_settings
+import tennisscorekeeper.shared.generated.resources.share_link_to_panel
+import tennisscorekeeper.shared.generated.resources.share_link_to_scoreboard
 import tennisscorekeeper.shared.generated.resources.tournament
 import tennisscorekeeper.shared.generated.resources.tournaments
 
@@ -152,7 +159,7 @@ fun LoginAppBar(
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalShareApi::class)
 @Composable
 fun MatchDetailsAppBar(
     matchId: Int,
@@ -165,6 +172,11 @@ fun MatchDetailsAppBar(
     val appConfig = AppConfig.current
 
     val baseUrlFrontend = appConfig.baseUrlFrontend
+
+    val shareLauncher = rememberShareLauncher()
+
+    val scope = rememberCoroutineScope()
+
     TopAppBar(
         title = { Text(stringResource(Res.string.match)) },
         navigationIcon = {
@@ -195,6 +207,22 @@ fun MatchDetailsAppBar(
                         onCopyLink("$baseUrlFrontend/#matches/${matchId}")
                         expanded = false
                     })
+                    DropdownMenuItem(
+                        text = { Text(stringResource(Res.string.share_link_to_scoreboard)) },
+                        onClick = {
+                            expanded = false
+                            scope.launch {
+                                shareLauncher.share(shareLinkPayload("$baseUrlFrontend/#matches/${matchId}/scoreboard"))
+                            }
+                        })
+                    DropdownMenuItem(
+                        text = { Text(stringResource(Res.string.share_link_to_panel)) },
+                        onClick = {
+                            expanded = false
+                            scope.launch {
+                                shareLauncher.share(shareLinkPayload("$baseUrlFrontend/#matches/${matchId}"))
+                            }
+                        })
                 }
             }
             IconButton(onClick = onNavigateToSettings) {
