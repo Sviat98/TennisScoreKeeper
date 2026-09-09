@@ -20,6 +20,8 @@ data class SetTemplateEntity(
     val tiebreakMode: String,
     @ColumnInfo(name = "tiebreak_points_to_win")
     val tiebreakPointsToWin: Int,
+    @ColumnInfo(name = "has_tiebreak_deciding_point")
+    val hasTiebreakDecidingPoint: Boolean,
     @ColumnInfo(name = "is_regular")
     val isRegular: Boolean,
     @ColumnInfo(name = "is_deciding")
@@ -33,6 +35,7 @@ fun SetTemplateDto.toEntity() = SetTemplateEntity(
     hasDecidingPoint = hasDecidingPoint,
     tiebreakMode = tiebreakMode.name,
     tiebreakPointsToWin = tiebreakPointsToWin,
+    hasTiebreakDecidingPoint = hasTiebreakDecidingPoint,
     isRegular = isRegular,
     isDeciding = isDeciding,
 )

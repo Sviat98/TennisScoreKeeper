@@ -18,6 +18,8 @@ data class SetTemplateDto(
     val tiebreakMode: TiebreakMode,
     @SerialName("tiebreak_points_to_win")
     val tiebreakPointsToWin: Int,
+    @SerialName("has_tiebreak_deciding_point")
+    val hasTiebreakDecidingPoint: Boolean,
     @SerialName("is_regular")
     val isRegular: Boolean,
     @SerialName("is_deciding")
