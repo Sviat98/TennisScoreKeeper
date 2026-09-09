@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "50e13897a07e3f975ffb82345e94bbd9",
+    "identityHash": "2ddf8f70cab4b64cdc91e2431bb5f3d1",
     "entities": [
       {
         "tableName": "tournaments",
@@ -83,7 +83,7 @@
       },
       {
         "tableName": "set_templates",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `name` TEXT NOT NULL, `games_to_win` INTEGER NOT NULL, `has_deciding_point` INTEGER NOT NULL, `tiebreak_mode` TEXT NOT NULL, `tiebreak_points_to_win` INTEGER NOT NULL, `is_regular` INTEGER NOT NULL, `is_deciding` INTEGER NOT NULL, PRIMARY KEY(`id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `name` TEXT NOT NULL, `games_to_win` INTEGER NOT NULL, `has_deciding_point` INTEGER NOT NULL, `tiebreak_mode` TEXT NOT NULL, `tiebreak_points_to_win` INTEGER NOT NULL, `has_tiebreak_deciding_point` INTEGER NOT NULL, `is_regular` INTEGER NOT NULL, `is_deciding` INTEGER NOT NULL, PRIMARY KEY(`id`))",
         "fields": [
           {
             "fieldPath": "id",
@@ -118,6 +118,12 @@
           {
             "fieldPath": "tiebreakPointsToWin",
             "columnName": "tiebreak_points_to_win",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "hasTiebreakDecidingPoint",
+            "columnName": "has_tiebreak_deciding_point",
             "affinity": "INTEGER",
             "notNull": true
           },
@@ -583,7 +589,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '50e13897a07e3f975ffb82345e94bbd9')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '2ddf8f70cab4b64cdc91e2431bb5f3d1')"
     ]
   }
 }

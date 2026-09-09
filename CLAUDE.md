@@ -123,4 +123,4 @@ Base package: `com.bashkevich.tennisscorekeeper`
 - **NEVER use `init {}` blocks in ViewModels.** Build state reactively from repository Flows (`combine` / `flatMapLatest` / `map { ... }.stateIn(...)`) on the `state` property. One-shot startup side effects go in the same flow's `.onStart { }` operator — not in `init {}`. This is a hard, always-applied rule.
 - DI is Koin — register new dependencies in the appropriate feature module in `di/`
 - Use `LoadResult<S, E>` for repository return types with proper error handling
-- Room schema files go in `shared/schemas/`
+- Room schema files go in `shared/schemas/`. After changing any Room entity, regenerate the schema by running `./gradlew :shared:kspKotlinDesktop` and commit the updated JSON (DB version bumps and migrations are handled separately by the repo owner)
