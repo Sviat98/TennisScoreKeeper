@@ -10,6 +10,7 @@ data class SetTemplate(
     val hasDecidingPoint: Boolean,
     val tiebreakMode: TiebreakMode,
     val tiebreakPointsToWin: Int,
+    val hasTiebreakDecidingPoint: Boolean,
     val isRegular: Boolean,
     val isDeciding: Boolean,
 )
@@ -17,6 +18,7 @@ data class SetTemplate(
 val SET_TEMPLATE_DEFAULT = SetTemplate(
     id = 0, name = "", gamesToWin = 6, hasDecidingPoint = false,
     tiebreakMode = TiebreakMode.NO, tiebreakPointsToWin = 7,
+    hasTiebreakDecidingPoint = false,
     isRegular = false, isDeciding = false
 )
 
@@ -27,6 +29,7 @@ fun SetTemplateDto.toDomain() = SetTemplate(
     hasDecidingPoint = this.hasDecidingPoint,
     tiebreakMode = this.tiebreakMode,
     tiebreakPointsToWin = this.tiebreakPointsToWin,
+    hasTiebreakDecidingPoint = this.hasTiebreakDecidingPoint,
     isRegular = this.isRegular,
     isDeciding = this.isDeciding
 )
@@ -38,6 +41,7 @@ fun SetTemplateEntity.toDomain() = SetTemplate(
     hasDecidingPoint = hasDecidingPoint,
     tiebreakMode = TiebreakMode.valueOf(tiebreakMode),
     tiebreakPointsToWin = tiebreakPointsToWin,
+    hasTiebreakDecidingPoint = hasTiebreakDecidingPoint,
     isRegular = isRegular,
     isDeciding = isDeciding,
 )
