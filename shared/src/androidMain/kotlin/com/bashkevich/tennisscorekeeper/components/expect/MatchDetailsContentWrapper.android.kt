@@ -32,7 +32,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalClipboard
 import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
@@ -48,6 +47,8 @@ import com.bashkevich.tennisscorekeeper.model.match.remote.body.toResource
 import com.bashkevich.tennisscorekeeper.navigation.SettingsRoute
 import com.bashkevich.tennisscorekeeper.screens.matchdetails.MatchDetailsState
 import com.bashkevich.tennisscorekeeper.screens.matchdetails.MatchDetailsUiEvent
+import com.mobilebytelabs.kmptoolkit.share.ExperimentalShareApi
+import com.mobilebytelabs.kmptoolkit.share.compose.rememberShareLauncher
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 import tennisscorekeeper.shared.generated.resources.Res
@@ -64,6 +65,7 @@ val LocalFullScreenState = compositionLocalOf<FullScreenState> {
     error("FullScreenState не предоставлен")
 }
 
+@OptIn(ExperimentalShareApi::class)
 @Composable
 actual fun MatchDetailsContentWrapper(
     modifier: Modifier,
@@ -73,8 +75,6 @@ actual fun MatchDetailsContentWrapper(
 ) {
     val navController = LocalNavHostController.current
     val match = state.match
-
-    val clipboard = LocalClipboard.current
 
     val isAuthorized = LocalAuthorization.current
 
@@ -140,6 +140,8 @@ actual fun MatchDetailsContentWrapper(
     }
 
     val scope = rememberCoroutineScope()
+
+    val shareLauncher = rememberShareLauncher()
     CompositionLocalProvider(
         LocalFullScreenState provides fullScreenState
     ) {
@@ -151,9 +153,9 @@ actual fun MatchDetailsContentWrapper(
                     MatchDetailsAppBar(
                         matchId = match.id,
                         onBack = { navController.navigateUp() },
-                        onCopyLink = { link ->
+                        onShareLink = { link ->
                             scope.launch {
-                                clipboard.setText(link)
+                                shareLauncher.share(shareLinkPayload(link))
                             }
                         },
                         onNavigateToSettings = { navController.navigate(SettingsRoute) }

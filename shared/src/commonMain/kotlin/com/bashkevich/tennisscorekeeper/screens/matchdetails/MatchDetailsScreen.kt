@@ -21,13 +21,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalClipboard
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.bashkevich.tennisscorekeeper.LocalNavHostController
 import com.bashkevich.tennisscorekeeper.components.MatchDetailsAppBar
 import com.bashkevich.tennisscorekeeper.components.expect.MatchDetailsContentWrapper
-import com.bashkevich.tennisscorekeeper.components.expect.setText
+import com.bashkevich.tennisscorekeeper.components.expect.shareLinkPayload
 import com.bashkevich.tennisscorekeeper.components.match_details.ScoreboardControlPanel
 import com.bashkevich.tennisscorekeeper.components.scoreboard.match_details.MatchDetailsScoreboardView
 import com.bashkevich.tennisscorekeeper.components.showUnauthorizedActionSnackbar
@@ -37,6 +36,8 @@ import com.bashkevich.tennisscorekeeper.model.theme.domain.ScoreboardThemeState
 import com.bashkevich.tennisscorekeeper.model.theme.domain.themeOrDefault
 import com.bashkevich.tennisscorekeeper.mvi.LaunchedUiEffectHandler
 import com.bashkevich.tennisscorekeeper.navigation.SettingsFlowRoute
+import com.mobilebytelabs.kmptoolkit.share.ExperimentalShareApi
+import com.mobilebytelabs.kmptoolkit.share.compose.rememberShareLauncher
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 import tennisscorekeeper.shared.generated.resources.Res
@@ -90,6 +91,7 @@ fun MatchDetailsScreen(
 }
 
 // вызывается из MatchDetailsContentWrapper (Desktop/WasmJS)
+@OptIn(ExperimentalShareApi::class)
 @Composable
 fun MatchDetailsCommonContent(
     modifier: Modifier = Modifier,
@@ -100,7 +102,7 @@ fun MatchDetailsCommonContent(
     val navController = LocalNavHostController.current
     val match = state.match
 
-    val clipboard = LocalClipboard.current
+    val shareLauncher = rememberShareLauncher()
 
     val scope = rememberCoroutineScope()
     Scaffold(
@@ -110,9 +112,9 @@ fun MatchDetailsCommonContent(
             MatchDetailsAppBar(
                 matchId = match.id,
                 onBack = { navController.navigateUp() },
-                onCopyLink = { link ->
+                onShareLink = { link ->
                     scope.launch {
-                        clipboard.setText(link)
+                        shareLauncher.share(shareLinkPayload(link))
                     }
                 },
                 onNavigateToSettings = { navController.navigate(SettingsFlowRoute) }
