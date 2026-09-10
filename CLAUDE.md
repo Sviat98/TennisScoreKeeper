@@ -20,6 +20,14 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 # so a page opened via localhost gets 403 on every WebSocket upgrade.
 ./gradlew :webApp:wasmJsBrowserDevelopmentRun
 
+# iOS: build the shared framework (simulator / device)
+./gradlew :shared:linkDebugFrameworkIosSimulatorArm64
+./gradlew :shared:linkDebugFrameworkIosArm64
+
+# iOS: build the app itself
+xcodebuild -project iosApp/iosApp.xcodeproj -scheme iosApp \
+  -destination 'generic/platform=iOS Simulator' build
+
 # Run Android unit tests
 ./gradlew :androidApp:testDebugUnitTest
 
@@ -53,17 +61,42 @@ BUILD_MODE=RELEASE ./gradlew :webApp:wasmJsBrowserDevelopmentRun
 - `connectToMatchUpdatesLegacy` is the pre-heartbeat implementation kept as a fallback; the active one is `connectToMatchUpdates`.
 - A local mock WS server for e2e testing lives at `.zcode/mock-ws-server.cjs` (Node + `ws` from the kotlin-npm cache; WS on 8090, control HTTP on 8091: `/mode?s=silent|reply|kill`, `/log`, `/reset`). Pointing the client at it requires temporarily changing the URL in `MatchRemoteDataSource.connectToMatchUpdates`.
 
+## Building for iOS
+
+- **`xcode-select` must point at Xcode, not the Command Line Tools.** `/Library/Developer/CommandLineTools`
+  has no iOS SDK, so every Kotlin/Native task fails against it with `SDK "iphonesimulator" cannot be
+  located`. Check with `xcode-select -p` (expected: `/Applications/Xcode.app/Contents/Developer`);
+  fix via Xcode → Settings → Locations → Command Line Tools, or
+  `sudo xcode-select -s /Applications/Xcode.app`. A one-off override is
+  `DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer ./gradlew …`.
+- Targets: `iosArm64` (device) + `iosSimulatorArm64`. **`iosX64` (Intel simulator) is deliberately
+  absent** — calf-file-picker, coil3, colorpicker-compose, room3, sqlite-bundled and
+  datastore-core-okio no longer publish that target, and adding it back breaks dependency
+  resolution for the whole `nativeMain` source set.
+- The shared module is exported as a **static** framework named `Shared`. Swift reaches Compose
+  through `MainViewControllerKt.MainViewController()` (`shared/src/iosMain/.../MainViewController.kt`).
+- `iosApp`'s first build phase runs `./gradlew :shared:embedAndSignAppleFrameworkForXcode`, which
+  drops the framework in `shared/build/xcode-frameworks/$CONFIGURATION/$SDK_NAME` — that path is the
+  target's `FRAMEWORK_SEARCH_PATHS`. `ENABLE_USER_SCRIPT_SANDBOXING` is `NO` because Gradle writes
+  outside the Xcode build directory.
+- iOS has no video player: `media-player` and `sdp-ssp` are Android-only, so
+  `MatchDetailsContentWrapper.ios.kt` delegates to `MatchDetailsCommonContent` the way desktop does.
+
 ## Project Structure
 
-**Kotlin Multiplatform** project targeting Android, Desktop (JVM), and Web (Kotlin/Wasm).
+**Kotlin Multiplatform** project targeting Android, iOS, Desktop (JVM), and Web (Kotlin/Wasm).
 
 - `androidApp/` — Thin Android shell: `MainActivity` sets content to shared `App()` composable. Debug variant uses `.debug` applicationId suffix.
 - `desktopApp/` — Thin Desktop (JVM) shell: `main.kt` entry point (`compose.desktop` application). Depends on `shared`.
+- `iosApp/` — Thin iOS shell (Xcode project, not a Gradle module): `iOSApp.swift` (SwiftUI `@main`) +
+  `ContentView.swift` wrapping `MainViewController()` in a `UIViewControllerRepresentable`.
 - `webApp/` — Thin Web (Wasm) shell: `main.kt` entry point (ComposeViewport), `index.html`/`styles.css`, `webpack.config.d` (COOP/COEP dev headers). Depends on `shared`.
 - `shared/` — Shared code module with platform-specific source sets:
   - `commonMain` — All shared business logic, UI, navigation, DI, networking
   - `androidMain` — Android-specific HTTP client (OkHttp), DataStore settings, media player
   - `desktopMain` — JVM/OkHttp client, Swing coroutines
+  - `iosMain` — Darwin HTTP client, `NSDocumentDirectory`-backed DataStore + Room, `AppleLanguages`
+    locale override
   - `wasmJsMain` — JS HTTP client, observable settings, `ScoreboardRoute` + the wasmJs-only Scoreboard feature (live match scoreboard via WebSocket)
 
 Base package: `com.bashkevich.tennisscorekeeper`
@@ -100,10 +133,10 @@ Base package: `com.bashkevich.tennisscorekeeper`
 - Multiplatform Settings (backed by DataStore on Android/Desktop) wrapped as `KeyValueStorage`.
 
 **Platform-specific expect/actual**:
-- `PlatformConfiguration` — holds Android Context on Android, empty elsewhere
-- `httpClient()` — OkHttp engine on Android/Desktop, JS engine on WasmJS
-- `getDatabaseBuilder()` — SQLite on Android/Desktop, Web SQL on WasmJS
-- `platformSpecificRoutes()` — WasmJS-only scoreboard route
+- `PlatformConfiguration` — holds Android Context on Android, empty elsewhere (including iOS)
+- `httpClient()` — OkHttp engine on Android/Desktop, JS engine on WasmJS, Darwin engine on iOS
+- `getDatabaseBuilder()` — SQLite on Android/Desktop/iOS, Web SQL on WasmJS
+- `platformSpecificRoutes()` — WasmJS-only scoreboard route (no-op on iOS)
 
 ## Key Dependencies
 
