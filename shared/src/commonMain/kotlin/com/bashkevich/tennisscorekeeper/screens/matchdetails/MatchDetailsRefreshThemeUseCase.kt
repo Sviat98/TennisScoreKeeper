@@ -1,6 +1,7 @@
 package com.bashkevich.tennisscorekeeper.screens.matchdetails
 
 import com.bashkevich.tennisscorekeeper.core.remote.LoadResult
+import com.bashkevich.tennisscorekeeper.model.theme.domain.ScoreboardTheme
 import com.bashkevich.tennisscorekeeper.model.theme.repository.ThemeRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
@@ -13,6 +14,7 @@ import kotlinx.coroutines.flow.onStart
  * Перезапрашиваемый flow загрузки темы матча в БД: /themes/{id} → fetchThemeById.
  * Владеет retry-триггером (первый запрос — при подписке через onStart,
  * повторный — через [refresh]). Паттерн как у RefreshThemeDetailsUseCase.
+ * Для id дефолтной темы сетевой вызов не выполняется — сразу Success.
  */
 @OptIn(ExperimentalCoroutinesApi::class)
 class MatchDetailsRefreshThemeUseCase(
@@ -29,7 +31,11 @@ class MatchDetailsRefreshThemeUseCase(
         flow {
             refreshTrigger.onStart { emit(Unit) }.collect {
                 emit(null)
-                emit(themeRepository.fetchThemeByIdAndSaveToDb(id))
+                if (id == ScoreboardTheme.DEFAULT.id) {
+                    emit(LoadResult.Success(Unit))
+                } else {
+                    emit(themeRepository.fetchThemeByIdAndSaveToDb(id))
+                }
             }
         }
     }

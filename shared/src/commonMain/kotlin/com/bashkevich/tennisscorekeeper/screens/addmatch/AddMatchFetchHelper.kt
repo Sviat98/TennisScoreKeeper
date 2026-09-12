@@ -2,6 +2,7 @@ package com.bashkevich.tennisscorekeeper.screens.addmatch
 
 import com.bashkevich.tennisscorekeeper.core.remote.LoadResult
 import com.bashkevich.tennisscorekeeper.model.set_template.repository.SetTemplateRepository
+import com.bashkevich.tennisscorekeeper.model.theme.domain.ScoreboardTheme
 import com.bashkevich.tennisscorekeeper.model.theme.repository.ThemeRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -16,10 +17,15 @@ class AddMatchFetchHelper(
     private val _regularSetTrigger = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
     private val _decidingSetTrigger = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
 
+    /** Для id дефолтной темы сетевой вызов не выполняется — сразу Success. */
     fun observeThemeByIdFromNetwork(id: Int): Flow<LoadResult<Unit, Throwable>?> = flow {
         _themeTrigger.onStart { emit(Unit) }.collect {
             emit(null)
-            emit(themeRepository.fetchThemeByIdAndSaveToDb(id))
+            if (id == ScoreboardTheme.DEFAULT.id) {
+                emit(LoadResult.Success(Unit))
+            } else {
+                emit(themeRepository.fetchThemeByIdAndSaveToDb(id))
+            }
         }
     }
 

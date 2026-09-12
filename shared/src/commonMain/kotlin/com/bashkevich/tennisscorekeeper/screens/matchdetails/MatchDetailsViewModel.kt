@@ -63,7 +63,6 @@ class MatchDetailsViewModel(
         themeFromDb
     ) { id, fetchResult, dbTheme ->
         when {
-            id == ScoreboardTheme.DEFAULT.id -> ScoreboardThemeState.Loaded(ScoreboardTheme.DEFAULT)
             dbTheme.id == id -> ScoreboardThemeState.Loaded(dbTheme)
             fetchResult is LoadResult.Error -> ScoreboardThemeState.Error
             else -> ScoreboardThemeState.Loading
