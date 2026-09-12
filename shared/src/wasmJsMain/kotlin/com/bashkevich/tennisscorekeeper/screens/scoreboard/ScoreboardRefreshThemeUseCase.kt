@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.onStart
  * (без БД): /themes/{id} → fetchThemeByIdFromNetwork.
  * Владеет retry-триггером (первый запрос — при подписке через onStart,
  * повторный — через [refresh]).
+ * Для id дефолтной темы сетевой вызов не выполняется — сразу Success с дефолтом.
  */
 @OptIn(ExperimentalCoroutinesApi::class)
 class ScoreboardRefreshThemeUseCase(
@@ -31,7 +32,11 @@ class ScoreboardRefreshThemeUseCase(
         flow {
             refreshTrigger.onStart { emit(Unit) }.collect {
                 emit(null)
-                emit(themeRepository.fetchThemeByIdFromNetwork(id))
+                if (id == ScoreboardTheme.DEFAULT.id) {
+                    emit(LoadResult.Success(ScoreboardTheme.DEFAULT))
+                } else {
+                    emit(themeRepository.fetchThemeByIdFromNetwork(id))
+                }
             }
         }
     }

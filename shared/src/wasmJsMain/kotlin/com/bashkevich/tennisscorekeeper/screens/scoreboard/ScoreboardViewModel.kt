@@ -5,7 +5,6 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import com.bashkevich.tennisscorekeeper.core.remote.LoadResult
 import com.bashkevich.tennisscorekeeper.model.match.repository.MatchRepository
-import com.bashkevich.tennisscorekeeper.model.theme.domain.ScoreboardTheme
 import com.bashkevich.tennisscorekeeper.model.theme.domain.ScoreboardThemeState
 import com.bashkevich.tennisscorekeeper.model.theme.repository.ThemeRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -52,11 +51,10 @@ class ScoreboardViewModel(
     private val themeLoadState: StateFlow<ScoreboardThemeState> = combine(
         themeIdFlow,
         themeFetchResult
-    ) { id, fetchResult ->
-        when {
-            id == ScoreboardTheme.DEFAULT.id -> ScoreboardThemeState.Loaded(ScoreboardTheme.DEFAULT)
-            fetchResult is LoadResult.Success -> ScoreboardThemeState.Loaded(fetchResult.result)
-            fetchResult is LoadResult.Error -> ScoreboardThemeState.Error
+    ) { _, fetchResult ->
+        when (fetchResult) {
+            is LoadResult.Success -> ScoreboardThemeState.Loaded(fetchResult.result)
+            is LoadResult.Error -> ScoreboardThemeState.Error
             else -> ScoreboardThemeState.Loading
         }
     }.stateIn(
