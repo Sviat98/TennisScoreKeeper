@@ -1,18 +1,56 @@
+# --- Gradle / Kotlin ---
 *.iml
 .kotlin
 .gradle
 **/build/
-xcuserdata
 !src/**/build/
 local.properties
+
+# --- IDE ---
 .idea
-.DS_Store
 captures
 .externalNativeBuild
 .cxx
+
+# --- OS ---
+.DS_Store
+
+# --- Xcode / iOS ---
+# Keep the project file and shared schemes, drop everything user- or machine-specific
 *.xcodeproj/*
 !*.xcodeproj/project.pbxproj
 !*.xcodeproj/xcshareddata/
 !*.xcodeproj/project.xcworkspace/
 !*.xcworkspace/contents.xcworkspacedata
 **/xcshareddata/WorkspaceSettings.xcsettings
+xcuserdata/
+*.xcuserstate
+*.xcscmblueprint
+*.xccheckout
+
+# Build output / derived data
+DerivedData/
+build/iosApp/
+*.hmap
+*.ipa
+*.dSYM
+*.dSYM.zip
+*.moved-aside
+*.xcarchive
+
+# Swift Package Manager / CocoaPods (not used yet, but harmless)
+.swiftpm/
+Packages/
+Package.resolved
+iosApp/Pods/
+
+# Framework produced by :shared:embedAndSignAppleFrameworkForXcode
+shared/build/xcode-frameworks/
+
+# Fastlane / provisioning
+*.mobileprovision
+*.certSigningRequest
+fastlane/report.xml
+fastlane/Preview.html
+fastlane/screenshots/**/*.png
+fastlane/test_output
