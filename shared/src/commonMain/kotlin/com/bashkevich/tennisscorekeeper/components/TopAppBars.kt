@@ -16,6 +16,7 @@ import androidx.compose.runtime.setValue
 import com.bashkevich.tennisscorekeeper.AppConfig
 import com.bashkevich.tennisscorekeeper.components.icons.IconGroup
 import com.bashkevich.tennisscorekeeper.components.icons.default_icons.ArrowBack
+import com.bashkevich.tennisscorekeeper.components.icons.default_icons.Edit
 import com.bashkevich.tennisscorekeeper.components.icons.default_icons.Settings
 import com.bashkevich.tennisscorekeeper.components.icons.default_icons.Share
 import com.bashkevich.tennisscorekeeper.components.expect.sharePanelMenuItemLabel
@@ -25,6 +26,7 @@ import tennisscorekeeper.shared.generated.resources.Res
 import tennisscorekeeper.shared.generated.resources.add_match
 import tennisscorekeeper.shared.generated.resources.add_tournament
 import tennisscorekeeper.shared.generated.resources.copy_link
+import tennisscorekeeper.shared.generated.resources.edit
 import tennisscorekeeper.shared.generated.resources.login
 import tennisscorekeeper.shared.generated.resources.match
 import tennisscorekeeper.shared.generated.resources.navigate_back
@@ -157,6 +159,7 @@ fun LoginAppBar(
 fun MatchDetailsAppBar(
     matchId: Int,
     onBack: () -> Unit,
+    onEditClick: () -> Unit,
     onShareLink: (String) -> Unit,
     onNavigateToSettings: () -> Unit
 ) {
@@ -178,6 +181,9 @@ fun MatchDetailsAppBar(
             }
         },
         actions = {
+            IconButton(onClick = onEditClick) {
+                Icon(IconGroup.Default.Edit, contentDescription = stringResource(Res.string.edit))
+            }
             Box {
                 IconButton(onClick = { expanded = true }) {
                     Icon(IconGroup.Default.Share, contentDescription = stringResource(Res.string.copy_link))

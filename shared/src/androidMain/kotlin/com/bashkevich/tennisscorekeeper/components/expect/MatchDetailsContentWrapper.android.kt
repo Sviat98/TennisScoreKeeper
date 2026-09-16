@@ -44,6 +44,7 @@ import com.bashkevich.tennisscorekeeper.components.MatchDetailsAppBar
 import com.bashkevich.tennisscorekeeper.components.ScoreboardWithMediaPlayerView
 import com.bashkevich.tennisscorekeeper.components.match_details.ScoreboardControlPanel
 import com.bashkevich.tennisscorekeeper.model.match.remote.body.toResource
+import com.bashkevich.tennisscorekeeper.navigation.EditMatchRoute
 import com.bashkevich.tennisscorekeeper.navigation.SettingsRoute
 import com.bashkevich.tennisscorekeeper.screens.matchdetails.MatchDetailsState
 import com.bashkevich.tennisscorekeeper.screens.matchdetails.MatchDetailsUiEvent
@@ -153,6 +154,7 @@ actual fun MatchDetailsContentWrapper(
                     MatchDetailsAppBar(
                         matchId = match.id,
                         onBack = { navController.navigateUp() },
+                        onEditClick = { navController.navigate(EditMatchRoute(match.id)) },
                         onShareLink = { link ->
                             scope.launch {
                                 shareLauncher.share(shareLinkPayload(link))

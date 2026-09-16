@@ -27,6 +27,7 @@ fun ThemeComponent(
     onThemeSelected: (ScoreboardTheme) -> Unit,
     onRetrySelectedTheme: (Int) -> Unit,
     onPreviewClick: () -> Unit = {},
+    showPreviewButton: Boolean = true,
 ) {
     Column(
         modifier = Modifier.then(modifier),
@@ -47,19 +48,21 @@ fun ThemeComponent(
                 onRetrySelectedTheme = onRetrySelectedTheme,
             )
 
-            val isPreviewButtonEnabled =
-                themeComponentState.selectedTheme is ThemeComponentState.SelectedThemeState.Idle
-                        && themeComponentState.selectedTheme.theme != null
+            if (showPreviewButton) {
+                val isPreviewButtonEnabled =
+                    themeComponentState.selectedTheme is ThemeComponentState.SelectedThemeState.Idle
+                            && themeComponentState.selectedTheme.theme != null
 
-            IconButton(
-                onClick = onPreviewClick,
-                enabled = isPreviewButtonEnabled
-            ) {
-                Icon(
-                    modifier = Modifier.size(24.dp),
-                    imageVector = IconGroup.Default.Preview,
-                    contentDescription = stringResource(Res.string.preview),
-                )
+                IconButton(
+                    onClick = onPreviewClick,
+                    enabled = isPreviewButtonEnabled
+                ) {
+                    Icon(
+                        modifier = Modifier.size(24.dp),
+                        imageVector = IconGroup.Default.Preview,
+                        contentDescription = stringResource(Res.string.preview),
+                    )
+                }
             }
         }
     }

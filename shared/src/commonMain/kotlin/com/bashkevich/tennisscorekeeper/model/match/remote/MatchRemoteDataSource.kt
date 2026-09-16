@@ -10,6 +10,7 @@ import com.bashkevich.tennisscorekeeper.model.match.remote.body.MatchStatusBody
 import com.bashkevich.tennisscorekeeper.model.match.remote.body.RetiredParticipantBody
 import com.bashkevich.tennisscorekeeper.model.match.remote.body.ServeBody
 import com.bashkevich.tennisscorekeeper.model.match.remote.body.ServeInPairBody
+import com.bashkevich.tennisscorekeeper.model.match.remote.body.UpdateMatchBody
 import com.bashkevich.tennisscorekeeper.model.match.remote.body.VideoLinkBody
 import com.bashkevich.tennisscorekeeper.screens.matchdetails.ConnectionState
 import io.ktor.client.HttpClient
@@ -19,6 +20,7 @@ import io.ktor.client.plugins.websocket.webSocketSession
 import io.ktor.client.request.get
 import io.ktor.client.request.patch
 import io.ktor.client.request.post
+import io.ktor.client.request.put
 import io.ktor.client.request.setBody
 import io.ktor.http.URLProtocol
 import io.ktor.http.path
@@ -180,6 +182,20 @@ class MatchRemoteDataSource(
                 setBody(matchStatusBody)
             }.body<ResponseMessage>()
 
+            message
+        }
+    }
+
+    suspend fun updateMatch(
+        matchId: String,
+        updateMatchBody: UpdateMatchBody
+    ): LoadResult<ResponseMessage, Throwable> {
+        return runOperationCatching {
+            val message = httpClient.put("/matches/$matchId") {
+                setBody(updateMatchBody)
+            }.body<ResponseMessage>()
+
+            println(message)
             message
         }
     }

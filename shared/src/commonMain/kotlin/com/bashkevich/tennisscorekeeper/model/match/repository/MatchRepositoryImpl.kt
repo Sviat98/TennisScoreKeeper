@@ -20,6 +20,7 @@ import com.bashkevich.tennisscorekeeper.model.match.remote.body.RetiredParticipa
 import com.bashkevich.tennisscorekeeper.model.match.remote.body.ScoreType
 import com.bashkevich.tennisscorekeeper.model.match.remote.body.ServeBody
 import com.bashkevich.tennisscorekeeper.model.match.remote.body.ServeInPairBody
+import com.bashkevich.tennisscorekeeper.model.match.remote.body.UpdateMatchBody
 import com.bashkevich.tennisscorekeeper.model.match.remote.body.VideoLinkBody
 import com.bashkevich.tennisscorekeeper.model.tournament.local.TournamentLocalDataSource
 import com.bashkevich.tennisscorekeeper.screens.matchdetails.ConnectionState
@@ -137,6 +138,18 @@ class MatchRepositoryImpl(
             matchId = matchId.toString(),
             matchStatusBody = matchStatusBody
         )
+    }
+
+    // Локальный кэш не обновляем вручную: после PUT сервер рассылает обновлённый MatchDto
+    // по WebSocket, и активная подписка observeMatchUpdatesFromSaveToDb пере-кэширует матч
+    override suspend fun updateMatch(
+        matchId: Int,
+        updateMatchBody: UpdateMatchBody
+    ): LoadResult<Unit, Throwable> {
+        return matchRemoteDataSource.updateMatch(
+            matchId = matchId.toString(),
+            updateMatchBody = updateMatchBody
+        ).mapSuccess { }
     }
 
     override suspend fun deleteMatchesForTournament(tournamentId: Int) {
