@@ -27,6 +27,7 @@ import com.bashkevich.tennisscorekeeper.screens.matchdetails.ConnectionState
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
 
@@ -68,10 +69,6 @@ class MatchRepositoryImpl(
             .mapSuccess { shortMatches -> shortMatches.map { it.toDomain() } }
     }
 
-    override fun closeSession() {
-        matchRemoteDataSource.closeSession()
-    }
-
     override fun observeMatchById(matchId: Int): Flow<Match?> {
         return matchLocalDataSource.observeMatchById(matchId).
             onEach { println("match From Db = $it") }
@@ -80,7 +77,8 @@ class MatchRepositoryImpl(
 
     override fun observeMatchUpdatesFromNetworkAndSaveToDb(matchId: Int): Flow<LoadResult<Unit, Throwable>> =
         matchRemoteDataSource.observeMatchUpdates()
-            .onStart { matchRemoteDataSource.connectToMatchUpdates(matchId.toString()) }
+            .onStart { matchRemoteDataSource.retainSession(matchId.toString()) }
+            .onCompletion { matchRemoteDataSource.releaseSession() }
             .onEach { result ->
                 println("observeMatchUpdatesFromNetwork = $result")
                 result.doOnSuccess { matchDto ->
@@ -90,7 +88,8 @@ class MatchRepositoryImpl(
 
     override fun observeMatchUpdatesFromNetwork(matchId: Int): Flow<LoadResult<Match, Throwable>> =
         matchRemoteDataSource.observeMatchUpdates()
-            .onStart { matchRemoteDataSource.connectToMatchUpdates(matchId.toString()) }
+            .onStart { matchRemoteDataSource.retainSession(matchId.toString()) }
+            .onCompletion { matchRemoteDataSource.releaseSession() }
             .map { result -> result.mapSuccess { matchDto -> matchDto.toDomain() } }
 
     override fun observeConnectionState(): StateFlow<ConnectionState> =

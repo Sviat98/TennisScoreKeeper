@@ -43,6 +43,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
+import kotlin.concurrent.atomics.AtomicInt
 import kotlin.concurrent.atomics.AtomicLong
 import kotlin.concurrent.atomics.ExperimentalAtomicApi
 import kotlin.coroutines.cancellation.CancellationException
@@ -55,6 +56,13 @@ class MatchRemoteDataSource(
     private var webSocketSession: DefaultClientWebSocketSession? = null
     private val scope = CoroutineScope(SupervisorJob() + webSocketDispatcher)
     private var connectionJob: Job? = null
+
+    // Счётчик заинтересованных в сессии экранов (retain/release поверх единственного соединения):
+    // сессия открывается при первом подписчике и закрывается, когда подписчиков не осталось
+    @OptIn(ExperimentalAtomicApi::class)
+    private val subscribersCount = AtomicInt(0)
+    private var closeJob: Job? = null
+    private var retainedMatchId: String? = null
 
     private val _connectionStateFlow = MutableStateFlow(ConnectionState.Loading)
 
@@ -213,6 +221,43 @@ class MatchRemoteDataSource(
 
     fun observeMatchUpdates(): SharedFlow<LoadResult<MatchDto, Throwable>> =
         _matchFlow.asSharedFlow() // Expose as read-only flow
+
+    /**
+     * Регистрирует нового подписчика матч-сессии. Открывает соединение, только если его ещё нет,
+     * закрытие ещё не успело выполниться или запрошен другой матч; иначе живая сессия
+     * переиспользуется без пересоздания (без мигания ConnectionState).
+     */
+    @OptIn(ExperimentalAtomicApi::class)
+    fun retainSession(matchId: String) {
+        val closeWasPending = closeJob?.isActive == true
+        closeJob?.cancel()
+
+        val previousCount = subscribersCount.fetchAndAdd(1)
+
+        val isSessionAlive = closeWasPending || connectionJob?.isActive == true
+
+        if (!isSessionAlive || retainedMatchId != matchId) {
+            retainedMatchId = matchId
+            connectToMatchUpdates(matchId)
+        }
+    }
+
+    /**
+     * Снимает подписку с матч-сессии; когда подписчиков не осталось — закрывает соединение
+     * с небольшой задержкой (её отменяет новый [retainSession] при быстром возврате экрана).
+     */
+    @OptIn(ExperimentalAtomicApi::class)
+    fun releaseSession() {
+        val previousCount = subscribersCount.fetchAndAdd(-1)
+
+        if (previousCount == 1) {
+            closeJob?.cancel()
+            closeJob = scope.launch {
+                delay(SESSION_CLOSE_DELAY_MS.milliseconds)
+                closeSession()
+            }
+        }
+    }
 
     @OptIn(ExperimentalAtomicApi::class)
     fun connectToMatchUpdates(matchId: String) {
@@ -412,6 +457,7 @@ class MatchRemoteDataSource(
         const val HEARTBEAT_TIMEOUT_MS = 10_000L
         const val RECONNECTION_BASE_DELAY_MS = 5_000L
         const val RECONNECTION_MAX_DELAY_MS = 60_000L
+        const val SESSION_CLOSE_DELAY_MS = 1_000L
         const val HEARTBEAT = """{"type":"heartbeat"}"""
     }
 }
