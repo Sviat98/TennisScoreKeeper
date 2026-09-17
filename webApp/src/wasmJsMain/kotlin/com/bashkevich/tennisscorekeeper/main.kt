@@ -14,6 +14,7 @@ import com.bashkevich.tennisscorekeeper.navigation.TournamentRoute
 import com.bashkevich.tennisscorekeeper.navigation.TournamentsRoute
 import com.bashkevich.tennisscorekeeper.navigation.AddMatchRoute
 import com.bashkevich.tennisscorekeeper.navigation.AddTournamentRoute
+import com.bashkevich.tennisscorekeeper.navigation.EditMatchRoute
 import com.bashkevich.tennisscorekeeper.navigation.MatchDetailsRoute
 import kotlinx.browser.document
 import kotlinx.browser.window
@@ -45,6 +46,11 @@ fun main() {
                     val tournamentId = initRoute.substring(findNthOccurrence(initRoute,'/',1)+1,findNthOccurrence(initRoute,'/',2)).toInt()
 
                     navController.navigate(AddMatchRoute(tournamentId = tournamentId))
+                }
+                initRoute.matches(Regex("matches/[0-9]+/editMatch")) ->{
+                    val matchId = initRoute.substring(findNthOccurrence(initRoute,'/',1)+1,findNthOccurrence(initRoute,'/',2)).toInt()
+
+                    navController.navigate(EditMatchRoute(matchId = matchId))
                 }
 
                 else -> navController.navigate(initRoute)
@@ -78,6 +84,11 @@ fun main() {
                         val tournamentId = navBackStackEntry.toRoute<AddMatchRoute>().tournamentId
 
                         "#tournaments/$tournamentId/addMatch"
+                    }
+                    destination.hasRoute(EditMatchRoute::class)->{
+                        val matchId = navBackStackEntry.toRoute<EditMatchRoute>().matchId
+
+                        "#matches/$matchId/editMatch"
                     }
                     else-> "#$route"
                 }

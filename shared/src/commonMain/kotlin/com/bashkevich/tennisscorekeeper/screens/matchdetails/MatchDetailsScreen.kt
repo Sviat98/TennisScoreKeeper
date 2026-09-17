@@ -35,6 +35,7 @@ import com.bashkevich.tennisscorekeeper.model.match.remote.body.toResource
 import com.bashkevich.tennisscorekeeper.model.theme.domain.ScoreboardThemeState
 import com.bashkevich.tennisscorekeeper.model.theme.domain.themeOrDefault
 import com.bashkevich.tennisscorekeeper.mvi.LaunchedUiEffectHandler
+import com.bashkevich.tennisscorekeeper.navigation.EditMatchRoute
 import com.bashkevich.tennisscorekeeper.navigation.SettingsFlowRoute
 import com.mobilebytelabs.kmptoolkit.share.ExperimentalShareApi
 import com.mobilebytelabs.kmptoolkit.share.compose.rememberShareLauncher
@@ -112,6 +113,7 @@ fun MatchDetailsCommonContent(
             MatchDetailsAppBar(
                 matchId = match.id,
                 onBack = { navController.navigateUp() },
+                onEditClick = { navController.navigate(EditMatchRoute(match.id)) },
                 onShareLink = { link ->
                     scope.launch {
                         shareLauncher.share(shareLinkPayload(link))

@@ -7,6 +7,7 @@ import com.bashkevich.tennisscorekeeper.model.match.domain.ShortMatch
 import com.bashkevich.tennisscorekeeper.model.match.remote.MatchBody
 import com.bashkevich.tennisscorekeeper.model.match.remote.body.MatchStatus
 import com.bashkevich.tennisscorekeeper.model.match.remote.body.ScoreType
+import com.bashkevich.tennisscorekeeper.model.match.remote.body.UpdateMatchBody
 import com.bashkevich.tennisscorekeeper.screens.matchdetails.ConnectionState
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
@@ -43,5 +44,10 @@ interface MatchRepository {
     suspend fun addNewMatch(
         tournamentId: Int,
         matchBody: MatchBody
+    ): LoadResult<Unit, Throwable>
+
+    suspend fun updateMatch(
+        matchId: Int,
+        updateMatchBody: UpdateMatchBody
     ): LoadResult<Unit, Throwable>
 }

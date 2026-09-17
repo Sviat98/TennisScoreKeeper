@@ -27,6 +27,7 @@
     <string name="tournament">Tournament</string>
     <string name="match">Match</string>
     <string name="add_match">Add Match</string>
+    <string name="edit_match">Edit Match</string>
     <string name="add_tournament">Add Tournament</string>
     <string name="navigate_back">Navigate back</string>
     <string name="navigate_to_settings">Navigate to settings</string>
