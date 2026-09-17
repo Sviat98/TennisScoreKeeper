@@ -42,7 +42,7 @@ fun TournamentTypeCombobox(
 
     val tournamentTypeState = TextFieldState(tournamentTypeText)
 
-    Box(modifier = modifier) {
+    Box(modifier = Modifier.then(modifier)) {
         TextField(
             modifier = Modifier.fillMaxWidth(),
             state = tournamentTypeState,
