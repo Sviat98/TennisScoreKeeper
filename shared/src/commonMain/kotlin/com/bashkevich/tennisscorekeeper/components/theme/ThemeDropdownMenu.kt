@@ -98,7 +98,7 @@ fun ThemeCombobox(
         is ThemeComponentState.SelectedThemeState.Error -> null
     }
 
-    Box(modifier = modifier) {
+    Box(modifier = Modifier.then(modifier)) {
         TextField(
             modifier = Modifier.fillMaxWidth(),
             state = TextFieldState(text),

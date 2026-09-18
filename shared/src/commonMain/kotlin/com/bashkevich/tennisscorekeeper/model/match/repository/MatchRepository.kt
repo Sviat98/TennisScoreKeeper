@@ -17,7 +17,6 @@ interface MatchRepository {
     fun observeMatchesForTournament(tournamentId: Int): Flow<List<ShortMatch>>
 
     suspend fun getMatchesForTournament(tournamentId: Int): LoadResult<List<ShortMatch>, Throwable>
-    fun closeSession()
     fun observeMatchById(matchId: Int): Flow<Match?>
     fun observeMatchUpdatesFromNetworkAndSaveToDb(matchId: Int): Flow<LoadResult<Unit, Throwable>>
 

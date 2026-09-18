@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
@@ -27,16 +26,13 @@ fun ThemeComponent(
     onThemeSelected: (ScoreboardTheme) -> Unit,
     onRetrySelectedTheme: (Int) -> Unit,
     onPreviewClick: () -> Unit = {},
-    showPreviewButton: Boolean = true,
 ) {
     Column(
         modifier = Modifier.then(modifier),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Row(
-            modifier = Modifier
-                .widthIn(max = 300.dp)
-                .fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
@@ -48,21 +44,19 @@ fun ThemeComponent(
                 onRetrySelectedTheme = onRetrySelectedTheme,
             )
 
-            if (showPreviewButton) {
-                val isPreviewButtonEnabled =
-                    themeComponentState.selectedTheme is ThemeComponentState.SelectedThemeState.Idle
-                            && themeComponentState.selectedTheme.theme != null
+            val isPreviewButtonEnabled =
+                themeComponentState.selectedTheme is ThemeComponentState.SelectedThemeState.Idle
+                        && themeComponentState.selectedTheme.theme != null
 
-                IconButton(
-                    onClick = onPreviewClick,
-                    enabled = isPreviewButtonEnabled
-                ) {
-                    Icon(
-                        modifier = Modifier.size(24.dp),
-                        imageVector = IconGroup.Default.Preview,
-                        contentDescription = stringResource(Res.string.preview),
-                    )
-                }
+            IconButton(
+                onClick = onPreviewClick,
+                enabled = isPreviewButtonEnabled
+            ) {
+                Icon(
+                    modifier = Modifier.size(24.dp),
+                    imageVector = IconGroup.Default.Preview,
+                    contentDescription = stringResource(Res.string.preview),
+                )
             }
         }
     }

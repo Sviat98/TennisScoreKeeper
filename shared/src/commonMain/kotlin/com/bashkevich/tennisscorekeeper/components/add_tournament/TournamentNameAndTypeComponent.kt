@@ -36,26 +36,36 @@ fun TournamentNameAndTypeComponent(
                 horizontalArrangement = Arrangement.spacedBy(64.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                TournamentNameComponent(
+                Box(
                     modifier = Modifier.weight(1f),
-                    tournamentNameState = tournamentNameState
-                )
-                TournamentTypeComponent(
+                    contentAlignment = Alignment.Center
+                ) {
+                    TournamentNameComponent(
+                        modifier = Modifier.widthIn(max = 300.dp).fillMaxWidth(),
+                        tournamentNameState = tournamentNameState
+                    )
+                }
+                Box(
                     modifier = Modifier.weight(1f),
-                    currentTournamentType = currentTournamentType,
-                    onTournamentTypeChange = onTournamentTypeChange,
-                )
+                    contentAlignment = Alignment.Center
+                ) {
+                    TournamentTypeComponent(
+                        modifier = Modifier.widthIn(max = 300.dp).fillMaxWidth(),
+                        currentTournamentType = currentTournamentType,
+                        onTournamentTypeChange = onTournamentTypeChange,
+                    )
+                }
             }
         } else {
             Column(
                 verticalArrangement = Arrangement.spacedBy(16.dp),
             ) {
                 TournamentNameComponent(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier.widthIn(max = 300.dp).fillMaxWidth(),
                     tournamentNameState = tournamentNameState
                 )
                 TournamentTypeComponent(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier.widthIn(max = 300.dp).fillMaxWidth(),
                     currentTournamentType = currentTournamentType,
                     onTournamentTypeChange = onTournamentTypeChange,
                 )

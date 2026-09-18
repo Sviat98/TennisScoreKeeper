@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
@@ -55,7 +54,7 @@ fun AddMatchParticipantComponent(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         ParticipantCombobox(
-            modifier = Modifier.widthIn(max = 300.dp).fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth(),
             participantOptions = participantOptions,
             currentParticipant = participant,
             onParticipantsFetch = onParticipantsFetch,
@@ -63,7 +62,7 @@ fun AddMatchParticipantComponent(
         )
 
         ParticipantDisplayNameComponent(
-            modifier = Modifier.widthIn(max = 300.dp).fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth(),
             participant = participant,
             onParticipantDisplayNameChange = onParticipantDisplayNameChange
         )

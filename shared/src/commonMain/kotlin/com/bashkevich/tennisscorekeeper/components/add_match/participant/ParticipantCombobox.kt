@@ -2,6 +2,7 @@ package com.bashkevich.tennisscorekeeper.components.add_match.participant
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -48,10 +49,10 @@ fun ParticipantCombobox(
         participantState.updateTextField(participantText)
     }
 
-    Box {
+    Box(modifier = Modifier.then(modifier)) {
         // Поле ввода с заблокированным редактированием
         TextField(
-            modifier = Modifier.then(modifier),
+            modifier = Modifier.fillMaxWidth(),
             state = participantState,
             placeholder = { Text(stringResource(Res.string.participant)) },
             readOnly = true,

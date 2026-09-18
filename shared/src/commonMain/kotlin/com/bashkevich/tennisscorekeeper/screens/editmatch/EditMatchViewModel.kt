@@ -249,9 +249,4 @@ class EditMatchViewModel(
             else -> sendAction(EditMatchAction.ShowError(e.message ?: "Error"))
         }
     }
-
-    override fun onCleared() {
-        super.onCleared()
-        matchRepository.closeSession()
-    }
 }

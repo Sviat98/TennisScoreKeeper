@@ -33,7 +33,7 @@ import com.bashkevich.tennisscorekeeper.components.icons.default_icons.ArrowBack
 import com.bashkevich.tennisscorekeeper.components.icons.default_icons.Check
 import com.bashkevich.tennisscorekeeper.components.scoreboard.match_details.MatchDetailsScoreboardView
 import com.bashkevich.tennisscorekeeper.components.showUnauthorizedActionSnackbar
-import com.bashkevich.tennisscorekeeper.components.theme.ThemeComponent
+import com.bashkevich.tennisscorekeeper.components.theme.ThemeCombobox
 import com.bashkevich.tennisscorekeeper.model.match.domain.Match
 import com.bashkevich.tennisscorekeeper.mvi.LaunchedUiEffectHandler
 import org.jetbrains.compose.resources.stringResource
@@ -166,7 +166,8 @@ private fun EditMatchContent(
                 }
             )
 
-            ThemeComponent(
+            ThemeCombobox(
+                modifier = Modifier.fillMaxWidth(),
                 themeComponentState = state.themeComponentState,
                 onThemesFetch = { onEvent(EditMatchUiEvent.FetchThemes) },
                 onThemeSelected = { theme ->
@@ -174,8 +175,7 @@ private fun EditMatchContent(
                 },
                 onRetrySelectedTheme = { themeId ->
                     onEvent(EditMatchUiEvent.RetrySelectedTheme(themeId))
-                },
-                showPreviewButton = false
+                }
             )
         }
     }
