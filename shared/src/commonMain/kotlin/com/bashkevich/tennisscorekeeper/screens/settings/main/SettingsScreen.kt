@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -38,7 +37,7 @@ import com.bashkevich.tennisscorekeeper.navigation.GeneralSettingsRoute
 import com.bashkevich.tennisscorekeeper.navigation.LoginRoute
 import com.bashkevich.tennisscorekeeper.navigation.ScoreboardThemeListRoute
 import com.bashkevich.tennisscorekeeper.navigation.SetTemplateListRoute
-import com.bashkevich.tennisscorekeeper.model.auth.domain.LoggedInPlayer
+import com.bashkevich.tennisscorekeeper.model.auth.domain.LoggedInUser
 import org.jetbrains.compose.resources.stringResource
 import tennisscorekeeper.shared.generated.resources.Res
 import tennisscorekeeper.shared.generated.resources.general_settings
@@ -59,7 +58,7 @@ fun SettingsScreen(
 
     SettingsScreenContent(
         modifier = modifier,
-        loggedInPlayer = state.loggedInPlayer,
+        loggedInUser = state.loggedInUser,
         onEvent = { viewModel.onEvent(it) }
     )
 }
@@ -68,7 +67,7 @@ fun SettingsScreen(
 @Composable
 private fun SettingsScreenContent(
     modifier: Modifier = Modifier,
-    loggedInPlayer: LoggedInPlayer,
+    loggedInUser: LoggedInUser,
     onEvent: (SettingsUiEvent) -> Unit,
 ) {
     val navController = LocalNavHostController.current
@@ -98,7 +97,7 @@ private fun SettingsScreenContent(
             verticalArrangement = Arrangement.spacedBy(12.dp, Alignment.Top)
         ) {
             ProfileCard(
-                loggedInPlayer = loggedInPlayer,
+                loggedInUser = loggedInUser,
                 onLogout = { onEvent(SettingsUiEvent.Logout) },
                 onLogin = { navController.navigate(LoginRoute) }
             )
@@ -129,13 +128,13 @@ private fun SettingsScreenContent(
 
 @Composable
 private fun ProfileCard(
-    loggedInPlayer: LoggedInPlayer,
+    loggedInUser: LoggedInUser,
     onLogout: () -> Unit,
     onLogin: () -> Unit,
 ) {
     val isAuthorized = LocalAuthorization.current
 
-    val playerLabelText = if (isAuthorized) "${loggedInPlayer.name} ${loggedInPlayer.surname}"
+    val playerLabelText = if (isAuthorized) "${loggedInUser.name} ${loggedInUser.surname}"
     else stringResource(Res.string.guest)
 
     Card(

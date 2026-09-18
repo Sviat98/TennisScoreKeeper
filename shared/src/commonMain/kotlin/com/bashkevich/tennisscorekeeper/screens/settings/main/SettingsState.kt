@@ -4,7 +4,7 @@ import androidx.compose.runtime.Immutable
 import com.bashkevich.tennisscorekeeper.mvi.UiAction
 import com.bashkevich.tennisscorekeeper.mvi.UiEvent
 import com.bashkevich.tennisscorekeeper.mvi.UiState
-import com.bashkevich.tennisscorekeeper.model.auth.domain.LoggedInPlayer
+import com.bashkevich.tennisscorekeeper.model.auth.domain.LoggedInUser
 
 @Immutable
 sealed class SettingsUiEvent : UiEvent {
@@ -13,12 +13,12 @@ sealed class SettingsUiEvent : UiEvent {
 
 @Immutable
 data class SettingsState(
-    val loggedInPlayer: LoggedInPlayer,
+    val loggedInUser: LoggedInUser,
     val action: SettingsAction? = null
 ) : UiState {
     companion object {
         fun initial() = SettingsState(
-            loggedInPlayer = LoggedInPlayer.empty()
+            loggedInUser = LoggedInUser.empty()
         )
     }
 }
