@@ -14,10 +14,10 @@ class SettingsViewModel(
 ) : BaseViewModel<SettingsState, SettingsUiEvent, SettingsAction>() {
 
     override val state: StateFlow<SettingsState> = combine(
-        authRepository.observeLoggedInPlayer(),
+        authRepository.observeLoggedInUser(),
         _action
-    ) { loggedInPlayer, action ->
-        SettingsState(loggedInPlayer = loggedInPlayer, action = action)
+    ) { loggedInUser, action ->
+        SettingsState(loggedInUser = loggedInUser, action = action)
     }.stateIn(
         viewModelScope,
         SharingStarted.WhileSubscribed(5_000),

@@ -24,13 +24,13 @@ class AppViewModel(
     // checkRefreshTokenStatus() runs as a one-shot startup side effect via onStart.
     val state: StateFlow<AppState> =
         combine(
-            authRepository.observePlayerId().distinctUntilChanged(),
+            authRepository.observeUserId().distinctUntilChanged(),
             settingsRepository.observeAppThemeMode().distinctUntilChanged(),
             settingsRepository.observeAppLanguage().distinctUntilChanged(),
-        ) { playerId, themeMode, language ->
+        ) { userId, themeMode, language ->
             println("collected themeMode = $themeMode")
             AppState(
-                isAuthorized = playerId.isNotEmpty(),
+                isAuthorized = userId.isNotEmpty(),
                 appThemeMode = themeMode,
                 appLanguage = language,
             )
