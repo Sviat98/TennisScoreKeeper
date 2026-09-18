@@ -8,14 +8,13 @@ import com.bashkevich.tennisscorekeeper.model.settings.domain.AppLanguage
 import com.bashkevich.tennisscorekeeper.model.settings.domain.AppThemeMode
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import kotlin.collections.get
 
 class  KeyValueStorage(
     private val dataStore: DataStore<Preferences>
 ) {
-    private val PLAYER_ID_KEY = stringPreferencesKey("playerId")
-    private val PLAYER_NAME_KEY = stringPreferencesKey("playerName")
-    private val PLAYER_SURNAME_KEY = stringPreferencesKey("playerSurname")
+    private val USER_ID_KEY = stringPreferencesKey("userId")
+    private val USER_NAME_KEY = stringPreferencesKey("userName")
+    private val USER_SURNAME_KEY = stringPreferencesKey("userSurname")
     private val ACCESS_TOKEN_KEY = stringPreferencesKey("accessToken")
     private val REFRESH_TOKEN_KEY = stringPreferencesKey("refreshToken")
     private val APP_THEME_KEY = stringPreferencesKey("appTheme")
@@ -36,26 +35,26 @@ class  KeyValueStorage(
             Pair(it[ACCESS_TOKEN_KEY] ?: STRING_DEFAULT, it[REFRESH_TOKEN_KEY] ?: STRING_DEFAULT)
         }
 
-    suspend fun savePlayerId(playerId: String) {
-        dataStore.edit { it[PLAYER_ID_KEY] = playerId }
+    suspend fun saveUserId(userId: String) {
+        dataStore.edit { it[USER_ID_KEY] = userId }
     }
 
-    fun observePlayerId(): Flow<String> =
-        dataStore.data.map { it[PLAYER_ID_KEY] ?: STRING_DEFAULT }
+    fun observeUserId(): Flow<String> =
+        dataStore.data.map { it[USER_ID_KEY] ?: STRING_DEFAULT }
 
-    suspend fun savePlayerName(name: String) {
-        dataStore.edit { it[PLAYER_NAME_KEY] = name }
+    suspend fun saveUserName(name: String) {
+        dataStore.edit { it[USER_NAME_KEY] = name }
     }
 
-    fun observePlayerName(): Flow<String> =
-        dataStore.data.map { it[PLAYER_NAME_KEY] ?: STRING_DEFAULT }
+    fun observeUserName(): Flow<String> =
+        dataStore.data.map { it[USER_NAME_KEY] ?: STRING_DEFAULT }
 
-    suspend fun savePlayerSurname(surname: String) {
-        dataStore.edit { it[PLAYER_SURNAME_KEY] = surname }
+    suspend fun saveUserSurname(surname: String) {
+        dataStore.edit { it[USER_SURNAME_KEY] = surname }
     }
 
-    fun observePlayerSurname(): Flow<String> =
-        dataStore.data.map { it[PLAYER_SURNAME_KEY] ?: STRING_DEFAULT }
+    fun observeUserSurname(): Flow<String> =
+        dataStore.data.map { it[USER_SURNAME_KEY] ?: STRING_DEFAULT }
 
     fun observeRefreshToken(): Flow<String> =
         dataStore.data.map { it[REFRESH_TOKEN_KEY] ?: STRING_DEFAULT }

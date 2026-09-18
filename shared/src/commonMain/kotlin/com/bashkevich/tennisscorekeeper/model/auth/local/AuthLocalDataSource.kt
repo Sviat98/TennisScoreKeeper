@@ -8,11 +8,11 @@ import kotlinx.coroutines.flow.first
 class AuthLocalDataSource(
     private val keyValueStorage: KeyValueStorage
 ) {
-    fun observePlayerId(): Flow<String> = keyValueStorage.observePlayerId()
-    suspend fun saveLoggedInPlayer(playerId: String, name: String, surname: String) {
-        keyValueStorage.savePlayerId(playerId)
-        keyValueStorage.savePlayerName(name)
-        keyValueStorage.savePlayerSurname(surname)
+    fun observeUserId(): Flow<String> = keyValueStorage.observeUserId()
+    suspend fun saveLoggedInUser(userId: String, name: String, surname: String) {
+        keyValueStorage.saveUserId(userId)
+        keyValueStorage.saveUserName(name)
+        keyValueStorage.saveUserSurname(surname)
     }
 
     suspend fun saveTokens(accessToken: String, refreshToken: String) {
@@ -23,7 +23,7 @@ class AuthLocalDataSource(
        return keyValueStorage.observeRefreshToken().distinctUntilChanged().first()
     }
 
-    fun observePlayerName(): Flow<String> = keyValueStorage.observePlayerName()
+    fun observeUserName(): Flow<String> = keyValueStorage.observeUserName()
 
-    fun observePlayerSurname(): Flow<String> = keyValueStorage.observePlayerSurname()
+    fun observeUserSurname(): Flow<String> = keyValueStorage.observeUserSurname()
 }
