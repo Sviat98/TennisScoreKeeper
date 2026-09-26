@@ -132,7 +132,13 @@ fun MatchWithParticipantsEntity.toMatchDomain(): Match {
 
 private fun ParticipantInMatchWithDetails.toMatchParticipantDomain(): TennisParticipantInMatch {
     val displayName = participantInMatch.displayName
-        .ifEmpty { participant.player.surname + " " + participant.player.name }
+        .ifEmpty {
+            if (participant.secondPlayer != null) {
+                "${participant.player.surname}/${participant.secondPlayer.surname}".uppercase()
+            } else {
+                participant.player.surname.uppercase()
+            }
+        }
     val primaryColor = participantInMatch.primaryColor.toColorOrDefault()
     val secondaryColor = participantInMatch.secondaryColor?.toColorOrDefault()
 

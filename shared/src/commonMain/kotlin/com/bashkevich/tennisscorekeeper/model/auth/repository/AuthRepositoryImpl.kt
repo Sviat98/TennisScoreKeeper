@@ -5,7 +5,7 @@ import com.bashkevich.tennisscorekeeper.core.remote.ResponseMessage
 import com.bashkevich.tennisscorekeeper.core.remote.UnauthorizedException
 import com.bashkevich.tennisscorekeeper.core.remote.doOnError
 import com.bashkevich.tennisscorekeeper.core.remote.doOnSuccess
-import com.bashkevich.tennisscorekeeper.model.auth.domain.LoggedInPlayer
+import com.bashkevich.tennisscorekeeper.model.auth.domain.LoggedInUser
 import com.bashkevich.tennisscorekeeper.model.auth.local.AuthLocalDataSource
 import com.bashkevich.tennisscorekeeper.model.auth.remote.AuthRemoteDataSource
 import com.bashkevich.tennisscorekeeper.model.auth.remote.LoginBody
@@ -17,18 +17,18 @@ class AuthRepositoryImpl(
     private val authRemoteDataSource: AuthRemoteDataSource,
     private val authLocalDataSource: AuthLocalDataSource
 ) : AuthRepository {
-    override fun observePlayerId(): Flow<String> = authLocalDataSource.observePlayerId()
+    override fun observeUserId(): Flow<String> = authLocalDataSource.observeUserId()
 
-    override fun observeLoggedInPlayer(): Flow<LoggedInPlayer> = combine(
-        authLocalDataSource.observePlayerId(),
-        authLocalDataSource.observePlayerName(),
-        authLocalDataSource.observePlayerSurname()
-    ) { playerId, name, surname ->
-        LoggedInPlayer(playerId = playerId, name = name, surname = surname)
+    override fun observeLoggedInUser(): Flow<LoggedInUser> = combine(
+        authLocalDataSource.observeUserId(),
+        authLocalDataSource.observeUserName(),
+        authLocalDataSource.observeUserSurname()
+    ) { userId, name, surname ->
+        LoggedInUser(userId = userId, name = name, surname = surname)
     }
 
-    override suspend fun saveLoggedInPlayer(playerId: String, name: String, surname: String) {
-        authLocalDataSource.saveLoggedInPlayer(playerId, name, surname)
+    override suspend fun saveLoggedInUser(userId: String, name: String, surname: String) {
+        authLocalDataSource.saveLoggedInUser(userId, name, surname)
     }
 
     override suspend fun saveTokens(accessToken: String, refreshToken: String) {
@@ -37,10 +37,10 @@ class AuthRepositoryImpl(
 
     override suspend fun login(loginBody: LoginBody): LoadResult<LoginResponseDto, Throwable> {
         return authRemoteDataSource.login(loginBody).doOnSuccess { loginResponseDto ->
-            authLocalDataSource.saveLoggedInPlayer(
-                loginResponseDto.player.id,
-                loginResponseDto.player.name,
-                loginResponseDto.player.surname
+            authLocalDataSource.saveLoggedInUser(
+                loginResponseDto.user.id,
+                loginResponseDto.user.name,
+                loginResponseDto.user.surname
             )
             authLocalDataSource.saveTokens(
                 loginResponseDto.accessToken,
@@ -55,7 +55,7 @@ class AuthRepositoryImpl(
         val result = if(refreshToken.isNotEmpty()){
             authRemoteDataSource.refreshTokenStatus(refreshToken).doOnError { throwable ->
                 if (throwable is UnauthorizedException){
-                    authLocalDataSource.saveLoggedInPlayer("", "", "")
+                    authLocalDataSource.saveLoggedInUser("", "", "")
                     authLocalDataSource.saveTokens(accessToken = "", refreshToken = "")
                 }
             }
@@ -69,7 +69,7 @@ class AuthRepositoryImpl(
     override suspend fun logout() {
         val refreshToken = authLocalDataSource.getRefreshToken()
         // удаляем данные в ЛЮБОМ случае
-        authLocalDataSource.saveLoggedInPlayer("", "", "")
+        authLocalDataSource.saveLoggedInUser("", "", "")
         authLocalDataSource.saveTokens(accessToken = "", refreshToken = "")
         authRemoteDataSource.clearAuthTokens()
         authRemoteDataSource.logout(refreshToken)

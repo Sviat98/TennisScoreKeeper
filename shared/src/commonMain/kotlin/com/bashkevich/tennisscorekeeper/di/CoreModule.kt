@@ -154,7 +154,7 @@ val coreModule = module {
                                 bearerTokens = BearerTokens(accessToken, refreshToken)
                             }.doOnError { throwable ->
                                 if (throwable is UnauthorizedException) {
-                                    keyValueStorage.savePlayerId("")
+                                    keyValueStorage.saveUserId("")
                                     keyValueStorage.saveTokens("", "")
                                 }
                             }

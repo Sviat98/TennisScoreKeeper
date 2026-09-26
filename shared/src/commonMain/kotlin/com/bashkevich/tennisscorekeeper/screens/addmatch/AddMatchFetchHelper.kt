@@ -1,6 +1,7 @@
 package com.bashkevich.tennisscorekeeper.screens.addmatch
 
 import com.bashkevich.tennisscorekeeper.core.remote.LoadResult
+import com.bashkevich.tennisscorekeeper.model.set_template.domain.SET_TEMPLATE_DEFAULT
 import com.bashkevich.tennisscorekeeper.model.set_template.repository.SetTemplateRepository
 import com.bashkevich.tennisscorekeeper.model.theme.domain.ScoreboardTheme
 import com.bashkevich.tennisscorekeeper.model.theme.repository.ThemeRepository
@@ -29,19 +30,29 @@ class AddMatchFetchHelper(
         }
     }
 
+    /** Для id дефолтного сет-темплейта сетевой вызов не выполняется — сразу Success. */
     fun observeRegularSetByIdFromNetwork(id: Int?): Flow<LoadResult<Unit, Throwable>?> = flow {
         id?.let {
             _regularSetTrigger.onStart { emit(Unit) }.collect {
                 emit(null)
-                emit(setTemplateRepository.fetchSetTemplateById(id))
+                if (id == SET_TEMPLATE_DEFAULT.id) {
+                    emit(LoadResult.Success(Unit))
+                } else {
+                    emit(setTemplateRepository.fetchSetTemplateById(id))
+                }
             }
         }
     }
 
+    /** Для id дефолтного сет-темплейта сетевой вызов не выполняется — сразу Success. */
     fun observeDecidingSetByIdFromNetwork(id: Int): Flow<LoadResult<Unit, Throwable>?> = flow {
         _decidingSetTrigger.onStart { emit(Unit) }.collect {
             emit(null)
-            emit(setTemplateRepository.fetchSetTemplateById(id))
+            if (id == SET_TEMPLATE_DEFAULT.id) {
+                emit(LoadResult.Success(Unit))
+            } else {
+                emit(setTemplateRepository.fetchSetTemplateById(id))
+            }
         }
     }
 

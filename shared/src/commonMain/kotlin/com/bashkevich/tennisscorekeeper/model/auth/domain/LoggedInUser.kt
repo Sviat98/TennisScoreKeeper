@@ -1,13 +1,13 @@
 package com.bashkevich.tennisscorekeeper.model.auth.domain
 
-data class LoggedInPlayer(
-    val playerId: String,
+data class LoggedInUser(
+    val userId: String,
     val name: String,
     val surname: String
 ) {
     companion object {
-        fun empty() = LoggedInPlayer(
-            playerId = "",
+        fun empty() = LoggedInUser(
+            userId = "",
             name = "",
             surname = ""
         )
