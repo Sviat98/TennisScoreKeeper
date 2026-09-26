@@ -13,6 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.window.core.layout.WindowSizeClass
+import com.bashkevich.tennisscorekeeper.components.ComponentMode
 import com.bashkevich.tennisscorekeeper.model.participant.domain.TennisParticipant
 import com.bashkevich.tennisscorekeeper.model.participant.domain.TennisParticipantInMatch
 
@@ -22,6 +23,7 @@ fun AddMatchParticipantsBlock(
     participantOptions: List<TennisParticipant>,
     firstParticipant: TennisParticipantInMatch,
     secondParticipant: TennisParticipantInMatch,
+    mode: ComponentMode,
     onParticipantsFetch: () -> Unit,
     onParticipantChange: (Int, TennisParticipant) -> Unit,
     onParticipantDisplayNameChange: (Int, String) -> Unit,
@@ -50,6 +52,7 @@ fun AddMatchParticipantsBlock(
                         modifier = Modifier.widthIn(max = 300.dp).fillMaxWidth(),
                         participantOptions = firstParticipantOptions,
                         participant = firstParticipant,
+                        mode = mode,
                         onParticipantsFetch = onParticipantsFetch,
                         onParticipantChange = { participant ->
                             onParticipantChange(1, participant)
@@ -76,6 +79,7 @@ fun AddMatchParticipantsBlock(
                         modifier = Modifier.widthIn(max = 300.dp).fillMaxWidth(),
                         participantOptions = secondParticipantOptions,
                         participant = secondParticipant,
+                        mode = mode,
                         onParticipantsFetch = onParticipantsFetch,
                         onParticipantChange = { participant ->
                             onParticipantChange(2, participant)
@@ -104,6 +108,7 @@ fun AddMatchParticipantsBlock(
                     modifier = Modifier.widthIn(max = 300.dp).fillMaxWidth(),
                     participantOptions = firstParticipantOptions,
                     participant = firstParticipant,
+                    mode = mode,
                     onParticipantsFetch = onParticipantsFetch,
                     onParticipantChange = { participant ->
                         onParticipantChange(1, participant)
@@ -125,6 +130,7 @@ fun AddMatchParticipantsBlock(
                     modifier = Modifier.widthIn(max = 300.dp).fillMaxWidth(),
                     participantOptions = secondParticipantOptions,
                     participant = secondParticipant,
+                    mode = mode,
                     onParticipantsFetch = onParticipantsFetch,
                     onParticipantChange = { participant ->
                         onParticipantChange(2, participant)

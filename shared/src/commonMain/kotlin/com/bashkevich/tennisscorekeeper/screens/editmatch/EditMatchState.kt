@@ -1,18 +1,29 @@
 package com.bashkevich.tennisscorekeeper.screens.editmatch
 
 import androidx.compose.runtime.Immutable
+import androidx.compose.ui.graphics.Color
 import com.bashkevich.tennisscorekeeper.components.theme.ThemeComponentState
 import com.bashkevich.tennisscorekeeper.model.match.domain.Match
 import com.bashkevich.tennisscorekeeper.model.theme.domain.ScoreboardTheme
 import com.bashkevich.tennisscorekeeper.mvi.UiAction
 import com.bashkevich.tennisscorekeeper.mvi.UiEvent
 import com.bashkevich.tennisscorekeeper.mvi.UiState
+import com.bashkevich.tennisscorekeeper.screens.addmatch.OpenColorPickerDialogState
 import com.bashkevich.tennisscorekeeper.screens.matchdetails.ConnectionState
 
 @Immutable
 sealed class EditMatchUiEvent : UiEvent {
     class ChangeDisplayName(val participantNumber: Int, val displayName: String) :
         EditMatchUiEvent()
+
+    class OpenColorPickerDialog(val participantNumber: Int, val colorNumber: Int) :
+        EditMatchUiEvent()
+
+    data object CloseColorPickerDialog : EditMatchUiEvent()
+
+    class SelectPrimaryColor(val participantNumber: Int, val color: Color) : EditMatchUiEvent()
+
+    class SelectSecondaryColor(val participantNumber: Int, val color: Color?) : EditMatchUiEvent()
 
     class SelectTheme(val themeId: Int) : EditMatchUiEvent()
 
@@ -26,8 +37,8 @@ sealed class EditMatchUiEvent : UiEvent {
 /**
  * Два слоя состояния:
  * 1. [match] — сам матч, приходящий с веб-сокета (фреймы кэшируются в БД, состояние читается из БД);
- * 2. пользовательские правки (display-имена, тема) — живут только в оперативной памяти
- *    ViewModel и накладываются поверх первого слоя в [editedMatch].
+ * 2. пользовательские правки (display-имена, цвета участников, тема) — живут только в оперативной
+ *    памяти ViewModel и накладываются поверх первого слоя в [editedMatch].
  *    Если пользователь закрыл экран без сохранения — правки теряются.
  */
 @Immutable
@@ -40,6 +51,7 @@ data class EditMatchState(
         ThemeComponentState.SelectedThemeState.Idle(null),
         ThemeComponentState.ThemeOptionsState.Idle(emptyList())
     ),
+    val dialogState: OpenColorPickerDialogState = OpenColorPickerDialogState.None,
     val isSaving: Boolean = false,
     val action: EditMatchAction? = null
 ) : UiState

@@ -24,6 +24,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import com.bashkevich.tennisscorekeeper.components.ComponentMode
 import com.bashkevich.tennisscorekeeper.components.icons.IconGroup
 import com.bashkevich.tennisscorekeeper.components.icons.default_icons.Add
 import com.bashkevich.tennisscorekeeper.components.icons.default_icons.Close
@@ -40,6 +41,7 @@ fun AddMatchParticipantComponent(
     modifier: Modifier = Modifier,
     participantOptions: List<TennisParticipant>,
     participant: TennisParticipantInMatch,
+    mode: ComponentMode,
     onParticipantsFetch: () -> Unit,
     onParticipantChange: (TennisParticipant) -> Unit,
     onParticipantDisplayNameChange: (String) -> Unit,
@@ -57,6 +59,7 @@ fun AddMatchParticipantComponent(
             modifier = Modifier.fillMaxWidth(),
             participantOptions = participantOptions,
             currentParticipant = participant,
+            mode = mode,
             onParticipantsFetch = onParticipantsFetch,
             onParticipantChange = onParticipantChange
         )

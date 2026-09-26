@@ -1,5 +1,6 @@
 package com.bashkevich.tennisscorekeeper.screens.editmatch
 
+import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
@@ -12,7 +13,9 @@ import com.bashkevich.tennisscorekeeper.core.remote.doOnSuccess
 import com.bashkevich.tennisscorekeeper.components.theme.ThemeComponentState
 import com.bashkevich.tennisscorekeeper.mvi.BaseViewModel
 import com.bashkevich.tennisscorekeeper.model.match.domain.Match
+import com.bashkevich.tennisscorekeeper.model.match.remote.ParticipantInMatchBody
 import com.bashkevich.tennisscorekeeper.model.match.remote.body.UpdateMatchBody
+import com.bashkevich.tennisscorekeeper.model.match.remote.convertToRgbString
 import com.bashkevich.tennisscorekeeper.model.match.repository.MatchRepository
 import com.bashkevich.tennisscorekeeper.model.participant.domain.ParticipantInDoublesMatch
 import com.bashkevich.tennisscorekeeper.model.participant.domain.ParticipantInSinglesMatch
@@ -20,6 +23,7 @@ import com.bashkevich.tennisscorekeeper.model.participant.domain.TennisParticipa
 import com.bashkevich.tennisscorekeeper.model.theme.domain.ScoreboardTheme
 import com.bashkevich.tennisscorekeeper.model.theme.repository.ThemeRepository
 import com.bashkevich.tennisscorekeeper.navigation.EditMatchRoute
+import com.bashkevich.tennisscorekeeper.screens.addmatch.OpenColorPickerDialogState
 import com.bashkevich.tennisscorekeeper.screens.matchdetails.ConnectionState
 import com.bashkevich.tennisscorekeeper.screens.matchdetails.MatchDetailsRefreshThemeUseCase
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -30,6 +34,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.getString
 import tennisscorekeeper.shared.generated.resources.Res
@@ -49,23 +54,24 @@ class EditMatchViewModel(
     private val matchFromDb: StateFlow<Match?> = matchRepository.observeMatchById(matchId)
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
 
-    // Слой 2: пользовательские правки (null = пользователь поле не трогал, берём значение из матча).
+    // Слой 2: пользовательские правки (null/Unchanged = пользователь поле не трогал, берём значение из матча).
     // Хранятся только в памяти: закрыл экран без сохранения — правки пропали
-    private val _firstParticipantDisplayName = MutableStateFlow<String?>(null)
-    private val _secondParticipantDisplayName = MutableStateFlow<String?>(null)
+    private val _firstParticipantEdits = MutableStateFlow(ParticipantEdits())
+    private val _secondParticipantEdits = MutableStateFlow(ParticipantEdits())
+    private val _dialogState = MutableStateFlow<OpenColorPickerDialogState>(OpenColorPickerDialogState.None)
     private val _selectedThemeId = MutableStateFlow<Int?>(null)
     private val _isSaving = MutableStateFlow(false)
 
     // Итоговый матч с наложенными правками — то, что показывается на табло и уходит в PUT
     private val editedMatch: StateFlow<Match?> = combine(
         matchFromDb,
-        _firstParticipantDisplayName,
-        _secondParticipantDisplayName,
+        _firstParticipantEdits,
+        _secondParticipantEdits,
         _selectedThemeId,
-    ) { match: Match?, firstName: String?, secondName: String?, themeId: Int? ->
+    ) { match: Match?, firstEdits: ParticipantEdits, secondEdits: ParticipantEdits, themeId: Int? ->
         match?.copy(
-            firstParticipant = match.firstParticipant.withDisplayName(firstName),
-            secondParticipant = match.secondParticipant.withDisplayName(secondName),
+            firstParticipant = match.firstParticipant.withEdits(firstEdits),
+            secondParticipant = match.secondParticipant.withEdits(secondEdits),
             themeId = themeId ?: match.themeId
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
@@ -148,6 +154,7 @@ class EditMatchViewModel(
         matchRepository.observeConnectionState(),
         themeFromDb,
         themeComponentState,
+        _dialogState,
         _isSaving,
         _action,
     ) {
@@ -157,6 +164,7 @@ class EditMatchViewModel(
             connectionState: ConnectionState,
             theme: ScoreboardTheme,
             themeComp: ThemeComponentState,
+            dialogState: OpenColorPickerDialogState,
             isSaving: Boolean,
             action: EditMatchAction?,
         ->
@@ -166,6 +174,7 @@ class EditMatchViewModel(
             connectionState = connectionState,
             theme = theme,
             themeComponentState = themeComp,
+            dialogState = dialogState,
             isSaving = isSaving,
             action = action
         )
@@ -182,6 +191,23 @@ class EditMatchViewModel(
                 displayName = uiEvent.displayName
             )
 
+            is EditMatchUiEvent.OpenColorPickerDialog -> openColorPickerDialog(
+                participantNumber = uiEvent.participantNumber,
+                colorNumber = uiEvent.colorNumber
+            )
+
+            EditMatchUiEvent.CloseColorPickerDialog -> closeColorPickerDialog()
+
+            is EditMatchUiEvent.SelectPrimaryColor -> selectPrimaryColor(
+                participantNumber = uiEvent.participantNumber,
+                color = uiEvent.color
+            )
+
+            is EditMatchUiEvent.SelectSecondaryColor -> selectSecondaryColor(
+                participantNumber = uiEvent.participantNumber,
+                color = uiEvent.color
+            )
+
             is EditMatchUiEvent.SelectTheme -> _selectedThemeId.value = uiEvent.themeId
 
             EditMatchUiEvent.FetchThemes -> fetchThemes()
@@ -194,9 +220,39 @@ class EditMatchViewModel(
 
     private fun changeDisplayName(participantNumber: Int, displayName: String) {
         when (participantNumber) {
-            1 -> _firstParticipantDisplayName.value = displayName
-            2 -> _secondParticipantDisplayName.value = displayName
+            1 -> _firstParticipantEdits.update { it.copy(displayName = displayName) }
+            2 -> _secondParticipantEdits.update { it.copy(displayName = displayName) }
         }
+    }
+
+    private fun openColorPickerDialog(participantNumber: Int, colorNumber: Int) {
+        _dialogState.value =
+            OpenColorPickerDialogState.OpenColorPicker(participantNumber, colorNumber)
+    }
+
+    private fun closeColorPickerDialog() {
+        _dialogState.value = OpenColorPickerDialogState.None
+    }
+
+    private fun selectPrimaryColor(participantNumber: Int, color: Color) {
+        when (participantNumber) {
+            1 -> _firstParticipantEdits.update { it.copy(primaryColor = color) }
+            2 -> _secondParticipantEdits.update { it.copy(primaryColor = color) }
+        }
+        _dialogState.value = OpenColorPickerDialogState.None
+    }
+
+    private fun selectSecondaryColor(participantNumber: Int, color: Color?) {
+        val secondaryColorEdit = if (color != null) {
+            SecondaryColorEdit.Set(color)
+        } else {
+            SecondaryColorEdit.Removed
+        }
+        when (participantNumber) {
+            1 -> _firstParticipantEdits.update { it.copy(secondaryColor = secondaryColorEdit) }
+            2 -> _secondParticipantEdits.update { it.copy(secondaryColor = secondaryColorEdit) }
+        }
+        _dialogState.value = OpenColorPickerDialogState.None
     }
 
     private fun fetchThemes() {
@@ -212,8 +268,8 @@ class EditMatchViewModel(
         viewModelScope.launch {
             _isSaving.value = true
             val updateMatchBody = UpdateMatchBody(
-                firstParticipantDisplayName = edited.firstParticipant.displayName,
-                secondParticipantDisplayName = edited.secondParticipant.displayName,
+                firstParticipant = edited.firstParticipant.toParticipantInMatchBody(),
+                secondParticipant = edited.secondParticipant.toParticipantInMatchBody(),
                 themeId = edited.themeId.toString(),
             )
             matchRepository.updateMatch(matchId = matchId, updateMatchBody = updateMatchBody)
@@ -228,12 +284,32 @@ class EditMatchViewModel(
         }
     }
 
-    private fun TennisParticipantInMatch.withDisplayName(displayName: String?): TennisParticipantInMatch {
-        if (displayName == null) return this
+    private fun TennisParticipantInMatch.toParticipantInMatchBody() = ParticipantInMatchBody(
+        id = id.toString(),
+        displayName = displayName,
+        primaryColor = primaryColor.convertToRgbString(),
+        secondaryColor = secondaryColor?.convertToRgbString()
+    )
+
+    private fun TennisParticipantInMatch.withEdits(edits: ParticipantEdits): TennisParticipantInMatch {
+        val editedSecondaryColor = when (val secondaryColorEdit = edits.secondaryColor) {
+            is SecondaryColorEdit.Unchanged -> secondaryColor
+            is SecondaryColorEdit.Set -> secondaryColorEdit.color
+            is SecondaryColorEdit.Removed -> null
+        }
 
         return when (this) {
-            is ParticipantInSinglesMatch -> copy(displayName = displayName)
-            is ParticipantInDoublesMatch -> copy(displayName = displayName)
+            is ParticipantInSinglesMatch -> copy(
+                displayName = edits.displayName ?: displayName,
+                primaryColor = edits.primaryColor ?: primaryColor,
+                secondaryColor = editedSecondaryColor
+            )
+
+            is ParticipantInDoublesMatch -> copy(
+                displayName = edits.displayName ?: displayName,
+                primaryColor = edits.primaryColor ?: primaryColor,
+                secondaryColor = editedSecondaryColor
+            )
         }
     }
 
@@ -249,4 +325,21 @@ class EditMatchViewModel(
             else -> sendAction(EditMatchAction.ShowError(e.message ?: "Error"))
         }
     }
+}
+
+/**
+ * Пользовательские правки одного участника, накладываемые поверх данных матча.
+ * null = поле не трогали, берём значение из матча.
+ */
+private data class ParticipantEdits(
+    val displayName: String? = null,
+    val primaryColor: Color? = null,
+    val secondaryColor: SecondaryColorEdit = SecondaryColorEdit.Unchanged,
+)
+
+// Второй цвет nullable, поэтому «не трогал» и «убрал» — разные состояния
+private sealed interface SecondaryColorEdit {
+    data object Unchanged : SecondaryColorEdit
+    data class Set(val color: Color) : SecondaryColorEdit
+    data object Removed : SecondaryColorEdit
 }
