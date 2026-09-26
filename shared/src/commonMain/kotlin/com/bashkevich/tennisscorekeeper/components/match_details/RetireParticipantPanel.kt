@@ -7,6 +7,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
 import com.bashkevich.tennisscorekeeper.model.match.domain.Match
 import org.jetbrains.compose.resources.stringResource
 import tennisscorekeeper.shared.generated.resources.Res
@@ -28,11 +29,17 @@ fun RetireParticipantPanel(
         verticalAlignment = Alignment.CenterVertically
     ) {
         Button(onClick = {onParticipantRetire(firstParticipant.id)}){
-            Text(stringResource(Res.string.player_1_retire))
+            Text(
+                text = stringResource(Res.string.player_1_retire),
+                textAlign = TextAlign.Center
+            )
         }
 
         Button(onClick = {onParticipantRetire(secondParticipant.id)}){
-            Text(stringResource(Res.string.player_2_retire))
+            Text(
+                text = stringResource(Res.string.player_2_retire),
+                textAlign = TextAlign.Center
+            )
         }
     }
 }
