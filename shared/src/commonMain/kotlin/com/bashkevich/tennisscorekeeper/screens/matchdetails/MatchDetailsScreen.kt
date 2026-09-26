@@ -31,6 +31,7 @@ import com.bashkevich.tennisscorekeeper.components.match_details.ScoreboardContr
 import com.bashkevich.tennisscorekeeper.components.scoreboard.match_details.MatchDetailsScoreboardView
 import com.bashkevich.tennisscorekeeper.components.showUnauthorizedActionSnackbar
 import com.bashkevich.tennisscorekeeper.components.theme.ThemeLoadErrorRow
+import com.bashkevich.tennisscorekeeper.model.match.remote.body.MatchStatus
 import com.bashkevich.tennisscorekeeper.model.match.remote.body.toResource
 import com.bashkevich.tennisscorekeeper.model.theme.domain.ScoreboardThemeState
 import com.bashkevich.tennisscorekeeper.model.theme.domain.themeOrDefault
@@ -114,6 +115,7 @@ fun MatchDetailsCommonContent(
                 matchId = match.id,
                 onBack = { navController.navigateUp() },
                 onEditClick = { navController.navigate(EditMatchRoute(match.id)) },
+                isEditEnabled = match.status != MatchStatus.COMPLETED,
                 onShareLink = { link ->
                     scope.launch {
                         shareLauncher.share(shareLinkPayload(link))

@@ -20,6 +20,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.bashkevich.tennisscorekeeper.components.ComponentMode
 import com.bashkevich.tennisscorekeeper.components.add_match.participant.AddMatchParticipantsBlock
 import com.bashkevich.tennisscorekeeper.components.dialog.ColorPickerDialog
 import com.bashkevich.tennisscorekeeper.components.dialog.ScoreboardThemePreviewDialog
@@ -53,6 +54,7 @@ fun AddMatchComponent(
             participantOptions = participantState.options,
             firstParticipant = participantState.firstParticipant,
             secondParticipant = participantState.secondParticipant,
+            mode = ComponentMode.ADD,
             onParticipantsFetch = { onEvent(AddMatchUiEvent.FetchParticipants) },
             onParticipantChange = { participantNumber, participant ->
                 onEvent(

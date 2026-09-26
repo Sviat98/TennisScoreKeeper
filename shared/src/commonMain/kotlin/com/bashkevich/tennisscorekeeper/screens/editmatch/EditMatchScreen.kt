@@ -4,6 +4,7 @@ import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -19,6 +20,7 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -26,8 +28,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.window.core.layout.WindowSizeClass
 import com.bashkevich.tennisscorekeeper.LocalNavHostController
-import com.bashkevich.tennisscorekeeper.components.add_match.participant.ParticipantDisplayNameComponent
+import com.bashkevich.tennisscorekeeper.components.ComponentMode
+import com.bashkevich.tennisscorekeeper.components.add_match.participant.AddMatchParticipantsBlock
+import com.bashkevich.tennisscorekeeper.components.dialog.ColorPickerDialog
 import com.bashkevich.tennisscorekeeper.components.icons.IconGroup
 import com.bashkevich.tennisscorekeeper.components.icons.default_icons.ArrowBack
 import com.bashkevich.tennisscorekeeper.components.icons.default_icons.Check
@@ -35,7 +40,9 @@ import com.bashkevich.tennisscorekeeper.components.scoreboard.match_details.Matc
 import com.bashkevich.tennisscorekeeper.components.showUnauthorizedActionSnackbar
 import com.bashkevich.tennisscorekeeper.components.theme.ThemeCombobox
 import com.bashkevich.tennisscorekeeper.model.match.domain.Match
+import com.bashkevich.tennisscorekeeper.model.match.remote.body.MatchStatus
 import com.bashkevich.tennisscorekeeper.mvi.LaunchedUiEffectHandler
+import com.bashkevich.tennisscorekeeper.screens.addmatch.OpenColorPickerDialogState
 import org.jetbrains.compose.resources.stringResource
 import tennisscorekeeper.shared.generated.resources.Res
 import tennisscorekeeper.shared.generated.resources.edit_match
@@ -69,19 +76,32 @@ fun EditMatchScreen(
         }
     }
 
+    val match = state.match
+    val editedMatch = state.editedMatch
+
+    // editedMatch структурно расходится с матчем только когда есть пользовательские правки;
+    // возврат к исходным значениям (тот же цвет/тема/имя) снова даёт равенство
+    val hasUnsavedChanges = match != null && editedMatch != null && editedMatch != match
+
+    val isSaveEnabled = match != null &&
+            match.status != MatchStatus.COMPLETED &&
+            editedMatch != null &&
+            editedMatch.firstParticipant.displayName.isNotBlank() &&
+            editedMatch.secondParticipant.displayName.isNotBlank() &&
+            !state.isSaving
+
     Scaffold(
         modifier = Modifier.then(modifier),
         topBar = {
             EditMatchTopAppBar(
-                isSaveEnabled = state.match != null && !state.isSaving,
+                isSaveVisible = hasUnsavedChanges,
+                isSaveEnabled = isSaveEnabled,
                 onBack = { navController.navigateUp() },
                 onSave = { viewModel.onEvent(EditMatchUiEvent.SaveMatch) }
             )
         },
         snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { paddingValues ->
-        val editedMatch = state.editedMatch
-
         if (editedMatch == null) {
             Box(
                 modifier = Modifier.fillMaxSize().padding(paddingValues),
@@ -103,6 +123,7 @@ fun EditMatchScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun EditMatchTopAppBar(
+    isSaveVisible: Boolean,
     isSaveEnabled: Boolean,
     onBack: () -> Unit,
     onSave: () -> Unit,
@@ -118,11 +139,13 @@ private fun EditMatchTopAppBar(
             }
         },
         actions = {
-            IconButton(onClick = onSave, enabled = isSaveEnabled) {
-                Icon(
-                    imageVector = IconGroup.Default.Check,
-                    contentDescription = stringResource(Res.string.save)
-                )
+            if (isSaveVisible) {
+                IconButton(onClick = onSave, enabled = isSaveEnabled) {
+                    Icon(
+                        imageVector = IconGroup.Default.Check,
+                        contentDescription = stringResource(Res.string.save)
+                    )
+                }
             }
         }
     )
@@ -135,6 +158,9 @@ private fun EditMatchContent(
     editedMatch: Match,
     onEvent: (EditMatchUiEvent) -> Unit,
 ) {
+    val isWideScreen = currentWindowAdaptiveInfo().windowSizeClass
+        .isWidthAtLeastBreakpoint(WindowSizeClass.WIDTH_DP_MEDIUM_LOWER_BOUND)
+
     Box(
         modifier = Modifier.then(modifier)
             .fillMaxWidth()
@@ -142,8 +168,8 @@ private fun EditMatchContent(
             .verticalScroll(state = rememberScrollState())
     ) {
         Column(
-            modifier = Modifier.widthIn(max = 600.dp).fillMaxWidth().align(Alignment.Center),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
+            modifier = Modifier.fillMaxWidth().align(Alignment.Center),
+            verticalArrangement = Arrangement.spacedBy(32.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             MatchDetailsScoreboardView(
@@ -152,31 +178,120 @@ private fun EditMatchContent(
                 theme = state.theme,
             )
 
-            ParticipantDisplayNameComponent(
-                participant = editedMatch.firstParticipant,
-                onParticipantDisplayNameChange = { displayName ->
-                    onEvent(EditMatchUiEvent.ChangeDisplayName(1, displayName))
-                }
-            )
-
-            ParticipantDisplayNameComponent(
-                participant = editedMatch.secondParticipant,
-                onParticipantDisplayNameChange = { displayName ->
-                    onEvent(EditMatchUiEvent.ChangeDisplayName(2, displayName))
-                }
-            )
-
-            ThemeCombobox(
+            // Выбор участника залочен (ComponentMode.EDIT), редактируются
+            // display-имена и цвета; адаптивность — как на экране добавления матча
+            AddMatchParticipantsBlock(
                 modifier = Modifier.fillMaxWidth(),
-                themeComponentState = state.themeComponentState,
-                onThemesFetch = { onEvent(EditMatchUiEvent.FetchThemes) },
-                onThemeSelected = { theme ->
-                    onEvent(EditMatchUiEvent.SelectTheme(theme.id))
+                participantOptions = emptyList(),
+                firstParticipant = editedMatch.firstParticipant,
+                secondParticipant = editedMatch.secondParticipant,
+                mode = ComponentMode.EDIT,
+                onParticipantsFetch = {},
+                onParticipantChange = { _, _ -> },
+                onParticipantDisplayNameChange = { participantNumber, displayName ->
+                    onEvent(EditMatchUiEvent.ChangeDisplayName(participantNumber, displayName))
                 },
-                onRetrySelectedTheme = { themeId ->
-                    onEvent(EditMatchUiEvent.RetrySelectedTheme(themeId))
+                onColorPickerOpen = { participantNumber, colorNumber ->
+                    onEvent(
+                        EditMatchUiEvent.OpenColorPickerDialog(
+                            participantNumber = participantNumber,
+                            colorNumber = colorNumber
+                        )
+                    )
+                },
+                onToggleSecondaryColor = { participantNumber, color ->
+                    onEvent(
+                        EditMatchUiEvent.SelectSecondaryColor(
+                            participantNumber = participantNumber,
+                            color = color
+                        )
+                    )
                 }
             )
+
+            // Тема — строго под первым участником: на широком экране повторяем геометрию
+            // блока участников (Row до 1000dp с weight-колонками), поэтому левый край
+            // совпадает с колонкой первого участника и двигается вместе с ним
+            if (isWideScreen) {
+                Row(
+                    modifier = Modifier.widthIn(max = 1000.dp).fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(64.dp)
+                ) {
+                    Box(
+                        modifier = Modifier.weight(weight = 1f),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        ThemeCombobox(
+                            modifier = Modifier.widthIn(max = 300.dp).fillMaxWidth(),
+                            themeComponentState = state.themeComponentState,
+                            onThemesFetch = { onEvent(EditMatchUiEvent.FetchThemes) },
+                            onThemeSelected = { theme ->
+                                onEvent(EditMatchUiEvent.SelectTheme(theme.id))
+                            },
+                            onRetrySelectedTheme = { themeId ->
+                                onEvent(EditMatchUiEvent.RetrySelectedTheme(themeId))
+                            }
+                        )
+                    }
+
+                    // Вторая weight-колонка — заглушка, держит первую колонку
+                    // той же ширины, что колонка первого участника выше
+                    Box(modifier = Modifier.weight(weight = 1f))
+                }
+            } else {
+                ThemeCombobox(
+                    modifier = Modifier.widthIn(max = 300.dp).fillMaxWidth(),
+                    themeComponentState = state.themeComponentState,
+                    onThemesFetch = { onEvent(EditMatchUiEvent.FetchThemes) },
+                    onThemeSelected = { theme ->
+                        onEvent(EditMatchUiEvent.SelectTheme(theme.id))
+                    },
+                    onRetrySelectedTheme = { themeId ->
+                        onEvent(EditMatchUiEvent.RetrySelectedTheme(themeId))
+                    }
+                )
+            }
         }
+    }
+
+    val dialogState = state.dialogState
+    if (dialogState is OpenColorPickerDialogState.OpenColorPicker) {
+        val colorNumber = dialogState.colorNumber
+        val participantNumber = dialogState.participantNumber
+
+        val initialColor = if (colorNumber == 1) {
+            if (participantNumber == 1) {
+                editedMatch.firstParticipant.primaryColor
+            } else {
+                editedMatch.secondParticipant.primaryColor
+            }
+        } else {
+            // Кнопка второго цвета есть только когда secondaryColor != null
+            if (participantNumber == 1) {
+                editedMatch.firstParticipant.secondaryColor!!
+            } else {
+                editedMatch.secondParticipant.secondaryColor!!
+            }
+        }
+        ColorPickerDialog(
+            initialColor = initialColor,
+            onDismissRequest = { onEvent(EditMatchUiEvent.CloseColorPickerDialog) },
+            onColorSelected = { color ->
+                when (colorNumber) {
+                    1 -> onEvent(
+                        EditMatchUiEvent.SelectPrimaryColor(
+                            participantNumber = participantNumber,
+                            color = color
+                        )
+                    )
+
+                    2 -> onEvent(
+                        EditMatchUiEvent.SelectSecondaryColor(
+                            participantNumber = participantNumber,
+                            color = color
+                        )
+                    )
+                }
+            })
     }
 }

@@ -160,6 +160,7 @@ fun MatchDetailsAppBar(
     matchId: Int,
     onBack: () -> Unit,
     onEditClick: () -> Unit,
+    isEditEnabled: Boolean = true,
     onShareLink: (String) -> Unit,
     onNavigateToSettings: () -> Unit
 ) {
@@ -181,7 +182,7 @@ fun MatchDetailsAppBar(
             }
         },
         actions = {
-            IconButton(onClick = onEditClick) {
+            IconButton(onClick = onEditClick, enabled = isEditEnabled) {
                 Icon(IconGroup.Default.Edit, contentDescription = stringResource(Res.string.edit))
             }
             Box {

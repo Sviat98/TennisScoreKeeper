@@ -19,6 +19,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import com.bashkevich.tennisscorekeeper.components.ComponentMode
 import com.bashkevich.tennisscorekeeper.components.icons.default_icons.ArrowDropDown
 import com.bashkevich.tennisscorekeeper.components.icons.IconGroup
 import com.bashkevich.tennisscorekeeper.components.updateTextField
@@ -35,6 +36,7 @@ fun ParticipantCombobox(
     modifier: Modifier = Modifier,
     participantOptions: List<TennisParticipant>,
     currentParticipant: TennisParticipantInMatch,
+    mode: ComponentMode,
     onParticipantsFetch: ()-> Unit,
     onParticipantChange: (TennisParticipant) -> Unit
 ) {
@@ -60,9 +62,19 @@ fun ParticipantCombobox(
                 Icon(
                     imageVector = IconGroup.Default.ArrowDropDown,
                     contentDescription = stringResource(Res.string.open_dropdown),
-                    modifier = Modifier.clickable {
-                        expanded = true
-                        onParticipantsFetch()
+                    tint = if (mode == ComponentMode.EDIT) {
+                        // Залоченный комбобокс: стрелка приглушена и не кликается
+                        MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
+                    } else {
+                        Color.Unspecified
+                    },
+                    modifier = if (mode == ComponentMode.ADD) {
+                        Modifier.clickable {
+                            expanded = true
+                            onParticipantsFetch()
+                        }
+                    } else {
+                        Modifier
                     }
                 )
             },
@@ -74,19 +86,21 @@ fun ParticipantCombobox(
             )
         )
 
-        // Выпадающее меню
-        DropdownMenu(
-            expanded = expanded,
-            onDismissRequest = { expanded = false },
-        ) {
-            participantOptions.forEach { option ->
-                DropdownMenuItem(
-                    text = { Text(text = option.toDisplayFormat()) },
-                    onClick = {
-                        onParticipantChange(option)
-                        expanded = false
-                    }
-                )
+        // Выпадающее меню (в режиме EDIT выбор участника менять нельзя)
+        if (mode == ComponentMode.ADD) {
+            DropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { expanded = false },
+            ) {
+                participantOptions.forEach { option ->
+                    DropdownMenuItem(
+                        text = { Text(text = option.toDisplayFormat()) },
+                        onClick = {
+                            onParticipantChange(option)
+                            expanded = false
+                        }
+                    )
+                }
             }
         }
     }
