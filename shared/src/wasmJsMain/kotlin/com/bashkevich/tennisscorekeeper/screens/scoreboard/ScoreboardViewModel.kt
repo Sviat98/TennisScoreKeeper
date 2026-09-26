@@ -84,9 +84,4 @@ class ScoreboardViewModel(
             ScoreboardUiEvent.RetryThemeLoad -> refreshThemeUseCase.refresh()
         }
     }
-
-    override fun onCleared() {
-        super.onCleared()
-        matchRepository.closeSession()
-    }
 }

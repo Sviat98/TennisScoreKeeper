@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
@@ -30,7 +29,7 @@ fun SetsToWinBlock(
         horizontalArrangement = Arrangement.Center
     ) {
             SetsToWinComponent(
-                modifier = Modifier.widthIn(max = 300.dp).fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth(),
                 setsToWin = setsToWin,
                 onValueChange = onValueChange
             )

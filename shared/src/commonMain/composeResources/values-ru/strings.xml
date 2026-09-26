@@ -27,6 +27,7 @@
     <string name="tournament">Турнир</string>
     <string name="match">Матч</string>
     <string name="add_match">Добавить матч</string>
+    <string name="edit_match">Редактирование матча</string>
     <string name="add_tournament">Добавить турнир</string>
     <string name="navigate_back">Перейти назад</string>
     <string name="navigate_to_settings">Перейти в настройки</string>
@@ -40,10 +41,10 @@
     <!-- Buttons & Actions -->
     <string name="start_tournament">Начать турнир</string>
     <string name="finish_tournament">Завершить турнир</string>
-    <string name="start_match">Начать матч</string>
-    <string name="finish_match">Завершить матч</string>
+    <string name="start_match">Начать</string>
+    <string name="finish_match">Завершить</string>
     <string name="pause_match">Пауза</string>
-    <string name="resume_match">Продолжить матч</string>
+    <string name="resume_match">Продолжить</string>
     <string name="player_1_point">Игрок 1\nРозыгрыш</string>
     <string name="player_2_point">Игрок 2\nРозыгрыш</string>
     <string name="player_1_game">Игрок 1\nГейм</string>

@@ -5,6 +5,7 @@ import com.bashkevich.tennisscorekeeper.model.match.remote.MatchRemoteDataSource
 import com.bashkevich.tennisscorekeeper.model.match.repository.MatchRepository
 import com.bashkevich.tennisscorekeeper.model.match.repository.MatchRepositoryImpl
 import com.bashkevich.tennisscorekeeper.screens.addmatch.AddMatchViewModel
+import com.bashkevich.tennisscorekeeper.screens.editmatch.EditMatchViewModel
 import com.bashkevich.tennisscorekeeper.screens.matchdetails.MatchDetailsViewModel
 import org.koin.dsl.module
 import org.koin.plugin.module.dsl.*
@@ -12,6 +13,7 @@ import org.koin.plugin.module.dsl.*
 val matchModule = module {
     viewModel<MatchDetailsViewModel>()
     viewModel<AddMatchViewModel>()
+    viewModel<EditMatchViewModel>()
 
     single<MatchRepositoryImpl>().bind(MatchRepository::class)
     single<MatchRemoteDataSource>()

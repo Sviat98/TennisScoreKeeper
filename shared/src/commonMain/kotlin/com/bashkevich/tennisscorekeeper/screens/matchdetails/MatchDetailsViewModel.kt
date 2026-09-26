@@ -219,9 +219,4 @@ class MatchDetailsViewModel(
                 sendAction(MatchDetailsAction.ShowUnauthorizedError)
         }
     }
-
-    override fun onCleared() {
-        super.onCleared()
-        matchRepository.closeSession()
-    }
 }

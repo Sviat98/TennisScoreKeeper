@@ -43,7 +43,8 @@ fun MatchScoringAndThemeSettingsBlock(
     onPreviewClick: () -> Unit = {},
 ) {
     val windowSize = currentWindowAdaptiveInfo().windowSizeClass
-    val isWideScreen = windowSize.isWidthAtLeastBreakpoint(WindowSizeClass.WIDTH_DP_MEDIUM_LOWER_BOUND)
+    val isWideScreen =
+        windowSize.isWidthAtLeastBreakpoint(WindowSizeClass.WIDTH_DP_MEDIUM_LOWER_BOUND)
 
     Box(modifier = Modifier.then(modifier)) {
         if (isWideScreen) {
@@ -57,19 +58,29 @@ fun MatchScoringAndThemeSettingsBlock(
                     horizontalArrangement = Arrangement.spacedBy(64.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    ThemeComponent(
+                    Box(
                         modifier = Modifier.weight(1f),
-                        themeComponentState = themeComponentState,
-                        onThemeSelected = onThemeSelected,
-                        onThemesFetch = onThemesFetch,
-                        onRetrySelectedTheme = onRetrySelectedTheme,
-                        onPreviewClick = onPreviewClick,
-                    )
-                    SetsToWinBlock(
+                        contentAlignment = Alignment.Center
+                    ) {
+                        ThemeComponent(
+                            modifier = Modifier.widthIn(max = 300.dp).fillMaxWidth(),
+                            themeComponentState = themeComponentState,
+                            onThemeSelected = onThemeSelected,
+                            onThemesFetch = onThemesFetch,
+                            onRetrySelectedTheme = onRetrySelectedTheme,
+                            onPreviewClick = onPreviewClick,
+                        )
+                    }
+                    Box(
                         modifier = Modifier.weight(1f),
-                        setsToWin = setsToWin,
-                        onValueChange = onSetsToWinChange,
-                    )
+                        contentAlignment = Alignment.Center
+                    ) {
+                        SetsToWinBlock(
+                            modifier = Modifier.widthIn(max = 300.dp).fillMaxWidth(),
+                            setsToWin = setsToWin,
+                            onValueChange = onSetsToWinChange,
+                        )
+                    }
                 }
 
                 // Row 2: Regular + Deciding set templates
@@ -78,24 +89,34 @@ fun MatchScoringAndThemeSettingsBlock(
                     horizontalArrangement = Arrangement.spacedBy(64.dp),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    SetTemplateComponent(
+                    Box(
                         modifier = Modifier.weight(1f),
-                        label = stringResource(Res.string.regular_set_template),
-                        enabled = setsToWin > 1,
-                        setComponentState = regularSetComponentState,
-                        onSetTemplatesFetch = { onSetTemplatesFetch(SetTemplateTypeFilter.REGULAR) },
-                        onSetTemplateChange = onRegularSetTemplateChange,
-                        onRetrySelectedSet = onRetrySelectedRegularSet,
-                    )
-                    SetTemplateComponent(
+                        contentAlignment = Alignment.Center
+                    ) {
+                        SetTemplateComponent(
+                            modifier = Modifier.widthIn(max = 300.dp).fillMaxWidth(),
+                            label = stringResource(Res.string.regular_set_template),
+                            enabled = setsToWin > 1,
+                            setComponentState = regularSetComponentState,
+                            onSetTemplatesFetch = { onSetTemplatesFetch(SetTemplateTypeFilter.REGULAR) },
+                            onSetTemplateChange = onRegularSetTemplateChange,
+                            onRetrySelectedSet = onRetrySelectedRegularSet,
+                        )
+                    }
+                    Box(
                         modifier = Modifier.weight(1f),
-                        label = stringResource(Res.string.deciding_set_template),
-                        enabled = true,
-                        setComponentState = decidingSetComponentState,
-                        onSetTemplatesFetch = { onSetTemplatesFetch(SetTemplateTypeFilter.DECIDER) },
-                        onSetTemplateChange = onDecidingSetTemplateChange,
-                        onRetrySelectedSet = onRetrySelectedDecidingSet,
-                    )
+                        contentAlignment = Alignment.Center
+                    ) {
+                        SetTemplateComponent(
+                            modifier = Modifier.widthIn(max = 300.dp).fillMaxWidth(),
+                            label = stringResource(Res.string.deciding_set_template),
+                            enabled = true,
+                            setComponentState = decidingSetComponentState,
+                            onSetTemplatesFetch = { onSetTemplatesFetch(SetTemplateTypeFilter.DECIDER) },
+                            onSetTemplateChange = onDecidingSetTemplateChange,
+                            onRetrySelectedSet = onRetrySelectedDecidingSet,
+                        )
+                    }
                 }
             }
         } else {
@@ -105,7 +126,7 @@ fun MatchScoringAndThemeSettingsBlock(
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 ThemeComponent(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier.widthIn(max = 300.dp).fillMaxWidth(),
                     themeComponentState = themeComponentState,
                     onThemeSelected = onThemeSelected,
                     onThemesFetch = onThemesFetch,
@@ -114,14 +135,14 @@ fun MatchScoringAndThemeSettingsBlock(
                 )
 
                 SetsToWinBlock(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier.widthIn(max = 300.dp).fillMaxWidth(),
                     setsToWin = setsToWin,
                     onValueChange = onSetsToWinChange,
                 )
 
                 SetTemplateComponent(
-                    modifier = Modifier.fillMaxWidth(),
-                    label = "Regular Set Template",
+                    modifier = Modifier.widthIn(max = 300.dp).fillMaxWidth(),
+                    label = stringResource(Res.string.regular_set_template),
                     enabled = setsToWin > 1,
                     setComponentState = regularSetComponentState,
                     onSetTemplatesFetch = { onSetTemplatesFetch(SetTemplateTypeFilter.REGULAR) },
@@ -130,8 +151,8 @@ fun MatchScoringAndThemeSettingsBlock(
                 )
 
                 SetTemplateComponent(
-                    modifier = Modifier.fillMaxWidth(),
-                    label = "Deciding Set Template",
+                    modifier = Modifier.widthIn(max = 300.dp).fillMaxWidth(),
+                    label = stringResource(Res.string.deciding_set_template),
                     enabled = true,
                     setComponentState = decidingSetComponentState,
                     onSetTemplatesFetch = { onSetTemplatesFetch(SetTemplateTypeFilter.DECIDER) },

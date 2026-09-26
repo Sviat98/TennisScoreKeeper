@@ -1,5 +1,10 @@
 package com.bashkevich.tennisscorekeeper
 
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -26,6 +31,7 @@ import com.bashkevich.tennisscorekeeper.model.settings.domain.AppLanguage
 import com.bashkevich.tennisscorekeeper.model.settings.domain.AppThemeMode
 import com.bashkevich.tennisscorekeeper.navigation.AddMatchRoute
 import com.bashkevich.tennisscorekeeper.navigation.AddTournamentRoute
+import com.bashkevich.tennisscorekeeper.navigation.EditMatchRoute
 import com.bashkevich.tennisscorekeeper.navigation.LoginRoute
 import com.bashkevich.tennisscorekeeper.navigation.MatchDetailsRoute
 import com.bashkevich.tennisscorekeeper.navigation.TournamentRoute
@@ -36,6 +42,8 @@ import com.bashkevich.tennisscorekeeper.screens.addmatch.AddMatchScreen
 import com.bashkevich.tennisscorekeeper.screens.addmatch.AddMatchViewModel
 import com.bashkevich.tennisscorekeeper.screens.addtournament.AddTournamentScreen
 import com.bashkevich.tennisscorekeeper.screens.addtournament.AddTournamentViewModel
+import com.bashkevich.tennisscorekeeper.screens.editmatch.EditMatchScreen
+import com.bashkevich.tennisscorekeeper.screens.editmatch.EditMatchViewModel
 import com.bashkevich.tennisscorekeeper.screens.login.LoginScreen
 import com.bashkevich.tennisscorekeeper.screens.login.LoginViewModel
 import com.bashkevich.tennisscorekeeper.screens.matchdetails.MatchDetailsScreen
@@ -158,6 +166,22 @@ fun App(
                             AddMatchScreen(
                                 modifier = Modifier.fillMaxSize(),
                                 viewModel = addMatchViewModel
+                            )
+                        }
+                        // Экран редактирования: выезд справа при открытии, уход влево при закрытии
+                        composable<EditMatchRoute>(
+                            enterTransition = {
+                                slideInHorizontally(animationSpec = tween(350)) { it } + fadeIn(animationSpec = tween(350))
+                            },
+                            popExitTransition = {
+                                slideOutHorizontally(animationSpec = tween(350)) { -it } + fadeOut(animationSpec = tween(350))
+                            }
+                        ) {
+                            val editMatchViewModel = koinViewModel<EditMatchViewModel>()
+
+                            EditMatchScreen(
+                                modifier = Modifier.fillMaxSize(),
+                                viewModel = editMatchViewModel
                             )
                         }
                         platformSpecificRoutes()

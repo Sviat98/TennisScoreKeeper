@@ -13,6 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.window.core.layout.WindowSizeClass
+import com.bashkevich.tennisscorekeeper.components.ComponentMode
 import com.bashkevich.tennisscorekeeper.model.participant.domain.TennisParticipant
 import com.bashkevich.tennisscorekeeper.model.participant.domain.TennisParticipantInMatch
 
@@ -22,6 +23,7 @@ fun AddMatchParticipantsBlock(
     participantOptions: List<TennisParticipant>,
     firstParticipant: TennisParticipantInMatch,
     secondParticipant: TennisParticipantInMatch,
+    mode: ComponentMode,
     onParticipantsFetch: () -> Unit,
     onParticipantChange: (Int, TennisParticipant) -> Unit,
     onParticipantDisplayNameChange: (Int, String) -> Unit,
@@ -42,47 +44,59 @@ fun AddMatchParticipantsBlock(
                 horizontalArrangement = Arrangement.spacedBy(64.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                AddMatchParticipantComponent(
+                Box(
                     modifier = Modifier.weight(weight = 1f),
-                    participantOptions = firstParticipantOptions,
-                    participant = firstParticipant,
-                    onParticipantsFetch = onParticipantsFetch,
-                    onParticipantChange = { participant ->
-                        onParticipantChange(1, participant)
-                    },
-                    onParticipantDisplayNameChange = { displayName ->
-                        onParticipantDisplayNameChange(1, displayName)
-                    },
-                    participantPrimaryColor = firstParticipant.primaryColor,
-                    participantSecondaryColor = firstParticipant.secondaryColor,
-                    onColorPickerOpen = { colorNumber ->
-                        onColorPickerOpen(1, colorNumber)
-                    },
-                    onToggleSecondaryColor = { color ->
-                        onToggleSecondaryColor(1, color)
-                    }
-                )
+                    contentAlignment = Alignment.Center
+                ) {
+                    AddMatchParticipantComponent(
+                        modifier = Modifier.widthIn(max = 300.dp).fillMaxWidth(),
+                        participantOptions = firstParticipantOptions,
+                        participant = firstParticipant,
+                        mode = mode,
+                        onParticipantsFetch = onParticipantsFetch,
+                        onParticipantChange = { participant ->
+                            onParticipantChange(1, participant)
+                        },
+                        onParticipantDisplayNameChange = { displayName ->
+                            onParticipantDisplayNameChange(1, displayName)
+                        },
+                        participantPrimaryColor = firstParticipant.primaryColor,
+                        participantSecondaryColor = firstParticipant.secondaryColor,
+                        onColorPickerOpen = { colorNumber ->
+                            onColorPickerOpen(1, colorNumber)
+                        },
+                        onToggleSecondaryColor = { color ->
+                            onToggleSecondaryColor(1, color)
+                        }
+                    )
+                }
 
-                AddMatchParticipantComponent(
+                Box(
                     modifier = Modifier.weight(weight = 1f),
-                    participantOptions = secondParticipantOptions,
-                    participant = secondParticipant,
-                    onParticipantsFetch = onParticipantsFetch,
-                    onParticipantChange = { participant ->
-                        onParticipantChange(2, participant)
-                    },
-                    onParticipantDisplayNameChange = { displayName ->
-                        onParticipantDisplayNameChange(2, displayName)
-                    },
-                    participantPrimaryColor = secondParticipant.primaryColor,
-                    participantSecondaryColor = secondParticipant.secondaryColor,
-                    onColorPickerOpen = { colorNumber ->
-                        onColorPickerOpen(2, colorNumber)
-                    },
-                    onToggleSecondaryColor = { color ->
-                        onToggleSecondaryColor(2, color)
-                    }
-                )
+                    contentAlignment = Alignment.Center
+                ) {
+                    AddMatchParticipantComponent(
+                        modifier = Modifier.widthIn(max = 300.dp).fillMaxWidth(),
+                        participantOptions = secondParticipantOptions,
+                        participant = secondParticipant,
+                        mode = mode,
+                        onParticipantsFetch = onParticipantsFetch,
+                        onParticipantChange = { participant ->
+                            onParticipantChange(2, participant)
+                        },
+                        onParticipantDisplayNameChange = { displayName ->
+                            onParticipantDisplayNameChange(2, displayName)
+                        },
+                        participantPrimaryColor = secondParticipant.primaryColor,
+                        participantSecondaryColor = secondParticipant.secondaryColor,
+                        onColorPickerOpen = { colorNumber ->
+                            onColorPickerOpen(2, colorNumber)
+                        },
+                        onToggleSecondaryColor = { color ->
+                            onToggleSecondaryColor(2, color)
+                        }
+                    )
+                }
             }
         } else {
             Column(
@@ -91,8 +105,10 @@ fun AddMatchParticipantsBlock(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 AddMatchParticipantComponent(
+                    modifier = Modifier.widthIn(max = 300.dp).fillMaxWidth(),
                     participantOptions = firstParticipantOptions,
                     participant = firstParticipant,
+                    mode = mode,
                     onParticipantsFetch = onParticipantsFetch,
                     onParticipantChange = { participant ->
                         onParticipantChange(1, participant)
@@ -111,8 +127,10 @@ fun AddMatchParticipantsBlock(
                 )
 
                 AddMatchParticipantComponent(
+                    modifier = Modifier.widthIn(max = 300.dp).fillMaxWidth(),
                     participantOptions = secondParticipantOptions,
                     participant = secondParticipant,
+                    mode = mode,
                     onParticipantsFetch = onParticipantsFetch,
                     onParticipantChange = { participant ->
                         onParticipantChange(2, participant)

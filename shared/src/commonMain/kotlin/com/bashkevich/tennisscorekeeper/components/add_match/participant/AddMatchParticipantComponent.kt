@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
@@ -25,6 +24,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import com.bashkevich.tennisscorekeeper.components.ComponentMode
 import com.bashkevich.tennisscorekeeper.components.icons.IconGroup
 import com.bashkevich.tennisscorekeeper.components.icons.default_icons.Add
 import com.bashkevich.tennisscorekeeper.components.icons.default_icons.Close
@@ -41,6 +41,7 @@ fun AddMatchParticipantComponent(
     modifier: Modifier = Modifier,
     participantOptions: List<TennisParticipant>,
     participant: TennisParticipantInMatch,
+    mode: ComponentMode,
     onParticipantsFetch: () -> Unit,
     onParticipantChange: (TennisParticipant) -> Unit,
     onParticipantDisplayNameChange: (String) -> Unit,
@@ -55,15 +56,16 @@ fun AddMatchParticipantComponent(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         ParticipantCombobox(
-            modifier = Modifier.widthIn(max = 300.dp).fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth(),
             participantOptions = participantOptions,
             currentParticipant = participant,
+            mode = mode,
             onParticipantsFetch = onParticipantsFetch,
             onParticipantChange = onParticipantChange
         )
 
         ParticipantDisplayNameComponent(
-            modifier = Modifier.widthIn(max = 300.dp).fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth(),
             participant = participant,
             onParticipantDisplayNameChange = onParticipantDisplayNameChange
         )

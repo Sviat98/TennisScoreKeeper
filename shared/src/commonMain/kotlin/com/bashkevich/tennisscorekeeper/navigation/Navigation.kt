@@ -31,6 +31,11 @@ data object LoginRoute
 data class AddMatchRoute(val tournamentId: Int = 0)
 
 @Serializable
+@SerialName("editMatch")
+//@SerialName("matches/edit") распознает как MatchDetailsRoute(id=edit) на НЕ-Андроид
+data class EditMatchRoute(val matchId: Int = 0)
+
+@Serializable
 @SerialName("settings_flow")
 data object SettingsFlowRoute
 

@@ -27,6 +27,7 @@
     <string name="tournament">Tournament</string>
     <string name="match">Match</string>
     <string name="add_match">Add Match</string>
+    <string name="edit_match">Edit Match</string>
     <string name="add_tournament">Add Tournament</string>
     <string name="navigate_back">Navigate back</string>
     <string name="navigate_to_settings">Navigate to settings</string>
@@ -40,10 +41,10 @@
     <!-- Buttons & Actions -->
     <string name="start_tournament">Start tournament</string>
     <string name="finish_tournament">Finish tournament</string>
-    <string name="start_match">Start match</string>
-    <string name="finish_match">Finish match</string>
-    <string name="pause_match">Pause match</string>
-    <string name="resume_match">Resume match</string>
+    <string name="start_match">Start</string>
+    <string name="finish_match">Finish</string>
+    <string name="pause_match">Pause</string>
+    <string name="resume_match">Resume</string>
     <string name="player_1_point">Player 1\nPoint</string>
     <string name="player_2_point">Player 2\nPoint</string>
     <string name="player_1_game">Player 1\nGame</string>
