@@ -26,74 +26,79 @@ fun main() {
     requestPersistentStorage()
 
     ComposeViewport(document.body!!) {
-        App(onNavHostReady = { navController ->
-            val initRoute = window.location.hash.substringAfter('#', "")
-            println("initRoute = $initRoute")
-            when {
-                // Identifies the corresponding route and navigates to it
-                initRoute.contains("scoreboard") -> {
-                    val matchId = initRoute.substring(findNthOccurrence(initRoute,'/',1)+1,findNthOccurrence(initRoute,'/',2)).toInt()
-                    navController.navigate(ScoreboardRoute(matchId = matchId))
-                }
-                // Identifies the corresponding route and navigates to it
-                initRoute.isEmpty()-> {
-                    navController.navigate(TournamentsRoute)
-                }
-                initRoute == "tournaments/add" ->{
-                    navController.navigate(AddTournamentRoute)
-                }
-                initRoute.matches(Regex("tournaments/[0-9]+/addMatch")) ->{
-                    val tournamentId = initRoute.substring(findNthOccurrence(initRoute,'/',1)+1,findNthOccurrence(initRoute,'/',2)).toInt()
-
-                    navController.navigate(AddMatchRoute(tournamentId = tournamentId))
-                }
-                initRoute.matches(Regex("matches/[0-9]+/editMatch")) ->{
-                    val matchId = initRoute.substring(findNthOccurrence(initRoute,'/',1)+1,findNthOccurrence(initRoute,'/',2)).toInt()
-
-                    navController.navigate(EditMatchRoute(matchId = matchId))
-                }
-
-                else -> navController.navigate(initRoute)
-            }
-
-            navController.bindToBrowserNavigation()
-            { navBackStackEntry ->
-                val destination = navBackStackEntry.destination
-
-                val route = navBackStackEntry.destination.route.orEmpty()
-                println("route = $route")
+        // Прогрев строковых ресурсов до композиции App (обход веб-бага CMP 1.12.x,
+        // см. WebResourceWarmUp.kt): стартовая смена локали en->ru больше не отменяет
+        // единственный холодный fetch .cvr, оставляя stringResource пустыми.
+        WarmedAppGate {
+            App(onNavHostReady = { navController ->
+                val initRoute = window.location.hash.substringAfter('#', "")
+                println("initRoute = $initRoute")
                 when {
-                    destination.hasRoute(ScoreboardRoute::class)->{
-                        val matchId = navBackStackEntry.toRoute<ScoreboardRoute>().matchId
-                        "#matches/$matchId/scoreboard"
+                    // Identifies the corresponding route and navigates to it
+                    initRoute.contains("scoreboard") -> {
+                        val matchId = initRoute.substring(findNthOccurrence(initRoute,'/',1)+1,findNthOccurrence(initRoute,'/',2)).toInt()
+                        navController.navigate(ScoreboardRoute(matchId = matchId))
                     }
-                    destination.hasRoute(TournamentRoute::class)->{
-                        val tournamentId = navBackStackEntry.toRoute<TournamentRoute>().tournamentId
+                    // Identifies the corresponding route and navigates to it
+                    initRoute.isEmpty()-> {
+                        navController.navigate(TournamentsRoute)
+                    }
+                    initRoute == "tournaments/add" ->{
+                        navController.navigate(AddTournamentRoute)
+                    }
+                    initRoute.matches(Regex("tournaments/[0-9]+/addMatch")) ->{
+                        val tournamentId = initRoute.substring(findNthOccurrence(initRoute,'/',1)+1,findNthOccurrence(initRoute,'/',2)).toInt()
 
-                        "#tournaments/$tournamentId"
+                        navController.navigate(AddMatchRoute(tournamentId = tournamentId))
                     }
-                    destination.hasRoute(AddTournamentRoute::class)->{
-                        "#tournaments/add"
-                    }
-                    destination.hasRoute(MatchDetailsRoute::class)->{
-                        val matchId = navBackStackEntry.toRoute<MatchDetailsRoute>().id
+                    initRoute.matches(Regex("matches/[0-9]+/editMatch")) ->{
+                        val matchId = initRoute.substring(findNthOccurrence(initRoute,'/',1)+1,findNthOccurrence(initRoute,'/',2)).toInt()
 
-                        "#matches/$matchId"
+                        navController.navigate(EditMatchRoute(matchId = matchId))
                     }
-                    destination.hasRoute(AddMatchRoute::class)->{
-                        val tournamentId = navBackStackEntry.toRoute<AddMatchRoute>().tournamentId
 
-                        "#tournaments/$tournamentId/addMatch"
-                    }
-                    destination.hasRoute(EditMatchRoute::class)->{
-                        val matchId = navBackStackEntry.toRoute<EditMatchRoute>().matchId
-
-                        "#matches/$matchId/editMatch"
-                    }
-                    else-> "#$route"
+                    else -> navController.navigate(initRoute)
                 }
-            }
-        })
+
+                navController.bindToBrowserNavigation()
+                { navBackStackEntry ->
+                    val destination = navBackStackEntry.destination
+
+                    val route = navBackStackEntry.destination.route.orEmpty()
+                    println("route = $route")
+                    when {
+                        destination.hasRoute(ScoreboardRoute::class)->{
+                            val matchId = navBackStackEntry.toRoute<ScoreboardRoute>().matchId
+                            "#matches/$matchId/scoreboard"
+                        }
+                        destination.hasRoute(TournamentRoute::class)->{
+                            val tournamentId = navBackStackEntry.toRoute<TournamentRoute>().tournamentId
+
+                            "#tournaments/$tournamentId"
+                        }
+                        destination.hasRoute(AddTournamentRoute::class)->{
+                            "#tournaments/add"
+                        }
+                        destination.hasRoute(MatchDetailsRoute::class)->{
+                            val matchId = navBackStackEntry.toRoute<MatchDetailsRoute>().id
+
+                            "#matches/$matchId"
+                        }
+                        destination.hasRoute(AddMatchRoute::class)->{
+                            val tournamentId = navBackStackEntry.toRoute<AddMatchRoute>().tournamentId
+
+                            "#tournaments/$tournamentId/addMatch"
+                        }
+                        destination.hasRoute(EditMatchRoute::class)->{
+                            val matchId = navBackStackEntry.toRoute<EditMatchRoute>().matchId
+
+                            "#matches/$matchId/editMatch"
+                        }
+                        else-> "#$route"
+                    }
+                }
+            })
+        }
     }
 
 }
