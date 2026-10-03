@@ -14,6 +14,7 @@ import org.jetbrains.compose.resources.stringResource
 import tennisscorekeeper.shared.generated.resources.Res
 import tennisscorekeeper.shared.generated.resources.first_pair_to_serve
 import tennisscorekeeper.shared.generated.resources.first_player_to_serve
+import tennisscorekeeper.shared.generated.resources.next_player_to_serve
 
 @Composable
 fun ChooseServePanel(
@@ -49,6 +50,10 @@ fun ChooseServePanel(
                 FirstServePlayerInPairBlock(
                     participantOptions = participantOptions,
                     firstParticipantToServe = firstParticipantToServe,
+                    firstPlayerLabel = stringResource(Res.string.first_player_to_serve),
+                    nextPlayerLabel = stringResource(Res.string.next_player_to_serve),
+                    firstPlayerEnabled = true,
+                    nextPlayerEnabled = true,
                     onFirstPlayerInPairToServeChoose = onFirstPlayerInPairToServeChoose
                 )
             }

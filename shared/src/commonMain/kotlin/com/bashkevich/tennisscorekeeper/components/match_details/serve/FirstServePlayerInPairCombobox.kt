@@ -38,6 +38,14 @@ fun FirstServePlayerInPairCombobox(
 ) {
     var expanded by remember { mutableStateOf(false) }
 
+    // неактивный комбобокс не должен открываться: клики по стрелке заблокированы,
+    // а уже открытое меню закрывается
+    LaunchedEffect(enabled) {
+        if (!enabled) {
+            expanded = false
+        }
+    }
+
     val playerText = currentPlayer.toDisplayFormat()
 
     val playerState = rememberTextFieldState(playerText)
@@ -58,7 +66,7 @@ fun FirstServePlayerInPairCombobox(
                 Icon(
                     imageVector = IconGroup.Default.ArrowDropDown,
                     contentDescription = stringResource(Res.string.open_dropdown),
-                    modifier = Modifier.clickable {
+                    modifier = Modifier.clickable(enabled = enabled) {
                         expanded = true
                     }
                 )
