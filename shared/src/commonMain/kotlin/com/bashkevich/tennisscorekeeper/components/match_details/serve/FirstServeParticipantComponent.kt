@@ -6,7 +6,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material3.Text
-import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
+import androidx.compose.material3.adaptive.currentWindowAdaptiveInfoV2
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -22,7 +22,7 @@ fun FirstServeParticipantComponent(
     currentParticipant: TennisParticipantInMatch,
     onParticipantChange: (Int) -> Unit,
 ) {
-    val windowSizeClass = currentWindowAdaptiveInfo().windowSizeClass
+    val windowSizeClass = currentWindowAdaptiveInfoV2().windowSizeClass
 
     if (windowSizeClass.isWidthAtLeastBreakpoint(WindowSizeClass.WIDTH_DP_MEDIUM_LOWER_BOUND)) {
         Row(

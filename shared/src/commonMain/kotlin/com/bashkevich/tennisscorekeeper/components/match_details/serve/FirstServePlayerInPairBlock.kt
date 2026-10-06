@@ -10,16 +10,17 @@ import com.bashkevich.tennisscorekeeper.model.participant.domain.ParticipantInDo
 import com.bashkevich.tennisscorekeeper.model.participant.domain.TennisParticipantInMatch
 import com.bashkevich.tennisscorekeeper.model.player.domain.PLAYER_IN_DOUBLES_MATCH_DEFAULT
 import com.bashkevich.tennisscorekeeper.model.player.domain.PlayerInDoublesMatch
-import org.jetbrains.compose.resources.stringResource
-import tennisscorekeeper.shared.generated.resources.Res
-import tennisscorekeeper.shared.generated.resources.first_player_to_serve
-import tennisscorekeeper.shared.generated.resources.next_player_to_serve
 
 @Composable
 fun FirstServePlayerInPairBlock(
     modifier: Modifier = Modifier,
     participantOptions: List<TennisParticipantInMatch>,
     firstParticipantToServe: TennisParticipantInMatch,
+    firstPlayerLabel: String,
+    nextPlayerLabel: String,
+    firstPlayerEnabled: Boolean,
+    nextPlayerEnabled: Boolean,
+    horizontalAlignment: Alignment.Horizontal = Alignment.End,
     onFirstPlayerInPairToServeChoose: (Int)->Unit,
 ){
     var nextParticipantToServeInDoublesMatch: ParticipantInDoublesMatch?
@@ -60,22 +61,22 @@ fun FirstServePlayerInPairBlock(
     Column(
         modifier = Modifier.then(modifier),
         verticalArrangement = Arrangement.spacedBy(16.dp),
-        horizontalAlignment = Alignment.End
+        horizontalAlignment = horizontalAlignment
     ) {
         FirstServePlayerInPairComponent(
-            label = stringResource(Res.string.first_player_to_serve),
+            label = firstPlayerLabel,
             playerOptions = firstServePlayerOptions,
             currentPlayer = firstServePlayer,
             onPlayerChange = { player -> onFirstPlayerInPairToServeChoose(player.id) },
-            enabled = enablePlayerCombobox
+            enabled = enablePlayerCombobox && firstPlayerEnabled
         )
 
         FirstServePlayerInPairComponent(
-            label = stringResource(Res.string.next_player_to_serve),
+            label = nextPlayerLabel,
             playerOptions = nextServePlayerOptions,
             currentPlayer = nextServePlayer,
             onPlayerChange = { player -> onFirstPlayerInPairToServeChoose(player.id) },
-            enabled = enablePlayerCombobox
+            enabled = enablePlayerCombobox && nextPlayerEnabled
         )
     }
 

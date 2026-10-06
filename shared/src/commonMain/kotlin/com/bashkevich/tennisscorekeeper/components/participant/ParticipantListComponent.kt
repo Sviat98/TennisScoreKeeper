@@ -5,7 +5,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.LocalTextStyle
-import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
+import androidx.compose.material3.adaptive.currentWindowAdaptiveInfoV2
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -29,7 +29,7 @@ fun ParticipantListComponent(
     val textMeasurer = rememberTextMeasurer()
     val density = LocalDensity.current
 
-    val windowSizeClass = currentWindowAdaptiveInfo().windowSizeClass
+    val windowSizeClass = currentWindowAdaptiveInfoV2().windowSizeClass
 
     val isCompact =
         !windowSizeClass.isWidthAtLeastBreakpoint(WindowSizeClass.WIDTH_DP_MEDIUM_LOWER_BOUND)
