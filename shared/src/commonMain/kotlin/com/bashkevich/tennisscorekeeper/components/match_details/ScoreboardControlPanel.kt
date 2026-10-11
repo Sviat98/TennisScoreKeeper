@@ -123,12 +123,16 @@ fun ScoreboardControlPanel(
                     }
 
                     Column {
-                        ServeChangeBanner(
-                            modifier = Modifier.fillMaxWidth(),
-                            visible = isServeChangeWindowOpen,
-                            expanded = isServeChangePanelExpanded,
-                            onToggleClick = { isServeChangePanelExpanded = !isServeChangePanelExpanded }
-                        )
+                        // слот баннера резервируется только в парном матче -
+                        // в одиночном баннер не появится никогда
+                        if (isDoublesMatch) {
+                            ServeChangeBanner(
+                                modifier = Modifier.fillMaxWidth(),
+                                visible = isServeChangeWindowOpen,
+                                expanded = isServeChangePanelExpanded,
+                                onToggleClick = { isServeChangePanelExpanded = !isServeChangePanelExpanded }
+                            )
+                        }
 
                         AnimatedContent(
                             targetState = isServeChangeWindowOpen && isServeChangePanelExpanded,
