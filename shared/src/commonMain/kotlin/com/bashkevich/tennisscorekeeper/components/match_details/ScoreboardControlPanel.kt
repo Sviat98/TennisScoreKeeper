@@ -30,7 +30,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.bashkevich.tennisscorekeeper.components.match_details.serve.ChooseServePanel
@@ -123,12 +122,18 @@ fun ScoreboardControlPanel(
                     }
 
                     Column {
-                        ServeChangeBanner(
-                            modifier = Modifier.fillMaxWidth(),
-                            visible = isServeChangeWindowOpen,
-                            expanded = isServeChangePanelExpanded,
-                            onToggleClick = { isServeChangePanelExpanded = !isServeChangePanelExpanded }
-                        )
+                        // слот баннера резервируется только в парном матче -
+                        // в одиночном баннер не появится никогда
+                        if (isDoublesMatch) {
+                            ServeChangeBanner(
+                                modifier = Modifier.fillMaxWidth(),
+                                visible = isServeChangeWindowOpen,
+                                expanded = isServeChangePanelExpanded,
+                                onToggleClick = { isServeChangePanelExpanded = !isServeChangePanelExpanded }
+                            )
+                            // постоянный отступ до контента ниже - не зависит от видимости баннера
+                            Spacer(modifier = Modifier.height(8.dp))
+                        }
 
                         AnimatedContent(
                             targetState = isServeChangeWindowOpen && isServeChangePanelExpanded,
