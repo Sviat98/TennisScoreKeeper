@@ -50,6 +50,8 @@ fun ScoreboardScreen(
             .fillMaxSize(),
         verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.CenterVertically)
     ) {
+        CircularProgressIndicator()
+
         val connectionState = state.connectionState
 
         println("connectionState = $connectionState")
