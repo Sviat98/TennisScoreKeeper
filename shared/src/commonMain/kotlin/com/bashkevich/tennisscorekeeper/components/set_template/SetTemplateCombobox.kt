@@ -53,7 +53,7 @@ fun SetTemplateCombobox(
 
     val text = when (val state = setComponentState.selectedSetState) {
         is SetComponentState.SelectedSetState.Idle -> state.setTemplate?.name ?: ""
-        is SetComponentState.SelectedSetState.Loading -> stringResource(Res.string.loading)
+        is SetComponentState.SelectedSetState.Loading -> stringResource(Res.string.loading) + "..."
         is SetComponentState.SelectedSetState.Error -> stringResource(Res.string.error_loading_set_template)
     }
 

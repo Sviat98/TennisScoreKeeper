@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -30,6 +29,7 @@ import com.bashkevich.tennisscorekeeper.screens.matchdetails.ConnectionState
 import org.jetbrains.compose.resources.stringResource
 import tennisscorekeeper.shared.generated.resources.Res
 import tennisscorekeeper.shared.generated.resources.connection_with_scoreboard_lost
+import tennisscorekeeper.shared.generated.resources.loading
 
 @Composable
 fun ScoreboardScreen(
@@ -50,13 +50,11 @@ fun ScoreboardScreen(
             .fillMaxSize(),
         verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.CenterVertically)
     ) {
-        CircularProgressIndicator()
-
         val connectionState = state.connectionState
 
         println("connectionState = $connectionState")
         if (connectionState == ConnectionState.Loading) {
-            CircularProgressIndicator()
+            Text(text = stringResource(Res.string.loading) + " . . .")
         } else {
             ScoreboardContent(
                 match = state.match,
