@@ -142,10 +142,14 @@ class MatchDetailsViewModel(
 
     private fun setFirstPlayerInPairToServe(playerId: Int) {
         viewModelScope.launch {
-            val matchId = state.value.match.id
+            val match = state.value.match
+            // подающий в паре выбирается для текущего сета: для NOT_STARTED previousSets пуст
+            // и это сет 1, для IN_PROGRESS - номер текущего сета (бэкенд его валидирует)
+            val setNumber = match.previousSets.size + 1
             matchRepository.setFirstPlayerInPairToServe(
-                matchId = matchId,
+                matchId = match.id,
                 playerId = playerId,
+                setNumber = setNumber,
             ).doOnError { error ->
                 handleError(error)
             }

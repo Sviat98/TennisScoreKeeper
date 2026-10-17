@@ -34,7 +34,7 @@ interface MatchRepository {
     suspend fun redoPoint(matchId: Int): LoadResult<ResponseMessage, Throwable>
     suspend fun attachVideoLink(matchId: Int, videoLink: String): LoadResult<ResponseMessage, Throwable>
     suspend fun setFirstParticipantToServe(matchId: Int, participantId: Int): LoadResult<ResponseMessage, Throwable>
-    suspend fun setFirstPlayerInPairToServe(matchId: Int, playerId: Int): LoadResult<ResponseMessage, Throwable>
+    suspend fun setFirstPlayerInPairToServe(matchId: Int, playerId: Int, setNumber: Int): LoadResult<ResponseMessage, Throwable>
     suspend fun setParticipantRetired(matchId: Int, participantId: Int): LoadResult<ResponseMessage, Throwable>
     suspend fun setMatchStatus(matchId: Int, status: MatchStatus): LoadResult<ResponseMessage, Throwable>
 

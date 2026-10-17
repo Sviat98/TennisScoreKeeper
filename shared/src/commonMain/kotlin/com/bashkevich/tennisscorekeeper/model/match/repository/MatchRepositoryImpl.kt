@@ -118,8 +118,8 @@ class MatchRepositoryImpl(
         return matchRemoteDataSource.setFirstParticipantToServe(matchId = matchId.toString(), serveBody = serveBody)
     }
 
-    override suspend fun setFirstPlayerInPairToServe(matchId: Int, playerId: Int): LoadResult<ResponseMessage, Throwable> {
-        val serveInPairBody = ServeInPairBody(playerId.toString())
+    override suspend fun setFirstPlayerInPairToServe(matchId: Int, playerId: Int, setNumber: Int): LoadResult<ResponseMessage, Throwable> {
+        val serveInPairBody = ServeInPairBody(setNumber = setNumber, servingPlayerId = playerId.toString())
         return matchRemoteDataSource.setFirstServeInPair(
             matchId = matchId.toString(),
             serveInPairBody = serveInPairBody

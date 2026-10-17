@@ -11,6 +11,8 @@ data class ServeBody(
 
 @Serializable
 data class ServeInPairBody(
+    @SerialName("set_number")
+    val setNumber: Int,
     @SerialName("serving_player_id")
     val servingPlayerId: String
 )

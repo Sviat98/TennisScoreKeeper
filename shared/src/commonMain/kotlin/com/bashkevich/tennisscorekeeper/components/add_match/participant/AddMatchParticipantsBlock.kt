@@ -6,7 +6,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.widthIn
-import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
+import androidx.compose.material3.adaptive.currentWindowAdaptiveInfoV2
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -31,7 +31,7 @@ fun AddMatchParticipantsBlock(
     onToggleSecondaryColor: (Int, Color?) -> Unit
 ) {
 
-    val windowSize = currentWindowAdaptiveInfo().windowSizeClass
+    val windowSize = currentWindowAdaptiveInfoV2().windowSizeClass
 
     val firstParticipantOptions =
         participantOptions.filter { it.id != secondParticipant.id }
