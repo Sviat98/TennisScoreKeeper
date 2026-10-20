@@ -31,6 +31,7 @@ import io.ktor.client.plugins.auth.providers.bearer
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.defaultRequest
 import io.ktor.client.plugins.logging.LogLevel
+import io.ktor.client.plugins.logging.Logger
 import io.ktor.client.plugins.logging.Logging
 import io.ktor.client.plugins.plugin
 import io.ktor.client.plugins.websocket.WebSockets
@@ -112,6 +113,14 @@ val coreModule = module {
             }
             install(Logging) {
                 level = LogLevel.ALL
+                // Logger.DEFAULT на Android уходит в slf4j-android, а тот отдаёт сообщение
+                // в Log.println() одним куском. Logcat режет запись длиннее ~4 КБ, поэтому
+                // блок ответа (заголовки + pretty-printed JSON) просто не доезжает до лога.
+                logger = object : Logger {
+                    override fun log(message: String) {
+                        message.chunked(3000).forEach { chunk -> println("Ktor: $chunk") }
+                    }
+                }
                 sanitizeHeader { header ->
                     header == HttpHeaders.Authorization
                 }
