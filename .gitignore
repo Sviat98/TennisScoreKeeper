@@ -16,3 +16,9 @@ captures
 !*.xcodeproj/project.xcworkspace/
 !*.xcworkspace/contents.xcworkspacedata
 **/xcshareddata/WorkspaceSettings.xcsettings
+
+# Serena (ZCode MCP) local files; .serena/project.yml is committed
+.serena/.gitignore
+.serena/cache/
+.serena/memories/
+.serena/project.local.yml

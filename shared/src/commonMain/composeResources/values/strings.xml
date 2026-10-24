@@ -21,6 +21,10 @@
     <string name="toggle_section">Expand/collapse</string>
     <string name="preview">Preview</string>
     <string name="check_internet_connection">Check your internet connection</string>
+    <string name="select_lt_tournament">Select tournament</string>
+    <string name="start_date">Start date: %1$s</string>
+    <string name="error_loading_lt_tournaments">Error loading tournaments</string>
+    <string name="tournament_already_exists">Tournament already exists</string>
 
     <!-- Navigation & Top Bars -->
     <string name="tournaments">Tournaments</string>
