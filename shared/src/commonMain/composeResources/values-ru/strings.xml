@@ -21,6 +21,10 @@
     <string name="toggle_section">Развернуть/свернуть</string>
     <string name="preview">Превью</string>
     <string name="check_internet_connection">Проверьте подключение к интернету</string>
+    <string name="select_lt_tournament">Выберите турнир</string>
+    <string name="start_date">дата начала: %1$s</string>
+    <string name="error_loading_lt_tournaments">Ошибка загрузки турниров</string>
+    <string name="tournament_already_exists">Турнир уже существует</string>
 
     <!-- Navigation & Top Bars -->
     <string name="tournaments">Турниры</string>

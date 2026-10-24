@@ -1,11 +1,13 @@
 package com.bashkevich.tennisscorekeeper.screens.addtournament
 
 import androidx.compose.runtime.Immutable
+import com.bashkevich.tennisscorekeeper.components.add_tournament.UpcomingTournamentComponentState
 import com.bashkevich.tennisscorekeeper.components.set_template.SetComponentState
 import com.bashkevich.tennisscorekeeper.components.theme.ThemeComponentState
 import com.bashkevich.tennisscorekeeper.model.set_template.domain.SetTemplate
 import com.bashkevich.tennisscorekeeper.model.set_template.domain.SetTemplateTypeFilter
 import com.bashkevich.tennisscorekeeper.model.theme.domain.ScoreboardTheme
+import com.bashkevich.tennisscorekeeper.model.tournament.domain.UpcomingTournament
 import com.bashkevich.tennisscorekeeper.model.tournament.remote.TournamentType
 
 import com.bashkevich.tennisscorekeeper.mvi.UiAction
@@ -14,6 +16,8 @@ import com.bashkevich.tennisscorekeeper.mvi.UiState
 
 @Immutable
 sealed class AddTournamentUiEvent : UiEvent {
+    data object FetchUpcomingTournaments : AddTournamentUiEvent()
+    class SelectUpcomingTournament(val upcomingTournament: UpcomingTournament) : AddTournamentUiEvent()
     class SelectTournamentType(val tournamentType: TournamentType) : AddTournamentUiEvent()
     class SelectRegularSetTemplate(val setTemplate: SetTemplate) : AddTournamentUiEvent()
     class SelectDecidingSetTemplate(val setTemplate: SetTemplate) : AddTournamentUiEvent()
@@ -22,6 +26,7 @@ sealed class AddTournamentUiEvent : UiEvent {
     data object FetchThemes : AddTournamentUiEvent()
     class ChangeSetsToWin(val delta: Int) : AddTournamentUiEvent()
     class AddTournament(
+        val apiId: String,
         val tournamentName: String,
         val tournamentType: TournamentType,
         val defaultSetTemplateId: Int?,
@@ -33,6 +38,7 @@ sealed class AddTournamentUiEvent : UiEvent {
 
 @Immutable
 data class AddTournamentState(
+    val upcomingTournamentComponentState: UpcomingTournamentComponentState,
     val tournamentType: TournamentType?,
     val regularSetComponentState: SetComponentState,
     val decidingSetComponentState: SetComponentState,
@@ -43,6 +49,10 @@ data class AddTournamentState(
 ) : UiState {
     companion object {
         fun initial() = AddTournamentState(
+            upcomingTournamentComponentState = UpcomingTournamentComponentState(
+                selectedTournament = null,
+                upcomingTournamentsOptionsState = UpcomingTournamentComponentState.UpcomingTournamentsOptionsState.Loading,
+            ),
             tournamentType = null,
             regularSetComponentState = SetComponentState(
                 selectedSetState = SetComponentState.SelectedSetState.Idle(null),

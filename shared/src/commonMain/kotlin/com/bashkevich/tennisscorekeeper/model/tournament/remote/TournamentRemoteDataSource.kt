@@ -20,6 +20,13 @@ class TournamentRemoteDataSource(
         }
     }
 
+    suspend fun getUpcomingTournaments(): LoadResult<List<TournamentApiUpcomingDto>, Throwable> {
+        return runOperationCatching {
+            val tournaments = httpClient.get("/tournaments/upcoming").body<List<TournamentApiUpcomingDto>>()
+            tournaments
+        }
+    }
+
     suspend fun getTournamentById(id: String): LoadResult<TournamentDto, Throwable> {
         return runOperationCatching {
             val tournament = httpClient.get("/tournaments/$id").body<TournamentDto>()

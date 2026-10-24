@@ -21,6 +21,7 @@ import com.bashkevich.tennisscorekeeper.model.tournament.remote.TournamentType
 fun TournamentNameAndTypeComponent(
     modifier: Modifier = Modifier,
     tournamentNameState: TextFieldState,
+    typeEnabled: Boolean = true,
     currentTournamentType: TournamentType?,
     onTournamentTypeChange: (TournamentType) -> Unit,
 ) {
@@ -51,6 +52,7 @@ fun TournamentNameAndTypeComponent(
                 ) {
                     TournamentTypeComponent(
                         modifier = Modifier.widthIn(max = 300.dp).fillMaxWidth(),
+                        enabled = typeEnabled,
                         currentTournamentType = currentTournamentType,
                         onTournamentTypeChange = onTournamentTypeChange,
                     )
@@ -66,6 +68,7 @@ fun TournamentNameAndTypeComponent(
                 )
                 TournamentTypeComponent(
                     modifier = Modifier.widthIn(max = 300.dp).fillMaxWidth(),
+                    enabled = typeEnabled,
                     currentTournamentType = currentTournamentType,
                     onTournamentTypeChange = onTournamentTypeChange,
                 )
