@@ -1,15 +1,15 @@
 package com.bashkevich.tennisscorekeeper.model.participant.repository
 
 import com.bashkevich.tennisscorekeeper.core.remote.LoadResult
-import com.bashkevich.tennisscorekeeper.model.file.domain.ExcelFile
 import com.bashkevich.tennisscorekeeper.model.participant.domain.TennisParticipant
+import com.bashkevich.tennisscorekeeper.model.participant.remote.ParticipantUploadRequestDto
 import kotlinx.coroutines.flow.Flow
 
 interface ParticipantRepository {
     suspend fun getParticipantsForTournament(tournamentId: Int): LoadResult<List<TennisParticipant>, Throwable>
-    suspend fun uploadParticipantsFile(
+    suspend fun uploadParticipants(
         tournamentId: Int,
-        participantsFile: ExcelFile
+        uploadParticipantsBody: ParticipantUploadRequestDto
     ): LoadResult<List<TennisParticipant>, Throwable>
     suspend fun fetchParticipantsForTournament(tournamentId: Int): LoadResult<Unit, Throwable>
     fun observeParticipantsForTournament(tournamentId: Int): Flow<List<TennisParticipant>>

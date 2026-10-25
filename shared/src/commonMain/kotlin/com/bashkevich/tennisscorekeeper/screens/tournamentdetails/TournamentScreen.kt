@@ -114,18 +114,13 @@ private fun TournamentContent(
             if (tournamentDetailsState is TournamentDetailsLoadingState.Content) {
                 val tournament = tournamentDetailsState.tournament
 
-                if (tournament.status == TournamentStatus.IN_PROGRESS) {
+                // currentPage, а не activeTab: отражает фактическую вкладку и при свайпе пейджера
+                if (tournament.status == TournamentStatus.IN_PROGRESS &&
+                    pagerState.currentPage == TournamentTab.MATCHES.ordinal
+                ) {
                     FloatingActionButton(
                         onClick = {
-                            when (state.activeTab) {
-                                TournamentTab.MATCHES -> {
-                                    navController.navigate(AddMatchRoute(tournament.id))
-                                }
-
-                                TournamentTab.PARTICIPANTS -> {
-
-                                }
-                            }
+                            navController.navigate(AddMatchRoute(tournament.id))
                         }
                     ) {
                         Icon(
@@ -239,9 +234,10 @@ private fun TournamentContent(
                             participantListLoadingState = state.participantListLoadingState,
                             tournamentStatus = (tournamentDetailsState as? TournamentDetailsLoadingState.Content)?.tournament?.status
                                 ?: TournamentStatus.NOT_STARTED,
-                            onUploadFile = { onEvent(TournamentUiEvent.UploadFile) },
-                            onSelectFile = { file -> onEvent(TournamentUiEvent.SelectFile(file)) },
-                            onClearFile = { onEvent(TournamentUiEvent.ClearFile) }
+                            onUploadParticipants = { onEvent(TournamentUiEvent.UploadParticipants) },
+                            onSeedAmountChange = { seedAmount ->
+                                onEvent(TournamentUiEvent.ChangeSeedAmount(seedAmount))
+                            }
                         )
                     }
                 }
