@@ -9,8 +9,6 @@ import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -25,16 +23,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.bashkevich.tennisscorekeeper.components.icons.IconGroup
-import com.bashkevich.tennisscorekeeper.components.icons.default_icons.ArrowDropDown
-import com.bashkevich.tennisscorekeeper.components.icons.default_icons.Autorenew
 import com.bashkevich.tennisscorekeeper.model.set_template.domain.SetTemplate
 import org.jetbrains.compose.resources.stringResource
 import tennisscorekeeper.shared.generated.resources.Res
 import tennisscorekeeper.shared.generated.resources.error_loading_set_template
 import tennisscorekeeper.shared.generated.resources.loading
-import tennisscorekeeper.shared.generated.resources.open_dropdown
-import tennisscorekeeper.shared.generated.resources.retry
 import tennisscorekeeper.shared.generated.resources.select_set_template
 
 @Composable
@@ -57,35 +50,10 @@ fun SetTemplateCombobox(
         is SetComponentState.SelectedSetState.Error -> stringResource(Res.string.error_loading_set_template)
     }
 
-    val trailingIcon: (@Composable () -> Unit)? = when (val state = setComponentState.selectedSetState) {
-        is SetComponentState.SelectedSetState.Idle -> {
-            {
-                IconButton(
-                    onClick = {
-                        expanded = true
-                        onSetTemplatesFetch()
-                    },
-                    enabled = dropdownEnabled
-                ) {
-                    Icon(
-                        imageVector = IconGroup.Default.ArrowDropDown,
-                        contentDescription = stringResource(Res.string.open_dropdown),
-                    )
-                }
-            }
-        }
-        is SetComponentState.SelectedSetState.Loading -> null
-        is SetComponentState.SelectedSetState.Error -> {
-            {
-                IconButton(onClick = { onRetrySelectedSet(state.initialSetTemplateId) }) {
-                    Icon(
-                        imageVector = IconGroup.Default.Autorenew,
-                        contentDescription = stringResource(Res.string.retry),
-                    )
-                }
-            }
-        }
-    }
+    // См. комментарий в ThemeDropdownMenu.kt: на Kotlin/Native composable-лямбда создаётся
+    // в одной точке под одним условием; выбор иконки — when внутри SetTemplateComboboxTrailingIcon.
+    val isSetTemplateLoading =
+        setComponentState.selectedSetState is SetComponentState.SelectedSetState.Loading
 
     Box(
         modifier = Modifier.then(modifier)
@@ -99,7 +67,21 @@ fun SetTemplateCombobox(
             ) },
             readOnly = true,
             enabled = dropdownEnabled,
-            trailingIcon = trailingIcon,
+            trailingIcon = if (isSetTemplateLoading) {
+                null
+            } else {
+                {
+                    SetTemplateComboboxTrailingIcon(
+                        state = setComponentState.selectedSetState,
+                        dropdownEnabled = dropdownEnabled,
+                        onRetrySelectedSet = onRetrySelectedSet,
+                        onExpandDropdown = {
+                            expanded = true
+                            onSetTemplatesFetch()
+                        },
+                    )
+                }
+            },
             lineLimits = TextFieldLineLimits.MultiLine(minHeightInLines = 2, maxHeightInLines = 3),
             colors = TextFieldDefaults.colors(
                 disabledIndicatorColor = Color.Transparent,
