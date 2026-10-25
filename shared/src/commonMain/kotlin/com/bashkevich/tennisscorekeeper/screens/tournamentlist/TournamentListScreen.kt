@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
@@ -39,7 +40,6 @@ import com.bashkevich.tennisscorekeeper.navigation.TournamentRoute
 import org.jetbrains.compose.resources.stringResource
 import tennisscorekeeper.shared.generated.resources.Res
 import tennisscorekeeper.shared.generated.resources.add_tournament
-import tennisscorekeeper.shared.generated.resources.loading
 import tennisscorekeeper.shared.generated.resources.try_again
 
 @Composable
@@ -153,7 +153,7 @@ private fun TournamentListLoading(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            Text(text = stringResource(Res.string.loading) + " . . .")
+            CircularProgressIndicator()
         }
     }
 }
