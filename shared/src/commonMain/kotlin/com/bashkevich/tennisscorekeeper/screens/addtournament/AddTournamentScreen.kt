@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
@@ -27,6 +28,7 @@ import com.bashkevich.tennisscorekeeper.LocalNavHostController
 import com.bashkevich.tennisscorekeeper.components.AddTournamentAppBar
 import com.bashkevich.tennisscorekeeper.components.add_match.MatchScoringAndThemeSettingsBlock
 import com.bashkevich.tennisscorekeeper.components.add_tournament.TournamentNameAndTypeComponent
+import com.bashkevich.tennisscorekeeper.components.add_tournament.UpcomingTournamentCombobox
 import com.bashkevich.tennisscorekeeper.components.dialog.ScoreboardThemePreviewDialog
 import com.bashkevich.tennisscorekeeper.components.set_template.SetComponentState
 import com.bashkevich.tennisscorekeeper.components.showUnauthorizedActionSnackbar
@@ -91,6 +93,7 @@ fun AddTournamentContent(
     onNavigateToSettings: () -> Unit = {},
 ) {
     val tournamentType = state.tournamentType
+    val selectedUpcomingTournament = state.upcomingTournamentComponentState.selectedTournament
     var isPreviewDialogOpen by remember { mutableStateOf(false) }
 
     val regularSetTemplate =
@@ -119,9 +122,22 @@ fun AddTournamentContent(
             verticalArrangement = Arrangement.spacedBy(16.dp),
             horizontalAlignment = androidx.compose.ui.Alignment.CenterHorizontally,
         ) {
+            // Tennis League upcoming tournament selection
+            UpcomingTournamentCombobox(
+                modifier = Modifier.fillMaxWidth(),
+                upcomingTournamentComponentState = state.upcomingTournamentComponentState,
+                onUpcomingTournamentsFetch = {
+                    onEvent(AddTournamentUiEvent.FetchUpcomingTournaments)
+                },
+                onUpcomingTournamentChange = { upcomingTournament ->
+                    onEvent(AddTournamentUiEvent.SelectUpcomingTournament(upcomingTournament))
+                },
+            )
+
             // Tournament name + Tournament type
             TournamentNameAndTypeComponent(
                 tournamentNameState = tournamentNameState,
+                typeEnabled = false,
                 currentTournamentType = tournamentType,
                 onTournamentTypeChange = { type ->
                     onEvent(AddTournamentUiEvent.SelectTournamentType(type))
@@ -160,7 +176,8 @@ fun AddTournamentContent(
             // Add button
             val needsRegularSet = state.setsToWin > 1
             val isButtonEnabled =
-                state.tournamentType != null
+                selectedUpcomingTournament != null
+                        && state.tournamentType != null
                         && tournamentNameState.text.toString().isNotBlank()
                         && decidingSetTemplate != null
                         && selectedTheme != null
@@ -171,6 +188,7 @@ fun AddTournamentContent(
                 onClick = {
                     onEvent(
                         AddTournamentUiEvent.AddTournament(
+                            apiId = selectedUpcomingTournament!!.id,
                             tournamentName = tournamentNameState.text.toString().trim(),
                             tournamentType = tournamentType!!,
                             defaultSetTemplateId = regularSetTemplate?.id,
