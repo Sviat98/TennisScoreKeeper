@@ -122,11 +122,11 @@
 
     <!-- File Upload -->
     <string name="open_file_storage">Open file storage</string>
-    <string name="upload_file">Upload file</string>
-    <string name="select_file_for_upload">Select file for upload</string>
-    <string name="upload">Upload</string>
     <string name="clear_file">Clear file</string>
-    <string name="upload_new_list">Upload new list</string>
+
+    <!-- Participants -->
+    <string name="seeded_players_count">Seeded players</string>
+    <string name="update">Update</string>
 
     <!-- Set Template -->
     <string name="regular_set_template">Regular Set Format</string>
