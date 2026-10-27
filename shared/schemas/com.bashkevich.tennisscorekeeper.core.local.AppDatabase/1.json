@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "2ddf8f70cab4b64cdc91e2431bb5f3d1",
+    "identityHash": "76132403a74921bd2319240ba5e27adf",
     "entities": [
       {
         "tableName": "tournaments",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `name` TEXT NOT NULL, `type` TEXT NOT NULL, `status` TEXT NOT NULL, `regular_set_id` INTEGER, `deciding_set_id` INTEGER NOT NULL, `theme_id` INTEGER NOT NULL, `sets_to_win` INTEGER NOT NULL, `total_participants` INTEGER NOT NULL, `total_matches` INTEGER NOT NULL, `uncompleted_matches` INTEGER NOT NULL, PRIMARY KEY(`id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `name` TEXT NOT NULL, `type` TEXT NOT NULL, `status` TEXT NOT NULL, `regular_set_id` INTEGER, `deciding_set_id` INTEGER NOT NULL, `theme_id` INTEGER NOT NULL, `sets_to_win` INTEGER NOT NULL, `total_participants` INTEGER NOT NULL, `seeded_participants` INTEGER NOT NULL, `total_matches` INTEGER NOT NULL, `uncompleted_matches` INTEGER NOT NULL, PRIMARY KEY(`id`))",
         "fields": [
           {
             "fieldPath": "id",
@@ -58,6 +58,12 @@
           {
             "fieldPath": "totalParticipants",
             "columnName": "total_participants",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "seededParticipants",
+            "columnName": "seeded_participants",
             "affinity": "INTEGER",
             "notNull": true
           },
@@ -589,7 +595,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '2ddf8f70cab4b64cdc91e2431bb5f3d1')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '76132403a74921bd2319240ba5e27adf')"
     ]
   }
 }
