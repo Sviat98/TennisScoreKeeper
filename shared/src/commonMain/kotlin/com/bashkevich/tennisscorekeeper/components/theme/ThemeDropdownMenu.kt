@@ -56,7 +56,7 @@ fun ThemeCombobox(
 
     val text = when (val state = themeComponentState.selectedTheme) {
         is ThemeComponentState.SelectedThemeState.Idle -> state.theme?.name ?: ""
-        is ThemeComponentState.SelectedThemeState.Loading -> stringResource(Res.string.loading)
+        is ThemeComponentState.SelectedThemeState.Loading -> stringResource(Res.string.loading) + "..."
         is ThemeComponentState.SelectedThemeState.Error -> stringResource(Res.string.error_loading_theme)
     }
 
