@@ -90,7 +90,7 @@ fun ParticipantListContentPreview() {
             seedAmount = 0
         ),
         tournament = null,
-        onUploadParticipants = {},
+        onDownloadParticipants = {},
         onSeedAmountChange = {}
     )
 }

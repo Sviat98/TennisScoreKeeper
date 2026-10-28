@@ -21,13 +21,13 @@ class ParticipantRemoteDataSource(
         }
     }
 
-    suspend fun uploadParticipants(
+    suspend fun downloadParticipants(
         tournamentId: String,
-        uploadParticipantsBody: ParticipantUploadRequestDto
+        downloadParticipantsBody: ParticipantDownloadRequestDto
     ): LoadResult<List<ParticipantDto>, Throwable> {
         return runOperationCatching {
-            httpClient.post("/tournaments/$tournamentId/participants/upload") {
-                setBody(uploadParticipantsBody)
+            httpClient.post("/tournaments/$tournamentId/participants/download") {
+                setBody(downloadParticipantsBody)
             }.body<List<ParticipantDto>>()
         }
     }

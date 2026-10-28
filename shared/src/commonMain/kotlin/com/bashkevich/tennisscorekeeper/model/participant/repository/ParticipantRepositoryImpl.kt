@@ -8,7 +8,7 @@ import com.bashkevich.tennisscorekeeper.model.participant.domain.toDomain
 import com.bashkevich.tennisscorekeeper.model.participant.local.ParticipantLocalDataSource
 import com.bashkevich.tennisscorekeeper.model.participant.local.toDomain
 import com.bashkevich.tennisscorekeeper.model.participant.remote.ParticipantRemoteDataSource
-import com.bashkevich.tennisscorekeeper.model.participant.remote.ParticipantUploadRequestDto
+import com.bashkevich.tennisscorekeeper.model.participant.remote.ParticipantDownloadRequestDto
 import com.bashkevich.tennisscorekeeper.model.tournament.local.TournamentLocalDataSource
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -23,12 +23,12 @@ class ParticipantRepositoryImpl(
         return participantRemoteDataSource.getParticipants(tournamentId.toString()).mapSuccess { participants -> participants.map { it.toDomain() } }
     }
 
-    override suspend fun uploadParticipants(tournamentId: Int, uploadParticipantsBody: ParticipantUploadRequestDto): LoadResult<List<TennisParticipant>, Throwable> {
-        return participantRemoteDataSource.uploadParticipants(tournamentId.toString(), uploadParticipantsBody)
+    override suspend fun downloadParticipants(tournamentId: Int, downloadParticipantsBody: ParticipantDownloadRequestDto): LoadResult<List<TennisParticipant>, Throwable> {
+        return participantRemoteDataSource.downloadParticipants(tournamentId.toString(), downloadParticipantsBody)
             .doOnSuccess { dtos ->
                 participantLocalDataSource.replaceParticipantsForTournament(tournamentId, dtos)
                 tournamentLocalDataSource.updateTotalParticipants(tournamentId, dtos.size)
-                tournamentLocalDataSource.updateSeededParticipants(tournamentId, uploadParticipantsBody.seedAmount)
+                tournamentLocalDataSource.updateSeededParticipants(tournamentId, downloadParticipantsBody.seedAmount)
             }
             .mapSuccess { participants -> participants.map { it.toDomain() } }
     }

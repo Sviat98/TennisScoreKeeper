@@ -233,8 +233,8 @@ private fun TournamentContent(
                             modifier = Modifier.fillMaxSize(),
                             participantListLoadingState = state.participantListLoadingState,
                             tournament = (tournamentDetailsState as? TournamentDetailsLoadingState.Content)?.tournament,
-                            onUploadParticipants = { seedAmount ->
-                                onEvent(TournamentUiEvent.UploadParticipants(seedAmount))
+                            onDownloadParticipants = { seedAmount ->
+                                onEvent(TournamentUiEvent.DownloadParticipants(seedAmount))
                             },
                             onSeedAmountChange = { seedAmount ->
                                 onEvent(TournamentUiEvent.ChangeSeedAmount(seedAmount))

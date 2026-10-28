@@ -4,7 +4,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class ParticipantUploadRequestDto(
+data class ParticipantDownloadRequestDto(
     @SerialName("seed_amount")
     val seedAmount: Int
 )
