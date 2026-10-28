@@ -232,9 +232,10 @@ private fun TournamentContent(
                         TournamentTab.PARTICIPANTS.ordinal -> ParticipantListScreen(
                             modifier = Modifier.fillMaxSize(),
                             participantListLoadingState = state.participantListLoadingState,
-                            tournamentStatus = (tournamentDetailsState as? TournamentDetailsLoadingState.Content)?.tournament?.status
-                                ?: TournamentStatus.NOT_STARTED,
-                            onUploadParticipants = { onEvent(TournamentUiEvent.UploadParticipants) },
+                            tournament = (tournamentDetailsState as? TournamentDetailsLoadingState.Content)?.tournament,
+                            onUploadParticipants = { seedAmount ->
+                                onEvent(TournamentUiEvent.UploadParticipants(seedAmount))
+                            },
                             onSeedAmountChange = { seedAmount ->
                                 onEvent(TournamentUiEvent.ChangeSeedAmount(seedAmount))
                             }

@@ -24,7 +24,6 @@ import com.bashkevich.tennisscorekeeper.components.participant.ParticipantListCo
 import com.bashkevich.tennisscorekeeper.components.scoreboard.components.ScoreboardNumber
 import com.bashkevich.tennisscorekeeper.model.participant.domain.DoublesParticipant
 import com.bashkevich.tennisscorekeeper.model.player.domain.PlayerInParticipant
-import com.bashkevich.tennisscorekeeper.model.tournament.remote.TournamentStatus
 import com.bashkevich.tennisscorekeeper.screens.participantlist.ParticipantListScreen
 import com.bashkevich.tennisscorekeeper.screens.tournamentdetails.ParticipantListLoadingState
 
@@ -87,9 +86,10 @@ fun ParticipantListContentPreview() {
                     firstPlayer = PlayerInParticipant(5, "Auger-Aliassime", "Felix"),
                     secondPlayer = PlayerInParticipant(6, "Davidivich Fokina", "Alejandro")
                 ),
-            )
+            ),
+            seedAmount = 0
         ),
-        tournamentStatus = TournamentStatus.NOT_STARTED,
+        tournament = null,
         onUploadParticipants = {},
         onSeedAmountChange = {}
     )

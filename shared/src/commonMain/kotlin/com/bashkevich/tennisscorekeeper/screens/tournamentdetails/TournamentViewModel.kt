@@ -61,7 +61,8 @@ class TournamentViewModel(
     private val _isRefreshing = MutableStateFlow(false)
     private val _currentTab = MutableStateFlow(TournamentTab.MATCHES)
     private val _isUploadInProgress = MutableStateFlow(false)
-    private val _seedAmount = MutableStateFlow(0)
+    // null — степпер ещё не меняли: показываем и шлём seeded_participants из БД
+    private val _seedAmount = MutableStateFlow<Int?>(null)
     private val hasTabOpened = TournamentTab.entries.associateWith { false }.toMutableMap()
 
     private val tournamentDetailsData = combine(
@@ -164,7 +165,7 @@ class TournamentViewModel(
                 ParticipantListLoadingState.Content(
                     participants = participantsList,
                     isUploadInProgress = isUploadInProgress,
-                    seedAmount = seedAmount
+                    seedAmount = seedAmount ?: tournament.seededParticipants
                 )
         }
 
@@ -186,7 +187,7 @@ class TournamentViewModel(
         when (uiEvent) {
             is TournamentUiEvent.Refresh -> refreshTournamentDetailsScreen()
             is TournamentUiEvent.ChangeTournamentStatus -> changeTournamentStatus(uiEvent.tournamentStatus)
-            TournamentUiEvent.UploadParticipants -> uploadParticipants()
+            is TournamentUiEvent.UploadParticipants -> uploadParticipants(uiEvent.seedAmount)
             is TournamentUiEvent.ChangeSeedAmount -> {
                 _seedAmount.value = uiEvent.seedAmount
             }
@@ -225,13 +226,13 @@ class TournamentViewModel(
         }
     }
 
-    private fun uploadParticipants() {
+    private fun uploadParticipants(seedAmount: Int) {
         viewModelScope.launch {
             _isUploadInProgress.value = true
 
             participantRepository.uploadParticipants(
                 tournamentId = tournamentId,
-                uploadParticipantsBody = ParticipantUploadRequestDto(seedAmount = _seedAmount.value)
+                uploadParticipantsBody = ParticipantUploadRequestDto(seedAmount = seedAmount)
             ).doOnSuccess {
                 _isUploadInProgress.value = false
             }.doOnError {

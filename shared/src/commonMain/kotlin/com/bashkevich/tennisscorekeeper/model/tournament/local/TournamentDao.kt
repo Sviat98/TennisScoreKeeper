@@ -30,6 +30,9 @@ interface TournamentDao {
     @Query("UPDATE tournaments SET total_participants = :amount WHERE id = :id")
     suspend fun updateTotalParticipants(id: Int, amount: Int)
 
+    @Query("UPDATE tournaments SET seeded_participants = :amount WHERE id = :id")
+    suspend fun updateSeededParticipants(id: Int, amount: Int)
+
     @Query("UPDATE tournaments SET uncompleted_matches = uncompleted_matches + 1 WHERE id = :id")
     suspend fun incrementUncompletedMatches(id: Int)
 

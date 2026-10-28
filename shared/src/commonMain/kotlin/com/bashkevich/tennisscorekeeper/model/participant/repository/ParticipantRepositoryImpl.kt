@@ -28,6 +28,7 @@ class ParticipantRepositoryImpl(
             .doOnSuccess { dtos ->
                 participantLocalDataSource.replaceParticipantsForTournament(tournamentId, dtos)
                 tournamentLocalDataSource.updateTotalParticipants(tournamentId, dtos.size)
+                tournamentLocalDataSource.updateSeededParticipants(tournamentId, uploadParticipantsBody.seedAmount)
             }
             .mapSuccess { participants -> participants.map { it.toDomain() } }
     }
