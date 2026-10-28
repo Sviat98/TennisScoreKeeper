@@ -27,6 +27,8 @@ data class TournamentEntity(
     val setsToWin: Int,
     @ColumnInfo(name = "total_participants")
     val totalParticipants: Int,
+    @ColumnInfo(name = "seeded_participants")
+    val seededParticipants: Int,
     @ColumnInfo(name = "total_matches")
     val totalMatches: Int,
     @ColumnInfo(name = "uncompleted_matches")
@@ -43,6 +45,7 @@ fun TournamentDto.toEntity() = TournamentEntity(
     themeId = themeId.toInt(),
     setsToWin = setsToWin,
     totalParticipants = totalParticipants,
+    seededParticipants = seededParticipants,
     totalMatches = totalMatches,
     uncompletedMatches = uncompletedMatches,
 )
@@ -57,6 +60,7 @@ fun Tournament.toEntity() = TournamentEntity(
     themeId = themeId,
     setsToWin = setsToWin,
     totalParticipants = totalParticipants,
+    seededParticipants = seededParticipants,
     totalMatches = totalMatches,
     uncompletedMatches = uncompletedMatches,
 )

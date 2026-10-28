@@ -35,7 +35,7 @@ sealed interface ParticipantListLoadingState {
     data class Content(
         val participants: List<TennisParticipant>,
         val isUploadInProgress: Boolean = false,
-        val seedAmount: Int = 0
+        val seedAmount: Int
     ) : ParticipantListLoadingState
 }
 
@@ -43,7 +43,7 @@ sealed interface ParticipantListLoadingState {
 sealed class TournamentUiEvent : UiEvent {
     class ChangeTournamentStatus(val tournamentStatus: TournamentStatus) : TournamentUiEvent()
     class ChangeSeedAmount(val seedAmount: Int) : TournamentUiEvent()
-    data object UploadParticipants : TournamentUiEvent()
+    class UploadParticipants(val seedAmount: Int) : TournamentUiEvent()
     class SwitchTab(val tab: TournamentTab) : TournamentUiEvent()
     data object Refresh : TournamentUiEvent()
 }

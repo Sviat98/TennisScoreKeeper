@@ -26,6 +26,7 @@ import com.bashkevich.tennisscorekeeper.components.icons.default_icons.Autorenew
 import com.bashkevich.tennisscorekeeper.components.icons.default_icons.Download
 import com.bashkevich.tennisscorekeeper.components.participant.ParticipantListComponent
 import com.bashkevich.tennisscorekeeper.components.participant.SeededPlayersCountComponent
+import com.bashkevich.tennisscorekeeper.model.tournament.domain.Tournament
 import com.bashkevich.tennisscorekeeper.model.tournament.remote.TournamentStatus
 import com.bashkevich.tennisscorekeeper.screens.tournamentdetails.ParticipantListLoadingState
 import com.bashkevich.tennisscorekeeper.screens.tournamentdetails.TournamentTabMaxWidth
@@ -42,8 +43,8 @@ import tennisscorekeeper.shared.generated.resources.update
 fun ParticipantListScreen(
     modifier: Modifier = Modifier,
     participantListLoadingState: ParticipantListLoadingState,
-    tournamentStatus: TournamentStatus,
-    onUploadParticipants: () -> Unit,
+    tournament: Tournament?,
+    onUploadParticipants: (Int) -> Unit,
     onSeedAmountChange: (Int) -> Unit
 ) {
     Box(modifier = modifier, contentAlignment = Alignment.TopCenter) {
@@ -84,7 +85,7 @@ fun ParticipantListScreen(
                         .fillMaxSize()
                         .padding(horizontal = 8.dp),
                     participantListLoadingState = participantListLoadingState,
-                    tournamentStatus = tournamentStatus,
+                    tournament = tournament,
                     onUploadParticipants = onUploadParticipants,
                     onSeedAmountChange = onSeedAmountChange
                 )
@@ -97,10 +98,12 @@ fun ParticipantListScreen(
 private fun ParticipantListContent(
     modifier: Modifier = Modifier,
     participantListLoadingState: ParticipantListLoadingState.Content,
-    tournamentStatus: TournamentStatus,
-    onUploadParticipants: () -> Unit,
+    tournament: Tournament?,
+    onUploadParticipants: (Int) -> Unit,
     onSeedAmountChange: (Int) -> Unit
 ) {
+    val tournamentStatus = tournament?.status ?: TournamentStatus.NOT_STARTED
+
     Column(
         modifier = Modifier.then(modifier),
         verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -124,7 +127,7 @@ private fun ParticipantListContent(
                 Text(text = stringResource(Res.string.participant_list_empty))
                 if (tournamentStatus != TournamentStatus.COMPLETED) {
                     Button(
-                        onClick = onUploadParticipants,
+                        onClick = { onUploadParticipants(participantListLoadingState.seedAmount) },
                         enabled = !participantListLoadingState.isUploadInProgress
                     ) {
                         if (participantListLoadingState.isUploadInProgress) {
@@ -156,7 +159,7 @@ private fun ParticipantListContent(
                         onValueChange = onSeedAmountChange
                     )
                     Button(
-                        onClick = onUploadParticipants,
+                        onClick = { onUploadParticipants(participantListLoadingState.seedAmount) },
                         enabled = !participantListLoadingState.isUploadInProgress
                     ) {
                         if (participantListLoadingState.isUploadInProgress) {

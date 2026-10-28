@@ -32,6 +32,10 @@ class TournamentLocalDataSource(
         dao.updateTotalParticipants(id, amount)
     }
 
+    suspend fun updateSeededParticipants(id: Int, amount: Int) {
+        dao.updateSeededParticipants(id, amount)
+    }
+
     suspend fun incrementUncompletedMatches(id: Int) {
         dao.incrementUncompletedMatches(id)
     }
