@@ -13,7 +13,7 @@ import tennisscorekeeper.shared.generated.resources.Res
 import tennisscorekeeper.shared.generated.resources.check_internet_connection
 import com.bashkevich.tennisscorekeeper.model.match.domain.ShortMatch
 import com.bashkevich.tennisscorekeeper.model.participant.domain.TennisParticipant
-import com.bashkevich.tennisscorekeeper.model.participant.remote.ParticipantUploadRequestDto
+import com.bashkevich.tennisscorekeeper.model.participant.remote.ParticipantDownloadRequestDto
 import com.bashkevich.tennisscorekeeper.model.participant.repository.ParticipantRepository
 import com.bashkevich.tennisscorekeeper.model.tournament.domain.TOURNAMENT_DEFAULT
 import com.bashkevich.tennisscorekeeper.model.tournament.domain.Tournament
@@ -60,7 +60,7 @@ class TournamentViewModel(
 
     private val _isRefreshing = MutableStateFlow(false)
     private val _currentTab = MutableStateFlow(TournamentTab.MATCHES)
-    private val _isUploadInProgress = MutableStateFlow(false)
+    private val _isDownloadInProgress = MutableStateFlow(false)
     // null — степпер ещё не меняли: показываем и шлём seeded_participants из БД
     private val _seedAmount = MutableStateFlow<Int?>(null)
     private val hasTabOpened = TournamentTab.entries.associateWith { false }.toMutableMap()
@@ -128,9 +128,9 @@ class TournamentViewModel(
         _data,
         _isRefreshing,
         _action,
-        _isUploadInProgress,
+        _isDownloadInProgress,
         _seedAmount
-    ) { data, isRefreshing, action, isUploadInProgress, seedAmount ->
+    ) { data, isRefreshing, action, isDownloadInProgress, seedAmount ->
         val (tournamentNetwork, tournament) = data.tournamentDetails
         val (matchesNetwork, matchesList) = data.matches
         val (participantsNetwork, participantsList) = data.participants
@@ -164,7 +164,7 @@ class TournamentViewModel(
             else ->
                 ParticipantListLoadingState.Content(
                     participants = participantsList,
-                    isUploadInProgress = isUploadInProgress,
+                    isDownloadInProgress = isDownloadInProgress,
                     seedAmount = seedAmount ?: tournament.seededParticipants
                 )
         }
@@ -187,7 +187,7 @@ class TournamentViewModel(
         when (uiEvent) {
             is TournamentUiEvent.Refresh -> refreshTournamentDetailsScreen()
             is TournamentUiEvent.ChangeTournamentStatus -> changeTournamentStatus(uiEvent.tournamentStatus)
-            is TournamentUiEvent.UploadParticipants -> uploadParticipants(uiEvent.seedAmount)
+            is TournamentUiEvent.DownloadParticipants -> downloadParticipants(uiEvent.seedAmount)
             is TournamentUiEvent.ChangeSeedAmount -> {
                 _seedAmount.value = uiEvent.seedAmount
             }
@@ -226,17 +226,17 @@ class TournamentViewModel(
         }
     }
 
-    private fun uploadParticipants(seedAmount: Int) {
+    private fun downloadParticipants(seedAmount: Int) {
         viewModelScope.launch {
-            _isUploadInProgress.value = true
+            _isDownloadInProgress.value = true
 
-            participantRepository.uploadParticipants(
+            participantRepository.downloadParticipants(
                 tournamentId = tournamentId,
-                uploadParticipantsBody = ParticipantUploadRequestDto(seedAmount = seedAmount)
+                downloadParticipantsBody = ParticipantDownloadRequestDto(seedAmount = seedAmount)
             ).doOnSuccess {
-                _isUploadInProgress.value = false
+                _isDownloadInProgress.value = false
             }.doOnError {
-                _isUploadInProgress.value = false
+                _isDownloadInProgress.value = false
                 handleError(it)
             }
 

@@ -44,7 +44,7 @@ fun ParticipantListScreen(
     modifier: Modifier = Modifier,
     participantListLoadingState: ParticipantListLoadingState,
     tournament: Tournament?,
-    onUploadParticipants: (Int) -> Unit,
+    onDownloadParticipants: (Int) -> Unit,
     onSeedAmountChange: (Int) -> Unit
 ) {
     Box(modifier = modifier, contentAlignment = Alignment.TopCenter) {
@@ -86,7 +86,7 @@ fun ParticipantListScreen(
                         .padding(horizontal = 8.dp),
                     participantListLoadingState = participantListLoadingState,
                     tournament = tournament,
-                    onUploadParticipants = onUploadParticipants,
+                    onDownloadParticipants = onDownloadParticipants,
                     onSeedAmountChange = onSeedAmountChange
                 )
             }
@@ -99,7 +99,7 @@ private fun ParticipantListContent(
     modifier: Modifier = Modifier,
     participantListLoadingState: ParticipantListLoadingState.Content,
     tournament: Tournament?,
-    onUploadParticipants: (Int) -> Unit,
+    onDownloadParticipants: (Int) -> Unit,
     onSeedAmountChange: (Int) -> Unit
 ) {
     val tournamentStatus = tournament?.status ?: TournamentStatus.NOT_STARTED
@@ -127,10 +127,10 @@ private fun ParticipantListContent(
                 Text(text = stringResource(Res.string.participant_list_empty))
                 if (tournamentStatus != TournamentStatus.COMPLETED) {
                     Button(
-                        onClick = { onUploadParticipants(participantListLoadingState.seedAmount) },
-                        enabled = !participantListLoadingState.isUploadInProgress
+                        onClick = { onDownloadParticipants(participantListLoadingState.seedAmount) },
+                        enabled = !participantListLoadingState.isDownloadInProgress
                     ) {
-                        if (participantListLoadingState.isUploadInProgress) {
+                        if (participantListLoadingState.isDownloadInProgress) {
                             CircularProgressIndicator(
                                 modifier = Modifier.size(16.dp),
                                 strokeWidth = 1.5.dp
@@ -159,10 +159,10 @@ private fun ParticipantListContent(
                         onValueChange = onSeedAmountChange
                     )
                     Button(
-                        onClick = { onUploadParticipants(participantListLoadingState.seedAmount) },
-                        enabled = !participantListLoadingState.isUploadInProgress
+                        onClick = { onDownloadParticipants(participantListLoadingState.seedAmount) },
+                        enabled = !participantListLoadingState.isDownloadInProgress
                     ) {
-                        if (participantListLoadingState.isUploadInProgress) {
+                        if (participantListLoadingState.isDownloadInProgress) {
                             CircularProgressIndicator(
                                 modifier = Modifier.size(16.dp),
                                 strokeWidth = 1.5.dp
