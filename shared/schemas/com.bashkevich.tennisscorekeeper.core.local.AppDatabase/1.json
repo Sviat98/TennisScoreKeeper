@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "76132403a74921bd2319240ba5e27adf",
+    "identityHash": "dcf6cd8bf98b00a2fc2dd1fad79cab70",
     "entities": [
       {
         "tableName": "tournaments",
@@ -308,7 +308,7 @@
       },
       {
         "tableName": "matches",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `tournament_id` INTEGER NOT NULL, `first_participant_id` INTEGER NOT NULL, `second_participant_id` INTEGER NOT NULL, `point_shift` INTEGER NOT NULL, `video_link` TEXT, `theme_id` INTEGER NOT NULL, `status` TEXT NOT NULL, `current_set_mode` TEXT, PRIMARY KEY(`id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `tournament_id` INTEGER NOT NULL, `first_participant_id` INTEGER NOT NULL, `second_participant_id` INTEGER NOT NULL, `point_shift` INTEGER NOT NULL, `video_link` TEXT, `sets_to_win` INTEGER NOT NULL, `regular_set_id` INTEGER, `deciding_set_id` INTEGER NOT NULL, `theme_id` INTEGER NOT NULL, `status` TEXT NOT NULL, `current_set_mode` TEXT, PRIMARY KEY(`id`))",
         "fields": [
           {
             "fieldPath": "id",
@@ -344,6 +344,23 @@
             "fieldPath": "videoLink",
             "columnName": "video_link",
             "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "setsToWin",
+            "columnName": "sets_to_win",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "regularSetId",
+            "columnName": "regular_set_id",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "decidingSetId",
+            "columnName": "deciding_set_id",
+            "affinity": "INTEGER",
+            "notNull": true
           },
           {
             "fieldPath": "themeId",
@@ -595,7 +612,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '76132403a74921bd2319240ba5e27adf')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'dcf6cd8bf98b00a2fc2dd1fad79cab70')"
     ]
   }
 }

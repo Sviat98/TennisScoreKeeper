@@ -10,6 +10,7 @@ import com.bashkevich.tennisscorekeeper.core.remote.NetworkException
 import com.bashkevich.tennisscorekeeper.core.remote.UnauthorizedActionException
 import com.bashkevich.tennisscorekeeper.core.remote.doOnError
 import com.bashkevich.tennisscorekeeper.core.remote.doOnSuccess
+import com.bashkevich.tennisscorekeeper.components.set_template.SetComponentState
 import com.bashkevich.tennisscorekeeper.components.theme.ThemeComponentState
 import com.bashkevich.tennisscorekeeper.mvi.BaseViewModel
 import com.bashkevich.tennisscorekeeper.model.match.domain.Match
@@ -20,9 +21,13 @@ import com.bashkevich.tennisscorekeeper.model.match.repository.MatchRepository
 import com.bashkevich.tennisscorekeeper.model.participant.domain.ParticipantInDoublesMatch
 import com.bashkevich.tennisscorekeeper.model.participant.domain.ParticipantInSinglesMatch
 import com.bashkevich.tennisscorekeeper.model.participant.domain.TennisParticipantInMatch
+import com.bashkevich.tennisscorekeeper.model.set_template.domain.SET_TEMPLATE_DEFAULT
+import com.bashkevich.tennisscorekeeper.model.set_template.domain.SetTemplate
+import com.bashkevich.tennisscorekeeper.model.set_template.repository.SetTemplateRepository
 import com.bashkevich.tennisscorekeeper.model.theme.domain.ScoreboardTheme
 import com.bashkevich.tennisscorekeeper.model.theme.repository.ThemeRepository
 import com.bashkevich.tennisscorekeeper.navigation.EditMatchRoute
+import com.bashkevich.tennisscorekeeper.screens.addmatch.AddMatchFetchHelper
 import com.bashkevich.tennisscorekeeper.screens.addmatch.OpenColorPickerDialogState
 import com.bashkevich.tennisscorekeeper.screens.matchdetails.ConnectionState
 import com.bashkevich.tennisscorekeeper.screens.matchdetails.MatchDetailsRefreshThemeUseCase
@@ -33,6 +38,8 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -44,15 +51,27 @@ import tennisscorekeeper.shared.generated.resources.check_internet_connection
 class EditMatchViewModel(
     savedStateHandle: SavedStateHandle,
     private val matchRepository: MatchRepository,
-    private val themeRepository: ThemeRepository
+    private val themeRepository: ThemeRepository,
+    private val setTemplateRepository: SetTemplateRepository
 ) : BaseViewModel<EditMatchState, EditMatchUiEvent, EditMatchAction>() {
     private val matchId: Int = savedStateHandle.toRoute<EditMatchRoute>().matchId
 
-    // Слой 1: матч с веб-сокета (фреймы кэшируются в БД, состояние читается из БД)
+    // Слой 1: матч с веб-сокета (фреймы кэшируются в БД, состояние читается из БД).
+    // networkUpdates подмешан к connectionState ради подписки: его значение не используется
+    // (кадры и так пишутся в БД), но WS-сессия должна жить, пока экран подписан на state
     private val networkUpdates = matchRepository.observeMatchUpdatesFromNetworkAndSaveToDb(matchId)
 
     private val matchFromDb: StateFlow<Match?> = matchRepository.observeMatchById(matchId)
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
+
+    private val connectionState: StateFlow<ConnectionState> = combine(
+        networkUpdates,
+        matchRepository.observeConnectionState(),
+    ) { _, connectionState: ConnectionState -> connectionState }.stateIn(
+        viewModelScope,
+        SharingStarted.WhileSubscribed(5_000),
+        ConnectionState.Loading
+    )
 
     // Слой 2: пользовательские правки (null/Unchanged = пользователь поле не трогал, берём значение из матча).
     // Хранятся только в памяти: закрыл экран без сохранения — правки пропали
@@ -147,23 +166,142 @@ class EditMatchViewModel(
         )
     )
 
+    // --- Настройки счёта матча (sets_to_win + шаблоны сетов): залочены от редактирования, только показываются.
+    // Источник — сам матч (аналог _setsToWin/_regularSetId/_decidingSetId из AddMatch, но read-only из БД);
+    // distinctUntilChanged нужен, чтобы счётные WS-кадры не перезапускали загрузку шаблонов
+    private val fetchHelper = AddMatchFetchHelper(themeRepository, setTemplateRepository)
+
+    private val setsToWin: StateFlow<Int> = matchFromDb
+        .map { match: Match? -> match?.setsToWin ?: 1 }
+        .distinctUntilChanged()
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), 1)
+
+    private val regularSetId: StateFlow<Int?> = matchFromDb
+        .map { match: Match? -> match?.regularSetTemplateId }
+        .distinctUntilChanged()
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
+
+    private val decidingSetId: StateFlow<Int> = matchFromDb
+        .map { match: Match? -> match?.decidingSetTemplateId ?: 0 }
+        .distinctUntilChanged()
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), 0)
+
+    // --- Fetch results via helper ---
+    private val regularSetFetchResult = regularSetId.flatMapLatest { id: Int? ->
+        fetchHelper.observeRegularSetByIdFromNetwork(id)
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
+
+    private val decidingSetFetchResult = decidingSetId.flatMapLatest { id: Int ->
+        fetchHelper.observeDecidingSetByIdFromNetwork(id)
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
+
+    // --- DB observations by IDs ---
+    private val regularSetFromDb: StateFlow<SetTemplate?> =
+        regularSetId.filterNotNull().flatMapLatest { id: Int ->
+            setTemplateRepository.observeSetTemplateById(id)
+        }.stateIn(viewModelScope, SharingStarted.Lazily, SET_TEMPLATE_DEFAULT)
+
+    private val decidingSetFromDb: StateFlow<SetTemplate> =
+        decidingSetId.flatMapLatest { id: Int ->
+            setTemplateRepository.observeSetTemplateById(id)
+        }.stateIn(viewModelScope, SharingStarted.Lazily, SET_TEMPLATE_DEFAULT)
+
+    // --- Selected states: Loading/Error/Idle based on fetch result + DB value ---
+    private val regularSelectedState = combine(
+        regularSetId,
+        regularSetFetchResult,
+        regularSetFromDb,
+    ) { id: Int?, fetchResult: LoadResult<Unit, Throwable>?, dbValue: SetTemplate? ->
+        when {
+            id == null -> SetComponentState.SelectedSetState.Idle(null)
+            fetchResult == null -> SetComponentState.SelectedSetState.Loading(id)
+            fetchResult is LoadResult.Error -> SetComponentState.SelectedSetState.Error(id)
+            else -> SetComponentState.SelectedSetState.Idle(dbValue)
+        }
+    }.stateIn(
+        viewModelScope,
+        SharingStarted.WhileSubscribed(5_000),
+        SetComponentState.SelectedSetState.Idle(null)
+    )
+
+    private val decidingSelectedState = combine(
+        decidingSetId,
+        decidingSetFetchResult,
+        decidingSetFromDb,
+    ) { id: Int, fetchResult: LoadResult<Unit, Throwable>?, dbValue: SetTemplate ->
+        when (fetchResult) {
+            null -> SetComponentState.SelectedSetState.Loading(id)
+            is LoadResult.Error -> SetComponentState.SelectedSetState.Error(id)
+            else -> SetComponentState.SelectedSetState.Idle(dbValue)
+        }
+    }.stateIn(
+        viewModelScope,
+        SharingStarted.WhileSubscribed(5_000),
+        SetComponentState.SelectedSetState.Idle(null)
+    )
+
+    // --- Component states (у AddMatch здесь ещё combine с опциями дропдауна; на EditMatch дропдауны
+    // залочены, опции никогда не запрашиваются — подставляем пустой список) ---
+    private val regularSetComponentState = regularSelectedState
+        .map { selected: SetComponentState.SelectedSetState ->
+            SetComponentState(selected, SetComponentState.SetTemplateOptionsState.Idle(emptyList()))
+        }.stateIn(
+            viewModelScope,
+            SharingStarted.WhileSubscribed(5_000),
+            SetComponentState(
+                SetComponentState.SelectedSetState.Idle(null),
+                SetComponentState.SetTemplateOptionsState.Idle(emptyList())
+            )
+        )
+
+    private val decidingSetComponentState = decidingSelectedState
+        .map { selected: SetComponentState.SelectedSetState ->
+            SetComponentState(selected, SetComponentState.SetTemplateOptionsState.Idle(emptyList()))
+        }.stateIn(
+            viewModelScope,
+            SharingStarted.WhileSubscribed(5_000),
+            SetComponentState(
+                SetComponentState.SelectedSetState.Idle(null),
+                SetComponentState.SetTemplateOptionsState.Idle(emptyList())
+            )
+        )
+
+    // Компоненты сетов предобъединены в пару без нового класса:
+    // итоговый combine ограничен 10 типизированными потоками (core.combine)
+    private val setComponents: StateFlow<Pair<SetComponentState, SetComponentState>> = combine(
+        regularSetComponentState,
+        decidingSetComponentState,
+    ) { regular: SetComponentState, deciding: SetComponentState -> regular to deciding }.stateIn(
+        viewModelScope,
+        SharingStarted.WhileSubscribed(5_000),
+        SetComponentState(
+            SetComponentState.SelectedSetState.Idle(null),
+            SetComponentState.SetTemplateOptionsState.Idle(emptyList())
+        ) to SetComponentState(
+            SetComponentState.SelectedSetState.Idle(null),
+            SetComponentState.SetTemplateOptionsState.Idle(emptyList())
+        )
+    )
+
     override val state: StateFlow<EditMatchState> = combine(
-        networkUpdates,
         matchFromDb,
         editedMatch,
-        matchRepository.observeConnectionState(),
+        connectionState,
         themeFromDb,
         themeComponentState,
+        setsToWin,
+        setComponents,
         _dialogState,
         _isSaving,
         _action,
     ) {
-            _: LoadResult<Unit, Throwable>,
             match: Match?,
             edited: Match?,
             connectionState: ConnectionState,
             theme: ScoreboardTheme,
             themeComp: ThemeComponentState,
+            setsToWin: Int,
+            setComponents: Pair<SetComponentState, SetComponentState>,
             dialogState: OpenColorPickerDialogState,
             isSaving: Boolean,
             action: EditMatchAction?,
@@ -174,6 +312,9 @@ class EditMatchViewModel(
             connectionState = connectionState,
             theme = theme,
             themeComponentState = themeComp,
+            setsToWin = setsToWin,
+            regularSetComponentState = setComponents.first,
+            decidingSetComponentState = setComponents.second,
             dialogState = dialogState,
             isSaving = isSaving,
             action = action
@@ -213,6 +354,10 @@ class EditMatchViewModel(
             EditMatchUiEvent.FetchThemes -> fetchThemes()
 
             is EditMatchUiEvent.RetrySelectedTheme -> refreshThemeUseCase.refresh()
+
+            is EditMatchUiEvent.RetrySelectedRegularSet -> fetchHelper.retryRegularSet(uiEvent.setId)
+
+            is EditMatchUiEvent.RetrySelectedDecidingSet -> fetchHelper.retryDecidingSet(uiEvent.setId)
 
             EditMatchUiEvent.SaveMatch -> saveMatch()
         }
