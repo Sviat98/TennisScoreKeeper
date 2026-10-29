@@ -2,16 +2,11 @@ package com.bashkevich.tennisscorekeeper.model.participant.remote
 
 import com.bashkevich.tennisscorekeeper.core.remote.LoadResult
 import com.bashkevich.tennisscorekeeper.core.remote.runOperationCatching
-import com.bashkevich.tennisscorekeeper.model.file.domain.ExcelFile
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
-import io.ktor.client.request.forms.MultiPartFormDataContent
-import io.ktor.client.request.forms.formData
 import io.ktor.client.request.get
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
-import io.ktor.http.Headers
-import io.ktor.http.HttpHeaders
 
 class ParticipantRemoteDataSource(
     private val httpClient: HttpClient,
@@ -26,34 +21,14 @@ class ParticipantRemoteDataSource(
         }
     }
 
-    suspend fun uploadParticipantsFile(
+    suspend fun downloadParticipants(
         tournamentId: String,
-        participantsFIle: ExcelFile
+        downloadParticipantsBody: ParticipantDownloadRequestDto
     ): LoadResult<List<ParticipantDto>, Throwable> {
         return runOperationCatching {
-            println("Trying to send request")
-            val response = httpClient.post("/tournaments/$tournamentId/participants/upload") {
-                setBody(
-                    MultiPartFormDataContent(
-                        formData {
-                            append("description", "Participants for a tournament $tournamentId")
-                            append("excelFile", participantsFIle.content, Headers.build {
-                                append(HttpHeaders.ContentType, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
-                                append(
-                                    HttpHeaders.ContentDisposition,
-                                    "filename=\"${participantsFIle.name}\""
-                                )
-                            })
-                        },
-                    )
-                )
-            }
-
-            val participants = response.body<List<ParticipantDto>>()
-
-            println("participants result = $participants")
-
-            participants
+            httpClient.post("/tournaments/$tournamentId/participants/download") {
+                setBody(downloadParticipantsBody)
+            }.body<List<ParticipantDto>>()
         }
     }
 }

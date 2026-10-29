@@ -11,9 +11,9 @@ import com.bashkevich.tennisscorekeeper.core.remote.doOnSuccess
 import org.jetbrains.compose.resources.getString
 import tennisscorekeeper.shared.generated.resources.Res
 import tennisscorekeeper.shared.generated.resources.check_internet_connection
-import com.bashkevich.tennisscorekeeper.model.file.domain.EMPTY_EXCEL_FILE
 import com.bashkevich.tennisscorekeeper.model.match.domain.ShortMatch
 import com.bashkevich.tennisscorekeeper.model.participant.domain.TennisParticipant
+import com.bashkevich.tennisscorekeeper.model.participant.remote.ParticipantDownloadRequestDto
 import com.bashkevich.tennisscorekeeper.model.participant.repository.ParticipantRepository
 import com.bashkevich.tennisscorekeeper.model.tournament.domain.TOURNAMENT_DEFAULT
 import com.bashkevich.tennisscorekeeper.model.tournament.domain.Tournament
@@ -60,8 +60,9 @@ class TournamentViewModel(
 
     private val _isRefreshing = MutableStateFlow(false)
     private val _currentTab = MutableStateFlow(TournamentTab.MATCHES)
-    private val _isUploadInProgress = MutableStateFlow(false)
-    private val _participantsFile = MutableStateFlow(EMPTY_EXCEL_FILE)
+    private val _isDownloadInProgress = MutableStateFlow(false)
+    // null — степпер ещё не меняли: показываем и шлём seeded_participants из БД
+    private val _seedAmount = MutableStateFlow<Int?>(null)
     private val hasTabOpened = TournamentTab.entries.associateWith { false }.toMutableMap()
 
     private val tournamentDetailsData = combine(
@@ -127,9 +128,9 @@ class TournamentViewModel(
         _data,
         _isRefreshing,
         _action,
-        _isUploadInProgress,
-        _participantsFile
-    ) { data, isRefreshing, action, isUploadInProgress, participantsFile ->
+        _isDownloadInProgress,
+        _seedAmount
+    ) { data, isRefreshing, action, isDownloadInProgress, seedAmount ->
         val (tournamentNetwork, tournament) = data.tournamentDetails
         val (matchesNetwork, matchesList) = data.matches
         val (participantsNetwork, participantsList) = data.participants
@@ -163,8 +164,8 @@ class TournamentViewModel(
             else ->
                 ParticipantListLoadingState.Content(
                     participants = participantsList,
-                    isUploadInProgress = isUploadInProgress,
-                    participantsFile = participantsFile
+                    isDownloadInProgress = isDownloadInProgress,
+                    seedAmount = seedAmount ?: tournament.seededParticipants
                 )
         }
 
@@ -186,12 +187,9 @@ class TournamentViewModel(
         when (uiEvent) {
             is TournamentUiEvent.Refresh -> refreshTournamentDetailsScreen()
             is TournamentUiEvent.ChangeTournamentStatus -> changeTournamentStatus(uiEvent.tournamentStatus)
-            TournamentUiEvent.UploadFile -> uploadFile()
-            TournamentUiEvent.ClearFile -> {
-                _participantsFile.value = EMPTY_EXCEL_FILE
-            }
-            is TournamentUiEvent.SelectFile -> {
-                _participantsFile.value = uiEvent.file
+            is TournamentUiEvent.DownloadParticipants -> downloadParticipants(uiEvent.seedAmount)
+            is TournamentUiEvent.ChangeSeedAmount -> {
+                _seedAmount.value = uiEvent.seedAmount
             }
 
             is TournamentUiEvent.SwitchTab -> {
@@ -228,18 +226,17 @@ class TournamentViewModel(
         }
     }
 
-    private fun uploadFile() {
+    private fun downloadParticipants(seedAmount: Int) {
         viewModelScope.launch {
-            _isUploadInProgress.value = true
+            _isDownloadInProgress.value = true
 
-            participantRepository.uploadParticipantsFile(
+            participantRepository.downloadParticipants(
                 tournamentId = tournamentId,
-                participantsFile = _participantsFile.value
+                downloadParticipantsBody = ParticipantDownloadRequestDto(seedAmount = seedAmount)
             ).doOnSuccess {
-                _isUploadInProgress.value = false
-                _participantsFile.value = EMPTY_EXCEL_FILE
+                _isDownloadInProgress.value = false
             }.doOnError {
-                _isUploadInProgress.value = false
+                _isDownloadInProgress.value = false
                 handleError(it)
             }
 

@@ -16,6 +16,8 @@ import com.bashkevich.tennisscorekeeper.model.set_template.local.SetTemplateDao
 import com.bashkevich.tennisscorekeeper.model.set_template.local.SetTemplateEntity
 import com.bashkevich.tennisscorekeeper.model.theme.local.ThemeDao
 import com.bashkevich.tennisscorekeeper.model.theme.local.ThemeEntity
+import com.bashkevich.tennisscorekeeper.model.tournament.local.TournamentApiUpcomingDao
+import com.bashkevich.tennisscorekeeper.model.tournament.local.TournamentApiUpcomingEntity
 import com.bashkevich.tennisscorekeeper.model.tournament.local.TournamentDao
 import com.bashkevich.tennisscorekeeper.model.tournament.local.TournamentEntity
 
@@ -30,12 +32,14 @@ import com.bashkevich.tennisscorekeeper.model.tournament.local.TournamentEntity
         MatchSetEntity::class,
         MatchGameEntity::class,
         ParticipantInMatchEntity::class,
+        TournamentApiUpcomingEntity::class,
     ],
     version = 1
 )
 @ConstructedBy(AppDatabaseConstructor::class)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun tournamentDao(): TournamentDao
+    abstract fun tournamentApiUpcomingDao(): TournamentApiUpcomingDao
     abstract fun setTemplateDao(): SetTemplateDao
     abstract fun themeDao(): ThemeDao
     abstract fun participantDao(): ParticipantDao

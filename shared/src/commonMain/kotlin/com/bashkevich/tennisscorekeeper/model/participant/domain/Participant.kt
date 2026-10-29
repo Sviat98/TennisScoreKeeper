@@ -73,3 +73,26 @@ fun TennisParticipantInMatch.toDisplayFormat() = when {
     this is ParticipantInDoublesMatch -> "${this.firstPlayer.surname} ${this.firstPlayer.name} / ${this.secondPlayer.surname} ${this.secondPlayer.name}"
     else -> ""
 }
+
+// Алфавитная сортировка участников: фамилия, затем имя, без учёта регистра.
+// Для пары её игроки сортируются по алфавиту, и пары сравниваются по первому
+// по алфавиту игроку, при совпадении — по второму. Порядок отображения пары
+// (firstPlayer, затем secondPlayer) при этом не меняется.
+private val playerAlphabeticalComparator =
+    compareBy<PlayerInParticipant>({ it.surname.lowercase() }, { it.name.lowercase() })
+
+private fun TennisParticipant.playersInAlphabeticalOrder(): List<PlayerInParticipant> = when (this) {
+    is SinglesParticipant -> listOf(player)
+    is DoublesParticipant -> listOf(firstPlayer, secondPlayer).sortedWith(playerAlphabeticalComparator)
+}
+
+val tennisParticipantAlphabeticalComparator = Comparator<TennisParticipant> { a, b ->
+    val aPlayers = a.playersInAlphabeticalOrder()
+    val bPlayers = b.playersInAlphabeticalOrder()
+    // В одном турнире все участники одного типа, поэтому списки равной длины
+    for (i in aPlayers.indices) {
+        val playerComparison = playerAlphabeticalComparator.compare(aPlayers[i], bPlayers[i])
+        if (playerComparison != 0) return@Comparator playerComparison
+    }
+    0
+}

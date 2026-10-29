@@ -28,6 +28,7 @@ import com.bashkevich.tennisscorekeeper.model.participant.domain.PARTICIPANT_IN_
 import com.bashkevich.tennisscorekeeper.model.participant.domain.SinglesParticipant
 import com.bashkevich.tennisscorekeeper.model.participant.domain.TennisParticipant
 import com.bashkevich.tennisscorekeeper.model.participant.domain.TennisParticipantInMatch
+import com.bashkevich.tennisscorekeeper.model.participant.domain.tennisParticipantAlphabeticalComparator
 import com.bashkevich.tennisscorekeeper.model.participant.repository.ParticipantRepository
 import com.bashkevich.tennisscorekeeper.model.player.domain.PlayerInDoublesMatch
 import com.bashkevich.tennisscorekeeper.model.player.domain.PlayerInSinglesMatch
@@ -50,6 +51,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -297,6 +299,7 @@ class AddMatchViewModel(
     // --- DB observations for participants ---
     private val participantsFromDb: StateFlow<List<TennisParticipant>> =
         participantRepository.observeParticipantsForTournament(tournamentId)
+            .map { participants -> participants.sortedWith(tennisParticipantAlphabeticalComparator) }
             .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
     // --- Participant data ---

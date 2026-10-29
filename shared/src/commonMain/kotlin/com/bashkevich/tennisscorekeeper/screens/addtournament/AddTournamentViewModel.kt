@@ -2,6 +2,7 @@ package com.bashkevich.tennisscorekeeper.screens.addtournament
 
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.lifecycle.viewModelScope
+import com.bashkevich.tennisscorekeeper.components.add_tournament.UpcomingTournamentComponentState
 import com.bashkevich.tennisscorekeeper.components.set_template.SetComponentState
 import com.bashkevich.tennisscorekeeper.components.theme.ThemeComponentState
 import com.bashkevich.tennisscorekeeper.core.remote.LoadResult
@@ -9,6 +10,8 @@ import com.bashkevich.tennisscorekeeper.core.remote.NetworkException
 import org.jetbrains.compose.resources.getString
 import tennisscorekeeper.shared.generated.resources.Res
 import tennisscorekeeper.shared.generated.resources.check_internet_connection
+import tennisscorekeeper.shared.generated.resources.tournament_already_exists
+import com.bashkevich.tennisscorekeeper.core.remote.ConflictException
 import com.bashkevich.tennisscorekeeper.core.remote.UnauthorizedActionException
 import com.bashkevich.tennisscorekeeper.core.remote.doOnError
 import com.bashkevich.tennisscorekeeper.core.remote.doOnSuccess
@@ -17,6 +20,7 @@ import com.bashkevich.tennisscorekeeper.model.set_template.domain.SetTemplateTyp
 import com.bashkevich.tennisscorekeeper.model.set_template.repository.SetTemplateRepository
 import com.bashkevich.tennisscorekeeper.model.theme.domain.ScoreboardTheme
 import com.bashkevich.tennisscorekeeper.model.theme.repository.ThemeRepository
+import com.bashkevich.tennisscorekeeper.model.tournament.domain.UpcomingTournament
 import com.bashkevich.tennisscorekeeper.model.tournament.remote.AddTournamentBody
 import com.bashkevich.tennisscorekeeper.model.tournament.remote.TournamentType
 import com.bashkevich.tennisscorekeeper.model.tournament.repository.TournamentRepository
@@ -38,6 +42,7 @@ class AddTournamentViewModel(
     val tournamentNameState = TextFieldState()
 
     // Form fields
+    private val _selectedUpcomingTournament = MutableStateFlow<UpcomingTournament?>(null)
     private val _tournamentType = MutableStateFlow<TournamentType?>(null)
     private val _regularSetSelectedState = MutableStateFlow<SetComponentState.SelectedSetState>(
         SetComponentState.SelectedSetState.Idle(null)
@@ -53,6 +58,7 @@ class AddTournamentViewModel(
     private val _regularSetTemplatesFetchResult = MutableStateFlow<LoadResult<Unit, Throwable>?>(null)
     private val _decidingSetTemplatesFetchResult = MutableStateFlow<LoadResult<Unit, Throwable>?>(null)
     private val _themesFetchResult = MutableStateFlow<LoadResult<Unit, Throwable>?>(null)
+    private val _upcomingTournamentsFetchResult = MutableStateFlow<LoadResult<Unit, Throwable>?>(null)
 
     // DB observations
     private val regularSetTemplatesFromDb: StateFlow<List<SetTemplate>> =
@@ -65,6 +71,10 @@ class AddTournamentViewModel(
 
     private val themesFromDb: StateFlow<List<ScoreboardTheme>> =
         themeRepository.observeThemesFromDatabase()
+            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
+
+    private val upcomingTournamentsFromDb: StateFlow<List<UpcomingTournament>> =
+        tournamentRepository.observeUpcomingTournaments()
             .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
     // Derived dropdown substates
@@ -104,6 +114,36 @@ class AddTournamentViewModel(
         }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), ThemeComponentState.ThemeOptionsState.Idle(emptyList()))
 
+    private val upcomingTournamentsOptionsState = combine(
+        _upcomingTournamentsFetchResult,
+        upcomingTournamentsFromDb,
+    ) { result, dbData ->
+        when {
+            result == null && dbData.isEmpty() ->
+                UpcomingTournamentComponentState.UpcomingTournamentsOptionsState.Loading
+            result is LoadResult.Error && dbData.isEmpty() ->
+                UpcomingTournamentComponentState.UpcomingTournamentsOptionsState.Error
+            else -> UpcomingTournamentComponentState.UpcomingTournamentsOptionsState.Idle(dbData)
+        }
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), UpcomingTournamentComponentState.UpcomingTournamentsOptionsState.Loading)
+
+    private val upcomingTournamentComponentState: StateFlow<UpcomingTournamentComponentState> = combine(
+        _selectedUpcomingTournament,
+        upcomingTournamentsOptionsState,
+    ) { selectedTournament, optionsState ->
+        UpcomingTournamentComponentState(
+            selectedTournament = selectedTournament,
+            upcomingTournamentsOptionsState = optionsState,
+        )
+    }.stateIn(
+        viewModelScope,
+        SharingStarted.WhileSubscribed(5_000),
+        UpcomingTournamentComponentState(
+            selectedTournament = null,
+            upcomingTournamentsOptionsState = UpcomingTournamentComponentState.UpcomingTournamentsOptionsState.Loading,
+        )
+    )
+
     // Single state via combine
     override val state: StateFlow<AddTournamentState> = combine(
         _isAdding,
@@ -115,8 +155,9 @@ class AddTournamentViewModel(
         regularSetOptionsState,
         decidingSetOptionsState,
         themeOptionsState,
+        upcomingTournamentComponentState,
         _action,
-    ) { isAdding, tournamentType, regularSetState, decidingSetState, theme, setsToWin, regularSetOptsState, decidingSetOptsState, themeOptsState, action ->
+    ) { isAdding, tournamentType, regularSetState, decidingSetState, theme, setsToWin, regularSetOptsState, decidingSetOptsState, themeOptsState, upcomingTournamentState, action ->
         AddTournamentState(
             isAdding = isAdding,
             tournamentType = tournamentType,
@@ -133,6 +174,7 @@ class AddTournamentViewModel(
                 themeOptionsState = themeOptsState,
             ),
             setsToWin = setsToWin,
+            upcomingTournamentComponentState = upcomingTournamentState,
             action = action,
         )
     }.stateIn(
@@ -143,6 +185,12 @@ class AddTournamentViewModel(
 
     fun onEvent(uiEvent: AddTournamentUiEvent) {
         when (uiEvent) {
+            is AddTournamentUiEvent.FetchUpcomingTournaments -> fetchUpcomingTournaments()
+
+            is AddTournamentUiEvent.SelectUpcomingTournament -> {
+                selectUpcomingTournament(uiEvent.upcomingTournament)
+            }
+
             is AddTournamentUiEvent.SelectTournamentType -> {
                 _tournamentType.value = uiEvent.tournamentType
             }
@@ -172,6 +220,7 @@ class AddTournamentViewModel(
             is AddTournamentUiEvent.FetchThemes -> fetchThemes()
 
             is AddTournamentUiEvent.AddTournament -> addTournament(
+                apiId = uiEvent.apiId,
                 tournamentName = uiEvent.tournamentName,
                 tournamentType = uiEvent.tournamentType,
                 defaultSetTemplateId = uiEvent.defaultSetTemplateId,
@@ -206,6 +255,22 @@ class AddTournamentViewModel(
         }
     }
 
+    private fun fetchUpcomingTournaments() {
+        viewModelScope.launch {
+            _upcomingTournamentsFetchResult.value = null
+            val result = tournamentRepository.fetchUpcomingTournaments()
+            _upcomingTournamentsFetchResult.value = result
+        }
+    }
+
+    private fun selectUpcomingTournament(upcomingTournament: UpcomingTournament) {
+        _selectedUpcomingTournament.value = upcomingTournament
+        _tournamentType.value = upcomingTournament.type
+        tournamentNameState.edit {
+            replace(0, length, upcomingTournament.name)
+        }
+    }
+
     private fun fetchThemes() {
         viewModelScope.launch {
             _themesFetchResult.value = null
@@ -215,6 +280,7 @@ class AddTournamentViewModel(
     }
 
     private fun addTournament(
+        apiId: String,
         tournamentName: String,
         tournamentType: TournamentType,
         defaultSetTemplateId: Int?,
@@ -225,6 +291,7 @@ class AddTournamentViewModel(
         viewModelScope.launch {
             _isAdding.value = true
             val addTournamentBody = AddTournamentBody(
+                apiId = apiId,
                 name = tournamentName,
                 type = tournamentType,
                 regularSetTemplateId = defaultSetTemplateId?.toString(),
@@ -249,6 +316,8 @@ class AddTournamentViewModel(
                 sendAction(AddTournamentAction.ShowError(getString(Res.string.check_internet_connection)))
             is UnauthorizedActionException ->
                 sendAction(AddTournamentAction.ShowUnauthorizedActionError)
+            is ConflictException ->
+                sendAction(AddTournamentAction.ShowError(e.message ?: getString(Res.string.tournament_already_exists)))
             else ->
                 sendAction(AddTournamentAction.ShowError(e.message ?: "Не удалось добавить турнир"))
         }

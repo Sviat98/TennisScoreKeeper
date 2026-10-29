@@ -21,6 +21,10 @@
     <string name="toggle_section">Expand/collapse</string>
     <string name="preview">Preview</string>
     <string name="check_internet_connection">Check your internet connection</string>
+    <string name="select_lt_tournament">Select tournament</string>
+    <string name="start_date">Start date: %1$s</string>
+    <string name="error_loading_lt_tournaments">Error loading tournaments</string>
+    <string name="tournament_already_exists">Tournament already exists</string>
 
     <!-- Navigation & Top Bars -->
     <string name="tournaments">Tournaments</string>
@@ -118,11 +122,11 @@
 
     <!-- File Upload -->
     <string name="open_file_storage">Open file storage</string>
-    <string name="upload_file">Upload file</string>
-    <string name="select_file_for_upload">Select file for upload</string>
-    <string name="upload">Upload</string>
     <string name="clear_file">Clear file</string>
-    <string name="upload_new_list">Upload new list</string>
+
+    <!-- Participants -->
+    <string name="seeded_players_count">Seeded players</string>
+    <string name="update">Update</string>
 
     <!-- Set Template -->
     <string name="regular_set_template">Regular Set Format</string>

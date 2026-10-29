@@ -114,18 +114,13 @@ private fun TournamentContent(
             if (tournamentDetailsState is TournamentDetailsLoadingState.Content) {
                 val tournament = tournamentDetailsState.tournament
 
-                if (tournament.status == TournamentStatus.IN_PROGRESS) {
+                // currentPage, а не activeTab: отражает фактическую вкладку и при свайпе пейджера
+                if (tournament.status == TournamentStatus.IN_PROGRESS &&
+                    pagerState.currentPage == TournamentTab.MATCHES.ordinal
+                ) {
                     FloatingActionButton(
                         onClick = {
-                            when (state.activeTab) {
-                                TournamentTab.MATCHES -> {
-                                    navController.navigate(AddMatchRoute(tournament.id))
-                                }
-
-                                TournamentTab.PARTICIPANTS -> {
-
-                                }
-                            }
+                            navController.navigate(AddMatchRoute(tournament.id))
                         }
                     ) {
                         Icon(
@@ -237,11 +232,13 @@ private fun TournamentContent(
                         TournamentTab.PARTICIPANTS.ordinal -> ParticipantListScreen(
                             modifier = Modifier.fillMaxSize(),
                             participantListLoadingState = state.participantListLoadingState,
-                            tournamentStatus = (tournamentDetailsState as? TournamentDetailsLoadingState.Content)?.tournament?.status
-                                ?: TournamentStatus.NOT_STARTED,
-                            onUploadFile = { onEvent(TournamentUiEvent.UploadFile) },
-                            onSelectFile = { file -> onEvent(TournamentUiEvent.SelectFile(file)) },
-                            onClearFile = { onEvent(TournamentUiEvent.ClearFile) }
+                            tournament = (tournamentDetailsState as? TournamentDetailsLoadingState.Content)?.tournament,
+                            onDownloadParticipants = { seedAmount ->
+                                onEvent(TournamentUiEvent.DownloadParticipants(seedAmount))
+                            },
+                            onSeedAmountChange = { seedAmount ->
+                                onEvent(TournamentUiEvent.ChangeSeedAmount(seedAmount))
+                            }
                         )
                     }
                 }
