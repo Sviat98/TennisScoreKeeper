@@ -31,6 +31,8 @@ fun MatchScoringAndThemeSettingsBlock(
     regularSetComponentState: SetComponentState,
     decidingSetComponentState: SetComponentState,
     themeComponentState: ThemeComponentState,
+    // false = настройки счёта показываются только для информации (EditMatch), правка залочена
+    canEditMatchScoreSettings: Boolean,
     onSetsToWinChange: (Int) -> Unit,
     onSetTemplatesFetch: (SetTemplateTypeFilter) -> Unit,
     onRegularSetTemplateChange: (SetTemplate) -> Unit,
@@ -79,6 +81,7 @@ fun MatchScoringAndThemeSettingsBlock(
                             modifier = Modifier.widthIn(max = 300.dp).fillMaxWidth(),
                             setsToWin = setsToWin,
                             onValueChange = onSetsToWinChange,
+                            canEditValue = canEditMatchScoreSettings,
                         )
                     }
                 }
@@ -96,7 +99,7 @@ fun MatchScoringAndThemeSettingsBlock(
                         SetTemplateComponent(
                             modifier = Modifier.widthIn(max = 300.dp).fillMaxWidth(),
                             label = stringResource(Res.string.regular_set_template),
-                            enabled = setsToWin > 1,
+                            enabled = canEditMatchScoreSettings && setsToWin > 1,
                             setComponentState = regularSetComponentState,
                             onSetTemplatesFetch = { onSetTemplatesFetch(SetTemplateTypeFilter.REGULAR) },
                             onSetTemplateChange = onRegularSetTemplateChange,
@@ -110,7 +113,7 @@ fun MatchScoringAndThemeSettingsBlock(
                         SetTemplateComponent(
                             modifier = Modifier.widthIn(max = 300.dp).fillMaxWidth(),
                             label = stringResource(Res.string.deciding_set_template),
-                            enabled = true,
+                            enabled = canEditMatchScoreSettings,
                             setComponentState = decidingSetComponentState,
                             onSetTemplatesFetch = { onSetTemplatesFetch(SetTemplateTypeFilter.DECIDER) },
                             onSetTemplateChange = onDecidingSetTemplateChange,
@@ -138,12 +141,13 @@ fun MatchScoringAndThemeSettingsBlock(
                     modifier = Modifier.widthIn(max = 300.dp).fillMaxWidth(),
                     setsToWin = setsToWin,
                     onValueChange = onSetsToWinChange,
+                    canEditValue = canEditMatchScoreSettings,
                 )
 
                 SetTemplateComponent(
                     modifier = Modifier.widthIn(max = 300.dp).fillMaxWidth(),
                     label = stringResource(Res.string.regular_set_template),
-                    enabled = setsToWin > 1,
+                    enabled = canEditMatchScoreSettings && setsToWin > 1,
                     setComponentState = regularSetComponentState,
                     onSetTemplatesFetch = { onSetTemplatesFetch(SetTemplateTypeFilter.REGULAR) },
                     onSetTemplateChange = onRegularSetTemplateChange,
@@ -153,7 +157,7 @@ fun MatchScoringAndThemeSettingsBlock(
                 SetTemplateComponent(
                     modifier = Modifier.widthIn(max = 300.dp).fillMaxWidth(),
                     label = stringResource(Res.string.deciding_set_template),
-                    enabled = true,
+                    enabled = canEditMatchScoreSettings,
                     setComponentState = decidingSetComponentState,
                     onSetTemplatesFetch = { onSetTemplatesFetch(SetTemplateTypeFilter.DECIDER) },
                     onSetTemplateChange = onDecidingSetTemplateChange,
