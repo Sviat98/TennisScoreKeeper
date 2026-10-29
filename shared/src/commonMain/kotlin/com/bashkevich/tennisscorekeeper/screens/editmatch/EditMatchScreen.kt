@@ -4,11 +4,9 @@ import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CircularProgressIndicator
@@ -20,7 +18,6 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.adaptive.currentWindowAdaptiveInfoV2
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -28,9 +25,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.window.core.layout.WindowSizeClass
 import com.bashkevich.tennisscorekeeper.LocalNavHostController
 import com.bashkevich.tennisscorekeeper.components.ComponentMode
+import com.bashkevich.tennisscorekeeper.components.add_match.MatchScoringAndThemeSettingsBlock
 import com.bashkevich.tennisscorekeeper.components.add_match.participant.AddMatchParticipantsBlock
 import com.bashkevich.tennisscorekeeper.components.dialog.ColorPickerDialog
 import com.bashkevich.tennisscorekeeper.components.icons.IconGroup
@@ -38,7 +35,6 @@ import com.bashkevich.tennisscorekeeper.components.icons.default_icons.ArrowBack
 import com.bashkevich.tennisscorekeeper.components.icons.default_icons.Check
 import com.bashkevich.tennisscorekeeper.components.scoreboard.match_details.MatchDetailsScoreboardView
 import com.bashkevich.tennisscorekeeper.components.showUnauthorizedActionSnackbar
-import com.bashkevich.tennisscorekeeper.components.theme.ThemeCombobox
 import com.bashkevich.tennisscorekeeper.model.match.domain.Match
 import com.bashkevich.tennisscorekeeper.model.match.remote.body.MatchStatus
 import com.bashkevich.tennisscorekeeper.mvi.LaunchedUiEffectHandler
@@ -158,9 +154,6 @@ private fun EditMatchContent(
     editedMatch: Match,
     onEvent: (EditMatchUiEvent) -> Unit,
 ) {
-    val isWideScreen = currentWindowAdaptiveInfoV2().windowSizeClass
-        .isWidthAtLeastBreakpoint(WindowSizeClass.WIDTH_DP_MEDIUM_LOWER_BOUND)
-
     Box(
         modifier = Modifier.then(modifier)
             .fillMaxWidth()
@@ -209,48 +202,35 @@ private fun EditMatchContent(
                 }
             )
 
-            // Тема — строго под первым участником: на широком экране повторяем геометрию
-            // блока участников (Row до 1000dp с weight-колонками), поэтому левый край
-            // совпадает с колонкой первого участника и двигается вместе с ним
-            if (isWideScreen) {
-                Row(
-                    modifier = Modifier.widthIn(max = 1000.dp).fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(64.dp)
-                ) {
-                    Box(
-                        modifier = Modifier.weight(weight = 1f),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        ThemeCombobox(
-                            modifier = Modifier.widthIn(max = 300.dp).fillMaxWidth(),
-                            themeComponentState = state.themeComponentState,
-                            onThemesFetch = { onEvent(EditMatchUiEvent.FetchThemes) },
-                            onThemeSelected = { theme ->
-                                onEvent(EditMatchUiEvent.SelectTheme(theme.id))
-                            },
-                            onRetrySelectedTheme = { themeId ->
-                                onEvent(EditMatchUiEvent.RetrySelectedTheme(themeId))
-                            }
-                        )
-                    }
-
-                    // Вторая weight-колонка — заглушка, держит первую колонку
-                    // той же ширины, что колонка первого участника выше
-                    Box(modifier = Modifier.weight(weight = 1f))
-                }
-            } else {
-                ThemeCombobox(
-                    modifier = Modifier.widthIn(max = 300.dp).fillMaxWidth(),
-                    themeComponentState = state.themeComponentState,
-                    onThemesFetch = { onEvent(EditMatchUiEvent.FetchThemes) },
-                    onThemeSelected = { theme ->
-                        onEvent(EditMatchUiEvent.SelectTheme(theme.id))
-                    },
-                    onRetrySelectedTheme = { themeId ->
-                        onEvent(EditMatchUiEvent.RetrySelectedTheme(themeId))
-                    }
-                )
-            }
+            // Тема + залоченные настройки счёта (sets_to_win, шаблоны сетов) — нижняя часть
+            // как на экране добавления матча. На широком экране блок повторяет геометрию
+            // блока участников (Row до 1000dp с weight-колонками), поэтому тема остаётся
+            // под первым участником; настройки счёта приходят в самом матче и не редактируются
+            MatchScoringAndThemeSettingsBlock(
+                modifier = Modifier.fillMaxWidth(),
+                setsToWin = state.setsToWin,
+                regularSetComponentState = state.regularSetComponentState,
+                decidingSetComponentState = state.decidingSetComponentState,
+                themeComponentState = state.themeComponentState,
+                canEditMatchScoreSettings = false,
+                onSetsToWinChange = {},
+                onSetTemplatesFetch = {},
+                onRegularSetTemplateChange = {},
+                onDecidingSetTemplateChange = {},
+                onThemeSelected = { theme ->
+                    onEvent(EditMatchUiEvent.SelectTheme(theme.id))
+                },
+                onThemesFetch = { onEvent(EditMatchUiEvent.FetchThemes) },
+                onRetrySelectedTheme = { themeId ->
+                    onEvent(EditMatchUiEvent.RetrySelectedTheme(themeId))
+                },
+                onRetrySelectedRegularSet = { setId ->
+                    onEvent(EditMatchUiEvent.RetrySelectedRegularSet(setId))
+                },
+                onRetrySelectedDecidingSet = { setId ->
+                    onEvent(EditMatchUiEvent.RetrySelectedDecidingSet(setId))
+                },
+            )
         }
     }
 

@@ -29,6 +29,12 @@ data class MatchEntity(
     val pointShift: Int,
     @ColumnInfo(name = "video_link")
     val videoLink: String?,
+    @ColumnInfo(name = "sets_to_win")
+    val setsToWin: Int,
+    @ColumnInfo(name = "regular_set_id")
+    val regularSetId: Int?,
+    @ColumnInfo(name = "deciding_set_id")
+    val decidingSetId: Int,
     @ColumnInfo(name = "theme_id")
     val themeId: Int,
     @ColumnInfo(name = "status")
@@ -37,6 +43,8 @@ data class MatchEntity(
     val currentSetMode: String?,
 )
 
+// Настройки счёта в ShortMatchDto отсутствуют — пишем плейсхолдеры,
+// строку перезапишет полный WS-снапшот при открытии матча (insert REPLACE)
 fun ShortMatchDto.toMatchEntity() = MatchEntity(
     id = id.toInt(),
     tournamentId = tournamentId.toInt(),
@@ -44,6 +52,9 @@ fun ShortMatchDto.toMatchEntity() = MatchEntity(
     secondParticipantId = secondParticipant.id.toInt(),
     pointShift = 0,
     videoLink = null,
+    setsToWin = 0,
+    regularSetId = null,
+    decidingSetId = 0,
     themeId = themeId.toInt(),
     status = status.name,
     currentSetMode = null,
@@ -56,6 +67,9 @@ fun MatchDto.toMatchEntity() = MatchEntity(
     secondParticipantId = secondParticipant.id.toInt(),
     pointShift = pointShift,
     videoLink = videoLink,
+    setsToWin = setsToWin,
+    regularSetId = regularSetId?.toInt(),
+    decidingSetId = decidingSetId.toInt(),
     themeId = themeId.toInt(),
     status = status.name,
     currentSetMode = currentSetMode?.name,

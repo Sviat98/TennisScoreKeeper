@@ -95,6 +95,7 @@ fun AddMatchComponent(
             regularSetComponentState = contentState.regularSetComponentState,
             decidingSetComponentState = contentState.decidingSetComponentState,
             themeComponentState = contentState.themeComponentState,
+            canEditMatchScoreSettings = true,
             onSetsToWinChange = { delta -> onEvent(AddMatchUiEvent.ChangeSetsToWin(delta)) },
             onSetTemplatesFetch = { filter ->
                 onEvent(AddMatchUiEvent.FetchSetTemplates(filter))
