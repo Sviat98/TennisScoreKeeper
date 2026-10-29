@@ -150,6 +150,7 @@ fun AddTournamentContent(
                 regularSetComponentState = state.regularSetComponentState,
                 decidingSetComponentState = state.decidingSetComponentState,
                 themeComponentState = state.themeComponentState,
+                canEditMatchScoreSettings = true,
                 onSetsToWinChange = { delta ->
                     onEvent(AddTournamentUiEvent.ChangeSetsToWin(delta))
                 },

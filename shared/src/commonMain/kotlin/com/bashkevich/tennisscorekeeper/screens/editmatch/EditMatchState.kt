@@ -2,6 +2,7 @@ package com.bashkevich.tennisscorekeeper.screens.editmatch
 
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.graphics.Color
+import com.bashkevich.tennisscorekeeper.components.set_template.SetComponentState
 import com.bashkevich.tennisscorekeeper.components.theme.ThemeComponentState
 import com.bashkevich.tennisscorekeeper.model.match.domain.Match
 import com.bashkevich.tennisscorekeeper.model.theme.domain.ScoreboardTheme
@@ -31,6 +32,10 @@ sealed class EditMatchUiEvent : UiEvent {
 
     class RetrySelectedTheme(val themeId: Int) : EditMatchUiEvent()
 
+    class RetrySelectedRegularSet(val setId: Int) : EditMatchUiEvent()
+
+    class RetrySelectedDecidingSet(val setId: Int) : EditMatchUiEvent()
+
     data object SaveMatch : EditMatchUiEvent()
 }
 
@@ -40,6 +45,9 @@ sealed class EditMatchUiEvent : UiEvent {
  * 2. пользовательские правки (display-имена, цвета участников, тема) — живут только в оперативной
  *    памяти ViewModel и накладываются поверх первого слоя в [editedMatch].
  *    Если пользователь закрыл экран без сохранения — правки теряются.
+ *
+ * Настройки счёта ([setsToWin], шаблоны сетов) приходят в самом матче и залочены от редактирования —
+ * показываются только для информации.
  */
 @Immutable
 data class EditMatchState(
@@ -50,6 +58,15 @@ data class EditMatchState(
     val themeComponentState: ThemeComponentState = ThemeComponentState(
         ThemeComponentState.SelectedThemeState.Idle(null),
         ThemeComponentState.ThemeOptionsState.Idle(emptyList())
+    ),
+    val setsToWin: Int = 1,
+    val regularSetComponentState: SetComponentState = SetComponentState(
+        SetComponentState.SelectedSetState.Idle(null),
+        SetComponentState.SetTemplateOptionsState.Idle(emptyList())
+    ),
+    val decidingSetComponentState: SetComponentState = SetComponentState(
+        SetComponentState.SelectedSetState.Idle(null),
+        SetComponentState.SetTemplateOptionsState.Idle(emptyList())
     ),
     val dialogState: OpenColorPickerDialogState = OpenColorPickerDialogState.None,
     val isSaving: Boolean = false,
