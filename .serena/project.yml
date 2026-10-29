@@ -1,0 +1,4 @@
+# Serena project configuration (v2 format)
+project_name: TennisScoreKeeper
+language_servers:
+  - kotlin

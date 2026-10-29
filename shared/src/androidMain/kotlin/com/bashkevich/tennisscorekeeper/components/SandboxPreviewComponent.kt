@@ -133,7 +133,8 @@ fun SetsToWinComponentPreview() {
             .background(Color.White)
             .padding(horizontal = 32.dp),
         setsToWin = 1,
-        onValueChange = {}
+        onValueChange = {},
+        canEditValue = true
     )
 }
 

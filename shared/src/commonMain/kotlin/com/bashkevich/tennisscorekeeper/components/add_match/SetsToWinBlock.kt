@@ -23,6 +23,7 @@ fun SetsToWinBlock(
     modifier: Modifier = Modifier,
     setsToWin: Int,
     onValueChange: (Int) -> Unit,
+    canEditValue: Boolean,
 ) {
     Row(
         modifier = Modifier.then(modifier),
@@ -31,7 +32,8 @@ fun SetsToWinBlock(
             SetsToWinComponent(
                 modifier = Modifier.fillMaxWidth(),
                 setsToWin = setsToWin,
-                onValueChange = onValueChange
+                onValueChange = onValueChange,
+                canEditValue = canEditValue
             )
     }
 }
@@ -40,7 +42,8 @@ fun SetsToWinBlock(
 fun SetsToWinComponent(
     modifier: Modifier = Modifier,
     setsToWin: Int,
-    onValueChange: (Int) -> Unit
+    onValueChange: (Int) -> Unit,
+    canEditValue: Boolean
 ) {
     Row(
         modifier = Modifier.then(modifier),
@@ -56,14 +59,14 @@ fun SetsToWinComponent(
                 modifier = Modifier.size(32.dp),
                 onClick = { onValueChange(-1) },
                 text = "-",
-                enabled = setsToWin > 1
+                enabled = canEditValue && setsToWin > 1
             )
             Text(setsToWin.toString())
             ToggleSetsToWinButton(
                 modifier = Modifier.size(32.dp),
                 onClick = { onValueChange(1) },
                 text = "+",
-                enabled = setsToWin < 3
+                enabled = canEditValue && setsToWin < 3
             )
         }
 
