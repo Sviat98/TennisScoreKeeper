@@ -32,6 +32,7 @@ import com.bashkevich.tennisscorekeeper.model.settings.domain.AppThemeMode
 import com.bashkevich.tennisscorekeeper.navigation.AddMatchRoute
 import com.bashkevich.tennisscorekeeper.navigation.AddTournamentRoute
 import com.bashkevich.tennisscorekeeper.navigation.EditMatchRoute
+import com.bashkevich.tennisscorekeeper.navigation.EditTournamentRoute
 import com.bashkevich.tennisscorekeeper.navigation.LoginRoute
 import com.bashkevich.tennisscorekeeper.navigation.MatchDetailsRoute
 import com.bashkevich.tennisscorekeeper.navigation.TournamentRoute
@@ -44,6 +45,8 @@ import com.bashkevich.tennisscorekeeper.screens.addtournament.AddTournamentScree
 import com.bashkevich.tennisscorekeeper.screens.addtournament.AddTournamentViewModel
 import com.bashkevich.tennisscorekeeper.screens.editmatch.EditMatchScreen
 import com.bashkevich.tennisscorekeeper.screens.editmatch.EditMatchViewModel
+import com.bashkevich.tennisscorekeeper.screens.edittournament.EditTournamentScreen
+import com.bashkevich.tennisscorekeeper.screens.edittournament.EditTournamentViewModel
 import com.bashkevich.tennisscorekeeper.screens.login.LoginScreen
 import com.bashkevich.tennisscorekeeper.screens.login.LoginViewModel
 import com.bashkevich.tennisscorekeeper.screens.matchdetails.MatchDetailsScreen
@@ -147,6 +150,22 @@ fun App(
                             AddTournamentScreen(
                                 modifier = Modifier.fillMaxSize(),
                                 viewModel = addTournamentViewModel,
+                            )
+                        }
+                        // Экран редактирования: выезд справа при открытии, уход влево при закрытии
+                        composable<EditTournamentRoute>(
+                            enterTransition = {
+                                slideInHorizontally(animationSpec = tween(350)) { it } + fadeIn(animationSpec = tween(350))
+                            },
+                            popExitTransition = {
+                                slideOutHorizontally(animationSpec = tween(350)) { -it } + fadeOut(animationSpec = tween(350))
+                            }
+                        ) {
+                            val editTournamentViewModel = koinViewModel<EditTournamentViewModel>()
+
+                            EditTournamentScreen(
+                                modifier = Modifier.fillMaxSize(),
+                                viewModel = editTournamentViewModel
                             )
                         }
                         composable<MatchDetailsRoute> {

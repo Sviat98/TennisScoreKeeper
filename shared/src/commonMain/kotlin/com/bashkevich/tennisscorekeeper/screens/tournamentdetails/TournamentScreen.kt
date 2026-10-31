@@ -42,6 +42,7 @@ import com.bashkevich.tennisscorekeeper.components.tournament.TournamentDetailsL
 import com.bashkevich.tennisscorekeeper.model.tournament.remote.toResource
 import com.bashkevich.tennisscorekeeper.model.tournament.remote.TournamentStatus
 import com.bashkevich.tennisscorekeeper.navigation.AddMatchRoute
+import com.bashkevich.tennisscorekeeper.navigation.EditTournamentRoute
 import com.bashkevich.tennisscorekeeper.navigation.MatchDetailsRoute
 import com.bashkevich.tennisscorekeeper.navigation.SettingsFlowRoute
 import com.bashkevich.tennisscorekeeper.navigation.TournamentTab
@@ -107,6 +108,15 @@ private fun TournamentContent(
         topBar = {
             TournamentDetailsAppBar(
                 onBack = { navController.navigateUp() },
+                onEditClick = {
+                    // Просмотр разрешён при любом статусе: COMPLETED-турнир
+                    // открывается в режиме read-only
+                    val tournamentId =
+                        (tournamentDetailsState as? TournamentDetailsLoadingState.Content)?.tournament?.id
+                    if (tournamentId != null) {
+                        navController.navigate(EditTournamentRoute(tournamentId))
+                    }
+                },
                 onNavigateToSettings = { navController.navigate(SettingsFlowRoute) }
             )
         },

@@ -45,6 +45,8 @@ import tennisscorekeeper.shared.generated.resources.select_theme
 fun ThemeCombobox(
     modifier: Modifier = Modifier,
     themeComponentState: ThemeComponentState,
+    // false = выбор темы залочен (просмотр COMPLETED-матча/турнира), retry загрузки остаётся доступен
+    canEditTheme: Boolean,
     onThemeSelected: (ScoreboardTheme) -> Unit,
     onThemesFetch: () -> Unit = {},
     onRetrySelectedTheme: (Int) -> Unit,
@@ -52,7 +54,7 @@ fun ThemeCombobox(
     var expanded by remember { mutableStateOf(false) }
 
     val isIdle = themeComponentState.selectedTheme is ThemeComponentState.SelectedThemeState.Idle
-    val dropdownEnabled = isIdle
+    val dropdownEnabled = canEditTheme && isIdle
 
     val text = when (val state = themeComponentState.selectedTheme) {
         is ThemeComponentState.SelectedThemeState.Idle -> state.theme?.name ?: ""
@@ -63,10 +65,13 @@ fun ThemeCombobox(
     val trailingIcon: (@Composable () -> Unit)? = when (val state = themeComponentState.selectedTheme) {
         is ThemeComponentState.SelectedThemeState.Idle -> {
             {
-                IconButton(onClick = {
-                    expanded = true
-                    onThemesFetch()
-                }) {
+                IconButton(
+                    onClick = {
+                        expanded = true
+                        onThemesFetch()
+                    },
+                    enabled = dropdownEnabled
+                ) {
                     Icon(
                         imageVector = IconGroup.Default.ArrowDropDown,
                         contentDescription = stringResource(Res.string.open_dropdown),
@@ -104,7 +109,7 @@ fun ThemeCombobox(
             state = TextFieldState(text),
             placeholder = { Text(stringResource(Res.string.select_theme)) },
             readOnly = true,
-            enabled = isIdle,
+            enabled = dropdownEnabled,
             trailingIcon = trailingIcon,
             leadingIcon = leadingIcon,
             colors = TextFieldDefaults.colors(

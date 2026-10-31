@@ -29,6 +29,7 @@
     <string name="add_match">Добавить матч</string>
     <string name="edit_match">Редактирование матча</string>
     <string name="add_tournament">Добавить турнир</string>
+    <string name="edit_tournament">Редактирование турнира</string>
     <string name="navigate_back">Перейти назад</string>
     <string name="navigate_to_settings">Перейти в настройки</string>
     <string name="copy_link">Скопировать ссылку</string>

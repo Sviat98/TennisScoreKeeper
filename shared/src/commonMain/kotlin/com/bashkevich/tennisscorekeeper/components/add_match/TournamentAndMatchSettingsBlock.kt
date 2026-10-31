@@ -25,7 +25,7 @@ import tennisscorekeeper.shared.generated.resources.deciding_set_template
 import tennisscorekeeper.shared.generated.resources.regular_set_template
 
 @Composable
-fun MatchScoringAndThemeSettingsBlock(
+fun TournamentAndMatchSettingsBlock(
     modifier: Modifier = Modifier,
     setsToWin: Int,
     regularSetComponentState: SetComponentState,
@@ -33,6 +33,8 @@ fun MatchScoringAndThemeSettingsBlock(
     themeComponentState: ThemeComponentState,
     // false = настройки счёта показываются только для информации (EditMatch), правка залочена
     canEditMatchScoreSettings: Boolean,
+    // false = выбор темы залочен (просмотр COMPLETED-матча/турнира), retry загрузки остаётся доступен
+    canEditTheme: Boolean,
     onSetsToWinChange: (Int) -> Unit,
     onSetTemplatesFetch: (SetTemplateTypeFilter) -> Unit,
     onRegularSetTemplateChange: (SetTemplate) -> Unit,
@@ -67,6 +69,7 @@ fun MatchScoringAndThemeSettingsBlock(
                         ThemeComponent(
                             modifier = Modifier.widthIn(max = 300.dp).fillMaxWidth(),
                             themeComponentState = themeComponentState,
+                            canEditTheme = canEditTheme,
                             onThemeSelected = onThemeSelected,
                             onThemesFetch = onThemesFetch,
                             onRetrySelectedTheme = onRetrySelectedTheme,
@@ -131,6 +134,7 @@ fun MatchScoringAndThemeSettingsBlock(
                 ThemeComponent(
                     modifier = Modifier.widthIn(max = 300.dp).fillMaxWidth(),
                     themeComponentState = themeComponentState,
+                    canEditTheme = canEditTheme,
                     onThemeSelected = onThemeSelected,
                     onThemesFetch = onThemesFetch,
                     onRetrySelectedTheme = onRetrySelectedTheme,

@@ -42,6 +42,8 @@ fun AddMatchParticipantComponent(
     participantOptions: List<TennisParticipant>,
     participant: TennisParticipantInMatch,
     mode: ComponentMode,
+    // false = просмотр без правок (COMPLETED-матч): display-имя readOnly, цвета залочены
+    canEditParticipants: Boolean,
     onParticipantsFetch: () -> Unit,
     onParticipantChange: (TennisParticipant) -> Unit,
     onParticipantDisplayNameChange: (String) -> Unit,
@@ -67,12 +69,14 @@ fun AddMatchParticipantComponent(
         ParticipantDisplayNameComponent(
             modifier = Modifier.fillMaxWidth(),
             participant = participant,
+            canEditDisplayName = canEditParticipants,
             onParticipantDisplayNameChange = onParticipantDisplayNameChange
         )
 
         ParticipantColorPickerBlock(
             primaryColor = participantPrimaryColor,
             secondaryColor = participantSecondaryColor,
+            canEditColors = canEditParticipants,
             onColorPickerOpen = onColorPickerOpen,
             onToggleSecondaryColor = onToggleSecondaryColor,
         )
@@ -83,6 +87,7 @@ fun AddMatchParticipantComponent(
 fun ParticipantColorPickerBlock(
     primaryColor: Color,
     secondaryColor: Color?,
+    canEditColors: Boolean,
     onColorPickerOpen: (Int) -> Unit,
     onToggleSecondaryColor: (Color?) -> Unit
 ) {
@@ -91,9 +96,14 @@ fun ParticipantColorPickerBlock(
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(stringResource(Res.string.colors))
-        PrimaryColorPicker(color = primaryColor, onColorPickerOpen = onColorPickerOpen)
+        PrimaryColorPicker(
+            color = primaryColor,
+            canEditColor = canEditColors,
+            onColorPickerOpen = onColorPickerOpen
+        )
         SecondaryColorPicker(
             color = secondaryColor,
+            canEditColor = canEditColors,
             onColorPickerOpen = onColorPickerOpen,
             onToggleSecondaryColor = onToggleSecondaryColor
         )
@@ -101,18 +111,25 @@ fun ParticipantColorPickerBlock(
 }
 
 @Composable
-fun PrimaryColorPicker(color: Color, onColorPickerOpen: (Int) -> Unit) {
+fun PrimaryColorPicker(
+    color: Color,
+    canEditColor: Boolean,
+    onColorPickerOpen: (Int) -> Unit
+) {
     ColorPickerButton(
         modifier = Modifier.size(32.dp),
         color = color,
         colorNumber = 1,
+        canEditColor = canEditColor,
         onColorPickerOpen = onColorPickerOpen
     )
 }
 
 @Composable
 fun SecondaryColorPicker(
-    color: Color?, onColorPickerOpen: (Int) -> Unit,
+    color: Color?,
+    canEditColor: Boolean,
+    onColorPickerOpen: (Int) -> Unit,
     onToggleSecondaryColor: (Color?) -> Unit
 ) {
 
@@ -122,34 +139,40 @@ fun SecondaryColorPicker(
                 modifier = Modifier.size(32.dp),
                 color = color,
                 colorNumber = 2,
+                canEditColor = canEditColor,
                 onColorPickerOpen = onColorPickerOpen
             )
-            // Кнопка с крестиком в правом верхнем углу
-            Box(
-                modifier = Modifier
-                    .align(Alignment.TopEnd)
-                    .offset(x = 4.dp, y = (-4).dp)
-            ) {
-                Icon(
+            // Кнопка с крестиком в правом верхнем углу — только в режиме редактирования
+            if (canEditColor) {
+                Box(
                     modifier = Modifier
-                        .size(12.dp)
-                        .clip(CircleShape)
-                        .background(MaterialTheme.colorScheme.onSurface)
-                        .clickable {
-                            onToggleSecondaryColor(null)
-                        },
-                    imageVector = IconGroup.Default.Close,
-                    contentDescription = stringResource(Res.string.close),
-                    tint = MaterialTheme.colorScheme.surface
-                )
+                        .align(Alignment.TopEnd)
+                        .offset(x = 4.dp, y = (-4).dp)
+                ) {
+                    Icon(
+                        modifier = Modifier
+                            .size(12.dp)
+                            .clip(CircleShape)
+                            .background(MaterialTheme.colorScheme.onSurface)
+                            .clickable {
+                                onToggleSecondaryColor(null)
+                            },
+                        imageVector = IconGroup.Default.Close,
+                        contentDescription = stringResource(Res.string.close),
+                        tint = MaterialTheme.colorScheme.surface
+                    )
+                }
             }
 
         }
     } else {
-        AddSecondaryColorButton(
-            modifier = Modifier.size(32.dp),
-            onAddSecondaryColor = onToggleSecondaryColor
-        )
+        // Незаполненный второй цвет в режиме просмотра не показываем вовсе
+        if (canEditColor) {
+            AddSecondaryColorButton(
+                modifier = Modifier.size(32.dp),
+                onAddSecondaryColor = onToggleSecondaryColor
+            )
+        }
     }
 
 }
@@ -183,15 +206,20 @@ fun ColorPickerButton(
     modifier: Modifier = Modifier,
     color: Color,
     colorNumber: Int,
+    canEditColor: Boolean,
     onColorPickerOpen: (Int) -> Unit
 ) {
     Button(
         onClick = { onColorPickerOpen(colorNumber) },
+        enabled = canEditColor,
         modifier = Modifier.then(modifier), // Фиксированный размер для выравнивания
         border = BorderStroke(width = 1.dp, color = MaterialTheme.colorScheme.outline),
         shape = RoundedCornerShape(4.dp),
         colors = ButtonDefaults.buttonColors(
             containerColor = color,
+            // В залоченном режиме (COMPLETED) кнопка видна, но цвет участника не теряется:
+            // стандартный disabledContainerColor перекрашивает её в серый
+            disabledContainerColor = color,
         )
     ) {
         // Пустое содержимое кнопки
