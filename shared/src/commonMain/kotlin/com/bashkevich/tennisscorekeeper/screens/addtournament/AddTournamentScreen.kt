@@ -25,7 +25,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.bashkevich.tennisscorekeeper.LocalNavHostController
 import com.bashkevich.tennisscorekeeper.components.AddTournamentAppBar
-import com.bashkevich.tennisscorekeeper.components.add_match.MatchScoringAndThemeSettingsBlock
+import com.bashkevich.tennisscorekeeper.components.add_match.TournamentAndMatchSettingsBlock
 import com.bashkevich.tennisscorekeeper.components.add_tournament.TournamentNameAndTypeComponent
 import com.bashkevich.tennisscorekeeper.components.dialog.ScoreboardThemePreviewDialog
 import com.bashkevich.tennisscorekeeper.components.set_template.SetComponentState
@@ -122,19 +122,22 @@ fun AddTournamentContent(
             // Tournament name + Tournament type
             TournamentNameAndTypeComponent(
                 tournamentNameState = tournamentNameState,
+                canEditName = true,
                 currentTournamentType = tournamentType,
+                canEditType = true,
                 onTournamentTypeChange = { type ->
                     onEvent(AddTournamentUiEvent.SelectTournamentType(type))
                 },
             )
 
             // Scoring and theme settings block
-            MatchScoringAndThemeSettingsBlock(
+            TournamentAndMatchSettingsBlock(
                 setsToWin = state.setsToWin,
                 regularSetComponentState = state.regularSetComponentState,
                 decidingSetComponentState = state.decidingSetComponentState,
                 themeComponentState = state.themeComponentState,
                 canEditMatchScoreSettings = true,
+                canEditTheme = true,
                 onSetsToWinChange = { delta ->
                     onEvent(AddTournamentUiEvent.ChangeSetsToWin(delta))
                 },

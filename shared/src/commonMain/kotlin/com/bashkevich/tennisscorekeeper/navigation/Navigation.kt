@@ -18,6 +18,11 @@ data class TournamentRoute(val tournamentId: Int)
 data object AddTournamentRoute
 
 @Serializable
+@SerialName("editTournament")
+//@SerialName("tournaments/edit") распознает как TournamentRoute(id=edit) на НЕ-Андроид
+data class EditTournamentRoute(val tournamentId: Int = 0)
+
+@Serializable
 @SerialName("matches")
 data class MatchDetailsRoute(val id: Int)
 

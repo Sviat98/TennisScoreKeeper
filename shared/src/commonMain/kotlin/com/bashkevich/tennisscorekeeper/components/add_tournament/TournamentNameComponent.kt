@@ -15,7 +15,9 @@ import tennisscorekeeper.shared.generated.resources.tournament_name
 @Composable
 fun TournamentNameComponent(
     modifier: Modifier = Modifier,
-    tournamentNameState: TextFieldState
+    tournamentNameState: TextFieldState,
+    // false = просмотр без правок (COMPLETED-турнир), имя readOnly
+    canEditName: Boolean
 ) {
     Column(
         modifier = Modifier.then(modifier),
@@ -24,6 +26,7 @@ fun TournamentNameComponent(
         TextField(
             modifier = Modifier.fillMaxWidth(),
             state = tournamentNameState,
+            readOnly = !canEditName,
             placeholder = { Text(stringResource(Res.string.tournament_name)) },
         )
     }
