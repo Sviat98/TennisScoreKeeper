@@ -103,41 +103,39 @@ private fun TournamentContent(
     val pagerState = rememberPagerState(pageCount = { 2 })
     val scope = rememberCoroutineScope()
 
+    // Детали турнира доступны только в Content; пока Loading — редактирование недоступно
+    val tournament = when (tournamentDetailsState) {
+        is TournamentDetailsLoadingState.Content -> tournamentDetailsState.tournament
+        TournamentDetailsLoadingState.Loading -> null
+    }
+
     Scaffold(
         modifier = Modifier.then(modifier).refreshByKeyboard(onRefresh),
         topBar = {
             TournamentDetailsAppBar(
                 onBack = { navController.navigateUp() },
                 onEditClick = {
-                    // Просмотр разрешён при любом статусе: COMPLETED-турнир
-                    // открывается в режиме read-only
-                    val tournamentId =
-                        (tournamentDetailsState as? TournamentDetailsLoadingState.Content)?.tournament?.id
-                    if (tournamentId != null) {
-                        navController.navigate(EditTournamentRoute(tournamentId))
-                    }
+                    tournament?.let { navController.navigate(EditTournamentRoute(it.id)) }
                 },
+                isEditEnabled = tournament != null,
                 onNavigateToSettings = { navController.navigate(SettingsFlowRoute) }
             )
         },
         floatingActionButton = {
-            if (tournamentDetailsState is TournamentDetailsLoadingState.Content) {
-                val tournament = tournamentDetailsState.tournament
-
-                // currentPage, а не activeTab: отражает фактическую вкладку и при свайпе пейджера
-                if (tournament.status == TournamentStatus.IN_PROGRESS &&
-                    pagerState.currentPage == TournamentTab.MATCHES.ordinal
-                ) {
-                    FloatingActionButton(
-                        onClick = {
-                            navController.navigate(AddMatchRoute(tournament.id))
-                        }
-                    ) {
-                        Icon(
-                            IconGroup.Default.Add,
-                            contentDescription = stringResource(Res.string.add_match)
-                        )
+            // currentPage, а не activeTab: отражает фактическую вкладку и при свайпе пейджера
+            if (tournament != null &&
+                tournament.status == TournamentStatus.IN_PROGRESS &&
+                pagerState.currentPage == TournamentTab.MATCHES.ordinal
+            ) {
+                FloatingActionButton(
+                    onClick = {
+                        navController.navigate(AddMatchRoute(tournament.id))
                     }
+                ) {
+                    Icon(
+                        IconGroup.Default.Add,
+                        contentDescription = stringResource(Res.string.add_match)
+                    )
                 }
             }
         },
