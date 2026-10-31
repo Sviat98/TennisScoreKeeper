@@ -25,6 +25,8 @@ import kotlinx.coroutines.flow.collectLatest
 fun ParticipantDisplayNameComponent(
     modifier: Modifier = Modifier,
     participant: TennisParticipantInMatch,
+    // false = просмотр без правок (COMPLETED-матч), display-имя readOnly
+    canEditDisplayName: Boolean,
     onParticipantDisplayNameChange: (String) -> Unit
 ) {
     val participantDisplayName = participant.displayName
@@ -62,11 +64,13 @@ fun ParticipantDisplayNameComponent(
                 PlayerDisplayNameTextField(
                     modifier = Modifier.fillMaxWidth(),
                     state = firstPlayerDisplayNameState,
+                    readOnly = !canEditDisplayName,
                 )
                 Text("/")
                 PlayerDisplayNameTextField(
                     modifier = Modifier.fillMaxWidth(),
                     state = secondPlayerDisplayNameState,
+                    readOnly = !canEditDisplayName,
                 )
             }
         } else {
@@ -85,6 +89,7 @@ fun ParticipantDisplayNameComponent(
             PlayerDisplayNameTextField(
                 modifier = Modifier.fillMaxWidth(),
                 state = playerDisplayNameState,
+                readOnly = !canEditDisplayName,
             )
         }
     }
@@ -94,11 +99,13 @@ fun ParticipantDisplayNameComponent(
 @Composable
 fun PlayerDisplayNameTextField(
     modifier: Modifier = Modifier,
-    state: TextFieldState
+    state: TextFieldState,
+    readOnly: Boolean
 ) {
     TextField(
         modifier = Modifier.then(modifier),
         state = state,
+        readOnly = readOnly,
         inputTransformation = PlayerDisplayNameVisualTransformation
     )
 }

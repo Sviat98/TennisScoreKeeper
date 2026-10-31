@@ -8,6 +8,7 @@ import io.ktor.client.call.body
 import io.ktor.client.request.get
 import io.ktor.client.request.patch
 import io.ktor.client.request.post
+import io.ktor.client.request.put
 import io.ktor.client.request.setBody
 
 class TournamentRemoteDataSource(
@@ -42,6 +43,19 @@ class TournamentRemoteDataSource(
             }.body<TournamentDto>()
 
             tournamentDto
+        }
+    }
+
+    suspend fun updateTournament(
+        tournamentId: String,
+        updateTournamentBody: UpdateTournamentBody
+    ): LoadResult<ResponseMessage, Throwable> {
+        return runOperationCatching {
+            val message = httpClient.put("/tournaments/$tournamentId") {
+                setBody(updateTournamentBody)
+            }.body<ResponseMessage>()
+
+            message
         }
     }
 

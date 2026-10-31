@@ -22,6 +22,8 @@ import tennisscorekeeper.shared.generated.resources.preview
 fun ThemeComponent(
     modifier: Modifier = Modifier,
     themeComponentState: ThemeComponentState,
+    // false = выбор темы залочен (просмотр COMPLETED-матча/турнира), retry загрузки остаётся доступен
+    canEditTheme: Boolean,
     onThemesFetch: () -> Unit,
     onThemeSelected: (ScoreboardTheme) -> Unit,
     onRetrySelectedTheme: (Int) -> Unit,
@@ -39,6 +41,7 @@ fun ThemeComponent(
             ThemeCombobox(
                 modifier = Modifier.fillMaxWidth(0.9f),
                 themeComponentState = themeComponentState,
+                canEditTheme = canEditTheme,
                 onThemeSelected = onThemeSelected,
                 onThemesFetch = onThemesFetch,
                 onRetrySelectedTheme = onRetrySelectedTheme,
