@@ -6,6 +6,7 @@ import com.bashkevich.tennisscorekeeper.model.tournament.remote.TournamentRemote
 import com.bashkevich.tennisscorekeeper.model.tournament.repository.TournamentRepository
 import com.bashkevich.tennisscorekeeper.model.tournament.repository.TournamentRepositoryImpl
 import com.bashkevich.tennisscorekeeper.screens.addtournament.AddTournamentViewModel
+import com.bashkevich.tennisscorekeeper.screens.edittournament.EditTournamentViewModel
 import com.bashkevich.tennisscorekeeper.screens.tournamentdetails.TournamentViewModel
 import com.bashkevich.tennisscorekeeper.screens.tournamentlist.RefreshTournamentListScreenUseCase
 import com.bashkevich.tennisscorekeeper.screens.tournamentlist.TournamentListViewModel
@@ -17,6 +18,7 @@ val tournamentModule = module {
     single<RefreshTournamentListScreenUseCase>()
     viewModel<TournamentViewModel>()
     viewModel<AddTournamentViewModel>()
+    viewModel<EditTournamentViewModel>()
 
     single<TournamentRepositoryImpl>().bind(TournamentRepository::class)
     single<TournamentRemoteDataSource>()

@@ -15,6 +15,7 @@ import com.bashkevich.tennisscorekeeper.components.theme.ThemeComponentState
 import com.bashkevich.tennisscorekeeper.mvi.BaseViewModel
 import com.bashkevich.tennisscorekeeper.model.match.domain.Match
 import com.bashkevich.tennisscorekeeper.model.match.remote.ParticipantInMatchBody
+import com.bashkevich.tennisscorekeeper.model.match.remote.body.MatchStatus
 import com.bashkevich.tennisscorekeeper.model.match.remote.body.UpdateMatchBody
 import com.bashkevich.tennisscorekeeper.model.match.remote.convertToRgbString
 import com.bashkevich.tennisscorekeeper.model.match.repository.MatchRepository
@@ -27,7 +28,7 @@ import com.bashkevich.tennisscorekeeper.model.set_template.repository.SetTemplat
 import com.bashkevich.tennisscorekeeper.model.theme.domain.ScoreboardTheme
 import com.bashkevich.tennisscorekeeper.model.theme.repository.ThemeRepository
 import com.bashkevich.tennisscorekeeper.navigation.EditMatchRoute
-import com.bashkevich.tennisscorekeeper.screens.addmatch.AddMatchFetchHelper
+import com.bashkevich.tennisscorekeeper.screens.addmatch.TournamentAndMatchSettingsFetchHelper
 import com.bashkevich.tennisscorekeeper.screens.addmatch.OpenColorPickerDialogState
 import com.bashkevich.tennisscorekeeper.screens.matchdetails.ConnectionState
 import com.bashkevich.tennisscorekeeper.screens.matchdetails.MatchDetailsRefreshThemeUseCase
@@ -169,7 +170,7 @@ class EditMatchViewModel(
     // --- Настройки счёта матча (sets_to_win + шаблоны сетов): залочены от редактирования, только показываются.
     // Источник — сам матч (аналог _setsToWin/_regularSetId/_decidingSetId из AddMatch, но read-only из БД);
     // distinctUntilChanged нужен, чтобы счётные WS-кадры не перезапускали загрузку шаблонов
-    private val fetchHelper = AddMatchFetchHelper(themeRepository, setTemplateRepository)
+    private val fetchHelper = TournamentAndMatchSettingsFetchHelper(themeRepository, setTemplateRepository)
 
     private val setsToWin: StateFlow<Int> = matchFromDb
         .map { match: Match? -> match?.setsToWin ?: 1 }
@@ -409,6 +410,8 @@ class EditMatchViewModel(
 
     private fun saveMatch() {
         val edited = editedMatch.value ?: return
+        // COMPLETED — невозвратное состояние: экран открыт на просмотр, сохранение невозможно
+        if (edited.status == MatchStatus.COMPLETED) return
 
         viewModelScope.launch {
             _isSaving.value = true

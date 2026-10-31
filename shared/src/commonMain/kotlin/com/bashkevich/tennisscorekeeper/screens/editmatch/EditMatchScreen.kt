@@ -27,7 +27,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.bashkevich.tennisscorekeeper.LocalNavHostController
 import com.bashkevich.tennisscorekeeper.components.ComponentMode
-import com.bashkevich.tennisscorekeeper.components.add_match.MatchScoringAndThemeSettingsBlock
+import com.bashkevich.tennisscorekeeper.components.add_match.TournamentAndMatchSettingsBlock
 import com.bashkevich.tennisscorekeeper.components.add_match.participant.AddMatchParticipantsBlock
 import com.bashkevich.tennisscorekeeper.components.dialog.ColorPickerDialog
 import com.bashkevich.tennisscorekeeper.components.icons.IconGroup
@@ -79,6 +79,9 @@ fun EditMatchScreen(
     // возврат к исходным значениям (тот же цвет/тема/имя) снова даёт равенство
     val hasUnsavedChanges = match != null && editedMatch != null && editedMatch != match
 
+    // COMPLETED — невозвратное состояние: экран открыт на просмотр, все поля залочены
+    val isCompleted = match?.status == MatchStatus.COMPLETED
+
     val isSaveEnabled = match != null &&
             match.status != MatchStatus.COMPLETED &&
             editedMatch != null &&
@@ -90,7 +93,7 @@ fun EditMatchScreen(
         modifier = Modifier.then(modifier),
         topBar = {
             EditMatchTopAppBar(
-                isSaveVisible = hasUnsavedChanges,
+                isSaveVisible = hasUnsavedChanges && !isCompleted,
                 isSaveEnabled = isSaveEnabled,
                 onBack = { navController.navigateUp() },
                 onSave = { viewModel.onEvent(EditMatchUiEvent.SaveMatch) }
@@ -154,6 +157,9 @@ private fun EditMatchContent(
     editedMatch: Match,
     onEvent: (EditMatchUiEvent) -> Unit,
 ) {
+    // COMPLETED — невозвратное состояние: все поля залочены, экран открыт на просмотр
+    val isCompleted = editedMatch.status == MatchStatus.COMPLETED
+
     Box(
         modifier = Modifier.then(modifier)
             .fillMaxWidth()
@@ -172,13 +178,15 @@ private fun EditMatchContent(
             )
 
             // Выбор участника залочен (ComponentMode.EDIT), редактируются
-            // display-имена и цвета; адаптивность — как на экране добавления матча
+            // display-имена и цвета; адаптивность — как на экране добавления матча.
+            // У COMPLETED-матча залочено всё, включая display-имена и цвета
             AddMatchParticipantsBlock(
                 modifier = Modifier.fillMaxWidth(),
                 participantOptions = emptyList(),
                 firstParticipant = editedMatch.firstParticipant,
                 secondParticipant = editedMatch.secondParticipant,
                 mode = ComponentMode.EDIT,
+                canEditParticipants = !isCompleted,
                 onParticipantsFetch = {},
                 onParticipantChange = { _, _ -> },
                 onParticipantDisplayNameChange = { participantNumber, displayName ->
@@ -205,14 +213,16 @@ private fun EditMatchContent(
             // Тема + залоченные настройки счёта (sets_to_win, шаблоны сетов) — нижняя часть
             // как на экране добавления матча. На широком экране блок повторяет геометрию
             // блока участников (Row до 1000dp с weight-колонками), поэтому тема остаётся
-            // под первым участником; настройки счёта приходят в самом матче и не редактируются
-            MatchScoringAndThemeSettingsBlock(
+            // под первым участником; настройки счёта приходят в самом матче и не редактируются.
+            // У COMPLETED-матча залочена и тема
+            TournamentAndMatchSettingsBlock(
                 modifier = Modifier.fillMaxWidth(),
                 setsToWin = state.setsToWin,
                 regularSetComponentState = state.regularSetComponentState,
                 decidingSetComponentState = state.decidingSetComponentState,
                 themeComponentState = state.themeComponentState,
                 canEditMatchScoreSettings = false,
+                canEditTheme = !isCompleted,
                 onSetsToWinChange = {},
                 onSetTemplatesFetch = {},
                 onRegularSetTemplateChange = {},

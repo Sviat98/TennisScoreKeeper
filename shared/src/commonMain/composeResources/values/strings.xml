@@ -33,6 +33,7 @@
     <string name="add_match">Add Match</string>
     <string name="edit_match">Edit Match</string>
     <string name="add_tournament">Add Tournament</string>
+    <string name="edit_tournament">Edit Tournament</string>
     <string name="navigate_back">Navigate back</string>
     <string name="navigate_to_settings">Navigate to settings</string>
     <string name="copy_link">Copy link</string>

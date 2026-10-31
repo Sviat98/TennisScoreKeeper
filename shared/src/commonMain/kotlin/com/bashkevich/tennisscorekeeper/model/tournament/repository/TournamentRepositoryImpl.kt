@@ -18,6 +18,7 @@ import com.bashkevich.tennisscorekeeper.model.tournament.remote.AddTournamentBod
 import com.bashkevich.tennisscorekeeper.model.tournament.remote.TournamentRemoteDataSource
 import com.bashkevich.tennisscorekeeper.model.tournament.remote.TournamentStatus
 import com.bashkevich.tennisscorekeeper.model.tournament.remote.TournamentStatusBody
+import com.bashkevich.tennisscorekeeper.model.tournament.remote.UpdateTournamentBody
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.flow
@@ -62,6 +63,18 @@ class TournamentRepositoryImpl(
             .mapSuccess { tournamentDto ->
                 tournamentDto.toDomain()
             }
+    }
+
+    // PUT возвращает ResponseMessage — локальный кэш не обновляем: при возврате на экран
+    // деталей турнира RefreshTournamentDetailsUseCase перезабирает турнир из сети в БД
+    override suspend fun updateTournament(
+        tournamentId: Int,
+        updateTournamentBody: UpdateTournamentBody
+    ): LoadResult<Unit, Throwable> {
+        return tournamentRemoteDataSource.updateTournament(
+            tournamentId = tournamentId.toString(),
+            updateTournamentBody = updateTournamentBody
+        ).mapSuccess { }
     }
 
     override suspend fun changeTournamentStatus(

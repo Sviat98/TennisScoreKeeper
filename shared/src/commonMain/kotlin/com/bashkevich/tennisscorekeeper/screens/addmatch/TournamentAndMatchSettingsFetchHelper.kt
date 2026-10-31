@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.onStart
 
-class AddMatchFetchHelper(
+class TournamentAndMatchSettingsFetchHelper(
     private val themeRepository: ThemeRepository,
     private val setTemplateRepository: SetTemplateRepository,
 ) {

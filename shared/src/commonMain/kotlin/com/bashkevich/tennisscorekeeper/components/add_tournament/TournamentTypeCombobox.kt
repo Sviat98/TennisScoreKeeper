@@ -32,8 +32,9 @@ import tennisscorekeeper.shared.generated.resources.tournament_type
 @Composable
 fun TournamentTypeCombobox(
     modifier: Modifier = Modifier,
-    enabled: Boolean = true,
     currentTournamentType: TournamentType?,
+    // false = выбор типа залочен (EditTournament / тип из upcoming-турнира), тип только показывается
+    canEditType: Boolean,
     onTournamentTypeChange: (TournamentType) -> Unit,
 ) {
     var expanded by remember { mutableStateOf(false) }
@@ -49,11 +50,11 @@ fun TournamentTypeCombobox(
             state = tournamentTypeState,
             placeholder = { Text(stringResource(Res.string.tournament_type)) },
             readOnly = true,
-            enabled = enabled,
+            enabled = canEditType,
             trailingIcon = {
                 IconButton(
                     onClick = { expanded = true },
-                    enabled = enabled
+                    enabled = canEditType
                 ) {
                     Icon(
                         imageVector = IconGroup.Default.ArrowDropDown,
@@ -69,7 +70,7 @@ fun TournamentTypeCombobox(
             )
         )
 
-        if (enabled) {
+        if (canEditType) {
             DropdownMenu(
                 expanded = expanded,
                 onDismissRequest = { expanded = false }
