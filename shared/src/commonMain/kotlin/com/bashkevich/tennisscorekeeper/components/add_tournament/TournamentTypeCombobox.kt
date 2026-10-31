@@ -33,6 +33,8 @@ import tennisscorekeeper.shared.generated.resources.tournament_type
 fun TournamentTypeCombobox(
     modifier: Modifier = Modifier,
     currentTournamentType: TournamentType?,
+    // false = выбор типа залочен (EditTournament), тип только показывается
+    canEditType: Boolean,
     onTournamentTypeChange: (TournamentType) -> Unit,
 ) {
     var expanded by remember { mutableStateOf(false) }
@@ -48,9 +50,11 @@ fun TournamentTypeCombobox(
             state = tournamentTypeState,
             placeholder = { Text(stringResource(Res.string.tournament_type)) },
             readOnly = true,
+            enabled = canEditType,
             trailingIcon = {
                 IconButton(
-                    onClick = { expanded = true }
+                    onClick = { expanded = true },
+                    enabled = canEditType
                 ) {
                     Icon(
                         imageVector = IconGroup.Default.ArrowDropDown,
@@ -66,18 +70,20 @@ fun TournamentTypeCombobox(
             )
         )
 
-        DropdownMenu(
-            expanded = expanded,
-            onDismissRequest = { expanded = false }
-        ) {
-            options.forEach { option ->
-                DropdownMenuItem(
-                    text = { Text(text = stringResource(option.toResource())) },
-                    onClick = {
-                        onTournamentTypeChange(option)
-                        expanded = false
-                    }
-                )
+        if (canEditType) {
+            DropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { expanded = false }
+            ) {
+                options.forEach { option ->
+                    DropdownMenuItem(
+                        text = { Text(text = stringResource(option.toResource())) },
+                        onClick = {
+                            onTournamentTypeChange(option)
+                            expanded = false
+                        }
+                    )
+                }
             }
         }
     }

@@ -21,7 +21,11 @@ import com.bashkevich.tennisscorekeeper.model.tournament.remote.TournamentType
 fun TournamentNameAndTypeComponent(
     modifier: Modifier = Modifier,
     tournamentNameState: TextFieldState,
+    // false = просмотр без правок (COMPLETED-турнир), имя readOnly
+    canEditName: Boolean,
     currentTournamentType: TournamentType?,
+    // false = выбор типа залочен (EditTournament), тип только показывается
+    canEditType: Boolean,
     onTournamentTypeChange: (TournamentType) -> Unit,
 ) {
     val windowSize = currentWindowAdaptiveInfoV2().windowSizeClass
@@ -42,7 +46,8 @@ fun TournamentNameAndTypeComponent(
                 ) {
                     TournamentNameComponent(
                         modifier = Modifier.widthIn(max = 300.dp).fillMaxWidth(),
-                        tournamentNameState = tournamentNameState
+                        tournamentNameState = tournamentNameState,
+                        canEditName = canEditName
                     )
                 }
                 Box(
@@ -52,6 +57,7 @@ fun TournamentNameAndTypeComponent(
                     TournamentTypeComponent(
                         modifier = Modifier.widthIn(max = 300.dp).fillMaxWidth(),
                         currentTournamentType = currentTournamentType,
+                        canEditType = canEditType,
                         onTournamentTypeChange = onTournamentTypeChange,
                     )
                 }
@@ -62,11 +68,13 @@ fun TournamentNameAndTypeComponent(
             ) {
                 TournamentNameComponent(
                     modifier = Modifier.widthIn(max = 300.dp).fillMaxWidth(),
-                    tournamentNameState = tournamentNameState
+                    tournamentNameState = tournamentNameState,
+                    canEditName = canEditName
                 )
                 TournamentTypeComponent(
                     modifier = Modifier.widthIn(max = 300.dp).fillMaxWidth(),
                     currentTournamentType = currentTournamentType,
+                    canEditType = canEditType,
                     onTournamentTypeChange = onTournamentTypeChange,
                 )
             }

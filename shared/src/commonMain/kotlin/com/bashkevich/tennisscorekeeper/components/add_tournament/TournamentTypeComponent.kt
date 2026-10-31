@@ -11,6 +11,8 @@ import com.bashkevich.tennisscorekeeper.model.tournament.remote.TournamentType
 fun TournamentTypeComponent(
     modifier: Modifier = Modifier,
     currentTournamentType: TournamentType?,
+    // false = выбор типа залочен (EditTournament), тип только показывается
+    canEditType: Boolean,
     onTournamentTypeChange: (TournamentType) -> Unit,
 ) {
     Column(
@@ -20,6 +22,7 @@ fun TournamentTypeComponent(
         TournamentTypeCombobox(
             modifier = Modifier.fillMaxWidth(),
             currentTournamentType = currentTournamentType,
+            canEditType = canEditType,
             onTournamentTypeChange = onTournamentTypeChange,
         )
     }

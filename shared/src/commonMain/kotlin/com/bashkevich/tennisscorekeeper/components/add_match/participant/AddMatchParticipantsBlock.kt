@@ -24,6 +24,8 @@ fun AddMatchParticipantsBlock(
     firstParticipant: TennisParticipantInMatch,
     secondParticipant: TennisParticipantInMatch,
     mode: ComponentMode,
+    // false = просмотр без правок (COMPLETED-матч): display-имя readOnly, цвета залочены
+    canEditParticipants: Boolean,
     onParticipantsFetch: () -> Unit,
     onParticipantChange: (Int, TennisParticipant) -> Unit,
     onParticipantDisplayNameChange: (Int, String) -> Unit,
@@ -53,6 +55,7 @@ fun AddMatchParticipantsBlock(
                         participantOptions = firstParticipantOptions,
                         participant = firstParticipant,
                         mode = mode,
+                        canEditParticipants = canEditParticipants,
                         onParticipantsFetch = onParticipantsFetch,
                         onParticipantChange = { participant ->
                             onParticipantChange(1, participant)
@@ -80,6 +83,7 @@ fun AddMatchParticipantsBlock(
                         participantOptions = secondParticipantOptions,
                         participant = secondParticipant,
                         mode = mode,
+                        canEditParticipants = canEditParticipants,
                         onParticipantsFetch = onParticipantsFetch,
                         onParticipantChange = { participant ->
                             onParticipantChange(2, participant)
@@ -109,6 +113,7 @@ fun AddMatchParticipantsBlock(
                     participantOptions = firstParticipantOptions,
                     participant = firstParticipant,
                     mode = mode,
+                    canEditParticipants = canEditParticipants,
                     onParticipantsFetch = onParticipantsFetch,
                     onParticipantChange = { participant ->
                         onParticipantChange(1, participant)
@@ -131,6 +136,7 @@ fun AddMatchParticipantsBlock(
                     participantOptions = secondParticipantOptions,
                     participant = secondParticipant,
                     mode = mode,
+                    canEditParticipants = canEditParticipants,
                     onParticipantsFetch = onParticipantsFetch,
                     onParticipantChange = { participant ->
                         onParticipantChange(2, participant)

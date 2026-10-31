@@ -55,6 +55,7 @@ fun AddMatchComponent(
             firstParticipant = participantState.firstParticipant,
             secondParticipant = participantState.secondParticipant,
             mode = ComponentMode.ADD,
+            canEditParticipants = true,
             onParticipantsFetch = { onEvent(AddMatchUiEvent.FetchParticipants) },
             onParticipantChange = { participantNumber, participant ->
                 onEvent(
@@ -90,12 +91,13 @@ fun AddMatchComponent(
             }
         )
 
-        MatchScoringAndThemeSettingsBlock(
+        TournamentAndMatchSettingsBlock(
             setsToWin = contentState.setsToWin,
             regularSetComponentState = contentState.regularSetComponentState,
             decidingSetComponentState = contentState.decidingSetComponentState,
             themeComponentState = contentState.themeComponentState,
             canEditMatchScoreSettings = true,
+            canEditTheme = true,
             onSetsToWinChange = { delta -> onEvent(AddMatchUiEvent.ChangeSetsToWin(delta)) },
             onSetTemplatesFetch = { filter ->
                 onEvent(AddMatchUiEvent.FetchSetTemplates(filter))

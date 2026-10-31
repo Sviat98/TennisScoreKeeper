@@ -96,7 +96,7 @@ class AddMatchViewModel(
     private val _setsToWin = MutableStateFlow(tournamentFromDb.value.setsToWin)
 
     // --- Fetch helper ---
-    private val fetchHelper = AddMatchFetchHelper(themeRepository, setTemplateRepository)
+    private val fetchHelper = TournamentAndMatchSettingsFetchHelper(themeRepository, setTemplateRepository)
 
     // --- Fetch results via helper ---
     private val regularSetFetchResult = tournamentFromDb.flatMapLatest { tournament ->
