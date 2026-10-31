@@ -139,8 +139,8 @@ class MatchRepositoryImpl(
         )
     }
 
-    // Локальный кэш не обновляем вручную: после PUT сервер рассылает обновлённый MatchDto
-    // по WebSocket, и активная подписка observeMatchUpdatesFromSaveToDb пере-кэширует матч
+    // PUT возвращает обновлённый MatchDto — кэшируем его сразу; сервер дополнительно рассылает
+    // тот же снапшот по WebSocket, повторный insertMatch (REPLACE) идемпотентен
     override suspend fun updateMatch(
         matchId: Int,
         updateMatchBody: UpdateMatchBody
@@ -148,7 +148,11 @@ class MatchRepositoryImpl(
         return matchRemoteDataSource.updateMatch(
             matchId = matchId.toString(),
             updateMatchBody = updateMatchBody
-        ).mapSuccess { }
+        )
+            .doOnSuccess { matchDto ->
+                matchLocalDataSource.insertMatch(matchDto.toMatchWithParticipantsEntity())
+            }
+            .mapSuccess { }
     }
 
     override suspend fun deleteMatchesForTournament(tournamentId: Int) {
