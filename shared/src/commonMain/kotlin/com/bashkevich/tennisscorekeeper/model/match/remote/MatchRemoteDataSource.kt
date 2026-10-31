@@ -197,14 +197,14 @@ class MatchRemoteDataSource(
     suspend fun updateMatch(
         matchId: String,
         updateMatchBody: UpdateMatchBody
-    ): LoadResult<ResponseMessage, Throwable> {
+    ): LoadResult<MatchDto, Throwable> {
         return runOperationCatching {
-            val message = httpClient.put("/matches/$matchId") {
+            val matchDto = httpClient.put("/matches/$matchId") {
                 setBody(updateMatchBody)
-            }.body<ResponseMessage>()
+            }.body<MatchDto>()
 
-            println(message)
-            message
+            println(matchDto)
+            matchDto
         }
     }
 
