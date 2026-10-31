@@ -61,6 +61,8 @@ fun TournamentListAppBarWithButton(
 fun TournamentDetailsAppBar(
     onBack: () -> Unit,
     onEditClick: () -> Unit,
+    // false = детали турнира ещё не загружены, id для перехода неизвестен
+    isEditEnabled: Boolean,
     onNavigateToSettings: () -> Unit
 ) {
     TopAppBar(
@@ -76,7 +78,7 @@ fun TournamentDetailsAppBar(
             }
         },
         actions = {
-            IconButton(onClick = onEditClick) {
+            IconButton(onClick = onEditClick, enabled = isEditEnabled) {
                 Icon(IconGroup.Default.Edit, contentDescription = stringResource(Res.string.edit))
             }
             IconButton(onClick = onNavigateToSettings) {
