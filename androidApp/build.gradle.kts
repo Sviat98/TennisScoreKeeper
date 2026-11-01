@@ -74,6 +74,8 @@ dependencies {
     implementation(libs.media.player)
     implementation(libs.sdp.ssp)
     testImplementation(libs.junit)
+    // для AppConfigTest: свойства AppConfig типизированы классами ktor-http
+    testImplementation(libs.ktor.client.core)
     coreLibraryDesugaring(libs.android.core.desugaring)
     androidTestImplementation(libs.androidx.test.junit)
     androidTestImplementation(libs.androidx.espresso.core)

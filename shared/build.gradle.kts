@@ -126,16 +126,43 @@ val buildMode  = providers.environmentVariable("BUILD_MODE")
     .orElse("DEBUG")
     .get()
 
+require(buildMode == "DEBUG" || buildMode == "RELEASE") { "Unknown BUILD_MODE: $buildMode (expected DEBUG or RELEASE)" }
+
+// Обязательные URL без дефолтов: env -> gradle property, иначе ошибка сборки.
+// Хвостовой слэш обрезается, чтобы endpoint-пути ("/tournaments" и т.п.) не склеивались в двойной слэш.
+fun requiredUrl(name: String): String {
+    val value = providers.environmentVariable(name).filter { it.isNotBlank() }
+        .orElse(providers.gradleProperty(name).filter { it.isNotBlank() })
+        .orElse("")
+        .get()
+        .trim()
+        .trimEnd('/')
+    if (value.isBlank()) {
+        throw GradleException(
+            "$name is not set. Pass it as an environment variable or Gradle property, " +
+                "e.g. -P$name=https://your-host (in CI: BACKEND_URL/FRONTEND_URL build-args)."
+        )
+    }
+    return value
+}
+
+val backendUrl = requiredUrl("BACKEND_URL")
+val frontendUrl = requiredUrl("FRONTEND_URL")
+
 buildkonfig {
     packageName = "com.bashkevich.tennisscorekeeper"
     objectName = "BuildConfig"
 
     defaultConfigs {
         buildConfigField(FieldSpec.Type.STRING, "buildMode",buildMode)
+        buildConfigField(FieldSpec.Type.STRING, "backendUrl", backendUrl)
+        buildConfigField(FieldSpec.Type.STRING, "frontendUrl", frontendUrl)
     }
 }
 
 println("buildMode = $buildMode")
+println("backendUrl = $backendUrl")
+println("frontendUrl = $frontendUrl")
 
 gradle.taskGraph.whenReady {
     val lastTask = allTasks.lastOrNull()
