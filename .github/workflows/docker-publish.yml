@@ -19,6 +19,10 @@ env:
   IMAGE_NAME: ${{ github.repository }}
   # build mode: DEBUG or RELEASE
   BUILD_MODE: RELEASE
+  # API hosts baked into the app at build time (repository variables, not secrets);
+  # missing variables expand to empty strings and the Gradle build fails with a clear message
+  BACKEND_URL: ${{ vars.BACKEND_URL }}
+  FRONTEND_URL: ${{ vars.FRONTEND_URL }}
 
 
 jobs:
@@ -85,6 +89,8 @@ jobs:
           cache-to: type=gha,mode=max
           build-args: |
                       BUILD_MODE=${{ env.BUILD_MODE }}
+                      BACKEND_URL=${{ env.BACKEND_URL }}
+                      FRONTEND_URL=${{ env.FRONTEND_URL }}
 
       # Sign the resulting Docker image digest except on PRs.
       # This will only write to the public Rekor transparency log when the Docker

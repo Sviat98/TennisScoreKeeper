@@ -30,18 +30,24 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ./gradlew :androidApp:testDebugUnitTest --tests "com.bashkevich.tennisscorekeeper.ExampleUnitTest"
 ```
 
-Build mode is controlled via `BUILD_MODE` env var or Gradle property (defaults to `DEBUG`). DEBUG uses `tennisscorekeeper.onrender.com` API host, RELEASE uses `tennisscorekeeper.tech`.
+API hosts are controlled via **required** `BACKEND_URL` and `FRONTEND_URL` env vars (or Gradle properties `-PBACKEND_URL=...` / `-PFRONTEND_URL=...`). There are no defaults — the build fails with a clear error if they are missing. Values are trimmed and a trailing slash is stripped, so `https://host/` is safe and endpoint paths won't get a double slash. The backend URL is full (`http`/`https` + optional port): HTTP requests use its scheme/host/port, and WebSockets derive `ws`/`wss` from the same scheme (see `AppConfig`).
+
+Deployment chain: GitHub **repository variables** `BACKEND_URL`/`FRONTEND_URL` (Settings → Secrets and variables → Actions → Variables; URLs are not secrets) → build-args in `.github/workflows/docker-publish.yml` → `ARG`/`ENV` in the Dockerfile → Gradle env → buildKonfig fields `BuildConfig.backendUrl`/`frontendUrl`. To deploy different hosts, change the variables and re-run the Actions build.
+
+`BUILD_MODE` env var or Gradle property (defaults to `DEBUG`) only selects the wasm distribution task (dev vs prod bundle) and lands in `BuildConfig.buildMode` for logging — it no longer selects API hosts.
+
+Local development: pass the vars inline (`BACKEND_URL=http://localhost:8080 FRONTEND_URL=http://127.0.0.1:8080 ./gradlew ...`) or set them once in the user-global `~/.gradle/gradle.properties` (not committed).
 
 ## Running in browser (wasmJs)
 
 ```bash
-# Dev server with RELEASE API hosts (env var must be in the same command — shell state does not persist between calls)
-BUILD_MODE=RELEASE ./gradlew :webApp:wasmJsBrowserDevelopmentRun
+# Dev server with prod API hosts (env vars must be in the same command — shell state does not persist between calls)
+BACKEND_URL=https://api.tennisscorekeeper.tech FRONTEND_URL=https://tennisscorekeeper.tech BUILD_MODE=RELEASE ./gradlew :webApp:wasmJsBrowserDevelopmentRun
 ```
 
 - Opens at `http://127.0.0.1:8080` (use `127.0.0.1`, NOT `localhost` — backend CORS rejects the `localhost` origin on WebSocket upgrades with 403; see `plugins/Cors.kt` in the backend).
 - First build takes ~2–3 minutes; the wasm bundle is ~43 MiB.
-- BUILD_MODE only selects API hosts (via BuildKonfig `BuildConfig.buildMode`), it does not change binary optimization.
+- BUILD_MODE only selects the wasm distribution task (dev vs prod bundle); API hosts come from the required `BACKEND_URL`/`FRONTEND_URL` vars (see Build Commands above). BUILD_MODE does not change binary optimization.
 - In ZCode's in-app browser the page is NOT cross-origin isolated (`crossOriginIsolated === false`) even though the dev server sends COOP/COEP headers, so sqlite OPFS fails with `sqlite3.oo1.OpfsDb is not a constructor` and webpack shows a red error overlay. The app still renders behind the overlay (dismiss via the top-right ×). In a real Chrome everything works, OPFS included. On Windows open the user's Chrome from Git Bash with `cmd //c start chrome "http://127.0.0.1:8080"` — the in-app browser automation backend cannot control an external Chrome.
 
 ### WebSocket (local testing)
