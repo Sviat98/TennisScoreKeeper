@@ -1,21 +1,31 @@
 package com.bashkevich.tennisscorekeeper
 
-import com.bashkevich.tennisscorekeeper.core.remote.BASE_HOST_BACKEND_DEBUG
-import com.bashkevich.tennisscorekeeper.core.remote.BASE_HOST_BACKEND_RELEASE
-import com.bashkevich.tennisscorekeeper.core.remote.BASE_URL_FRONTEND_DEBUG
-import com.bashkevich.tennisscorekeeper.core.remote.BASE_URL_FRONTEND_RELEASE
+import io.ktor.http.Url
+import io.ktor.http.URLProtocol
 
 data class AppConfig(
     val baseUrlFrontend: String,
-    val baseHostBackend: String
-){
-    companion object{
-        private val debugConfig: AppConfig by lazy {
-            AppConfig(BASE_URL_FRONTEND_DEBUG, BASE_HOST_BACKEND_DEBUG)
-        }
+    val baseUrlBackend: String,
+) {
+    private val parsedBackendUrl: Url = Url(baseUrlBackend)
 
-        private val releaseConfig: AppConfig by lazy {
-            AppConfig(BASE_URL_FRONTEND_RELEASE, BASE_HOST_BACKEND_RELEASE)
+    val backendProtocol: URLProtocol = parsedBackendUrl.protocol
+
+    val backendHost: String = parsedBackendUrl.host
+
+    // Url.port сам подставляет protocol.defaultPort, когда порт не указан
+    // («не указан» в Ktor = DEFAULT_PORT = 0), поэтому для https/http всегда 443/80
+    val backendPort: Int = parsedBackendUrl.port
+
+    val backendWsProtocol: URLProtocol =
+        if (parsedBackendUrl.protocol == URLProtocol.HTTPS) URLProtocol.WSS else URLProtocol.WS
+
+    companion object{
+        val current: AppConfig by lazy {
+            AppConfig(
+                baseUrlFrontend = BuildConfig.frontendUrl,
+                baseUrlBackend = BuildConfig.backendUrl,
+            )
         }
 
         fun logBuildMode() {
@@ -24,13 +34,6 @@ data class AppConfig(
         }
 
         private fun getBuildMode(): BuildMode = BuildMode.valueOf(BuildConfig.buildMode)
-
-        val current: AppConfig
-            get() =
-                when (getBuildMode()) {
-                    BuildMode.DEBUG -> debugConfig
-                    BuildMode.RELEASE -> releaseConfig
-                }
     }
 }
 

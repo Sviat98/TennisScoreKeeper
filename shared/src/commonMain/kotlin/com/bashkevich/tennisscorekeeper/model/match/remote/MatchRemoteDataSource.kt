@@ -22,7 +22,6 @@ import io.ktor.client.request.patch
 import io.ktor.client.request.post
 import io.ktor.client.request.put
 import io.ktor.client.request.setBody
-import io.ktor.http.URLProtocol
 import io.ktor.http.path
 import io.ktor.websocket.CloseReason
 import io.ktor.websocket.Frame
@@ -277,9 +276,9 @@ class MatchRemoteDataSource(
                 try {
                     session = httpClient.webSocketSession {
                         url {
-                            protocol = URLProtocol.WSS
-                            host = appConfig.baseHostBackend
-                            port = 443
+                            protocol = appConfig.backendWsProtocol
+                            host = appConfig.backendHost
+                            port = appConfig.backendPort
                             path("/matches/$matchId")
                         }
                     }
@@ -399,9 +398,9 @@ class MatchRemoteDataSource(
                     webSocketSession =
                         httpClient.webSocketSession {
                             url {
-                                protocol = URLProtocol.WSS
-                                host = appConfig.baseHostBackend
-                                port = 443
+                                protocol = appConfig.backendWsProtocol
+                                host = appConfig.backendHost
+                                port = appConfig.backendPort
                                 path("/matches/$matchId")
                             }
                         }
