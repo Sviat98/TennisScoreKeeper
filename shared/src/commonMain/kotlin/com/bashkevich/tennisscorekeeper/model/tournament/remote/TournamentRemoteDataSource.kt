@@ -42,13 +42,13 @@ class TournamentRemoteDataSource(
     suspend fun updateTournament(
         tournamentId: String,
         updateTournamentBody: UpdateTournamentBody
-    ): LoadResult<ResponseMessage, Throwable> {
+    ): LoadResult<TournamentDto, Throwable> {
         return runOperationCatching {
-            val message = httpClient.put("/tournaments/$tournamentId") {
+            val tournamentDto = httpClient.put("/tournaments/$tournamentId") {
                 setBody(updateTournamentBody)
-            }.body<ResponseMessage>()
+            }.body<TournamentDto>()
 
-            message
+            tournamentDto
         }
     }
 
