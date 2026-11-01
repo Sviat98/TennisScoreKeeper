@@ -40,7 +40,6 @@ import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
-import io.ktor.http.URLProtocol
 import io.ktor.http.contentType
 import io.ktor.http.parameters
 import io.ktor.serialization.kotlinx.KotlinxWebsocketSerializationConverter
@@ -104,8 +103,9 @@ val coreModule = module {
             }
             defaultRequest {
                 url {
-                    protocol = URLProtocol.HTTPS
-                    host = appConfig.baseHostBackend
+                    protocol = appConfig.backendProtocol
+                    host = appConfig.backendHost
+                    port = appConfig.backendPort
                 }
                 contentType(ContentType.Application.Json)
                 header(HttpHeaders.Origin, appConfig.baseUrlFrontend)
