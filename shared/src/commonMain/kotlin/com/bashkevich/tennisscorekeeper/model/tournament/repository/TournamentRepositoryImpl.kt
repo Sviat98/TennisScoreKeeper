@@ -65,8 +65,8 @@ class TournamentRepositoryImpl(
             }
     }
 
-    // PUT возвращает ResponseMessage — локальный кэш не обновляем: при возврате на экран
-    // деталей турнира RefreshTournamentDetailsUseCase перезабирает турнир из сети в БД
+    // PUT возвращает обновлённый TournamentDto — кэшируем его сразу (REPLACE-апsert, как в
+    // addTournament): экран редактирования сразу видит обновление из БД, экран деталей — тоже
     override suspend fun updateTournament(
         tournamentId: Int,
         updateTournamentBody: UpdateTournamentBody
@@ -74,7 +74,11 @@ class TournamentRepositoryImpl(
         return tournamentRemoteDataSource.updateTournament(
             tournamentId = tournamentId.toString(),
             updateTournamentBody = updateTournamentBody
-        ).mapSuccess { }
+        )
+            .doOnSuccess { tournamentDto ->
+                tournamentLocalDataSource.insertTournament(tournamentDto.toEntity())
+            }
+            .mapSuccess { }
     }
 
     override suspend fun changeTournamentStatus(
