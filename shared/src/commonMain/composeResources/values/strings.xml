@@ -16,6 +16,7 @@
     <string name="error_loading_theme">Error loading theme</string>
     <string name="error_loading_set_template">Error loading set template</string>
     <string name="select_set_template">Select set template</string>
+    <string name="set_template_not_selected">No set template selected</string>
     <string name="retry">Retry</string>
     <string name="open_dropdown">Open dropdown</string>
     <string name="toggle_section">Expand/collapse</string>
@@ -132,6 +133,14 @@
     <!-- Set Template -->
     <string name="regular_set_template">Regular Set Format</string>
     <string name="deciding_set_template">Deciding Set Format</string>
+    <string name="games_to_win">Games to win</string>
+    <string name="tiebreak_mode">Tiebreak</string>
+    <string name="tiebreak_mode_no">No tiebreak</string>
+    <string name="tiebreak_mode_early">Early (at %1$d:%2$d)</string>
+    <string name="tiebreak_mode_late">Late (at %1$d:%2$d)</string>
+    <string name="tiebreak_points_to_win">Tiebreak points to win</string>
+    <string name="has_deciding_point">Deciding point in a game</string>
+    <string name="has_tiebreak_deciding_point">Deciding point in a tiebreak</string>
 
     <!-- Settings -->
     <string name="general_settings">General Settings</string>
