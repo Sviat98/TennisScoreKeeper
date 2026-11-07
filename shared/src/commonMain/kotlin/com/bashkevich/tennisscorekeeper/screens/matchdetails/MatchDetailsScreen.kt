@@ -30,8 +30,8 @@ import com.bashkevich.tennisscorekeeper.components.expect.shareLinkPayload
 import com.bashkevich.tennisscorekeeper.components.match_details.ScoreboardControlPanel
 import com.bashkevich.tennisscorekeeper.components.scoreboard.match_details.MatchDetailsScoreboardView
 import com.bashkevich.tennisscorekeeper.components.showUnauthorizedActionSnackbar
+import com.bashkevich.tennisscorekeeper.components.status.StatusText
 import com.bashkevich.tennisscorekeeper.components.theme.ThemeLoadErrorRow
-import com.bashkevich.tennisscorekeeper.model.match.remote.body.toResource
 import com.bashkevich.tennisscorekeeper.model.theme.domain.ScoreboardThemeState
 import com.bashkevich.tennisscorekeeper.model.theme.domain.themeOrDefault
 import com.bashkevich.tennisscorekeeper.mvi.LaunchedUiEffectHandler
@@ -40,9 +40,6 @@ import com.bashkevich.tennisscorekeeper.navigation.SettingsFlowRoute
 import com.mobilebytelabs.kmptoolkit.share.ExperimentalShareApi
 import com.mobilebytelabs.kmptoolkit.share.compose.rememberShareLauncher
 import kotlinx.coroutines.launch
-import org.jetbrains.compose.resources.stringResource
-import tennisscorekeeper.shared.generated.resources.Res
-import tennisscorekeeper.shared.generated.resources.status
 
 @Composable
 fun MatchDetailsScreen(
@@ -142,8 +139,7 @@ fun MatchDetailsCommonContent(
                     ThemeLoadErrorRow(onRetry = { onEvent(MatchDetailsUiEvent.RetryThemeLoad) })
                 }
 
-                val statusText = stringResource(match.status.toResource())
-                Text("${stringResource(Res.string.status)}: $statusText")
+                StatusText(modifier = Modifier, status = match.status)
 
                 ScoreboardControlPanel(
                     connectionState = state.connectionState,

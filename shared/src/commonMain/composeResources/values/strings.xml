@@ -77,16 +77,15 @@
     <!-- Tabs & Status -->
     <string name="matches">Matches</string>
     <string name="participants">Participants</string>
-    <string name="status">Status</string>
-    <string name="match_status_not_started">Not started</string>
-    <string name="match_status_in_progress">In progress</string>
-    <string name="match_status_paused">Paused</string>
-    <string name="match_status_completed">Completed</string>
+    <string name="match_status_not_started">not started</string>
+    <string name="match_status_in_progress">in progress</string>
+    <string name="match_status_paused">paused</string>
+    <string name="match_status_completed">completed</string>
     <string name="tournament_type_singles">Singles</string>
     <string name="tournament_type_doubles">Doubles</string>
-    <string name="tournament_status_not_started">Not started</string>
-    <string name="tournament_status_in_progress">In progress</string>
-    <string name="tournament_status_completed">Completed</string>
+    <string name="tournament_status_not_started">not started</string>
+    <string name="tournament_status_in_progress">in progress</string>
+    <string name="tournament_status_completed">completed</string>
 
     <!-- Placeholders & Labels -->
     <string name="tournament_name">Tournament name</string>
