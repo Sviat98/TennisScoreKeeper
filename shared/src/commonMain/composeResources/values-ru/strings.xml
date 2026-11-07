@@ -77,16 +77,15 @@
     <!-- Tabs & Status -->
     <string name="matches">Матчи</string>
     <string name="participants">Участники</string>
-    <string name="status">Статус</string>
-    <string name="match_status_not_started">Не начат</string>
-    <string name="match_status_in_progress">Идёт</string>
-    <string name="match_status_paused">Остановлен</string>
-    <string name="match_status_completed">Завершён</string>
+    <string name="match_status_not_started">не начат</string>
+    <string name="match_status_in_progress">идёт</string>
+    <string name="match_status_paused">остановлен</string>
+    <string name="match_status_completed">завершён</string>
     <string name="tournament_type_singles">Одиночный</string>
     <string name="tournament_type_doubles">Парный</string>
-    <string name="tournament_status_not_started">Не начат</string>
-    <string name="tournament_status_in_progress">Идёт</string>
-    <string name="tournament_status_completed">Завершён</string>
+    <string name="tournament_status_not_started">не начат</string>
+    <string name="tournament_status_in_progress">идёт</string>
+    <string name="tournament_status_completed">завершён</string>
 
     <!-- Placeholders & Labels -->
     <string name="tournament_name">Название турнира</string>

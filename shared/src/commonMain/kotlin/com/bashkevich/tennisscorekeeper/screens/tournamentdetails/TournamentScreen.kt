@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
@@ -34,13 +35,17 @@ import com.bashkevich.tennisscorekeeper.LocalNavHostController
 import com.bashkevich.tennisscorekeeper.components.TournamentDetailsAppBar
 import com.bashkevich.tennisscorekeeper.components.showUnauthorizedActionSnackbar
 import com.bashkevich.tennisscorekeeper.components.modifier.refreshByKeyboard
+import com.bashkevich.tennisscorekeeper.components.status.StatusText
 import com.bashkevich.tennisscorekeeper.components.tournament.ChangeTournamentStatusButton
 import com.bashkevich.tennisscorekeeper.components.icons.IconGroup
 import com.bashkevich.tennisscorekeeper.mvi.LaunchedUiEffectHandler
 import com.bashkevich.tennisscorekeeper.components.icons.default_icons.Add
+import com.bashkevich.tennisscorekeeper.components.icons.default_icons.Group
+import com.bashkevich.tennisscorekeeper.components.icons.default_icons.Person
 import com.bashkevich.tennisscorekeeper.components.tournament.TournamentDetailsLoading
-import com.bashkevich.tennisscorekeeper.model.tournament.remote.toResource
 import com.bashkevich.tennisscorekeeper.model.tournament.remote.TournamentStatus
+import com.bashkevich.tennisscorekeeper.model.tournament.remote.TournamentType
+import com.bashkevich.tennisscorekeeper.model.tournament.remote.toResource
 import com.bashkevich.tennisscorekeeper.navigation.AddMatchRoute
 import com.bashkevich.tennisscorekeeper.navigation.EditTournamentRoute
 import com.bashkevich.tennisscorekeeper.navigation.MatchDetailsRoute
@@ -54,7 +59,6 @@ import tennisscorekeeper.shared.generated.resources.Res
 import tennisscorekeeper.shared.generated.resources.add_match
 import tennisscorekeeper.shared.generated.resources.matches
 import tennisscorekeeper.shared.generated.resources.participants
-import tennisscorekeeper.shared.generated.resources.status
 
 @Composable
 fun TournamentScreen(
@@ -176,8 +180,21 @@ private fun TournamentContent(
                                 modifier = Modifier.weight(1f)
                             ) {
                                 Text(tournament.name, fontSize = 28.sp)
-                                val statusText = stringResource(tournament.status.toResource())
-                                Text("${stringResource(Res.string.status)}: $statusText")
+                                Row(
+                                    horizontalArrangement = Arrangement.spacedBy(6.dp),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Icon(
+                                        modifier = Modifier.size(24.dp),
+                                        imageVector = if (tournament.type == TournamentType.SINGLES) {
+                                            IconGroup.Default.Person
+                                        } else {
+                                            IconGroup.Default.Group
+                                        },
+                                        contentDescription = stringResource(tournament.type.toResource())
+                                    )
+                                    StatusText(modifier = Modifier, status = tournament.status)
+                                }
                             }
                             ChangeTournamentStatusButton(
                                 modifier = Modifier.weight(1f),
