@@ -15,7 +15,8 @@
     <string name="loading">Загрузка</string>
     <string name="error_loading_theme">Ошибка загрузки темы</string>
     <string name="error_loading_set_template">Ошибка загрузки шаблона</string>
-    <string name="select_set_template">Выберите шаблон</string>
+    <string name="select_set_template">Выберите шаблон сета</string>
+    <string name="set_template_not_selected">Не выбран шаблон сета</string>
     <string name="retry">Повторить</string>
     <string name="open_dropdown">Открыть выпадающий список</string>
     <string name="toggle_section">Развернуть/свернуть</string>
@@ -132,6 +133,14 @@
     <!-- Set Template -->
     <string name="regular_set_template">Формат обычного сета</string>
     <string name="deciding_set_template">Формат решающего сета</string>
+    <string name="games_to_win">Геймов для победы</string>
+    <string name="tiebreak_mode">Тай-брейк</string>
+    <string name="tiebreak_mode_no">Без тай-брейка</string>
+    <string name="tiebreak_mode_early">Ранний (при %1$d:%2$d)</string>
+    <string name="tiebreak_mode_late">Поздний (при %1$d:%2$d)</string>
+    <string name="tiebreak_points_to_win">Очков для победы в тай-брейке</string>
+    <string name="has_deciding_point">Решающее очко в гейме</string>
+    <string name="has_tiebreak_deciding_point">Решающее очко в тай-брейке</string>
 
     <!-- Settings -->
     <string name="general_settings">Общие настройки</string>
