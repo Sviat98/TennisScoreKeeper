@@ -16,6 +16,7 @@ import com.bashkevich.tennisscorekeeper.screens.settings.themedetails.Scoreboard
 import com.bashkevich.tennisscorekeeper.screens.settings.themelist.ScoreboardThemeListScreen
 import com.bashkevich.tennisscorekeeper.screens.settings.themelist.ScoreboardThemeListViewModel
 import com.bashkevich.tennisscorekeeper.screens.settings.settemplatelist.SetTemplateListScreen
+import com.bashkevich.tennisscorekeeper.screens.settings.settemplatelist.SetTemplateListViewModel
 import org.koin.compose.viewmodel.koinViewModel
 
 fun NavGraphBuilder.settingsFlow() {
@@ -51,7 +52,9 @@ fun NavGraphBuilder.settingsFlow() {
             GenerateThemeScreen(viewModel = generateThemeViewModel)
         }
         composable<SetTemplateListRoute> {
-            SetTemplateListScreen()
+            val setTemplateListViewModel = koinViewModel<SetTemplateListViewModel>()
+
+            SetTemplateListScreen(viewModel = setTemplateListViewModel)
         }
     }
 }

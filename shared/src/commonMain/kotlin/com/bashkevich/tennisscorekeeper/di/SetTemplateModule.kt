@@ -4,6 +4,7 @@ import com.bashkevich.tennisscorekeeper.model.set_template.local.SetTemplateLoca
 import com.bashkevich.tennisscorekeeper.model.set_template.remote.SetTemplateRemoteDataSource
 import com.bashkevich.tennisscorekeeper.model.set_template.repository.SetTemplateRepository
 import com.bashkevich.tennisscorekeeper.model.set_template.repository.SetTemplateRepositoryImpl
+import com.bashkevich.tennisscorekeeper.screens.settings.settemplatelist.SetTemplateListViewModel
 import org.koin.dsl.module
 import org.koin.plugin.module.dsl.*
 
@@ -12,4 +13,6 @@ val setTemplateModule = module {
 
     single<SetTemplateRemoteDataSource>()
     single<SetTemplateLocalDataSource>()
+
+    viewModel<SetTemplateListViewModel>()
 }
