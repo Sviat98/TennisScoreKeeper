@@ -43,7 +43,7 @@ import com.bashkevich.tennisscorekeeper.LocalNavHostController
 import com.bashkevich.tennisscorekeeper.components.MatchDetailsAppBar
 import com.bashkevich.tennisscorekeeper.components.ScoreboardWithMediaPlayerView
 import com.bashkevich.tennisscorekeeper.components.match_details.ScoreboardControlPanel
-import com.bashkevich.tennisscorekeeper.model.match.remote.body.toResource
+import com.bashkevich.tennisscorekeeper.components.status.StatusText
 import com.bashkevich.tennisscorekeeper.navigation.EditMatchRoute
 import com.bashkevich.tennisscorekeeper.navigation.SettingsRoute
 import com.bashkevich.tennisscorekeeper.screens.matchdetails.MatchDetailsState
@@ -51,9 +51,6 @@ import com.bashkevich.tennisscorekeeper.screens.matchdetails.MatchDetailsUiEvent
 import com.mobilebytelabs.kmptoolkit.share.ExperimentalShareApi
 import com.mobilebytelabs.kmptoolkit.share.compose.rememberShareLauncher
 import kotlinx.coroutines.launch
-import org.jetbrains.compose.resources.stringResource
-import tennisscorekeeper.shared.generated.resources.Res
-import tennisscorekeeper.shared.generated.resources.status
 
 // Класс состояния с значением и функцией обновления
 class FullScreenState(
@@ -194,7 +191,7 @@ actual fun MatchDetailsContentWrapper(
                         onEvent = onEvent
                     )
                     if (!isFullScreen) { // показываем, ТОЛЬКО если видео не на полный экран
-                        Text("${stringResource(Res.string.status)}: ${stringResource(match.status.toResource())}")
+                        StatusText(modifier = Modifier, status = match.status)
 
                         ScoreboardControlPanel(
                             modifier = Modifier.fillMaxSize(),

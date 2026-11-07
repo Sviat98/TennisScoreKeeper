@@ -26,11 +26,10 @@ import com.bashkevich.tennisscorekeeper.components.scoreboard.components.ShortMa
 import com.bashkevich.tennisscorekeeper.components.scoreboard.components.PrevSetScoreboardComponent
 import com.bashkevich.tennisscorekeeper.components.scoreboard.components.SeedScoreboardComponent
 import com.bashkevich.tennisscorekeeper.components.scoreboard.components.WinnerAndRetiredParticipantComponent
+import com.bashkevich.tennisscorekeeper.components.status.StatusText
 import com.bashkevich.tennisscorekeeper.model.match.domain.ShortMatch
-import com.bashkevich.tennisscorekeeper.model.match.remote.body.toResource
 import com.bashkevich.tennisscorekeeper.model.theme.domain.LocalScoreboardTheme
 import com.bashkevich.tennisscorekeeper.model.theme.domain.ScoreboardTheme
-import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun ShortMatchScoreboardCard(
@@ -49,7 +48,7 @@ fun ShortMatchScoreboardCard(
             modifier = Modifier.padding(8.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
-            Text(stringResource(match.status.toResource()))
+            StatusText(modifier = Modifier, status = match.status)
             CompositionLocalProvider(LocalScoreboardTheme provides theme) {
                 ShortMatchScoreboardView(modifier = Modifier.fillMaxWidth(), match = match)
             }
